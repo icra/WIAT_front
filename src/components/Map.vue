@@ -20,7 +20,7 @@ import stress_layer from "../layers/stress_topo.json"
 import VectorTile from "leaflet.vectorgrid/dist/Leaflet.VectorGrid.js";
 
 export default {
-  name: "Example",
+  name: "Map",
   components: {
     L
   },

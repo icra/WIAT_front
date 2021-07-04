@@ -5,6 +5,9 @@ import vuetify from './plugins/vuetify'
 
 Vue.config.productionTip = false
 
+//Global variables
+Vue.prototype.$assessments = []
+
 new Vue({
   router,
   vuetify,

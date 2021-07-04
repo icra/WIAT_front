@@ -1,49 +1,73 @@
 <template>
   <v-app id="app">
-    <v-toolbar flat>
-      <v-toolbar-title class="headline">
-        <span>Testing...</span>
-      </v-toolbar-title>
-      <v-spacer></v-spacer>
+    <v-toolbar
+        height="100px"
+        width="100%"
+    >
+      <div class="header">
+        <v-icon size="90">$icra_logo</v-icon>
+        <v-icon size="90">$icra_logo</v-icon>
+        <v-icon size="90">$icra_logo</v-icon>
+      </div>
+
     </v-toolbar>
     <v-layout fill-height>
       <v-navigation-drawer
           style="z-index:2"
-          dark
           clipped
-          stateless
-          v-model="leftMenu"
+          permanent
+          mini-variant
+          mini-variant-width="5vw"
       >
-        <v-container ma-0 pa-0>
-          <v-toolbar flat>
-            <span>Some helper toolbar</span>
-          </v-toolbar>
-        </v-container>
+
+        <div class="icon_sidebar_container">
+          <v-list height="100%">
+            <div class="icon_sidebar_list">
+              <v-list-item>
+                <v-list-item-action>
+                  <v-icon color = "#F2F4F3" @click="rightMenu = !rightMenu">
+                    mdi-arrow-expand-right
+                  </v-icon>
+                </v-list-item-action>
+              </v-list-item>
+              <v-list-item
+                  v-for="item in items"
+                  :key="item.title"
+              >
+                <v-list-item-action>
+                  <router-link :to="{ name: item.to}">
+                    <v-icon color = "#F2F4F3">
+                      {{ item.icon }}
+                    </v-icon>
+                  </router-link>
+                </v-list-item-action>
+              </v-list-item>
+
+            </div>
+          </v-list>
+        </div>
+      </v-navigation-drawer>
+
+      <v-navigation-drawer
+          style="z-index:1"
+          v-model="rightMenu"
+          :width="rightMenu ? '15vw' : '0vw'"
+      >
+        <h1>Assessment list</h1>
         <v-list>
-          <v-list-tile>
-            <v-list-tile-action>
-              <v-icon @click="rightMenu = !rightMenu">android</v-icon>
-            </v-list-tile-action>
-            <v-list-tile-content>
-              <v-list-tile-title>Task Menu</v-list-tile-title>
-            </v-list-tile-content>
-          </v-list-tile>
+            <v-list-item
+                v-for="(assessment, index ) in created_assessments"
+                :key="assessment.name"
+            >
+              {{assessment.name}}
+              <router-link :to="{ name: 'new_industry', params: {assessment_id: index } }">
+                <v-icon color = "black">mdi-plus-circle-outline</v-icon>
+              </router-link>
+            </v-list-item>
+
         </v-list>
       </v-navigation-drawer>
-      <v-navigation-drawer id="nav2"
-                           dark
-                           style="z-index:1"
-                           v-model="rightMenu"
-                           stateless>
-        <v-list>
-          <v-list-tile>
-            <v-list-tile-content>
-              <v-list-tile-title>Testing right nav</v-list-tile-title>
-            </v-list-tile-content>
-          </v-list-tile>
-        </v-list>
-      </v-navigation-drawer>
-      <v-main>
+      <v-main :class="rightMenu ? 'sidebar_enabled' : 'sidebar_disabled'">
         <router-view></router-view>
       </v-main>
     </v-layout>
@@ -52,13 +76,18 @@
 </template>
 
 <script>
-import Navbar from "@/components/Navbar";
 export default {
-  components: {Navbar},
   data () {
     return {
-      leftMenu: true,
-      rightMenu: false,
+      rightMenu: true,
+      items: [
+        { title: "Maps and Datasets", icon: 'mdi-map', to:"map" },
+        { title: "Add assessment", icon: 'mdi-plus-circle-outline', to:"new_assessment" },
+        { title: "Import assessment", icon: 'mdi-import', to:"map"},
+        { title: "Export data", icon: 'mdi-export', to:"map" },
+        { title: "Show statistics", icon: 'mdi-chart-areaspline', to:"map" },
+      ],
+      created_assessments: this.$assessments
     }
   },
 }
@@ -80,4 +109,36 @@ html::-webkit-scrollbar {
 #app{
   background-color: aqua
 }
+.sidebar_enabled{
+  width: 80vw;
+}
+.sidebar_disabled{
+  width: 95vw;
+}
+.header{
+  background-color: white;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+
+}
+
+.icon_sidebar_container {
+  background-color: #1C195B;
+  height: 100%;
+
+
+}
+.icon_sidebar_list {
+  height: 100%;
+  display: flex;
+
+  justify-content:space-evenly;
+  flex-direction: column;
+
+
+}
+
 </style>
