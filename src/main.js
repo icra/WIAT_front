@@ -5,6 +5,8 @@ import vuetify from './plugins/vuetify'
 
 Vue.config.productionTip = false
 
+import "@/assets/global.css"
+
 //Global variables
 Vue.prototype.$assessments = []
 

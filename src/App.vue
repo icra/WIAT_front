@@ -49,26 +49,36 @@
       </v-navigation-drawer>
 
       <v-navigation-drawer
-          style="z-index:1"
+          style="z-index:1; background-color: #F2F4F3"
           v-model="rightMenu"
           :width="rightMenu ? '15vw' : '0vw'"
+          flat
       >
         <h1>Assessment list</h1>
-        <v-list>
+        <div
+            v-for="(assessment, index ) in created_assessments"
+            :key="assessment.name"
+        >
+          {{assessment.name}}
+          <router-link :to="{ name: 'new_industry', params: {assessment_id: index } }">
+            <v-icon color = "black">mdi-plus-circle-outline</v-icon>
+          </router-link>
+          <br>
+          <v-list>
             <v-list-item
-                v-for="(assessment, index ) in created_assessments"
-                :key="assessment.name"
+                v-for="(industry, index_ind ) in assessment.industries"
+                :key="industry.name"
             >
-              {{assessment.name}}
-              <router-link :to="{ name: 'new_industry', params: {assessment_id: index } }">
-                <v-icon color = "black">mdi-plus-circle-outline</v-icon>
-              </router-link>
+              {{industry.name}}
             </v-list-item>
-
-        </v-list>
+          </v-list>
+        </div>
       </v-navigation-drawer>
       <v-main :class="rightMenu ? 'sidebar_enabled' : 'sidebar_disabled'">
-        <router-view></router-view>
+        <div class="content">
+          <router-view></router-view>
+        </div>
+
       </v-main>
     </v-layout>
 
@@ -106,9 +116,7 @@ html::-webkit-scrollbar {
   width: 0;
   height: 0;
 }
-#app{
-  background-color: aqua
-}
+
 .sidebar_enabled{
   width: 80vw;
 }
@@ -137,8 +145,20 @@ html::-webkit-scrollbar {
 
   justify-content:space-evenly;
   flex-direction: column;
+}
+
+.content{
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #F2F4F3;
+}
 
 
+#app {
+  background-color: #F2F4F3;
 }
 
 </style>

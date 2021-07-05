@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="outer">
     <v-text-field
         v-model="assessment_name"
         label="Assessment name"
@@ -11,7 +11,7 @@
 <script>
 
 
-import Assessment from "../ecam_backend";
+import {Assessment, Industry } from "../ecam_backend";
 export default {
   name: "new_assessment",
   components: {

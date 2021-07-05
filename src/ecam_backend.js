@@ -11,7 +11,7 @@ Array.prototype.sum=function(){return this.reduce((p,c)=>(p+c),0)};
 /*
   ASSESSMENT: main class
 */
-class Assessment{
+export class Assessment{
     constructor(){
         this.name="new assessment";
 
@@ -43,6 +43,10 @@ class Assessment{
         this.industries.push(i);
     }
 
+    add_industry(i){
+        this.industries.push(i);
+    }
+
     //delete industry
     delete_industry(i){
         this.industries.splice(i,1);
@@ -52,7 +56,7 @@ class Assessment{
 /*
   INDUSTRY: industries live inside an assessment object
 */
-class Industry{
+export class Industry{
 
     constructor(){
         this.name="new industry";
@@ -825,8 +829,10 @@ let Cts={
 
 
 
-export default Assessment
-
+export default {
+    Assessment,
+    Industry
+}
 
 /*
   Assessment example:

@@ -1,0 +1,8 @@
+.outer{
+    width: 90%;
+    height: 90%;
+    background-color: white;
+    overflow-y: auto;
+    position: absolute;
+    padding: 30px;
+}

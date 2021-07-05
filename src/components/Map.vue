@@ -1,8 +1,6 @@
 <template>
 
-  <div id="container">
-    <div id="mapContainer"></div>
-  </div>
+  <div id="mapContainer"></div>
 
 </template>
 
@@ -151,9 +149,7 @@ export default {
 <style>
 
 #mapContainer {
-  position: absolute;
-  top: 0;
-  bottom: 0;
   width: 100%;
+  height: 100%;
 }
 </style>
