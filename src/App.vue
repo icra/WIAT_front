@@ -66,24 +66,27 @@
 
         <h1>Assessment list</h1>
 
-        <div
-            v-for="(assessment, index ) in created_assessments"
-            :key="assessment.name"
-        >
-          {{assessment.name}}
-          <router-link :to="{ name: 'new_industry', params: {assessment_id: index } }">
-            <v-icon color = "black">mdi-plus-circle-outline</v-icon>
-          </router-link>
-          <br>
           <v-list>
-            <v-list-item
-                v-for="(industry, index_ind ) in assessment.industries"
-                :key="industry.name"
-            >
-              {{industry.name}}
-            </v-list-item>
+            <v-list-item-group v-model="asdf">
+              <v-list-item
+                  v-for="(assessment, index ) in created_assessments"
+                  :key="index"
+              >
+                  {{assessment.name}}
+
+                <br>
+                <v-list>
+                  <v-list-item
+                      v-for="(industry, index_ind ) in assessment.industries"
+                      :key="industry.name"
+                  >
+                    {{industry.name}}
+                  </v-list-item>
+                </v-list>
+              </v-list-item>
+            </v-list-item-group>
+
           </v-list>
-        </div>
 
         <v-btn block @click="rightMenu = !rightMenu">
           Create assessment
@@ -159,7 +162,7 @@ export default {
         },
         required: value => !!value || 'Required.',
       },
-      new_assessment_valid: false
+      new_assessment_valid: false,
     }
   },
   methods: {
@@ -237,6 +240,10 @@ html::-webkit-scrollbar {
 
 #app {
   background-color: #F2F4F3;
+}
+
+.assessment_list{
+  background-color: red;
 }
 
 </style>
