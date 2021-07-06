@@ -1,5 +1,7 @@
 <template>
   <v-app id="app">
+
+    <!-- Header -->
     <v-toolbar
         height="100px"
         width="100%"
@@ -12,6 +14,8 @@
 
     </v-toolbar>
     <v-layout fill-height>
+
+      <!-- Main sidebar -->
       <v-navigation-drawer
           style="z-index:2"
           clipped
@@ -25,7 +29,7 @@
             <div class="icon_sidebar_list">
               <v-list-item>
                 <v-list-item-action>
-                  <v-icon color = "#F2F4F3" @click="rightMenu = !rightMenu">
+                  <v-icon color = "#F2F4F3" @click="secondMenu = !secondMenu">
                     mdi-arrow-expand-right
                   </v-icon>
                 </v-list-item-action>
@@ -48,13 +52,20 @@
         </div>
       </v-navigation-drawer>
 
+      <!-- Assessment and factory sidebar -->
       <v-navigation-drawer
           style="z-index:1; background-color: #F2F4F3"
-          v-model="rightMenu"
-          :width="rightMenu ? '15vw' : '0vw'"
+          v-model="secondMenu"
+          :width="secondMenu ? '15vw' : '0vw'"
           flat
       >
+
+        <div style="display: flex; justify-content: flex-end; padding: 7px ">
+          <v-icon @click="secondMenu = !secondMenu">mdi-close</v-icon>
+        </div>
+
         <h1>Assessment list</h1>
+
         <div
             v-for="(assessment, index ) in created_assessments"
             :key="assessment.name"
@@ -73,33 +84,98 @@
             </v-list-item>
           </v-list>
         </div>
+
+        <v-btn block @click="rightMenu = !rightMenu">
+          Create assessment
+        </v-btn>
       </v-navigation-drawer>
-      <v-main :class="rightMenu ? 'sidebar_enabled' : 'sidebar_disabled'">
+
+      <!-- Main content -->
+      <v-main :class=class_for_main_content>
         <div class="content">
           <router-view></router-view>
         </div>
-
       </v-main>
+
+      <!-- Assessment/Company creation sidebar -->
+      <v-navigation-drawer
+          v-model="rightMenu"
+          style="background-color: #F2F4F3"
+          :width="rightMenu ? '15vw' : '0vw'"
+          flat
+      >
+        <div style="padding: 7px ">
+          <v-icon @click="rightMenu = !rightMenu">mdi-close</v-icon>
+        </div>
+        <div>
+          <h1>Create assessment</h1>
+          <v-form
+              ref="create_assessment_ref"
+              v-model="new_assessment_valid"
+          >
+            <v-text-field
+                v-model="assessment_name"
+                label="Assessment name"
+                :rules="[new_assessment_rules.name, new_assessment_rules.required]"
+            ></v-text-field>
+            <v-btn
+                :disabled="!new_assessment_valid"
+                @click="create_assessment">
+              Create assessment
+            </v-btn>
+          </v-form>
+        </div>
+      </v-navigation-drawer>
+
     </v-layout>
 
   </v-app>
 </template>
 
 <script>
+
+import {Assessment, Industry } from "./ecam_backend";
+
 export default {
   data () {
     return {
-      rightMenu: true,
-      items: [
+      secondMenu: true, //Assessment/factory sidebar
+      rightMenu: false, //Assessment/Company creation sidebar
+
+      items: [  //Icons for the main sidebar
         { title: "Maps and Datasets", icon: 'mdi-map', to:"map" },
-        { title: "Add assessment", icon: 'mdi-plus-circle-outline', to:"new_assessment" },
         { title: "Import assessment", icon: 'mdi-import', to:"map"},
         { title: "Export data", icon: 'mdi-export', to:"map" },
         { title: "Show statistics", icon: 'mdi-chart-areaspline', to:"map" },
       ],
-      created_assessments: this.$assessments
+      created_assessments: this.$assessments,  //Created assessments
+      assessment_name: null,     //Default name for creating an assessment
+      new_assessment_rules: {
+        name: value => {  //Assessment name must be unique
+          let assessments_with_same_name = this.created_assessments.filter(assessment => {
+            return assessment.name === value
+          })
+          return assessments_with_same_name.length === 0 || 'An assessment with same name already exists. '
+        },
+        required: value => !!value || 'Required.',
+      },
+      new_assessment_valid: false
     }
   },
+  methods: {
+    class_for_main_content() {
+      if (this.secondMenu && this.rightMenu) return "two_sidebar_open"
+      else if (this.secondMenu || this.rightMenu) return "one_sidebar_open"
+      else return "zero_sidebar_open"
+    },
+    create_assessment() {
+      let new_assessment = new Assessment()
+      new_assessment.name = this.assessment_name
+      this.$assessments.push(new_assessment)
+      this.rightMenu = !this.rightMenu
+      this.assessment_name = null
+    }
+  }
 }
 </script>
 
@@ -116,12 +192,14 @@ html::-webkit-scrollbar {
   width: 0;
   height: 0;
 }
-
-.sidebar_enabled{
+.zero_sidebar_open{
+  width: 95vw;
+}
+.one_sidebar_open{
   width: 80vw;
 }
-.sidebar_disabled{
-  width: 95vw;
+.two_sidebar_open{
+  width: 65vw;
 }
 .header{
   background-color: white;
