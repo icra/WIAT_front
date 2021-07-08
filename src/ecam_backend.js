@@ -51,6 +51,7 @@ export class Assessment{
     delete_industry(i){
         this.industries.splice(i,1);
     }
+
 };
 
 /*
