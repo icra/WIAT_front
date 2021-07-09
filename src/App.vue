@@ -227,7 +227,7 @@
               Edit industry
             </v-btn>
           </v-form>
-          <v-btn>
+          <v-btn :to="{ name: 'edit_industry', params: {assessment_id: selected_assessment, industry_id: selected_industry}}">
             Advanced edit
           </v-btn>
           <v-btn @click="delete_industry">

@@ -17,8 +17,8 @@ const routes = [
     component: New_assessment
   },
   {
-    path: '/add_company/:assessment_id',
-    name: 'new_industry',
+    path: '/edit_industry/:assessment_id/:industry_id',
+    name: 'edit_industry',
     props: true,
     component: New_industry
   },
