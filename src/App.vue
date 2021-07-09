@@ -238,108 +238,21 @@
       </v-navigation-drawer>
 
     </v-layout>
-    <!-- Snackbar for creating assessment -->
-    <v-snackbar
-        v-model="new_assessment_snackbar"
-        :timeout="2000"
-    >
-      New assessment created correctly
-      <template v-slot:action="{ attrs }">
-        <v-btn
-            color="pink"
-            text
-            v-bind="attrs"
-            @click="new_assessment_snackbar = false"
-        >
-          CLOSE
-        </v-btn>
-      </template>
-    </v-snackbar>
 
-    <!-- Snackbar for editing assessment -->
+    <!-- Snackbars -->
     <v-snackbar
-        v-model="edit_assessment_snackbar"
+        v-for="[key, snackbar] in Object.entries(snackbars)"
+        :key="key"
+        v-model="snackbar.v_model"
         :timeout="2000"
     >
-      Assessment edited correctly
+      {{ snackbar.text }}
       <template v-slot:action="{ attrs }">
         <v-btn
             color="pink"
             text
             v-bind="attrs"
-            @click="edit_assessment_snackbar = false"
-        >
-          CLOSE
-        </v-btn>
-      </template>
-    </v-snackbar>
-
-    <!-- Snackbar for deleting assessment -->
-    <v-snackbar
-        v-model="delete_assessment_snackbar"
-        :timeout="2000"
-    >
-      Assessment deleted correctly
-      <template v-slot:action="{ attrs }">
-        <v-btn
-            color="pink"
-            text
-            v-bind="attrs"
-            @click="delete_assessment_snackbar = false"
-        >
-          CLOSE
-        </v-btn>
-      </template>
-    </v-snackbar>
-
-    <!-- Snackbar for  creating new industry-->
-    <v-snackbar
-        v-model="create_industry_snackbar"
-        :timeout="2000"
-    >
-      New industry added correctly
-      <template v-slot:action="{ attrs }">
-        <v-btn
-            color="pink"
-            text
-            v-bind="attrs"
-            @click="create_industry_snackbar = false"
-        >
-          CLOSE
-        </v-btn>
-      </template>
-    </v-snackbar>
-
-    <!-- Snackbar for  editing industry-->
-    <v-snackbar
-        v-model="edit_industry_snackbar"
-        :timeout="2000"
-    >
-      Industry edited correctly
-      <template v-slot:action="{ attrs }">
-        <v-btn
-            color="pink"
-            text
-            v-bind="attrs"
-            @click="edit_industry_snackbar = false"
-        >
-          CLOSE
-        </v-btn>
-      </template>
-    </v-snackbar>
-
-    <!-- Snackbar for  deleting industry-->
-    <v-snackbar
-        v-model="delete_industry_snackbar"
-        :timeout="2000"
-    >
-      Industry deleted correctly
-      <template v-slot:action="{ attrs }">
-        <v-btn
-            color="pink"
-            text
-            v-bind="attrs"
-            @click="delete_industry_snackbar = false"
+            @click="snackbar.v_model = false"
         >
           CLOSE
         </v-btn>
@@ -386,12 +299,9 @@ export default {
         required: value => !!value || 'Required.',
       },
       new_assessment_valid: false,  //Enable or disable button for creating new assessment
-      new_assessment_snackbar: false, //Snackbar when a new assessment is created
-      right_sidebar_content: null,  //Content of the right sidebar: 1->create assessment, 2->edit assessment
+      right_sidebar_content: null,  //Content of the right sidebar: 1->create assessment, 2->edit assessment, 3->edit industry
       selected_assessment: null,  //Id of the assessment to edit
       edit_assessment_tab: 0, //Vmodel for edit assessment tab
-      edit_assessment_snackbar: false, //Snackbar for when an assessment is edited
-      delete_assessment_snackbar: false, //Snackbar for when an assessment is deleted
       factory_name: null, //v-model for creating new factory
       new_factory_rules: { //Rules for creating new factory
         name: value => {  // Factory name must bu unique inside an assessment
@@ -403,7 +313,6 @@ export default {
         required: value => !!value || 'Required.',
       },
       new_factory_valid: false, //Enable or disable button for creating new factory
-      create_industry_snackbar: false, //Snackbar for when new industry added
       edit_industry_rules: { //Rules for editing industry
         name: value => {  //Industry name must be unique
           let industries_with_same_name = this.created_assessments[this.selected_assessment].industries.filter(industry => {
@@ -414,8 +323,15 @@ export default {
         required: value => !!value || 'Required.',
       },
       selected_industry: null, //Id of the company to edit
-      edit_industry_snackbar: false, //Snackbar for when editing industry
-      delete_industry_snackbar: false, //Snackbar for when deleting industry
+      snackbars: {
+        new_assessment: {v_model: false, text: "New assessment created correctly", },
+        edit_assessment: {v_model: false, text: "Assessment edited correctly", },
+        delete_assessment: {v_model: false, text: "Assessment deleted correctly", },
+        new_industry: {v_model: false, text: "New industry added correctly", },
+        edit_industry: {v_model: false, text: "Industry edited correctly", },
+        delete_industry: {v_model: false, text: "Industry deleted correctly", },
+      },
+
 
     }
   },
@@ -431,7 +347,7 @@ export default {
       this.$assessments.push(new_assessment)
       this.rightMenu = !this.rightMenu
       this.assessment_name = null
-      this.new_assessment_snackbar = true
+      this.snackbars.new_assessment.v_model = true
     },
     open_edit_assessment_tab(assessment_index){
       this.rightMenu = true;
@@ -445,11 +361,11 @@ export default {
     edit_assessment(){
       this.rightMenu = false
       this.$assessments[this.selected_assessment].name = this.assessment_name
-      this.edit_assessment_snackbar = true
+      this.snackbars.edit_assessment.v_model = true
     },
     delete_assessment(){
       this.rightMenu = false
-      this.delete_assessment_snackbar = true
+      this.snackbars.delete_assessment.v_model = true
       this.$assessments.splice(this.selected_assessment, 1)
     },
     add_factory(){
@@ -459,7 +375,7 @@ export default {
       assessment.add_industry(industry)
       this.rightMenu = false
       this.factory_name = null
-      this.create_industry_snackbar = true
+      this.snackbars.new_industry.v_model = true
     },
     open_edit_industry_tab(assessment_index, industry_index){
       this.right_sidebar_content = 3
@@ -471,11 +387,11 @@ export default {
     edit_industry(){
       this.rightMenu = false
       this.$assessments[this.selected_assessment].industries[this.selected_industry].name = this.factory_name
-      this.edit_industry_snackbar = true
+      this.snackbars.edit_industry.v_model = true
     },
     delete_industry(){
       this.rightMenu = false
-      this.delete_industry_snackbar = true
+      this.snackbars.delete_industry.v_model = true
       this.$assessments[this.selected_assessment].delete_industry(this.selected_industry)
     }
   },
