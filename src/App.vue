@@ -233,6 +233,9 @@
           <v-btn @click="delete_industry">
             Delete
           </v-btn>
+          <v-btn :to="{ name: 'statistics_industry', params: {assessment_id: selected_assessment, industry_id: selected_industry}}">
+            STATISTICS
+          </v-btn>
         </div>
 
       </v-navigation-drawer>
