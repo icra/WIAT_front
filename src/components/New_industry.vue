@@ -4,7 +4,7 @@
       <h1> {{ this.industry.name}} </h1>
     </div>
     <v-row
-        v-for="[key, value] of Object.entries(this.Industry.info_inputs)"
+        v-for="[key, value] of Object.entries(this.inputs)"
         :key="key"
     >
       <v-col>
@@ -12,7 +12,7 @@
       </v-col>
       <v-col>
         <v-text-field
-            v-model="v.value"
+            v-model="industry[key]"
         ></v-text-field>
       </v-col>
     </v-row>
@@ -34,14 +34,15 @@ export default {
   },
   data() {
     return {
-      industry: this.$assessments[this.assessment_id].industries[this.industry_id]
+      industry: this.$assessments[this.assessment_id].industries[this.industry_id],
+      inputs: Industry.info_inputs()
     };
   },
-  methods: {
+  methods:  {
     edit_industry(){
-      console.log(this.industry)
-    }
-  },
+      console.log(this.$assessments[this.assessment_id].TotalGHG())
+    },
+  }
 
 };
 </script>

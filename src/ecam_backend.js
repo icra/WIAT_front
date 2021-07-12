@@ -59,7 +59,7 @@ export class Assessment{
 */
 export class Industry{
 
-    static get info_inputs(){
+    static info_inputs(){
         return {
 
             /*"wwt_serv_pop" :{question:"Serviced population", value: 0},
@@ -67,28 +67,28 @@ export class Industry{
             "wwt_vol_disc" :{question:"Volume of discharged effluent to water body", value: 0},*/
 
             //BOD (creates CH4)
-            "wwt_bod_infl" :{question:"Influent BOD5 load", value: 0},
-            "wwt_bod_effl" :{question:"Effluent BOD5 load", value: 0},
+            "wwt_bod_infl" :{question:"Influent BOD5 load", value: 0}, //kgBOD
+            "wwt_bod_effl" :{question:"Effluent BOD5 load", value: 0}, //kgBOD   Table 6.6B and 6.10C
 
             //TN (creates N2O)
-            "wwt_tn_infl" :{question:"Total Nitrogen load in the influent", value: 0},
-            "wwt_tn_effl" :{question:"Total Nitrogen load in the effluent", value: 0},
+            "wwt_tn_infl" :{question:"Total Nitrogen load in the influent", value: 0},  //kgN    Equacio 6.10
+            "wwt_tn_effl" :{question:"Total Nitrogen load in the effluent", value: 0},  //kgN   TAULA 6.10c
 
             //emission factors (treatment)
-            "wwt_ch4_efac_tre" :{question:"CH4 emission factor (treatment)", value: 0},
-            "wwt_n2o_efac_tre" :{question:"N2O emission factor (treatment)", value: 0},
+            "wwt_ch4_efac_tre" :{question:"CH4 emission factor (treatment)", value: 0},  //kgCH4/kgBOD  S'obté de la taula 6.3
+            "wwt_n2o_efac_tre" :{question:"N2O emission factor (treatment)", value: 0},  //kgN2O-N/kgN     Taula 6.8A
 
             //emission factors (discharge)
-            "wwt_ch4_efac_dis" :{question:"CH4 emission factor (discharge)", value: 0},
-            "wwt_n2o_efac_dis" :{question:"N2O emission factor (discharge)", value: 0},
+            "wwt_ch4_efac_dis" :{question:"CH4 emission factor (discharge)", value: 0},  //kgCH4/kgBOD   Table 6.3
+            "wwt_n2o_efac_dis" :{question:"N2O emission factor (discharge)", value: 0},  //kgN2O-N/kgN  //tAULA 6.8A
 
             //energy
-            "wwt_nrg_cons" :{question:"Energy consumed from the grid", value: 0},
-            "wwt_conv_kwh" :{question:"Emission factor for grid electricity", value: 0},
+            "wwt_nrg_cons" :{question:"Energy consumed from the grid", value: 0},  //kWh | energy consumed from the grid
+            "wwt_conv_kwh" :{question:"Emission factor for grid electricity", value: 0},  //kgCO2eq/kWh | conversion factor
 
             //SLUDGE MANAGEMENT
             "wwt_mass_slu" :{question:"Sludge removed from wastewater treatment (dry weight)", value: 0},  //kg | raw sludge removed from wwtp as dry mass
-            "wwt_bod_slud" :{question:"BOD5 removed as sludge", value: 0},  //kg | BOD removed as sludge
+            "wwt_bod_slud" :{question:"BOD5 removed as sludge", value: 0},  //kg | BOD removed as sludge    //Taula 6.6A
 
             //fuel engines
             "wwt_fuel_typ" :{question:"Fuel type (engines)", value: 0}, //Option | type of fuel (see Tables)
@@ -191,9 +191,10 @@ export class Industry{
 
     constructor(){
         this.name="new industry";
+
         let _this = this
 
-        for(let [clau, valor] of Object.entries(Industry.info_inputs)){
+        for(let [clau, valor] of Object.entries(Industry.info_inputs())){
             _this[clau] = valor.value
         }
 
@@ -260,8 +261,8 @@ export class Industry{
     //emissions from treatment
     wwt_KPI_GHG_tre(){
         let co2   = 0;
-        let ch4   = (this.wwt_bod_infl-this.wwt_bod_slud)*this.wwt_ch4_efac_tre*Cts.ct_ch4_eq.value;
-        let n2o   = this.wwt_tn_infl*this.wwt_n2o_efac_tre*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;
+        let ch4   = (this.wwt_bod_infl-this.wwt_bod_slud)*this.wwt_ch4_efac_tre*Cts.ct_ch4_eq.value;    //Eq. 6.1
+        let n2o   = this.wwt_tn_infl*this.wwt_n2o_efac_tre*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;  //Eq. 6.9
         let total = co2+ch4+n2o;
         return {total,co2,ch4,n2o};
     }
@@ -602,7 +603,7 @@ export class Industry{
     wwt_KPI_GHG_disc(){
         let co2   = 0;
         let ch4   = this.wwt_bod_effl*this.wwt_ch4_efac_dis*Cts.ct_ch4_eq.value;
-        let n2o   = this.wwt_tn_effl *this.wwt_n2o_efac_dis*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;
+        let n2o   = this.wwt_tn_effl *this.wwt_n2o_efac_dis*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;    //Equacio 6.7
         let total = co2+ch4+n2o;
         return {total,co2,ch4,n2o};
     }
@@ -654,7 +655,7 @@ let Tables={
         {name:"Flowing sewer (open or closed)",         ch4_efac:0},
     ],
 
-    //ipcc 2019, table 6.3 (updated) EF (kgCH4/kgBOD)
+    //ipcc 2019, table 6.3 (updated) EF (kgCH4/kgBOD)           CANVIAR PER TAULA 6.8
     "type_of_treatment":[
         {name:"Type of treatment undefined",                                  ch4_efac:0,     },
         {name:"Centralised, aerobic, treatment plant",                        ch4_efac:0.018, },
