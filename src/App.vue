@@ -21,7 +21,7 @@
           clipped
           permanent
           mini-variant
-          mini-variant-width="5vw"
+          mini-variant-width="3.25vw"
           height="100%"
       >
 
@@ -62,39 +62,56 @@
 
       >
 
-        <div style=" height: 100%; position: fixed; width: 100%">
+        <div style=" height: 100%; position: fixed; width: 100%; padding: 10px">
           <div style="display: flex; justify-content: flex-end; padding: 7px ">
             <v-icon @click="secondMenu = !secondMenu">mdi-close</v-icon>
           </div>
 
           <h1>Assessment list</h1>
           <div style = "overflow-y: auto; height: 85%; max-height: 85%; width: 100%">
-            <v-expansion-panels>
+            <v-expansion-panels focusable>
               <v-expansion-panel
                   v-for="(assessment, assessment_index ) in created_assessments"
                   :key="assessment.name"
+                  @click.native.stop
               >
                 <v-expansion-panel-header disable-icon-rotate>
                   {{ assessment.name }}
                   <template v-slot:actions>
-                    <v-icon color="teal" @click="open_edit_assessment_tab(assessment_index)" @click.native.stop>
-                      mdi-cog
-                    </v-icon>
+                    <v-hover v-slot:default="{ hover }">
+                      <v-icon color="#1C195B" :size="hover ? '25px' : '20px'" @click="open_edit_assessment_tab(assessment_index)" @click.native.stop>
+                        mdi-cog
+                      </v-icon>
+                    </v-hover>
+
                   </template>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
                   <div
                     v-for="(industry,industry_index ) in created_assessments[assessment_index].industries"
                     :key="industry.name"
+                    style="display: flex; align-items: flex-end"
                   >
-                    {{industry.name}}
-                    <v-icon @click = "open_edit_industry_tab(assessment_index, industry_index)">mdi-circle-edit-outline</v-icon>
+                    <div>
+                      {{industry.name}}
+                    </div>
+                    <div style="flex-grow: 1; display: block; margin-right: -1.5px">
+                      <v-hover v-slot:default="{ hover }">
+                        <v-icon
+                            @click = "open_edit_industry_tab(assessment_index, industry_index)"
+                            style="float: right"
+                            :size="hover ? '23px' : '20px'"
+                        >
+                          mdi-circle-edit-outline
+                        </v-icon>
+                      </v-hover>
+                    </div>
                   </div>
                 </v-expansion-panel-content>
               </v-expansion-panel>
             </v-expansion-panels>
           </div>
-          <v-btn block @click="rightMenu = true; right_sidebar_content = 1; assessment_name = null">
+          <v-btn style="width: 100%" @click="rightMenu = true; right_sidebar_content = 1; assessment_name = null">
             Create assessment
           </v-btn>
         </div>
@@ -115,11 +132,11 @@
           :width="rightMenu ? '15vw' : '0vw'"
           flat
       >
-        <div style="padding: 7px ">
+        <div style="padding: 17px ">
           <v-icon @click="rightMenu = !rightMenu">mdi-close</v-icon>
         </div>
         <!-- Assessment creation -->
-        <div v-if="right_sidebar_content === 1">
+        <div v-if="right_sidebar_content === 1" style="margin: 7px; padding: 7px; background-color: white">
           <h1>Create assessment</h1>
           <v-form
               ref="create_assessment_ref"
@@ -158,7 +175,7 @@
 
           </v-tabs>
 
-          <v-tabs-items v-model="edit_assessment_tab">
+          <v-tabs-items v-model="edit_assessment_tab" style="margin: 7px; padding: 7px;">
             <v-tab-item
                 key="edit"
                 value="tab-edit"
@@ -213,29 +230,32 @@
           </v-tabs-items>
         </div>
         <div v-else-if="right_sidebar_content === 3">
-          <h1>Edit industry</h1>
-          <v-form
-              v-model="new_factory_valid"
-          >
-            <v-text-field
-                v-model="factory_name"
-                :rules="[edit_industry_rules.name, edit_industry_rules.required]"
-            ></v-text-field>
-            <v-btn
-                :disabled="!new_factory_valid"
-                @click="edit_industry">
-              Edit industry
+          <div style="margin: 7px; padding: 7px; background-color: white">
+            <h1>Edit industry</h1>
+            <v-form
+                v-model="new_factory_valid"
+            >
+              <v-text-field
+                  v-model="factory_name"
+                  :rules="[edit_industry_rules.name, edit_industry_rules.required]"
+              ></v-text-field>
+              <v-btn
+                  :disabled="!new_factory_valid"
+                  @click="edit_industry">
+                Edit industry
+              </v-btn>
+            </v-form>
+            <v-btn :to="{ name: 'edit_industry', params: {assessment_id: selected_assessment, industry_id: selected_industry}}">
+              Advanced edit
             </v-btn>
-          </v-form>
-          <v-btn :to="{ name: 'edit_industry', params: {assessment_id: selected_assessment, industry_id: selected_industry}}">
-            Advanced edit
-          </v-btn>
-          <v-btn @click="delete_industry">
-            Delete
-          </v-btn>
-          <v-btn :to="{ name: 'statistics_industry', params: {assessment_id: selected_assessment, industry_id: selected_industry}}">
-            STATISTICS
-          </v-btn>
+            <v-btn @click="delete_industry">
+              Delete
+            </v-btn>
+            <v-btn :to="{ name: 'statistics_industry', params: {assessment_id: selected_assessment, industry_id: selected_industry}}">
+              STATISTICS
+            </v-btn>
+
+          </div>
         </div>
 
       </v-navigation-drawer>

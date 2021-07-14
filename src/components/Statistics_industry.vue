@@ -38,18 +38,23 @@
       </v-col>
     </v-row>
 
+    <industry_pie_chart v-bind:dataset="dataset_for_pie" v-bind:labels='labels_for_pie'
+    ></industry_pie_chart>
+
   </div>
 </template>
 
 <script>
 
 import {Assessment, Industry } from "../ecam_backend";
+import Industry_pie_chart from "@/components/Industry_pie_chart";
 export default {
   name: "new_assessment",
   props: ['assessment_id', 'industry_id'],
   components: {
     Industry,
-    Assessment
+    Assessment,
+    Industry_pie_chart
   },
   data() {
     let defaultIndustry = this.$assessments[this.assessment_id].industries[this.industry_id]
@@ -75,12 +80,33 @@ export default {
         {description: "emissions from sludge transport", emissions: defaultIndustry.wwt_KPI_GHG_sludge_transport()},
         {description: "emissions from water reuse transport", emissions: defaultIndustry.wwt_KPI_GHG_reus_trck()},
         {description: "emissions from water discharged", emissions: defaultIndustry.wwt_KPI_GHG_disc()},
-
-
-      ]
+      ],
+      labels_for_pie: [],
+      dataset_for_pie: [{
+        borderWidth: 1,
+        data: [],
+        backgroundColor: []
+      }],
     };
   },
-  methods:  {
+  methods: {
+    getRandomColor: function () {
+      let letters = '0123456789ABCDEF';
+      let color = '#';
+      for (let  i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+      }
+      return color
+    }
+},
+  created()  {
+    let _this = this
+    this.functions_to_call.forEach(func => {
+      _this.labels_for_pie.push(func.description)
+      _this.dataset_for_pie[0].data.push(func.emissions.total)
+      _this.dataset_for_pie[0].backgroundColor.push(_this.getRandomColor())
+
+    })
 
   }
 
