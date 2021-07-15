@@ -67,8 +67,8 @@ export class Industry{
             "wwt_vol_disc" :{question:"Volume of discharged effluent to water body", value: 0},*/
 
             //BOD (creates CH4)
-            "wwt_bod_infl" :{question:"Influent BOD5 load", value: 0, unit: "kg"}, //kgBOD
-            "wwt_bod_effl" :{question:"Effluent BOD5 load", value: 0, unit: "kg"}, //kgBOD   Table 6.6B and 6.10C
+            "wwt_bod_infl" :{question:"Influent BOD5 load", value: 0, unit: "kg"}, //kgBOD   //No te estimacio
+            "wwt_bod_effl" :{question:"Effluent BOD5 load", value: 0, unit: "kg", estimation_type: "option", items: Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"], estimation_based_on: "wwt_bod_infl" }, //kgBOD   Table 6.6B and 6.10C
 
             //TN (creates N2O)
             "wwt_tn_infl" :{question:"Total Nitrogen load in the influent", value: 0, unit: "kg"},  //kgN    Equacio 6.10
@@ -647,6 +647,7 @@ export class Industry{
    2. numeric variables inside Exceptions
 */
 let Tables={
+
     "Fuel type":[//            EF (kg/TJ)                                                                      FD (kg/L) NCV (TJ/Gg)
         {name:"Diesel",          EFCH4:{engines: 3,vehicles:3.9}, EFN2O:{engines:0.6,vehicles:3.9}, EFCO2:74100, FD:0.84,  NCV:43.0},
         {name:"Gasoline/Petrol", EFCH4:{engines: 3,vehicles:3.8}, EFN2O:{engines:0.6,vehicles:1.9}, EFCO2:69300, FD:0.74,  NCV:44.3},
@@ -680,21 +681,21 @@ let Tables={
     //ipcc 2019, table 6.3 (updated) EF (kgCH4/kgBOD)           CANVIAR PER TAULA 6.8
     "type_of_treatment":[
         {name:"Type of treatment undefined",                                  ch4_efac:0,     },
-        {name:"Centralised, aerobic, treatment plant",                        ch4_efac:0.018, },
+        {name:"Centralised, aerobic, treatment plant",                        ch4_efac:0, },
         {name:"Anaerobic Reactor - CH4 recovery not considered",              ch4_efac:0.48,  },
-        {name:"Anaerobic Reactor - CH4 recovery considered",                  ch4_efac:0.14,  },
+        //{name:"Anaerobic Reactor - CH4 recovery considered",                  ch4_efac:0.14,  },
         {name:"Anaerobic shallow lagoon and facultative lagoons (<2m depth)", ch4_efac:0.12,  },
         {name:"Anaerobic deep lagoon (>2m depth)",                            ch4_efac:0.48,  },
-        {name:"Anaerobic Lagoon covered",                                     ch4_efac:0,     },
+        //{name:"Anaerobic Lagoon covered",                                     ch4_efac:0,     },
         {name:"Wetlands - Surface flow",                                      ch4_efac:0.24,  },
         {name:"Wetlands - Horizontal subsurface flow",                        ch4_efac:0.06,  },
         {name:"Wetlands - Vertical subsurface flow",                          ch4_efac:0.006, },
-        {name:"Activated Sludge - Well managed",                              ch4_efac:0,     },
-        {name:"Activated Sludge - Minor poorly aerated zones",                ch4_efac:0.06,  },
-        {name:"Activated Sludge - Some aerated zones",                        ch4_efac:0.12,  },
-        {name:"Activated Sludge - Not well managed",                          ch4_efac:0.18,  },
-        {name:"Aerated Lagoon",                                               ch4_efac:0.06,  },
-        {name:"Trickling Filter",                                             ch4_efac:0.036, },
+        //{name:"Activated Sludge - Well managed",                              ch4_efac:0,     },
+        //{name:"Activated Sludge - Minor poorly aerated zones",                ch4_efac:0.06,  },
+        //{name:"Activated Sludge - Some aerated zones",                        ch4_efac:0.12,  },
+        //{name:"Activated Sludge - Not well managed",                          ch4_efac:0.18,  },
+        //{name:"Aerated Lagoon",                                               ch4_efac:0.06,  },
+        //{name:"Trickling Filter",                                             ch4_efac:0.036, },
     ],
 
     "Type of onsite treatment":[

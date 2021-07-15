@@ -95,11 +95,11 @@
                     <div>
                       {{industry.name}}
                     </div>
-                    <div style="flex-grow: 1; display: block; margin-right: -1.5px">
+                    <div style="flex-grow: 1; display: block;">
                       <v-hover v-slot:default="{ hover }">
                         <v-icon
                             @click = "open_edit_industry_tab(assessment_index, industry_index)"
-                            style="float: right"
+                            style="float: right; margin-right: 1px"
                             :size="hover ? '23px' : '20px'"
                         >
                           mdi-circle-edit-outline
