@@ -3,66 +3,74 @@
     <div>
       <h1> {{ this.industry.name}} </h1>
     </div>
-    <div
-        v-for="[key, value] of Object.entries(this.inputs)"
-        :key="key"
-    >
-      <div v-if="value.type === 'title'">
-        <h3>{{key}}</h3>
-      </div>
 
-      <div v-else>
-        <v-row>
-          <v-col cols="8">
-            <v-row>
-              <v-col>
-                <div style="height: 100%; display: flex;
-             justify-content: center;
-             align-content: center;
-             flex-direction: column;"
-                >
-                  <p>
-                    {{value.question}}
-                  </p>
+    <v-expansion-panels>
+      <v-expansion-panel
+        v-for="[title, form] of Object.entries(this.inputs)"
+        :key="title"
+      >
+        <v-expansion-panel-header>
+          {{ title }}
+        </v-expansion-panel-header>
+        <v-expansion-panel-content>
+          <div
+              v-for="[key, value] of Object.entries(form)"
+              :key="key"
+          >
+            <div>
+              <v-row style="background-color: #F2F4F3" align="center">
+                <v-col cols="7" >
+                  <div style="width: 100%;">
+                    <div style="height: 100%; width: 100%;">
+                      <p>
+                        {{value.question}}
+                      </p>
+                    </div>
+                    <div v-if="value.estimation_type === 'option'" style="width: 100%">
+                      <select v-model="industry[key]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                        <option
+                            v-for="item in value.items"
+                            :value="value.estimation_based_on === null ? item[value.estimation_factor] : (item[value.estimation_factor])*industry[value.estimation_based_on]"
+                        >
+                          {{item.name + item[value.description]}}
+                        </option>
+                        <option :value="industry[key]">Custom value</option>
+                      </select>
+                    </div>
 
-                </div>
+                  </div>
+                </v-col>
+                <v-col cols="4">
+                  <div>
+                    <div v-if="value.type === 'option'">
+                      <v-select
+                          v-model="value.value"
+                          :items="value.items"
+                          item-text="text"
+                          item-value="value"
+                          label="Select"
+                      ></v-select>
+                    </div>
+                    <div v-else >
+                      <v-text-field
+                          v-model="industry[key]"
+                          :suffix="value.unit"
+                      ></v-text-field>
 
-              </v-col>
-              <v-col v-if="value.estimation_type === 'option'" cols="6">
-                <v-select
-                    full-width
-                    :items="value.items"
-                    item-text="name"
-                    :item-value="item => item.bod_effl*industry[value.estimation_based_on]"
-                    label="Select"
-                    v-model="industry[key]"
-                ></v-select>
+                    </div>
+                  </div>
 
-              </v-col>
-            </v-row>
+                </v-col>
 
-          </v-col>
-          <v-col v-if="value.type === 'option'" cols="4">
-            <v-select
-                v-model="value.value"
-                :items="value.items"
-                item-text="text"
-                :item-value="value"
-                label="Select"
-            ></v-select>
+              </v-row>
 
-          </v-col>
-          <v-col v-else cols="4">
-            <v-text-field
-                v-model="industry[key]"
-                :suffix="value.unit"
-            ></v-text-field>
-          </v-col>
 
-        </v-row>
+            </div>
+          </div>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
+    </v-expansion-panels>
 
-      </div>
-    </div>
 
   </div>
 </template>
@@ -82,6 +90,9 @@ export default {
       industry: this.$assessments[this.assessment_id].industries[this.industry_id],
       inputs: Industry.info_inputs()
     };
+  },
+  created() {
+    console.log(this.industry)
   },
   methods:  {
   }

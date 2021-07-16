@@ -3,7 +3,7 @@
 
     <!-- Header -->
     <v-toolbar
-        height="100px"
+        height="75px"
         width="100%"
     >
       <div class="header">
@@ -68,7 +68,7 @@
           </div>
 
           <h1>Assessment list</h1>
-          <div style = "overflow-y: auto; height: 85%; max-height: 85%; width: 100%">
+          <div style = "overflow-y: auto; height: 80%; max-height: 80%; width: 100%">
             <v-expansion-panels focusable>
               <v-expansion-panel
                   v-for="(assessment, assessment_index ) in created_assessments"
@@ -155,14 +155,14 @@
           </v-form>
         </div>
         <!-- Edit settings -->
-        <div v-else-if="right_sidebar_content === 2">
+        <div v-else-if="right_sidebar_content === 2" >
 
           <v-tabs
               v-model="edit_assessment_tab"
               background-color="deep-purple accent-4"
               dark
+
           >
-            <v-tabs-slider></v-tabs-slider>
 
             <v-tab href="#tab-edit">
               <v-icon>mdi-circle-edit-outline</v-icon>

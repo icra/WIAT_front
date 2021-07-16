@@ -62,159 +62,376 @@ export class Industry{
     static info_inputs(){
         return {
 
-            /*"wwt_serv_pop" :{question:"Serviced population", value: 0},
-            "wwt_vol_trea" :{question:"Volume of treated wastewater", value: 0},
-            "wwt_vol_disc" :{question:"Volume of discharged effluent to water body", value: 0},*/
+            "Basic inputs": {
 
-            //BOD (creates CH4)
-            "wwt_bod_infl" :{question:"Influent BOD5 load", value: 0, unit: "kg"}, //kgBOD   //No te estimacio
-            "wwt_bod_effl" :{question:"Effluent BOD5 load", value: 0, unit: "kg", estimation_type: "option", items: Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"], estimation_based_on: "wwt_bod_infl" }, //kgBOD   Table 6.6B and 6.10C
+                /*"wwt_serv_pop" :{question:"Serviced population", value: 0},
+                "wwt_vol_trea" :{question:"Volume of treated wastewater", value: 0},
+                "wwt_vol_disc" :{question:"Volume of discharged effluent to water body", value: 0},*/
 
-            //TN (creates N2O)
-            "wwt_tn_infl" :{question:"Total Nitrogen load in the influent", value: 0, unit: "kg"},  //kgN    Equacio 6.10
-            "wwt_tn_effl" :{question:"Total Nitrogen load in the effluent", value: 0, unit: "kg"},  //kgN   TAULA 6.10c
+                //BOD (creates CH4)
+                "wwt_bod_infl": {question: "Influent BOD5 load", value: 0, unit: "kg"}, //kgBOD   //No te estimacio
+                "wwt_bod_effl": {
+                    question: "Effluent BOD5 load",
+                    value: 0,
+                    unit: "kg",
+                    estimation_type: "option",
+                    items: Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"],
+                    estimation_based_on: "wwt_bod_infl",
+                    estimation_factor: "bod_effl",
+                    description: "bod_effl_table"
+                }, //kgBOD   Table 6.6B and 6.10C
 
-            //emission factors (treatment)
-            "wwt_ch4_efac_tre" :{question:"CH4 emission factor (treatment)", value: 0, unit: "kgCH4/kgBOD"},  //kgCH4/kgBOD  S'obté de la taula 6.3
-            "wwt_n2o_efac_tre" :{question:"N2O emission factor (treatment)", value: 0, unit: "kgN2O-N/kgN"},  //kgN2O-N/kgN     Taula 6.8A
+                //TN (creates N2O)
+                "wwt_tn_infl": {question: "Total Nitrogen load in the influent", value: 0, unit: "kg"},  //kgN    Equacio 6.10
+                "wwt_tn_effl": {
+                    question: "Total Nitrogen load in the effluent",
+                    value: 0,
+                    unit: "kg",
+                    estimation_type: "option",
+                    items: Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"],
+                    estimation_based_on: "wwt_tn_infl",
+                    estimation_factor: "N_effl",
+                    description: "N_effl_table"
+                },  //kgN   TAULA 6.10c
 
-            //emission factors (discharge)
-            "wwt_ch4_efac_dis" :{question:"CH4 emission factor (discharge)", value: 0, unit:"kgCH4/kgBOD"},  //kgCH4/kgBOD   Table 6.3
-            "wwt_n2o_efac_dis" :{question:"N2O emission factor (discharge)", value: 0, unit: "kgN2O-N/kgN"},  //kgN2O-N/kgN  //tAULA 6.8A
+                //emission factors (treatment)
+                "wwt_ch4_efac_tre": {
+                    question: "CH4 emission factor (treatment)",
+                    value: 0,
+                    unit: "kgCH4/kgBOD",
+                    estimation_type: "option",
+                    items: Tables["type_of_treatment"],
+                    estimation_based_on: null,
+                    estimation_factor: "ch4_efac",
+                    description: "description"
+                },  //kgCH4/kgBOD  S'obté de la taula 6.3
+                "wwt_n2o_efac_tre": {
+                    question: "N2O emission factor (treatment)",
+                    value: 0,
+                    unit: "kgN2O-N/kgN",
+                    estimation_type: "option",
+                    items: Tables["N2O EF plants (Table 6.8A)"],
+                    estimation_based_on: null,
+                    estimation_factor: "n2o_efac",
+                    description: "description"
+                },  //kgN2O-N/kgN     Taula 6.8A
 
-            //energy
-            "wwt_nrg_cons" :{question:"Energy consumed from the grid", value: 0, unit: "kWh"},  //kWh | energy consumed from the grid
-            "wwt_conv_kwh" :{question:"Emission factor for grid electricity", value: 0, unit: "kgCO2eq/kWh"},  //kgCO2eq/kWh | conversion factor
+                //emission factors (discharge)
+                "wwt_ch4_efac_dis": {
+                    question: "CH4 emission factor (discharge)",
+                    value: 0,
+                    unit: "kgCH4/kgBOD",
+                    estimation_type: "option",
+                    items: Tables["type_of_water_body"],
+                    estimation_based_on: null,
+                    estimation_factor: "ch4_efac",
+                    description: "description"
+                },  //kgCH4/kgBOD   Table 6.3
+                "wwt_n2o_efac_dis": {
+                    question: "N2O emission factor (discharge)",
+                    value: 0,
+                    unit: "kgN2O-N/kgN",
+                    estimation_type: "option",
+                    items: Tables["N2O EF effluent (Table 6.8A)"],
+                    estimation_based_on: null,
+                    estimation_factor: "n2o_efac",
+                    description: "description"
+                },  //kgN2O-N/kgN  //tAULA 6.8A
 
-            //SLUDGE MANAGEMENT
-            "wwt_mass_slu" :{question:"Sludge removed from wastewater treatment (dry weight)", value: 0, unit: "kg"},  //kg | raw sludge removed from wwtp as dry mass
-            "wwt_bod_slud" :{question:"BOD5 removed as sludge", value: 0, unit: "kg"},  //kg | BOD removed as sludge    //Taula 6.6A
+                //energy
+                "wwt_nrg_cons": {question: "Energy consumed from the grid", value: 0, unit: "kWh"},  //kWh | energy consumed from the grid
+                "wwt_conv_kwh": {question: "Emission factor for grid electricity", value: 0, unit: "kgCO2eq/kWh"},  //kgCO2eq/kWh | conversion factor
 
-            "Fuel engines" :{type: "title"},
+                //SLUDGE MANAGEMENT
+                "wwt_mass_slu": {
+                    question: "Sludge removed from wastewater treatment (dry weight)",
+                    value: 0,
+                    unit: "kg"
+                },  //kg | raw sludge removed from wwtp as dry mass
+                "wwt_bod_slud": {question: "BOD5 removed as sludge", value: 0, unit: "kg"},  //kg | BOD removed as sludge    //Taula 6.6A
+            },
+            "Fuel engines" :{
 
+                //fuel engines
+                "wwt_fuel_typ" :{question:"Fuel type (engines)", value: 0, type: "option", items: Tables["Fuel type options"]}, //Option | type of fuel (see Tables)
+                "wwt_vol_fuel" :{question:"Volume of fuel consumed", value: 0, unit: "L"}, //L of fuel
+            },
 
-            //fuel engines
-            "wwt_fuel_typ" :{question:"Fuel type (engines)", value: 0, type: "option", items: Tables["Fuel type options"]}, //Option | type of fuel (see Tables)
-            "wwt_vol_fuel" :{question:"Volume of fuel consumed", value: 0, unit: "L"}, //L of fuel
+            "Biogas produced from anaerobic digestion" : {
+                //biogas
+                "wwt_biog_pro": {question: "Biogas produced (volume)", value: 0, unit: "Nm3"}, //Nm3 | total biogas produced
+                "wwt_biog_fla": {question: "% of biogas produced that is flared", value: 98, unit: "%"},
+                "wwt_biog_val": {
+                    question: "Biogas valorised as heat and/or electricity (% volume)",
+                    value: 0,
+                    unit: "%"
+                }, //% of biogas produced that is used for heat
+                "wwt_biog_lkd": {question: "Biogas leaked to the atmosphere (% volume)", value: 2, unit: "%"}, //% of biogas produced that is leaked
+                "wwt_biog_sold": {question: "Biogas sold (% volume)", value: 0, unit: "%"},
+                "wwt_ch4_biog": {question: "Percentage of methane in the biogas (% volume)", value: 59, unit: "%"}, //% of CH4 in biogas (volume)
+                "wwt_dige_typ": {
+                    question: "Fuel type (digester)",
+                    value: 0,
+                    type: "option",
+                    items: Tables["Fuel type options"]
+                }, //Option | type of fuel for digester
+                "wwt_fuel_dig": {question: "Fuel consumed for the digester", value: 0, unit: "L"}, //L | volume of fuel used in the digester
+                //"wwt_nrg_biog_eff" :{question:"Energy efficiency for biogas valorization with respect to the theoretical maximum", value: 43},
+                //"wwt_nrg_biog" :{question:"Electrical energy produced from biogas valorization", value: 0},
 
-            "Biogas produced from anaerobic digestion" :{type: "title"},
-            //biogas
-            "wwt_biog_pro" :{question:"Biogas produced (volume)", value: 0, unit:"Nm3"}, //Nm3 | total biogas produced
-            "wwt_biog_fla" :{question:"% of biogas produced that is flared", value: 98, unit:"%"},
-            "wwt_biog_val" :{question:"Biogas valorised as heat and/or electricity (% volume)", value: 0, unit:"%"}, //% of biogas produced that is used for heat
-            "wwt_biog_lkd" :{question:"Biogas leaked to the atmosphere (% volume)", value: 2, unit:"%"}, //% of biogas produced that is leaked
-            "wwt_biog_sold" :{question:"Biogas sold (% volume)", value: 0, unit:"%"},
-            "wwt_ch4_biog" :{question:"Percentage of methane in the biogas (% volume)", value: 59, unit:"%"}, //% of CH4 in biogas (volume)
-            "wwt_dige_typ" :{question:"Fuel type (digester)", value: 0, type: "option", items: Tables["Fuel type options"]}, //Option | type of fuel for digester
-            "wwt_fuel_dig" :{question:"Fuel consumed for the digester", value: 0, unit:"L"}, //L | volume of fuel used in the digester
-            //"wwt_nrg_biog_eff" :{question:"Energy efficiency for biogas valorization with respect to the theoretical maximum", value: 43},
-            //"wwt_nrg_biog" :{question:"Electrical energy produced from biogas valorization", value: 0},
+                //Treatment performance
+                /*
+                "wwt_trea_cap" :{question:"Treatment capacity", value: 0},
+                "wwt_tst_cmpl" :{question:"Number of water quality tests complying", value: 0},
+                "wwt_tst_cond" :{question:"Number of water quality tests conducted", value: 0},*/
 
-            //Treatment performance
-            /*
-            "wwt_trea_cap" :{question:"Treatment capacity", value: 0},
-            "wwt_tst_cmpl" :{question:"Number of water quality tests complying", value: 0},
-            "wwt_tst_cond" :{question:"Number of water quality tests conducted", value: 0},*/
+                //Pumping efficiency
+                /*
+                "wwt_nrg_pump" :{question:"Energy consumed from the grid (pumping)", value: 0},
+                "wwt_vol_pump" :{question:"Volume of pumped wastewater", value: 0},
+                "wwt_pmp_head" :{question:"Pump head", value: 0},
+                "wwt_sta_head" :{question:"Static head", value: 0},
+                "wwt_coll_len" :{question:"Collector length", value: 0},*/
 
-            //Pumping efficiency
-            /*
-            "wwt_nrg_pump" :{question:"Energy consumed from the grid (pumping)", value: 0},
-            "wwt_vol_pump" :{question:"Volume of pumped wastewater", value: 0},
-            "wwt_pmp_head" :{question:"Pump head", value: 0},
-            "wwt_sta_head" :{question:"Static head", value: 0},
-            "wwt_coll_len" :{question:"Collector length", value: 0},*/
+                //Electromechanical efficiency of pump
+                /*"wwt_pump_flow" :{question:"Measured pump flow", value: 0},
+                "wwt_pmp_volt" :{question:"Measured pump voltage", value: 0},
+                "wwt_pmp_amps" :{question:"Measured pump current", value: 0},
+                "wwt_pmp_pf" :{question:"Power factor", value: 0},
+                "wwt_pmp_exff" :{question:"Expected electromechanical efficiency of new pump", value: 0},*/
 
-            //Electromechanical efficiency of pump
-            /*"wwt_pump_flow" :{question:"Measured pump flow", value: 0},
-            "wwt_pmp_volt" :{question:"Measured pump voltage", value: 0},
-            "wwt_pmp_amps" :{question:"Measured pump current", value: 0},
-            "wwt_pmp_pf" :{question:"Power factor", value: 0},
-            "wwt_pmp_exff" :{question:"Expected electromechanical efficiency of new pump", value: 0},*/
+                //fuel used in water reuse trucks
+                "wwt_reus_trck_typ": {
+                    question: "Fuel type (trucks)",
+                    value: 0,
+                    type: "option",
+                    items: Tables["Fuel type options"]
+                }, //Option | type of fuel
+                "wwt_reus_vol_trck": {question: "Volume of fuel consumed (trucks)", value: 0}, //L | volume of fuel used
 
-            //fuel used in water reuse trucks
-            "wwt_reus_trck_typ" :{question:"Fuel type (trucks)", value: 0, type: "option", items: Tables["Fuel type options"]}, //Option | type of fuel
-            "wwt_reus_vol_trck" :{question:"Volume of fuel consumed (trucks)", value: 0}, //L | volume of fuel used
+                //GHG emissions avoided from reusing water
+                /*
+                "wwt_vol_nonp" :{question:"Volume of reused effluent", value: 0},
+                "wwt_wr_N_rec" :{question:"Total Nitrogen recovered", value: 0},
+                "wwt_wr_P_rec" :{question:"Total Phosphorus recovered", value: 0},*/
 
-            //GHG emissions avoided from reusing water
-            /*
-            "wwt_vol_nonp" :{question:"Volume of reused effluent", value: 0},
-            "wwt_wr_N_rec" :{question:"Total Nitrogen recovered", value: 0},
-            "wwt_wr_P_rec" :{question:"Total Phosphorus recovered", value: 0},*/
-
-            //sludge storage
-            "Sludge storage in WWTP" :{type: "title"},
-            "wwt_mass_slu_sto" :{question:"Sludge stored (dry weight)", value: 0, unit:"kg"}, //kg of sludge stored
-            "wwt_time_slu_sto" :{question:"Storage time", value: 0, unit:"days"}, //days
-            "wwt_slu_sto_TVS" :{question:"Total Volatile Solids (TVS) content of sludge stored (% of dry weight)", value: 0, unit:"%"}, //%
-            "wwt_slu_sto_f_CH4" :{question:"CH4 potential factor", value: 0, unit:"%"}, //% for CH4 potential
-            "wwt_slu_sto_EF" :{question:"Emission factor due to storage (estimate with storage time)", value: 0, unit:"%"}, //%
-
+                //sludge storage
+            },
+            "Sludge storage in WWTP" : {
+                "wwt_mass_slu_sto": {question: "Sludge stored (dry weight)", value: 0, unit: "kg"}, //kg of sludge stored
+                "wwt_time_slu_sto": {question: "Storage time", value: 0, unit: "days"}, //days
+                "wwt_slu_sto_TVS": {
+                    question: "Total Volatile Solids (TVS) content of sludge stored (% of dry weight)",
+                    value: 0,
+                    unit: "%",
+                    estimation_type: "option",
+                    items: Tables["Type of sludge disposed"],
+                    estimation_based_on: null,
+                    estimation_factor: "TVS",
+                    description: "description"
+                }, //%
+                "wwt_slu_sto_f_CH4": {
+                    question: "CH4 potential factor",
+                    value: 0,
+                    unit: "%",
+                    estimation_type: "option",
+                    items: Tables["Type of sludge disposed"],
+                    estimation_based_on: null,
+                    estimation_factor: "f_ch4",
+                    description: "description"
+                }, //% for CH4 potential
+                "wwt_slu_sto_EF": {
+                    question: "Emission factor due to storage (estimate with storage time)",
+                    value: 0,
+                    unit: "%"
+                }, //%
+            },
             //sludge composting
-            "Sludge composting in WWTP" :{type: "title"},
+            "Sludge composting in WWTP" : {
 
-            "wwt_mass_slu_comp" :{question:"Sludge composted (dry weight)", value: 0, unit:"kg"}, //kg of sludge composted
-            "wwt_slu_comp_emis_treated_or_piles_covered" :{question:"Are composting emissions treated and/or piles are covered", value: 0, type: "option", items: Tables["Yes/No"]}, //yes/no
-            "wwt_slu_comp_solids_content" :{question:"Solids content of compost", value: 0, unit:"%"}, //%
-            "wwt_slu_comp_TVS" :{question:"Total Volatile Solids (TVS) content of sludge composted (% of dry weight)", value: 0, unit:"%"}, //%
-            "wwt_slu_comp_N_cont" :{question:"N content of sludge stored (% of dry weight)", value: 0, unit:"%"}, //%
-            "wwt_slu_comp_low_CN_EF" :{question:"N2O emission factor for low C:N ratio", value: 0.015, unit:"kgN2O-N/kgN"}, //kgN2O-N/kgN
-            "wwt_slu_comp_uncovered_pile_EF" :{question:"CH4 emission factor for uncovered pile (fractor of initial C in solids)", value: 0.025, unit:"kgCH4/kgC"}, //kgCH4/kgC
-            "wwt_slu_comp_seqst_rate" :{question:"CO2eq sequestration rate", value: 0.25, unit:"kgN2O-N/kgN"}, //kgCO2eq/kgSludge
-
+                "wwt_mass_slu_comp": {question: "Sludge composted (dry weight)", value: 0, unit: "kg"}, //kg of sludge composted
+                "wwt_slu_comp_emis_treated_or_piles_covered": {
+                    question: "Are composting emissions treated and/or piles are covered",
+                    value: 0,
+                    type: "option",
+                    items: Tables["Yes/No"]
+                }, //yes/no
+                "wwt_slu_comp_solids_content": {question: "Solids content of compost", value: 0, unit: "%"}, //%
+                "wwt_slu_comp_TVS": {
+                    question: "Total Volatile Solids (TVS) content of sludge composted (% of dry weight)",
+                    value: 0,
+                    unit: "%",
+                    estimation_type: "option",
+                    items: Tables["Type of sludge disposed"],
+                    estimation_based_on: null,
+                    estimation_factor: "TVS",
+                    description: "description"
+                }, //%
+                "wwt_slu_comp_N_cont": {
+                    question: "N content of sludge stored (% of dry weight)",
+                    value: 0,
+                    unit: "%",
+                    estimation_type: "option",
+                    items: Tables["Type of sludge disposed"],
+                    estimation_based_on: null,
+                    estimation_factor: "N_cont",
+                    description: "description"
+                }, //%
+                "wwt_slu_comp_low_CN_EF": {
+                    question: "N2O emission factor for low C:N ratio",
+                    value: 0.015,
+                    unit: "kgN2O-N/kgN"
+                }, //kgN2O-N/kgN
+                "wwt_slu_comp_uncovered_pile_EF": {
+                    question: "CH4 emission factor for uncovered pile (fractor of initial C in solids)",
+                    value: 0.025,
+                    unit: "kgCH4/kgC"
+                }, //kgCH4/kgC
+                "wwt_slu_comp_seqst_rate": {question: "CO2eq sequestration rate", value: 0.25, unit: "kgN2O-N/kgN"}, //kgCO2eq/kgSludge
+            },
             //sludge incineration
-            "Sludge incineration" :{type: "title"},
+            "Sludge incineration" : {
 
-            "wwt_mass_slu_inc" :{question:"Sludge incinerated (dry weight)", value: 0, unit:"kg"}, //kg of sludge incinerated
-            "wwt_temp_inc" :{question:"Average highest temperature of combustion achieved in a Fluidized Bed incinerator", value: 1023, unit:"K"}, //K | temperature incineration
-            "wwt_slu_inc_N_cont" :{question:"N content of sludge incinerated (% of dry weight)", value: 0, unit:"%"}, //% of N
-            "wwt_slu_inc_SNCR" :{question:"Is 'SNCR air emissions technology with urea' used?", value: 0, type: "option", items: Tables["Yes/No"]}, //boolean
-
+                "wwt_mass_slu_inc": {question: "Sludge incinerated (dry weight)", value: 0, unit: "kg"}, //kg of sludge incinerated
+                "wwt_temp_inc": {
+                    question: "Average highest temperature of combustion achieved in a Fluidized Bed incinerator",
+                    value: 1023,
+                    unit: "K"
+                }, //K | temperature incineration
+                "wwt_slu_inc_N_cont": {
+                    question: "N content of sludge incinerated (% of dry weight)",
+                    value: 0,
+                    unit: "%",
+                    estimation_type: "option",
+                    items: Tables["Type of sludge disposed"],
+                    estimation_based_on: null,
+                    estimation_factor: "N_cont",
+                    description: "description"
+                }, //% of N
+                "wwt_slu_inc_SNCR": {
+                    question: "Is 'SNCR air emissions technology with urea' used?",
+                    value: 0,
+                    type: "option",
+                    items: Tables["Yes/No"]
+                }, //boolean
+            },
             //sludge LA
-            "Sludge sent to dry application" :{type: "title"},
+            "Sludge sent to dry application" : {
 
-            "wwt_mass_slu_app" :{question:"Sludge sent to land application (dry weight)", value: 0, unit:"kg"}, //kg of sludge sent to LA
-            "wwt_slu_la_solids_content" :{question:"Solids content of sludge sent to land application", value: 0, unit:"%"}, //%
-            "wwt_slu_la_TVS" :{question:"Total Volatile Solids (TVS) content of sludge sent to land application)", value: 0, unit:"%"}, //%
-            "wwt_slu_la_N_cont" :{question:"N content of sludge sent to land application (% of dry weight)", value: 0, unit:"%"}, //%
-            "wwt_slu_la_EF" :{question:"Amount of Nitrogen converted to N2O", value: 0, unit:"kgN2O-N/gN"}, //kgN2O-N/gN
-            //"wwt_slu_la_seqst_rate" :{question:"CO2eq sequestration rate", value: 0}, //kgCO2eq/kgSludge
-
+                "wwt_mass_slu_app": {question: "Sludge sent to land application (dry weight)", value: 0, unit: "kg"}, //kg of sludge sent to LA
+                "wwt_slu_la_solids_content": {
+                    question: "Solids content of sludge sent to land application",
+                    value: 0,
+                    unit: "%"
+                }, //%
+                "wwt_slu_la_TVS": {
+                    question: "Total Volatile Solids (TVS) content of sludge sent to land application)",
+                    value: 0,
+                    unit: "%",
+                    estimation_type: "option",
+                    items: Tables["Type of sludge disposed"],
+                    estimation_based_on: null,
+                    estimation_factor: "TVS",
+                    description: "description"
+                }, //%
+                "wwt_slu_la_N_cont": {
+                    question: "N content of sludge sent to land application (% of dry weight)",
+                    value: 0,
+                    unit: "%",
+                    estimation_type: "option",
+                    items: Tables["Type of sludge disposed"],
+                    estimation_based_on: null,
+                    estimation_factor: "N_cont",
+                    description: "description"
+                }, //%
+                "wwt_slu_la_EF": {
+                    question: "Amount of Nitrogen converted to N2O",
+                    value: 0,
+                    unit: "kgN2O-N/gN",
+                    estimation_type: "option",
+                    items: Tables["Soil type"],
+                    estimation_based_on: null,
+                    estimation_factor: "f_la",
+                    description: "description"
+                }, //kgN2O-N/gN
+                //"wwt_slu_la_seqst_rate" :{question:"CO2eq sequestration rate", value: 0}, //kgCO2eq/kgSludge
+            },
             //sludge LF
-            "Sludge landfilling" :{type: "title"},
-            "wwt_mass_slu_land" :{question:"Sludge sent to landfilling (dry weight)", value: 0, unit:"kg"}, //kg of sludge sent to LF
-            "wwt_slu_lf_TVS" :{question:"Total Volatile Solids (TVS) content of sludge sent to land application", value: 0, unit:"%"}, //%
-            "wwt_slu_lf_uncertainty" :{question:"Uncertainty factor (UNFCCC/CCNUC, 2008)", value: 0.9}, //adimensional
-            "wwt_slu_lf_CH4_in_gas" :{question:"CH4 in landfill gas", value: 50, unit:"%"}, //%
-            "wwt_slu_lf_DOCf" :{question:"Decomposable organic fraction of raw wastewater solids", value: 80, unit:"%"}, //%
-            "wwt_slu_lf_decomp_3yr" :{question:"Percentage decomposed in first 3 years", value: 69.9, unit:"%"}, //%
-            "wwt_slu_lf_MCF" :{question:"Methane correction for anaerobic managed landfills (default=1)", value: 1, unit: "ratio"}, //ratio
-            "wwt_slu_lf_N_cont" :{question:"N content of sludge sent to land application (% of dry weight)", value: 0}, //N content
-            "wwt_slu_lf_low_CN_EF" :{question:"N2O emission factor for low C:N ratio", value: 0.015, unit:"kgN2O-N/kgN"}, //kgN2O-N/kgN
-
+            "Sludge landfilling" : {
+                "wwt_mass_slu_land": {question: "Sludge sent to landfilling (dry weight)", value: 0, unit: "kg"}, //kg of sludge sent to LF
+                "wwt_slu_lf_TVS": {
+                    question: "Total Volatile Solids (TVS) content of sludge sent to land application",
+                    value: 0,
+                    unit: "%",
+                    estimation_type: "option",
+                    items: Tables["Type of sludge disposed"],
+                    estimation_based_on: null,
+                    estimation_factor: "TVS",
+                    description: "description"
+                }, //%
+                "wwt_slu_lf_uncertainty": {question: "Uncertainty factor (UNFCCC/CCNUC, 2008)", value: 0.9}, //adimensional
+                "wwt_slu_lf_CH4_in_gas": {question: "CH4 in landfill gas", value: 50, unit: "%"}, //%
+                "wwt_slu_lf_DOCf": {
+                    question: "Decomposable organic fraction of raw wastewater solids",
+                    value: 80,
+                    unit: "%"
+                }, //%
+                "wwt_slu_lf_decomp_3yr": {question: "Percentage decomposed in first 3 years", value: 69.9, unit: "%"}, //%
+                "wwt_slu_lf_MCF": {
+                    question: "Methane correction for anaerobic managed landfills (default=1)",
+                    value: 1,
+                    unit: "ratio",
+                    estimation_type: "option",
+                    items: Tables["Type of landfill"],
+                    estimation_based_on: null,
+                    estimation_factor: "MCF",
+                    description: "description"
+                }, //ratio
+                "wwt_slu_lf_N_cont": {
+                    question: "N content of sludge sent to land application (% of dry weight)",
+                    value: 0,
+                    estimation_type: "option",
+                    items: Tables["Type of sludge disposed"],
+                    estimation_based_on: null,
+                    estimation_factor: "N_cont",
+                    description: "description"
+                }, //N content
+                "wwt_slu_lf_low_CN_EF": {
+                    question: "N2O emission factor for low C:N ratio",
+                    value: 0.015,
+                    unit: "kgN2O-N/kgN"
+                } //kgN2O-N/kgN
+            },
             //sludge
-            "Sludge stockpiling" :{type: "title"},
-            "wwt_mass_slu_stock" :{question:"Sludge stockpiled (dry weight)", value: 0, unit: "kg"}, //kg of sludge stockpiled
-            "wwt_slu_sp_lifespan" :{question:"Stockpile lifespan", value: 0, unit: "years"}, //years
-
+            "Sludge stockpiling" : {
+                "wwt_mass_slu_stock": {question: "Sludge stockpiled (dry weight)", value: 0, unit: "kg"}, //kg of sludge stockpiled
+                "wwt_slu_sp_lifespan": {question: "Stockpile lifespan", value: 0, unit: "years"}, //years
+            },
             //sludge truck transport
-            "Sludge truck transportation to disposal site" :{type: "title"},
+            "Sludge truck transportation to disposal site" : {
 
-            "wwt_trck_typ" :{question:"Fuel type (trucks)", value: 0, type: "option", items: Tables["Fuel type options"]}, //Option | fuel type
-            "wwt_vol_tslu" :{question:"Volume of fuel consumed (trucks)", value: 0, unit: "L"}, //L | volume of fuel
+                "wwt_trck_typ": {
+                    question: "Fuel type (trucks)",
+                    value: 0,
+                    type: "option",
+                    items: Tables["Fuel type options"]
+                }, //Option | fuel type
+                "wwt_vol_tslu": {question: "Volume of fuel consumed (trucks)", value: 0, unit: "L"}, //L | volume of fuel
+            }
         }
     }
 
     constructor(){
         this.name="new industry";
 
+
         let _this = this
 
-        for(let [clau, valor] of Object.entries(Industry.info_inputs())){
-            _this[clau] = valor.value
+        for(let items of Object.values(Industry.info_inputs())){
+            for(let [clau, valor] of Object.entries(items)){
+                _this[clau] = valor.value
+            }
         }
-
-
-
     }
 
     /*
@@ -663,13 +880,13 @@ let Tables={
 
     //ipcc 2019, table 6.3 (updated) EF (kgCH4/kgBOD)
     "type_of_water_body":[
-        {name:"Water body undefined",                                                                   ch4_efac:0     },
-        {name:"Discharge to aquatic environments (Tier 1)",                                             ch4_efac:0.068 },
-        {name:"Discharge to aquatic environments other than reservoirs, lakes, and estuaries (Tier 2)", ch4_efac:0.021 },
-        {name:"Discharge to reservoirs, lakes, and estuaries (Tier 2)",                                 ch4_efac:0.114 },
-        {name:"Stagnant sewer or anaerobic water body",                                                 ch4_efac:0.3   },
-        {name:"Flowing sewer (open or closed)",                                                         ch4_efac:0     },
-        {name:"Soil infiltration",                                                                      ch4_efac:0     },
+        {name:"Water body undefined",                                                                   ch4_efac:0, description:""     },
+        {name:"Discharge to aquatic environments (Tier 1)",                                             ch4_efac:0.068, description:"" },
+        {name:"Discharge to aquatic environments other than reservoirs, lakes, and estuaries (Tier 2)", ch4_efac:0.021, description:"" },
+        {name:"Discharge to reservoirs, lakes, and estuaries (Tier 2)",                                 ch4_efac:0.114, description:"" },
+        {name:"Stagnant sewer or anaerobic water body",                                                 ch4_efac:0.3, description:""   },
+        {name:"Flowing sewer (open or closed)",                                                         ch4_efac:0, description:""     },
+        {name:"Soil infiltration",                                                                      ch4_efac:0, description:""     },
     ],
 
     "type_of_sewer":[
@@ -680,22 +897,22 @@ let Tables={
 
     //ipcc 2019, table 6.3 (updated) EF (kgCH4/kgBOD)           CANVIAR PER TAULA 6.8
     "type_of_treatment":[
-        {name:"Type of treatment undefined",                                  ch4_efac:0,     },
-        {name:"Centralised, aerobic, treatment plant",                        ch4_efac:0, },
-        {name:"Anaerobic Reactor - CH4 recovery not considered",              ch4_efac:0.48,  },
-        //{name:"Anaerobic Reactor - CH4 recovery considered",                  ch4_efac:0.14,  },
-        {name:"Anaerobic shallow lagoon and facultative lagoons (<2m depth)", ch4_efac:0.12,  },
-        {name:"Anaerobic deep lagoon (>2m depth)",                            ch4_efac:0.48,  },
-        //{name:"Anaerobic Lagoon covered",                                     ch4_efac:0,     },
-        {name:"Wetlands - Surface flow",                                      ch4_efac:0.24,  },
-        {name:"Wetlands - Horizontal subsurface flow",                        ch4_efac:0.06,  },
-        {name:"Wetlands - Vertical subsurface flow",                          ch4_efac:0.006, },
-        //{name:"Activated Sludge - Well managed",                              ch4_efac:0,     },
-        //{name:"Activated Sludge - Minor poorly aerated zones",                ch4_efac:0.06,  },
-        //{name:"Activated Sludge - Some aerated zones",                        ch4_efac:0.12,  },
-        //{name:"Activated Sludge - Not well managed",                          ch4_efac:0.18,  },
-        //{name:"Aerated Lagoon",                                               ch4_efac:0.06,  },
-        //{name:"Trickling Filter",                                             ch4_efac:0.036, },
+        {name:"Type of treatment undefined",                                  ch4_efac:0,  description: ""   },
+        {name:"Centralised, aerobic, treatment plant",                        ch4_efac:0, description: ""},
+        {name:"Anaerobic Reactor - CH4 recovery not considered",              ch4_efac:0.48,  description: ""},
+        //{name:"Anaerobic Reactor - CH4 recovery considered",                  ch4_efac:0.14,  description: ""},
+        {name:"Anaerobic shallow lagoon and facultative lagoons (<2m depth)", ch4_efac:0.12,  description: ""},
+        {name:"Anaerobic deep lagoon (>2m depth)",                            ch4_efac:0.48,  description: ""},
+        //{name:"Anaerobic Lagoon covered",                                     ch4_efac:0,     description: ""},
+        {name:"Wetlands - Surface flow",                                      ch4_efac:0.24,  description: ""},
+        {name:"Wetlands - Horizontal subsurface flow",                        ch4_efac:0.06,  description: ""},
+        {name:"Wetlands - Vertical subsurface flow",                          ch4_efac:0.006, description: ""},
+        //{name:"Activated Sludge - Well managed",                              ch4_efac:0,     description: ""},
+        //{name:"Activated Sludge - Minor poorly aerated zones",                ch4_efac:0.06,  description: ""},
+        //{name:"Activated Sludge - Some aerated zones",                        ch4_efac:0.12,  description: ""},
+        //{name:"Activated Sludge - Not well managed",                          ch4_efac:0.18,  description: ""},
+        //{name:"Aerated Lagoon",                                               ch4_efac:0.06,  description: ""},
+        //{name:"Trickling Filter",                                             ch4_efac:0.036, description: ""},
     ],
 
     "Type of onsite treatment":[
@@ -719,19 +936,19 @@ let Tables={
     ],
 
     "N2O EF plants (Table 6.8A)":[
-        {name:"Type of treatment undefined",           n2o_efac:0      },
-        {name:"Centralised, aerobic, treatment plant", n2o_efac:0.016  },
-        {name:"Anaerobic reactor",                     n2o_efac:0      },
-        {name:"Anaerobic lagoons",                     n2o_efac:0      },
-        {name:"Septic tank",                           n2o_efac:0      },
-        {name:"Septic tank + land dispersal field",    n2o_efac:0.0045 },
-        {name:"Latrine",                               n2o_efac:0      },
+        {name:"Type of treatment undefined",           n2o_efac:0, description:""     },
+        {name:"Centralised, aerobic, treatment plant", n2o_efac:0.016, description:""  },
+        {name:"Anaerobic reactor",                     n2o_efac:0, description:""      },
+        {name:"Anaerobic lagoons",                     n2o_efac:0, description:""      },
+        {name:"Septic tank",                           n2o_efac:0, description:""      },
+        {name:"Septic tank + land dispersal field",    n2o_efac:0.0045, description:"" },
+        {name:"Latrine",                               n2o_efac:0, description:""      },
     ],
 
     "N2O EF effluent (Table 6.8A)":[
-        {name:"Discharge undefined",                                                                              n2o_efac:0.000},
-        {name:"Freshwater, estuarine, and marine discharge (Tier 1)",                                             n2o_efac:0.005},
-        {name:"Nutrient-impacted and/or hypoxic freshwater, estuarine, and marine discharge (Tier 3, if needed)", n2o_efac:0.019},
+        {name:"Discharge undefined",                                                                              n2o_efac:0.000, description:""},
+        {name:"Freshwater, estuarine, and marine discharge (Tier 1)",                                             n2o_efac:0.005, description:""},
+        {name:"Nutrient-impacted and/or hypoxic freshwater, estuarine, and marine discharge (Tier 3, if needed)", n2o_efac:0.019, description:""},
     ],
 
     "type_of_treatment_KREM":[
@@ -742,10 +959,10 @@ let Tables={
     ],
 
     "WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)":[
-        {name:"Untreated systems",                                                     bod_effl:1,    N_effl:1.00},
-        {name:"Primary (mechanical treatment plants)",                                 bod_effl:0.60, N_effl:0.90},
-        {name:"Primary + Secondary (biological treatment plants)",                     bod_effl:0.15, N_effl:0.60},
-        {name:"Primary + Secondary + Tertiary (advanced biological treatment plants)", bod_effl:0.10, N_effl:0.20},
+        {name:"Untreated systems",                                                     bod_effl:1,  bod_effl_table:"[100%]",    N_effl:1.00,   N_effl_table:"[100%]"},
+        {name:"Primary (mechanical treatment plants)",                                 bod_effl:0.60, bod_effl_table:"[60%]", N_effl:0.90, N_effl_table:"[90%]"},
+        {name:"Primary + Secondary (biological treatment plants)",                     bod_effl:0.15, bod_effl_table:"[15%]", N_effl:0.60, N_effl_table:"[60%]"},
+        {name:"Primary + Secondary + Tertiary (advanced biological treatment plants)", bod_effl:0.10, bod_effl_table:"[10%]", N_effl:0.20, N_effl_table:"[20%]"},
     ],
 
     "WW treatment organics removal fractions (onsite) (Table 6.6B and 6.10C)":[
@@ -791,9 +1008,9 @@ let Tables={
     ],
 
     "Type of sludge disposed":[
-        {name:"Type of sludge disposed", f_ch4:0,  N_cont:0, TVS:0 },
-        {name:"Non-digested",            f_ch4:53, N_cont:3, TVS:70},
-        {name:"Digested",                f_ch4:6,  N_cont:4, TVS:51},
+        {name:"Type of sludge disposed", f_ch4:0,  N_cont:0, TVS:0, description:"" },
+        {name:"Non-digested",            f_ch4:53, N_cont:3, TVS:70, description:""},
+        {name:"Digested",                f_ch4:6,  N_cont:4, TVS:51, description:""},
     ],
 
     //for land application and landfilling
@@ -808,16 +1025,16 @@ let Tables={
     ],
 
     "Type of landfill":[
-        {name:"Landfill",                     MCF:1},
-        {name:"Landfill (with gas recovery)", MCF:0.02},
-        {name:"Landfill (flaring)",           MCF:0},
+        {name:"Landfill",                     MCF:1, description: ""},
+        {name:"Landfill (with gas recovery)", MCF:0.02, description: ""},
+        {name:"Landfill (flaring)",           MCF:0, description: ""},
     ],
 
     //f_la: gN transformed to gN2O
     "Soil type":[
-        {name:"Soil type undefined",         f_la:0.000},
-        {name:"Fine-Textured (>30% clay)",   f_la:0.023},
-        {name:"Coarse-Textured (<30% clay)", f_la:0.005},
+        {name:"Soil type undefined",         f_la:0.000, description: ""},
+        {name:"Fine-Textured (>30% clay)",   f_la:0.023, description: ""},
+        {name:"Coarse-Textured (<30% clay)", f_la:0.005, description: ""},
     ],
 
     "Type of containment":[
