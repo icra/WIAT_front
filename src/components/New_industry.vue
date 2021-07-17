@@ -19,12 +19,27 @@
           >
             <div>
               <v-row style="background-color: #F2F4F3" align="center">
-                <v-col cols="7" >
+                <v-col cols="8" >
                   <div style="width: 100%;">
-                    <div style="height: 100%; width: 100%;">
-                      <p>
+                    <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                      <span>
                         {{value.question}}
-                      </p>
+                      </span>
+                      <v-tooltip bottom>
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-btn
+                              v-bind="attrs"
+                              v-on="on"
+                              outlined
+                              x-small
+                              v-if="value.estimation_type === 'equation'" @click="industry[key] = estimations[key](industry)"
+                          >
+                          Estimation: {{estimations[key](industry)}}{{value.unit}}
+                          </v-btn>
+                        </template>
+                        <span>{{ estimations[key].toString() }}</span>
+                      </v-tooltip>
+
                     </div>
                     <div v-if="value.estimation_type === 'option'" style="width: 100%">
                       <select v-model="industry[key]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
@@ -32,11 +47,13 @@
                             v-for="item in value.items"
                             :value="value.estimation_based_on === null ? item[value.estimation_factor] : (item[value.estimation_factor])*industry[value.estimation_based_on]"
                         >
-                          {{item.name + item[value.description]}}
+                          {{item.name}} {{item[value.description]}} ({{value.estimation_based_on === null ? item[value.estimation_factor] : (item[value.estimation_factor])*industry[value.estimation_based_on]}} {{value.unit}})
                         </option>
                         <option :value="industry[key]">Custom value</option>
                       </select>
                     </div>
+
+
 
                   </div>
                 </v-col>
@@ -83,16 +100,16 @@ export default {
   props: ['assessment_id', 'industry_id'],
   components: {
     Industry,
-    Assessment
+    Assessment,
   },
   data() {
     return {
       industry: this.$assessments[this.assessment_id].industries[this.industry_id],
-      inputs: Industry.info_inputs()
+      inputs: Industry.info_inputs(),
+      estimations: Industry.get_estimations()
     };
   },
   created() {
-    console.log(this.industry)
   },
   methods:  {
   }

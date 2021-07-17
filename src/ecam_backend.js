@@ -82,7 +82,7 @@ export class Industry{
                 }, //kgBOD   Table 6.6B and 6.10C
 
                 //TN (creates N2O)
-                "wwt_tn_infl": {question: "Total Nitrogen load in the influent", value: 0, unit: "kg"},  //kgN    Equacio 6.10
+                "wwt_tn_infl": {question: "Total Nitrogen load in the influent", value: 0, unit: "kg", estimation_type: "equation"},  //kgN    Equacio 6.10
                 "wwt_tn_effl": {
                     question: "Total Nitrogen load in the effluent",
                     value: 0,
@@ -149,6 +149,10 @@ export class Industry{
                     unit: "kg"
                 },  //kg | raw sludge removed from wwtp as dry mass
                 "wwt_bod_slud": {question: "BOD5 removed as sludge", value: 0, unit: "kg"},  //kg | BOD removed as sludge    //Taula 6.6A
+                "wwt_ind_prod": {question: "Total industrial product", value: 0, unit: "t/yr"},  //t/yer | Total industrial product
+                "wwt_wwt_generated": {question: "Wastewater generated", value: 0, unit: "m3/t"},  //m3/t | Wastewater generated
+                "wwt_tot_nit": {question: "Total nitrogen in untreated wastewater", value: 0, unit: "kgTN/m3"},  //kgTN/m3 | Total nitrogen in untreated wastewater
+
             },
             "Fuel engines" :{
 
@@ -421,9 +425,19 @@ export class Industry{
         }
     }
 
+    static get_estimations(){
+        return {
+            wwt_tn_infl(industry){  //Equation 6.13
+                let P = industry.wwt_ind_prod   //Total industrial product
+                let W = industry.wwt_wwt_generated  //Wastewater generated
+                let TN = industry.wwt_tot_nit   //Total nitrogen in untreated wastewater
+                return P*W*TN
+            }
+        }
+    }
+
     constructor(){
         this.name="new industry";
-
 
         let _this = this
 
@@ -1119,9 +1133,10 @@ let Cts={
 
 
 
+
 export default {
     Assessment,
-    Industry
+    Industry,
 }
 
 /*
