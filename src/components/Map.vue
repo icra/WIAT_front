@@ -8,14 +8,20 @@
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { latLng, Icon } from "leaflet";
-delete Icon.Default.prototype._getIconUrl;
 
+delete Icon.Default.prototype._getIconUrl;
+Icon.Default.mergeOptions({
+  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
+  iconUrl: require('leaflet/dist/images/marker-icon.png'),
+  shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+});
 
 import axios from "axios"
 import deplession_layer from "../layers/deplession_topo.json"
 import stress_layer from "../layers/stress_topo.json"
 
 import VectorTile from "leaflet.vectorgrid/dist/Leaflet.VectorGrid.js";
+import Vue from "vue";
 
 export default {
   name: "Map",
@@ -24,11 +30,38 @@ export default {
   },
   data() {
     return {
-      center2: [47.41322, -1.219482]
+      center2: [47.41322, -1.219482],
+      location_markers: this.$location_markers,  //Created industries [{assessment, industry, location}]
+      mapDiv: null,
+      markers: []
 
     };
   },
+  watch: {
+    location_markers: function (markers) {
+      //Delete markers first
+      let _this = this
+      this.markers.forEach(marker => {
+        _this.mapDiv.removeLayer(marker);
+      })
+      this.place_markers(markers)
+    },
+  },
   methods: {
+
+
+    //Place markers on the map
+    place_markers(markers) {
+
+      let _this = this
+      _this.markers = []
+      markers.forEach(marker =>{
+        let new_marker = L.marker(marker.latlng).addTo(_this.mapDiv).on('click', function(e) {
+          _this.$emit('editIndustry', marker.assessment, marker.industry)
+        });
+        _this.markers.push(new_marker)
+      })
+    },
 
     get_population(event) {
       //http://localhost:3000/bona?longitude=2.16992&latitude=41.3879
@@ -47,7 +80,7 @@ export default {
     setupLeafletMap() {
       let _this = this
 
-      const mapDiv = L.map("mapContainer", {
+      this.mapDiv = L.map("mapContainer", {
         center: this.center2,
         zoom: 13,
         preferCanvas: true,
@@ -60,21 +93,29 @@ export default {
             id: 'mapbox/streets-v11',
             accessToken: "pk.eyJ1IjoiemVwaG9sIiwiYSI6ImNrcWMyN3N6eTA1Mm8yb3Bmb29uZ3d5eWoifQ.1YD7eO3cB9lH-J2eOaC2pg\n"
           }
-      ).addTo(mapDiv);
+      ).addTo(this.mapDiv);
 
       let popup = L.popup();
 
-      async function onMapClick(e) {
+      function onMapClick(e) {
 
-        let population_associated = await _this.get_population(e)
-        console.log(population_associated)
-        popup
+        //let population_associated = await _this.get_population(e)
+        /*popup
             .setLatLng(e.latlng)
             .setContent("You clicked the map at " + population_associated.toString())
-            .openOn(mapDiv);
+            .openOn(mapDiv);*/
+        let mapContent = {
+          "latlng": e.latlng,
+          "right bar content": {
+            "Population associated": 45
+          }
+
+        }
+        //console.log(_this.$parent)
+        _this.$emit('mapContent', mapContent)
       }
 
-      mapDiv.on('click', onMapClick);
+      this.mapDiv.on('click', onMapClick);
 
       //Water stress
       let water_stress =
@@ -133,7 +174,7 @@ export default {
         "Water Deplession": water_deplession
       }
 
-      L.control.layers(null, overlayMaps).addTo(mapDiv);
+      L.control.layers(null, overlayMaps).addTo(this.mapDiv);
 
 
 
@@ -142,6 +183,8 @@ export default {
 
   mounted() {
     this.setupLeafletMap();
+    this.place_markers(this.$location_markers)
+    console.log(this.$location_markers)
   }
 };
 </script>

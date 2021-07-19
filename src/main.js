@@ -9,6 +9,8 @@ import "@/assets/global.css"
 
 //Global variables
 Vue.prototype.$assessments = []
+Vue.prototype.$location_markers = []
+
 
 new Vue({
   router,

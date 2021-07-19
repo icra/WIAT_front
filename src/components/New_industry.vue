@@ -25,14 +25,17 @@
                       <span>
                         {{value.question}}
                       </span>
-                      <v-tooltip bottom>
+                      <v-tooltip
+                          bottom
+                          v-if="value.estimation_type === 'equation'">
                         <template v-slot:activator="{ on, attrs }">
                           <v-btn
                               v-bind="attrs"
                               v-on="on"
                               outlined
                               x-small
-                              v-if="value.estimation_type === 'equation'" @click="industry[key] = estimations[key](industry)"
+                              @click="industry[key] = estimations[key](industry)"
+
                           >
                           Estimation: {{estimations[key](industry)}}{{value.unit}}
                           </v-btn>

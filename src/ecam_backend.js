@@ -437,7 +437,8 @@ export class Industry{
     }
 
     constructor(){
-        this.name="new industry";
+        this.name = "new industry";
+        this.location = null
 
         let _this = this
 

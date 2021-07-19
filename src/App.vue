@@ -69,7 +69,7 @@
 
           <h1>Assessment list</h1>
           <div style = "overflow-y: auto; height: 80%; max-height: 80%; width: 100%">
-            <v-expansion-panels focusable>
+            <v-expansion-panels focusable v-model="assessment_expansion_panel">
               <v-expansion-panel
                   v-for="(assessment, assessment_index ) in created_assessments"
                   :key="assessment.name"
@@ -121,7 +121,7 @@
       <!-- Main content -->
       <v-main :class=class_for_main_content>
         <div class="content">
-          <router-view></router-view>
+          <router-view @mapContent="toggleMapContent" @editIndustry="open_edit_industry_tab"></router-view>
         </div>
       </v-main>
 
@@ -156,78 +156,30 @@
         </div>
         <!-- Edit settings -->
         <div v-else-if="right_sidebar_content === 2" >
-
-          <v-tabs
-              v-model="edit_assessment_tab"
-              background-color="deep-purple accent-4"
-              dark
-
-          >
-
-            <v-tab href="#tab-edit">
-              <v-icon>mdi-circle-edit-outline</v-icon>
-            </v-tab>
-
-            <v-tab href="#tab-add-factory">
-              <v-icon>mdi-factory</v-icon>
-            </v-tab>
-
-
-          </v-tabs>
-
-          <v-tabs-items v-model="edit_assessment_tab" style="margin: 7px; padding: 7px;">
-            <v-tab-item
-                key="edit"
-                value="tab-edit"
+          <h1>Edit assessment</h1>
+          <div style="margin: 7px; padding: 7px; background-color: white">
+            <v-form
+                v-model="new_assessment_valid"
             >
-              <v-card flat>
-                <v-form
-                    v-model="new_assessment_valid"
-                >
-                  <v-text-field
-                      v-model="assessment_name"
-                      :rules="[edit_assessment_rules.name, edit_assessment_rules.required]"
+              <v-text-field
+                  v-model="assessment_name"
+                  :rules="[edit_assessment_rules.name, edit_assessment_rules.required]"
 
-                  ></v-text-field>
-                  <v-btn
-                      :disabled="!new_assessment_valid"
-                      @click="edit_assessment"
+              ></v-text-field>
+              <v-btn
+                  :disabled="!new_assessment_valid"
+                  @click="edit_assessment"
 
-                  >
-                    Edit
-                  </v-btn>
-                </v-form>
-                <v-btn @click = "delete_assessment">
-                  Delete
-                </v-btn>
-              </v-card>
-            </v-tab-item>
-            <v-tab-item
-                key="add-factory"
-                value="tab-add-factory"
-            >
-              <v-card flat>
-                <v-form
-                    v-model="new_factory_valid"
-                >
-                  <v-text-field
-                      v-model="factory_name"
-                      label="Industry name"
-                      :rules="[new_factory_rules.name, new_factory_rules.required]"
+              >
+                Edit
+              </v-btn>
+            </v-form>
+          </div>
 
-                  ></v-text-field>
-                  <v-btn
-                      :disabled="!new_factory_valid"
-                      @click="add_factory"
+          <v-btn @click = "delete_assessment">
+            Delete
+          </v-btn>
 
-                  >
-                    Add industry
-                  </v-btn>
-                </v-form>
-
-              </v-card>
-            </v-tab-item>
-          </v-tabs-items>
         </div>
         <div v-else-if="right_sidebar_content === 3">
           <div style="margin: 7px; padding: 7px; background-color: white">
@@ -256,6 +208,48 @@
             </v-btn>
 
           </div>
+        </div>
+        <div v-else-if="right_sidebar_content === 4">
+          <div style="margin: 7px; padding: 7px; background-color: white">
+            <h1>Map info</h1>
+            <span
+                v-for="[key, value] in Object.entries(map_content_info)"
+                :key="key"
+            >
+              <b>{{key}}</b>: <p>{{value}}</p>
+            </span>
+          </div>
+          <v-btn
+              :disabled="assessment_expansion_panel === undefined"
+              @click="right_sidebar_content = 5; factory_name = null"
+          >
+            ADD NEW INDUSTRY
+          </v-btn>
+
+        </div>
+        <div v-else-if="right_sidebar_content === 5">
+          <div style="margin: 7px; padding: 7px; background-color: white">
+            <h1>New industry</h1>
+            <v-form
+                v-model="new_factory_valid"
+            >
+              <v-text-field
+                  v-model="factory_name"
+                  label="Industry name"
+                  :rules="[new_factory_rules.name, new_factory_rules.required]"
+
+              ></v-text-field>
+              <v-btn
+                  :disabled="!new_factory_valid"
+                  @click="add_factory"
+
+              >
+                Add industry
+              </v-btn>
+            </v-form>
+
+          </div>
+
         </div>
 
       </v-navigation-drawer>
@@ -291,6 +285,7 @@ import {Assessment, Industry } from "./ecam_backend";
 
 export default {
   data () {
+    let _this = this
     return {
       secondMenu: true, //Assessment/factory sidebar
       rightMenu: false, //Assessment/Company creation sidebar
@@ -305,7 +300,7 @@ export default {
       assessment_name: null,     //V-model name for creating/editing an assessment
       new_assessment_rules: { //Rules for creating new assessment
         name: value => {  //Assessment name must be unique
-          let assessments_with_same_name = this.created_assessments.filter(assessment => {
+          let assessments_with_same_name = _this.created_assessments.filter(assessment => {
             return assessment.name === value
           })
           return assessments_with_same_name.length === 0 || 'An assessment with same name already exists. '
@@ -314,21 +309,20 @@ export default {
       },
       edit_assessment_rules: { //Rules for editing assessment
         name: value => {  //Assessment name must be unique
-          let assessments_with_same_name = this.created_assessments.filter(assessment => {
+          let assessments_with_same_name = _this.created_assessments.filter(assessment => {
             return assessment.name === value
           })
-          return (assessments_with_same_name.length === 0 || (assessments_with_same_name.length === 1 && this.created_assessments[this.selected_assessment].name === value)) || 'An assessment with same name already exists.' //If there is an assessment with the same name, must be the edited assessment
+          return (assessments_with_same_name.length === 0 || (assessments_with_same_name.length === 1 && _this.created_assessments[_this.selected_assessment].name === value)) || 'An assessment with same name already exists.' //If there is an assessment with the same name, must be the edited assessment
         },
         required: value => !!value || 'Required.',
       },
       new_assessment_valid: false,  //Enable or disable button for creating new assessment
       right_sidebar_content: null,  //Content of the right sidebar: 1->create assessment, 2->edit assessment, 3->edit industry
       selected_assessment: null,  //Id of the assessment to edit
-      edit_assessment_tab: 0, //Vmodel for edit assessment tab
       factory_name: null, //v-model for creating new factory
       new_factory_rules: { //Rules for creating new factory
         name: value => {  // Factory name must bu unique inside an assessment
-          let factories_with_same_name = this.created_assessments[this.selected_assessment].industries.filter(company => {
+          let factories_with_same_name = _this.created_assessments[_this.selected_assessment].industries.filter(company => {
             return company.name === value
           })
           return factories_with_same_name.length === 0 || 'An industry with same name already exists. '
@@ -338,10 +332,10 @@ export default {
       new_factory_valid: false, //Enable or disable button for creating new factory
       edit_industry_rules: { //Rules for editing industry
         name: value => {  //Industry name must be unique
-          let industries_with_same_name = this.created_assessments[this.selected_assessment].industries.filter(industry => {
+          let industries_with_same_name = _this.created_assessments[_this.selected_assessment].industries.filter(industry => {
             return industry.name === value
           })
-          return (industries_with_same_name.length === 0 || (industries_with_same_name.length === 1 && this.created_assessments[this.selected_assessment].industries[this.selected_industry].name === value)) || 'An assessment with same name already exists.' //If there is an assessment with the same name, must be the edited assessment
+          return (industries_with_same_name.length === 0 || (industries_with_same_name.length === 1 && _this.created_assessments[_this.selected_assessment].industries[_this.selected_industry].name === value)) || 'An assessment with same name already exists.' //If there is an assessment with the same name, must be the edited assessment
         },
         required: value => !!value || 'Required.',
       },
@@ -354,11 +348,34 @@ export default {
         edit_industry: {v_model: false, text: "Industry edited correctly", },
         delete_industry: {v_model: false, text: "Industry deleted correctly", },
       },
+      map_content_info: null, //Info to show when the map is clicked
+      assessment_expansion_panel: undefined, //Selected assessment in expansion panel
+      latlng_selected: null //Coordinates of point in the map
 
 
     }
   },
   methods: {
+    update_markers(){
+      let _this = this
+      this.$location_markers.splice(0,this.$location_markers.length)
+      for (let assessment=0; assessment<_this.$assessments.length; assessment++) {
+        for(let industry=0; industry<_this.$assessments[assessment].industries.length; industry++){
+          let marker = {
+            assessment: assessment,
+            industry: industry,
+            latlng: _this.$assessments[assessment].industries[industry].location
+          }
+          _this.$location_markers.push(marker)
+        }
+      }
+    },
+    toggleMapContent(content){
+      this.right_sidebar_content = 4
+      this.rightMenu = true
+      this.map_content_info = content["right bar content"]
+      this.latlng_selected = content.latlng
+    },
     class_for_main_content() {
       if (this.secondMenu && this.rightMenu) return "two_sidebar_open"
       else if (this.secondMenu || this.rightMenu) return "one_sidebar_open"
@@ -377,8 +394,6 @@ export default {
       this.right_sidebar_content = 2;
       this.selected_assessment = assessment_index
       this.assessment_name = this.created_assessments[assessment_index].name
-      this.edit_assessment_tab = 0
-      this.factory_name = null
 
     },
     edit_assessment(){
@@ -390,11 +405,19 @@ export default {
       this.rightMenu = false
       this.snackbars.delete_assessment.v_model = true
       this.$assessments.splice(this.selected_assessment, 1)
+      this.update_markers()
     },
     add_factory(){
       let industry = new Industry()
       industry.name = this.factory_name
-      let assessment = this.$assessments[this.selected_assessment]
+      industry.location = this.latlng_selected
+      let assessment = this.$assessments[this.assessment_expansion_panel]
+      let marker = {
+        assessment: this.assessment_expansion_panel,
+        industry: assessment.industries.length,
+        latlng: this.latlng_selected
+      }
+      this.$location_markers.push(marker)
       assessment.add_industry(industry)
       this.rightMenu = false
       this.factory_name = null
@@ -416,6 +439,7 @@ export default {
       this.rightMenu = false
       this.snackbars.delete_industry.v_model = true
       this.$assessments[this.selected_assessment].delete_industry(this.selected_industry)
+      this.update_markers()
     }
   },
 }
