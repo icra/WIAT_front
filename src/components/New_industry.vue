@@ -23,7 +23,7 @@
                   <div style="width: 100%;">
                     <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                       <span>
-                        {{value.question}}
+                        {{value.question}}   <!-- Input -->
                       </span>
                       <v-tooltip
                           bottom
@@ -34,10 +34,9 @@
                               v-on="on"
                               outlined
                               x-small
-                              @click="industry[key] = estimations[key](industry)"
-
+                              @click="industry[key] = parseFloat(estimations[key](industry)).toFixed(2)"
                           >
-                          Estimation: {{estimations[key](industry)}}{{value.unit}}
+                          Estimation: {{parseFloat(estimations[key](industry)).toFixed(2)}}{{value.unit}} <!-- Botó amb estimació -->
                           </v-btn>
                         </template>
                         <span>{{ estimations[key].toString() }}</span>
@@ -48,9 +47,10 @@
                       <select v-model="industry[key]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
                         <option
                             v-for="item in value.items"
-                            :value="value.estimation_based_on === null ? item[value.estimation_factor] : (item[value.estimation_factor])*industry[value.estimation_based_on]"
+                            :value="value.estimation_based_on === null ? parseFloat(item[value.estimation_factor]).toFixed(2) : parseFloat((item[value.estimation_factor])*industry[value.estimation_based_on]).toFixed(2)"
                         >
-                          {{item.name}} {{item[value.description]}} ({{value.estimation_based_on === null ? item[value.estimation_factor] : (item[value.estimation_factor])*industry[value.estimation_based_on]}} {{value.unit}})
+                          <!--Desplegable amb estimació-->
+                          {{item.name}} {{item[value.description]}} ({{value.estimation_based_on === null ? parseFloat(item[value.estimation_factor]).toFixed(2) : parseFloat((item[value.estimation_factor])*industry[value.estimation_based_on]).toFixed(2)}} {{value.unit}})
                         </option>
                         <option :value="industry[key]">Custom value</option>
                       </select>
@@ -75,6 +75,7 @@
                       <v-text-field
                           v-model="industry[key]"
                           :suffix="value.unit"
+                          type="number"
                       ></v-text-field>
 
                     </div>

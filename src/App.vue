@@ -17,12 +17,13 @@
 
       <!-- Main sidebar (first)-->
       <v-navigation-drawer
-          style="z-index:2; max-height: 100%"
+          style="z-index:2; max-height: 100%; min-width: 32px"
           clipped
           permanent
           mini-variant
           mini-variant-width="3.25vw"
           height="100%"
+
       >
 
         <div class="icon_sidebar_container">
@@ -111,7 +112,7 @@
               </v-expansion-panel>
             </v-expansion-panels>
           </div>
-          <v-btn style="width: 100%" @click="rightMenu = true; right_sidebar_content = 1; assessment_name = null">
+          <v-btn style="width: 100%" @click="rightMenu = true; right_sidebar_content = 1; assessment_name = null" small outlined>
             Create assessment
           </v-btn>
         </div>
@@ -145,42 +146,48 @@
             <v-text-field
                 v-model="assessment_name"
                 label="Assessment name"
-                :rules="[new_assessment_rules.name, new_assessment_rules.required]"
+                :rules="[new_assessment_rules_name, rules_required]"
             ></v-text-field>
             <v-btn
                 :disabled="!new_assessment_valid"
-                @click="create_assessment">
+                @click="create_assessment"
+                small
+                outlined
+            >
               Create assessment
             </v-btn>
           </v-form>
         </div>
         <!-- Edit settings -->
         <div v-else-if="right_sidebar_content === 2" >
-          <h1>Edit assessment</h1>
           <div style="margin: 7px; padding: 7px; background-color: white">
+            <h1>Edit assessment</h1>
             <v-form
                 v-model="new_assessment_valid"
             >
               <v-text-field
                   v-model="assessment_name"
-                  :rules="[edit_assessment_rules.name, edit_assessment_rules.required]"
+                  :rules="[edit_assessment_rules, rules_required]"
 
               ></v-text-field>
               <v-btn
                   :disabled="!new_assessment_valid"
                   @click="edit_assessment"
-
+                  small
+                  outlined
               >
                 Edit
               </v-btn>
             </v-form>
           </div>
-
-          <v-btn @click = "delete_assessment">
-            Delete
-          </v-btn>
+          <div style="margin: 7px; padding: 7px;">
+            <v-btn @click = "delete_assessment" small outlined>
+              Delete
+            </v-btn>
+          </div>
 
         </div>
+        <!-- edit industry -->
         <div v-else-if="right_sidebar_content === 3">
           <div style="margin: 7px; padding: 7px; background-color: white">
             <h1>Edit industry</h1>
@@ -189,26 +196,32 @@
             >
               <v-text-field
                   v-model="factory_name"
-                  :rules="[edit_industry_rules.name, edit_industry_rules.required]"
+                  :rules="[edit_industry_rules_name, rules_required]"
               ></v-text-field>
               <v-btn
                   :disabled="!new_factory_valid"
-                  @click="edit_industry">
+                  @click="edit_industry"
+                  small
+                  outlined
+              >
                 Edit industry
               </v-btn>
             </v-form>
-            <v-btn :to="{ name: 'edit_industry', params: {assessment_id: selected_assessment, industry_id: selected_industry}}">
+          </div>
+          <div style="margin: 7px; padding: 7px;">
+            <v-btn :to="{ name: 'edit_industry', params: {assessment_id: selected_assessment, industry_id: selected_industry}}" small outlined>
               Advanced edit
             </v-btn>
-            <v-btn @click="delete_industry">
+            <v-btn @click="delete_industry" small outlined>
               Delete
             </v-btn>
-            <v-btn :to="{ name: 'statistics_industry', params: {assessment_id: selected_assessment, industry_id: selected_industry}}">
+            <v-btn small outlined :to="{ name: 'statistics_industry', params: {assessment_id: selected_assessment, industry_id: selected_industry}}">
               STATISTICS
             </v-btn>
 
           </div>
         </div>
+        <!-- map info -->
         <div v-else-if="right_sidebar_content === 4">
           <div style="margin: 7px; padding: 7px; background-color: white">
             <h1>Map info</h1>
@@ -219,12 +232,17 @@
               <b>{{key}}</b>: <p>{{value}}</p>
             </span>
           </div>
-          <v-btn
-              :disabled="assessment_expansion_panel === undefined"
-              @click="right_sidebar_content = 5; factory_name = null"
-          >
-            ADD NEW INDUSTRY
-          </v-btn>
+          <div style="margin: 7px; padding:7px">
+            <v-btn
+                :disabled="assessment_expansion_panel === undefined"
+                @click="right_sidebar_content = 5; factory_name = null"
+                small
+                outlined
+            >
+              ADD NEW INDUSTRY
+            </v-btn>
+
+          </div>
 
         </div>
         <div v-else-if="right_sidebar_content === 5">
@@ -236,12 +254,13 @@
               <v-text-field
                   v-model="factory_name"
                   label="Industry name"
-                  :rules="[new_factory_rules.name, new_factory_rules.required]"
+                  :rules="[new_factory_rules_name, rules_required]"
 
               ></v-text-field>
               <v-btn
                   :disabled="!new_factory_valid"
                   @click="add_factory"
+                  small outlined
 
               >
                 Add industry
@@ -285,7 +304,6 @@ import {Assessment, Industry } from "./ecam_backend";
 
 export default {
   data () {
-    let _this = this
     return {
       secondMenu: true, //Assessment/factory sidebar
       rightMenu: false, //Assessment/Company creation sidebar
@@ -298,47 +316,12 @@ export default {
       ],
       created_assessments: this.$assessments,  //Created assessments
       assessment_name: null,     //V-model name for creating/editing an assessment
-      new_assessment_rules: { //Rules for creating new assessment
-        name: value => {  //Assessment name must be unique
-          let assessments_with_same_name = _this.created_assessments.filter(assessment => {
-            return assessment.name === value
-          })
-          return assessments_with_same_name.length === 0 || 'An assessment with same name already exists. '
-        },
-        required: value => !!value || 'Required.',
-      },
-      edit_assessment_rules: { //Rules for editing assessment
-        name: value => {  //Assessment name must be unique
-          let assessments_with_same_name = _this.created_assessments.filter(assessment => {
-            return assessment.name === value
-          })
-          return (assessments_with_same_name.length === 0 || (assessments_with_same_name.length === 1 && _this.created_assessments[_this.selected_assessment].name === value)) || 'An assessment with same name already exists.' //If there is an assessment with the same name, must be the edited assessment
-        },
-        required: value => !!value || 'Required.',
-      },
       new_assessment_valid: false,  //Enable or disable button for creating new assessment
       right_sidebar_content: null,  //Content of the right sidebar: 1->create assessment, 2->edit assessment, 3->edit industry
       selected_assessment: null,  //Id of the assessment to edit
       factory_name: null, //v-model for creating new factory
-      new_factory_rules: { //Rules for creating new factory
-        name: value => {  // Factory name must bu unique inside an assessment
-          let factories_with_same_name = _this.created_assessments[_this.selected_assessment].industries.filter(company => {
-            return company.name === value
-          })
-          return factories_with_same_name.length === 0 || 'An industry with same name already exists. '
-        },
-        required: value => !!value || 'Required.',
-      },
       new_factory_valid: false, //Enable or disable button for creating new factory
-      edit_industry_rules: { //Rules for editing industry
-        name: value => {  //Industry name must be unique
-          let industries_with_same_name = _this.created_assessments[_this.selected_assessment].industries.filter(industry => {
-            return industry.name === value
-          })
-          return (industries_with_same_name.length === 0 || (industries_with_same_name.length === 1 && _this.created_assessments[_this.selected_assessment].industries[_this.selected_industry].name === value)) || 'An assessment with same name already exists.' //If there is an assessment with the same name, must be the edited assessment
-        },
-        required: value => !!value || 'Required.',
-      },
+
       selected_industry: null, //Id of the company to edit
       snackbars: {
         new_assessment: {v_model: false, text: "New assessment created correctly", },
@@ -440,8 +423,44 @@ export default {
       this.snackbars.delete_industry.v_model = true
       this.$assessments[this.selected_assessment].delete_industry(this.selected_industry)
       this.update_markers()
+    },
+    new_factory_rules_name(value) {  //Rules for creating new factory
+      let factories_with_same_name = this.created_assessments[this.assessment_expansion_panel].industries.filter(company => {
+        return company.name === value
+      })
+      if (factories_with_same_name.length === 0) return true
+      else return 'An industry with same name already exists. '
+    },
+    rules_required(value) {  //Rules for creating new factory
+      if(!!value) return true
+      else return 'Required.'
+    },
+    edit_industry_rules_name(value){ //Rules for editing industry
+      let industries_with_same_name = this.created_assessments[this.selected_assessment].industries.filter(industry => {
+        return industry.name === value
+      })
+      if (industries_with_same_name.length === 0 || (industries_with_same_name.length === 1 && this.created_assessments[this.selected_assessment].industries[this.selected_industry].name === value)) return true  //If there is an assessment with the same name, must be the edited assessment
+      else return 'An assessment with same name already exists.'
+    },
+    new_assessment_rules_name(value){//Rules for creating new assessment
+      let assessments_with_same_name = this.created_assessments.filter(assessment => {
+        return assessment.name === value
+      })
+      if (assessments_with_same_name.length === 0) return true
+      else return 'An assessment with same name already exists.'
+    },
+    edit_assessment_rules(value){//Rules for editing assessment
+      let assessments_with_same_name = this.created_assessments.filter(assessment => {
+        return assessment.name === value
+      })
+      if (assessments_with_same_name.length === 0 || (assessments_with_same_name.length === 1 && this.created_assessments[this.selected_assessment].name === value)) return true
+      else return 'An assessment with same name already exists.' //If there is an assessment with the same name, must be the edited assessment
+
     }
-  },
+
+
+  }
+
 }
 </script>
 

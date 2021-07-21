@@ -69,7 +69,7 @@ export class Industry{
                 "wwt_vol_disc" :{question:"Volume of discharged effluent to water body", value: 0},*/
 
                 //BOD (creates CH4)
-                "wwt_bod_infl": {question: "Influent BOD5 load", value: 0, unit: "kg"}, //kgBOD   //No te estimacio
+                "wwt_bod_infl": {question: "Influent COD5 load", value: 0, unit: "kg"}, //kgCOD   //No te estimacio
                 "wwt_bod_effl": {
                     question: "Effluent BOD5 load",
                     value: 0,
@@ -80,6 +80,10 @@ export class Industry{
                     estimation_factor: "bod_effl",
                     description: "bod_effl_table"
                 }, //kgBOD   Table 6.6B and 6.10C
+
+                "wwt_ind_prod": {question: "Total industrial product", value: 0, unit: "t/yr"},  //t/yer | Total industrial product
+                "wwt_wwt_generated": {question: "Wastewater generated", value: 0, unit: "m3/t"},  //m3/t | Wastewater generated
+                "wwt_tot_nit": {question: "Total nitrogen in untreated wastewater", value: 0, unit: "kgTN/m3"},  //kgTN/m3 | Total nitrogen in untreated wastewater
 
                 //TN (creates N2O)
                 "wwt_tn_infl": {question: "Total Nitrogen load in the influent", value: 0, unit: "kg", estimation_type: "equation"},  //kgN    Equacio 6.10
@@ -98,13 +102,13 @@ export class Industry{
                 "wwt_ch4_efac_tre": {
                     question: "CH4 emission factor (treatment)",
                     value: 0,
-                    unit: "kgCH4/kgBOD",
+                    unit: "kgCH4/kgCOD",
                     estimation_type: "option",
                     items: Tables["type_of_treatment"],
                     estimation_based_on: null,
                     estimation_factor: "ch4_efac",
                     description: "description"
-                },  //kgCH4/kgBOD  S'obté de la taula 6.3
+                },  //kgCH4/kgCOD  S'obté de la taula 6.3
                 "wwt_n2o_efac_tre": {
                     question: "N2O emission factor (treatment)",
                     value: 0,
@@ -120,13 +124,13 @@ export class Industry{
                 "wwt_ch4_efac_dis": {
                     question: "CH4 emission factor (discharge)",
                     value: 0,
-                    unit: "kgCH4/kgBOD",
+                    unit: "kgCH4/kgCOD",
                     estimation_type: "option",
                     items: Tables["type_of_water_body"],
                     estimation_based_on: null,
                     estimation_factor: "ch4_efac",
                     description: "description"
-                },  //kgCH4/kgBOD   Table 6.3
+                },  //kgCH4/kgCOD   Table 6.8
                 "wwt_n2o_efac_dis": {
                     question: "N2O emission factor (discharge)",
                     value: 0,
@@ -148,10 +152,7 @@ export class Industry{
                     value: 0,
                     unit: "kg"
                 },  //kg | raw sludge removed from wwtp as dry mass
-                "wwt_bod_slud": {question: "BOD5 removed as sludge", value: 0, unit: "kg"},  //kg | BOD removed as sludge    //Taula 6.6A
-                "wwt_ind_prod": {question: "Total industrial product", value: 0, unit: "t/yr"},  //t/yer | Total industrial product
-                "wwt_wwt_generated": {question: "Wastewater generated", value: 0, unit: "m3/t"},  //m3/t | Wastewater generated
-                "wwt_tot_nit": {question: "Total nitrogen in untreated wastewater", value: 0, unit: "kgTN/m3"},  //kgTN/m3 | Total nitrogen in untreated wastewater
+                "wwt_bod_slud": {question: "COD5 removed as sludge", value: 0, unit: "kg"},  //kg | COD removed as sludge    //Taula 6.6A
 
             },
             "Fuel engines" :{
@@ -849,7 +850,7 @@ export class Industry{
     //emissions from water discharged
     wwt_KPI_GHG_disc(){
         let co2   = 0;
-        let ch4   = this.wwt_bod_effl*this.wwt_ch4_efac_dis*Cts.ct_ch4_eq.value;
+        let ch4   = this.wwt_bod_effl*this.wwt_ch4_efac_dis*Cts.ct_ch4_eq.value;    //Equacio 6.2
         let n2o   = this.wwt_tn_effl *this.wwt_n2o_efac_dis*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;    //Equacio 6.7
         let total = co2+ch4+n2o;
         return {total,co2,ch4,n2o};
@@ -896,12 +897,12 @@ let Tables={
     //ipcc 2019, table 6.3 (updated) EF (kgCH4/kgBOD)
     "type_of_water_body":[
         {name:"Water body undefined",                                                                   ch4_efac:0, description:""     },
-        {name:"Discharge to aquatic environments (Tier 1)",                                             ch4_efac:0.068, description:"" },
-        {name:"Discharge to aquatic environments other than reservoirs, lakes, and estuaries (Tier 2)", ch4_efac:0.021, description:"" },
-        {name:"Discharge to reservoirs, lakes, and estuaries (Tier 2)",                                 ch4_efac:0.114, description:"" },
-        {name:"Stagnant sewer or anaerobic water body",                                                 ch4_efac:0.3, description:""   },
-        {name:"Flowing sewer (open or closed)",                                                         ch4_efac:0, description:""     },
-        {name:"Soil infiltration",                                                                      ch4_efac:0, description:""     },
+        {name:"Discharge to aquatic environments (Tier 1)",                                             ch4_efac:0.028, description:"" },
+        {name:"Discharge to aquatic environments other than reservoirs, lakes, and estuaries (Tier 2)", ch4_efac:0.009, description:"" },
+        {name:"Discharge to reservoirs, lakes, and estuaries (Tier 2)",                                 ch4_efac:0.048, description:"" },
+        //{name:"Stagnant sewer or anaerobic water body",                                                 ch4_efac:0.3, description:""   },
+        //{name:"Flowing sewer (open or closed)",                                                         ch4_efac:0, description:""     },
+        //{name:"Soil infiltration",                                                                      ch4_efac:0, description:""     },
     ],
 
     "type_of_sewer":[
@@ -910,18 +911,18 @@ let Tables={
         {name:"Flowing sewer (open or closed)",         ch4_efac:0},
     ],
 
-    //ipcc 2019, table 6.3 (updated) EF (kgCH4/kgBOD)           CANVIAR PER TAULA 6.8
+    //ipcc 2019, table 6.3 (updated) EF (kgCH4/kgCOD)           CANVIAR PER TAULA 6.8
     "type_of_treatment":[
         {name:"Type of treatment undefined",                                  ch4_efac:0,  description: ""   },
         {name:"Centralised, aerobic, treatment plant",                        ch4_efac:0, description: ""},
-        {name:"Anaerobic Reactor - CH4 recovery not considered",              ch4_efac:0.48,  description: ""},
+        {name:"Anaerobic Reactor - CH4 recovery not considered",              ch4_efac:0.2,  description: ""},
         //{name:"Anaerobic Reactor - CH4 recovery considered",                  ch4_efac:0.14,  description: ""},
-        {name:"Anaerobic shallow lagoon and facultative lagoons (<2m depth)", ch4_efac:0.12,  description: ""},
-        {name:"Anaerobic deep lagoon (>2m depth)",                            ch4_efac:0.48,  description: ""},
+        {name:"Anaerobic shallow lagoon and facultative lagoons (<2m depth)", ch4_efac:0.05,  description: ""},
+        {name:"Anaerobic deep lagoon (>2m depth)",                            ch4_efac:0.2,  description: ""},
         //{name:"Anaerobic Lagoon covered",                                     ch4_efac:0,     description: ""},
-        {name:"Wetlands - Surface flow",                                      ch4_efac:0.24,  description: ""},
-        {name:"Wetlands - Horizontal subsurface flow",                        ch4_efac:0.06,  description: ""},
-        {name:"Wetlands - Vertical subsurface flow",                          ch4_efac:0.006, description: ""},
+        {name:"Wetlands - Surface flow",                                      ch4_efac:0.1,  description: ""},
+        {name:"Wetlands - Horizontal subsurface flow",                        ch4_efac:0.025,  description: ""},
+        {name:"Wetlands - Vertical subsurface flow",                          ch4_efac:0.0025, description: ""},
         //{name:"Activated Sludge - Well managed",                              ch4_efac:0,     description: ""},
         //{name:"Activated Sludge - Minor poorly aerated zones",                ch4_efac:0.06,  description: ""},
         //{name:"Activated Sludge - Some aerated zones",                        ch4_efac:0.12,  description: ""},
@@ -930,6 +931,7 @@ let Tables={
         //{name:"Trickling Filter",                                             ch4_efac:0.036, description: ""},
     ],
 
+    /*
     "Type of onsite treatment":[
         {name:"Type of treatment undefined",                      ch4_efac:0.00,   bod_rmvd_as_sludge_estm:0.0,},
         {name:"Anaerobic Digester",                               ch4_efac:0.48,   bod_rmvd_as_sludge_estm:0.10,},
@@ -948,7 +950,7 @@ let Tables={
         {name:"Activated Sludge - Some aerated zones",            ch4_efac:0.12,   bod_rmvd_as_sludge_estm:0.65,},
         {name:"Activated Sludge - Not well managed",              ch4_efac:0.18,   bod_rmvd_as_sludge_estm:0.65,},
         {name:"Trickling Filter",                                 ch4_efac:0.036,  bod_rmvd_as_sludge_estm:0.65,},
-    ],
+    ],*/
 
     "N2O EF plants (Table 6.8A)":[
         {name:"Type of treatment undefined",           n2o_efac:0, description:""     },

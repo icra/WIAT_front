@@ -49,7 +49,6 @@ export default {
   },
   methods: {
 
-
     //Place markers on the map
     place_markers(markers) {
 
@@ -57,6 +56,7 @@ export default {
       _this.markers = []
       markers.forEach(marker =>{
         let new_marker = L.marker(marker.latlng).addTo(_this.mapDiv).on('click', function(e) {
+          _this.mapDiv.panTo(marker.latlng)
           _this.$emit('editIndustry', marker.assessment, marker.industry)
         });
         _this.markers.push(new_marker)
