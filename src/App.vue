@@ -329,8 +329,7 @@ export default {
 
       items: [  //Icons for the main sidebar
         { title: "Maps and Datasets", icon: 'mdi-map', to:"map" },
-        { title: "Import assessment", icon: 'mdi-import', to:"map"},
-        { title: "Export data", icon: 'mdi-export', to:"map" },
+        { title: "Import assessment", icon: 'mdi-import', to:"import"},
         { title: "Show statistics", icon: 'mdi-chart-areaspline', to:"map" },
       ],
       created_assessments: this.$assessments,  //Created assessments

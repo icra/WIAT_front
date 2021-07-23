@@ -4,6 +4,7 @@ import Map from '../components/Map'
 import New_assessment from "../components/New_assessment";
 import New_industry from "../components/New_industry";
 import Statistics_industry from "../components/Statistics_industry";
+import Import from "../components/Import";
 Vue.use(VueRouter)
 
 const routes = [
@@ -29,6 +30,12 @@ const routes = [
     props: true,
     component: Statistics_industry
   },
+  {
+    path: '/import',
+    name: 'import',
+    component: Import
+
+  }
 
 ]
 
