@@ -86,7 +86,7 @@ export class Industry{
                 "wwt_tot_nit": {question: "Total nitrogen in untreated wastewater", value: 0, unit: "kgTN/m3"},  //kgTN/m3 | Total nitrogen in untreated wastewater
 
                 //TN (creates N2O)
-                "wwt_tn_infl": {question: "Total Nitrogen load in the influent", value: 0, unit: "kg", estimation_type: "equation"},  //kgN    Equacio 6.10
+                "wwt_tn_infl": {question: "Total Nitrogen load in the influent", value: 0, unit: "kg", estimation_type: "equation"},  //kgN    Equacio 6.13
                 "wwt_tn_effl": {
                     question: "Total Nitrogen load in the effluent",
                     value: 0,
@@ -164,15 +164,16 @@ export class Industry{
 
             "Biogas produced from anaerobic digestion" : {
                 //biogas
-                "wwt_biog_pro": {question: "Biogas produced (volume)", value: 0, unit: "Nm3"}, //Nm3 | total biogas produced
-                "wwt_biog_fla": {question: "% of biogas produced that is flared", value: 98, unit: "%"},
+                "wwt_biog_pro": {question: "Biogas produced (volume)", value: 0, unit: "Nm3", estimation_type:"equation"}, //Nm3 | total biogas produced
+                "wwt_biog_fla": {question: "% of biogas produced that is flared", value: 98, unit: "%", estimation_type: "equation"},
                 "wwt_biog_val": {
                     question: "Biogas valorised as heat and/or electricity (% volume)",
                     value: 0,
-                    unit: "%"
+                    unit: "%",
+                    estimation_type: "equation"
                 }, //% of biogas produced that is used for heat
-                "wwt_biog_lkd": {question: "Biogas leaked to the atmosphere (% volume)", value: 2, unit: "%"}, //% of biogas produced that is leaked
-                "wwt_biog_sold": {question: "Biogas sold (% volume)", value: 0, unit: "%"},
+                "wwt_biog_lkd": {question: "Biogas leaked to the atmosphere (% volume)", value: 2, unit: "%", estimation_type: "equation"}, //% of biogas produced that is leaked
+                "wwt_biog_sold": {question: "Biogas sold (% volume)", value: 0, unit: "%", estimation_type: "equation"},
                 "wwt_ch4_biog": {question: "Percentage of methane in the biogas (% volume)", value: 59, unit: "%"}, //% of CH4 in biogas (volume)
                 "wwt_dige_typ": {
                     question: "Fuel type (digester)",
@@ -433,7 +434,28 @@ export class Industry{
                 let W = industry.wwt_wwt_generated  //Wastewater generated
                 let TN = industry.wwt_tot_nit   //Total nitrogen in untreated wastewater
                 return P*W*TN
-            }
+            },
+            //estimation for biogas produced
+            wwt_biog_pro(substage){
+                let wwt_mass_slu    = substage.wwt_mass_slu;  //kg  | mass of combined sludge to digestion
+                let VS_to_digestion = wwt_mass_slu    * 0.80; //kg  | VS to digestion: 80% of sludge mass
+                let VS_destroyed    = VS_to_digestion * 0.60; //kg  | VS destroyed: 60% of VS
+                let biogas_volume   = VS_destroyed    * 0.80; //Nm3 | biogas produced (volume)
+                return biogas_volume;
+            },
+            //wwt
+            wwt_biog_fla(substage){
+                return 100-substage.wwt_biog_val-substage.wwt_biog_lkd-substage.wwt_biog_sold;
+            },
+            wwt_biog_val(substage){
+                return 100-substage.wwt_biog_fla-substage.wwt_biog_lkd-substage.wwt_biog_sold;
+            },
+            wwt_biog_lkd(substage){
+                return 100-substage.wwt_biog_val-substage.wwt_biog_fla-substage.wwt_biog_sold;
+            },
+            wwt_biog_sold(substage){
+                return 100-substage.wwt_biog_val-substage.wwt_biog_fla-substage.wwt_biog_lkd;
+            },
         }
     }
 

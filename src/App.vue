@@ -29,26 +29,38 @@
         <div class="icon_sidebar_container">
           <v-list height="100%">
             <div class="icon_sidebar_list">
-              <v-list-item>
-                <v-list-item-action>
-                  <v-icon color = "#F2F4F3" @click="secondMenu = !secondMenu">
-                    mdi-arrow-expand-right
-                  </v-icon>
-                </v-list-item-action>
-              </v-list-item>
-              <v-list-item
-                  v-for="item in items"
-                  :key="item.title"
-              >
-                <v-list-item-action>
-                  <router-link :to="{ name: item.to}">
+              <v-hover v-slot:default="{ hover }">
+                <v-list-item :class="hover ? 'icon_hovered_pressed' : ''" @click="secondMenu = !secondMenu" style="height: 75px">
+                  <v-list-item-icon>
                     <v-icon color = "#F2F4F3">
-                      {{ item.icon }}
+                      mdi-arrow-expand-right
                     </v-icon>
-                  </router-link>
-                </v-list-item-action>
-              </v-list-item>
+                  </v-list-item-icon>
+                  <v-list-item-content></v-list-item-content>
+                </v-list-item>
+              </v-hover>
+              <v-list-item-group>
+                <v-hover
+                    v-slot:default="{ hover }"
+                    v-for="(item, index) in items"
+                    :key="item.title"
+                >
+                  <v-list-item
+                      @click="icon_selected = index"
+                      :class="(hover || icon_selected === index)? 'icon_hovered_pressed' : ''"
+                      :to="{ name: item.to}"
+                      style="height: 75px" :value="index"
+                  >
+                    <v-list-item-icon>
+                      <v-icon color = "#F2F4F3">
+                        {{ item.icon }}
+                      </v-icon>
+                    </v-list-item-icon>
+                    <v-list-item-content></v-list-item-content>
+                  </v-list-item>
+                </v-hover>
 
+              </v-list-item-group>
             </div>
           </v-list>
         </div>
@@ -69,7 +81,7 @@
           </div>
 
           <h1>Assessment list</h1>
-          <div style = "overflow-y: auto; height: 80%; max-height: 80%; width: 100%">
+          <div style = "overflow-y: auto; height: 75%; max-height: 75%; width: 100%">
             <v-expansion-panels focusable v-model="assessment_expansion_panel">
               <v-expansion-panel
                   v-for="(assessment, assessment_index ) in created_assessments"
@@ -80,7 +92,7 @@
                   {{ assessment.name }}
                   <template v-slot:actions>
                     <v-hover v-slot:default="{ hover }">
-                      <v-icon color="#1C195B" :size="hover ? '25px' : '20px'" @click="open_edit_assessment_tab(assessment_index)" @click.native.stop>
+                      <v-icon :color="hover ? '#463FCA' : '#1C195B'" @click="open_edit_assessment_tab(assessment_index)" @click.native.stop>
                         mdi-cog
                       </v-icon>
                     </v-hover>
@@ -100,8 +112,9 @@
                       <v-hover v-slot:default="{ hover }">
                         <v-icon
                             @click = "open_edit_industry_tab(assessment_index, industry_index)"
-                            style="float: right; margin-right: 1px"
-                            :size="hover ? '23px' : '20px'"
+                            style="float: right; margin-right: 3px"
+                            :color="hover ? '#463FCA' : '#1C195B'"
+                            size="18px"
                         >
                           mdi-circle-edit-outline
                         </v-icon>
@@ -112,9 +125,15 @@
               </v-expansion-panel>
             </v-expansion-panels>
           </div>
-          <v-btn style="width: 100%" @click="rightMenu = true; right_sidebar_content = 1; assessment_name = null" small outlined>
-            Create assessment
-          </v-btn>
+          <div style="padding-bottom: 20px">
+            <v-btn
+                style="width: 100%; "
+                @click="rightMenu = true; right_sidebar_content = 1; assessment_name = null"
+                small outlined>
+              Create assessment
+            </v-btn>
+
+          </div>
         </div>
 
       </v-navigation-drawer>
@@ -333,7 +352,8 @@ export default {
       },
       map_content_info: null, //Info to show when the map is clicked
       assessment_expansion_panel: undefined, //Selected assessment in expansion panel
-      latlng_selected: null //Coordinates of point in the map
+      latlng_selected: null, //Coordinates of point in the map
+      icon_selected: 0 //first sidebar icon selected
 
 
     }
@@ -412,6 +432,7 @@ export default {
       this.factory_name = this.created_assessments[assessment_index].industries[industry_index].name
       this.selected_assessment = assessment_index
       this.selected_industry = industry_index
+      this.assessment_expansion_panel = assessment_index
     },
     edit_industry(){
       this.rightMenu = false
@@ -505,10 +526,6 @@ html::-webkit-scrollbar {
 }
 .icon_sidebar_list {
   height: 100%;
-  display: flex;
-
-  justify-content:space-evenly;
-  flex-direction: column;
 }
 
 .content{
@@ -518,6 +535,10 @@ html::-webkit-scrollbar {
   align-items: center;
   justify-content: center;
   background-color: #F2F4F3;
+}
+
+.icon_hovered_pressed{
+  background-color: #463FCA;
 }
 
 
