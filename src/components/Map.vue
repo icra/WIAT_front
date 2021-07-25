@@ -1,5 +1,4 @@
 <template>
-
   <div id="mapContainer"></div>
 
 </template>
@@ -8,6 +7,8 @@
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { latLng, Icon } from "leaflet";
+import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
+import 'leaflet-geosearch/dist/geosearch.css';
 
 delete Icon.Default.prototype._getIconUrl;
 Icon.Default.mergeOptions({
@@ -116,6 +117,35 @@ export default {
       }
 
       this.mapDiv.on('click', onMapClick);
+
+      const provider = new OpenStreetMapProvider();
+      const searchControl = new GeoSearchControl({
+        provider: provider,
+        showMarker: false,
+        autoClose: true
+      });
+      this.mapDiv.addControl(searchControl);
+
+      function aux(e) {
+        let mapContent = {
+          "latlng": {
+            'lat': e.location.y,
+            'lng': e.location.x
+
+          },
+          "right bar content": {
+            "Population associated": 45
+          }
+
+        }
+        //console.log(_this.$parent)
+        _this.$emit('mapContent', mapContent)
+      }
+
+      this.mapDiv.on('geosearch/showlocation', aux);
+
+
+
 
       //Water stress
       let water_stress =
