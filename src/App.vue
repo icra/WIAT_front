@@ -68,20 +68,23 @@
 
       <!-- Assessment and factory sidebar (second) -->
       <v-navigation-drawer
-          style="z-index:1; background-color: #F2F4F3;"
+          style="z-index:1; background-color: #F2F4F3; height: 100vh"
           v-model="secondMenu"
           :width="secondMenu ? '15vw' : '0vw'"
           flat
 
       >
 
-        <div style=" height: 100%; position: fixed; width: 100%; padding: 10px">
+        <div style=" height: 90vh; display: flex; flex-flow: column; width: 100%; padding: 10px">
           <div style="display: flex; justify-content: flex-end; padding: 7px ">
             <v-icon @click="secondMenu = !secondMenu">mdi-close</v-icon>
           </div>
 
           <h1>Assessment list</h1>
-          <div style = "overflow-y: auto; height: 75%; max-height: 75%; width: 100%">
+          <!-- <div style = "overflow-y: auto; height: 75%; max-height: 75%; width: 100%"> -->
+          <div style="flex: 2;  /* 1 and it will fill whole space left if no flex value are set to other children*/
+          background: gold;
+          overflow: auto; width: 100%">
             <v-expansion-panels focusable v-model="assessment_expansion_panel">
               <v-expansion-panel
                   v-for="(assessment, assessment_index ) in created_assessments"
@@ -125,14 +128,13 @@
               </v-expansion-panel>
             </v-expansion-panels>
           </div>
-          <div style="padding-bottom: 20px">
+          <div style="padding-bottom: 20px; min-width: 100px">
             <v-btn
                 style="width: 100%; "
                 @click="rightMenu = true; right_sidebar_content = 1; assessment_name = null"
                 small outlined>
               Create assessment
             </v-btn>
-
           </div>
         </div>
 
@@ -492,6 +494,7 @@ html {
   scrollbar-width: none;
   -ms-overflow-style: none;
   width: 100%;
+  height:100%;
 }
 
 html::-webkit-scrollbar {
