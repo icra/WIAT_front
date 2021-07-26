@@ -126,7 +126,7 @@ export default {
       });
       this.mapDiv.addControl(searchControl);
 
-      function aux(e) {
+      function searchLocation(e) {
         let mapContent = {
           "latlng": {
             'lat': e.location.y,
@@ -142,7 +142,7 @@ export default {
         _this.$emit('mapContent', mapContent)
       }
 
-      this.mapDiv.on('geosearch/showlocation', aux);
+      this.mapDiv.on('geosearch/showlocation', searchLocation);
 
 
 
