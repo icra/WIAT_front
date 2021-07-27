@@ -128,7 +128,7 @@
               </v-expansion-panel>
             </v-expansion-panels>
           </div>
-          <div style="padding-bottom: 20px; min-width: 100px">
+          <div style="padding-bottom: 20px; min-width: 100px; margin-top: 10px">
             <v-btn
                 style="width: 100%; "
                 @click="rightMenu = true; right_sidebar_content = 1; assessment_name = null"
@@ -143,7 +143,7 @@
       <!-- Main content -->
       <v-main :class=class_for_main_content>
         <div class="content">
-          <router-view @mapContent="toggleMapContent" @editIndustry="open_edit_industry_tab"></router-view>
+          <router-view @mapContent="toggleMapContent" @editIndustry="open_edit_industry_tab" ref="delete_click_marker"></router-view>
         </div>
       </v-main>
 
@@ -337,7 +337,7 @@ export default {
       created_assessments: this.$assessments,  //Created assessments
       assessment_name: null,     //V-model name for creating/editing an assessment
       new_assessment_valid: false,  //Enable or disable button for creating new assessment
-      right_sidebar_content: null,  //Content of the right sidebar: 1->create assessment, 2->edit assessment, 3->edit industry
+      right_sidebar_content: null,  //Content of the right sidebar: 1->create assessment, 2->edit assessment, 3->edit industry, 4->map info
       selected_assessment: null,  //Id of the assessment to edit
       factory_name: null, //v-model for creating new factory
       new_factory_valid: false, //Enable or disable button for creating new factory
@@ -358,6 +358,10 @@ export default {
 
 
     }
+  },
+  watch: {
+
+
   },
   methods: {
     update_markers(){
