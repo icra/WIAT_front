@@ -156,6 +156,8 @@ export default {
       //Empty arrays
       _this.created_assessments.splice(0,_this.created_assessments.length)
       _this.location_markers.splice(0,_this.location_markers.length)
+      _this.$assessment_active.splice(0,_this.$assessment_active.length)
+
 
       let imported_assessments = await this.fileToJSON(this.imported_file)
 
@@ -249,6 +251,7 @@ export default {
 
         //Repeat loop but for adding markers to map
         this.created_assessments.forEach((assessment, assessment_index )=> {
+          this.$assessment_active.push(true)
           let industries = assessment.industries
           industries.forEach((industry, industry_index)=> {
             _this.location_markers.push({

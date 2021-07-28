@@ -365,11 +365,10 @@ export default {
       assessment_expansion_panel: undefined, //Selected assessment in expansion panel
       latlng_selected: null, //Coordinates of point in the map
       icon_selected: 0, //first sidebar icon selected
-      assessment_active: [] //if assessment_active[i]=true, industries of the i-th assessment are shown on the map
+      assessment_active: this.$assessment_active //if assessment_active[i]=true, industries of the i-th assessment are shown on the map
     }
   },
   watch: {
-
 
   },
   methods: {
