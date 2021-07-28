@@ -8,8 +8,10 @@ Vue.config.productionTip = false
 import "@/assets/global.css"
 
 //Global variables
-Vue.prototype.$assessments = []
-Vue.prototype.$location_markers = []
+Vue.prototype.$assessments = []   //created assessments
+Vue.prototype.$location_markers = []    //Location of the industries of the assessments to show on the map
+Vue.prototype.$clicked_point = null    //Location of the point clicked on the map
+
 
 
 new Vue({

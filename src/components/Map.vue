@@ -34,21 +34,34 @@ export default {
       center2: [47.41322, -1.219482],
       location_markers: this.$location_markers,  //Created industries [{assessment, industry, location}]
       mapDiv: null,
-      markers: []
+      markers: [],
+      clicked_marker: null
 
     };
   },
   watch: {
     location_markers: function (markers) {
       //Delete markers first
-      let _this = this
-      this.markers.forEach(marker => {
-        _this.mapDiv.removeLayer(marker);
-      })
+      this.delete_markers()
       this.place_markers(markers)
     },
   },
   methods: {
+
+    //Delete markers from industries
+    delete_markers(){
+      this.markers.forEach(marker => {
+        this.mapDiv.removeLayer(marker);
+      })
+    },
+
+    //Delete clicked marker
+    delete_click_marker(){
+      if (this.clicked_marker !== null) {
+        this.mapDiv.removeLayer(this.clicked_marker);
+        this.clicked_marker = null
+      }
+    },
 
     //Place markers on the map
     place_markers(markers) {
@@ -68,7 +81,6 @@ export default {
       //http://localhost:3000/bona?longitude=2.16992&latitude=41.3879
       let lat = event.latlng.lat
       let lng = event.latlng.lng
-      console.log(event.latlng)
       let call = "/bona?longitude="+lng+"&latitude="+lat
       return axios
           .get(call)
@@ -98,6 +110,15 @@ export default {
 
       let popup = L.popup();
 
+      let greenIcon = new L.Icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+      });
+
       function onMapClick(e) {
 
         //let population_associated = await _this.get_population(e)
@@ -105,13 +126,17 @@ export default {
             .setLatLng(e.latlng)
             .setContent("You clicked the map at " + population_associated.toString())
             .openOn(mapDiv);*/
+
         let mapContent = {
           "latlng": e.latlng,
           "right bar content": {
             "Population associated": 45
           }
-
         }
+
+        if(_this.clicked_marker !== null) _this.mapDiv.removeLayer(_this.clicked_marker);
+        _this.clicked_marker = L.marker(e.latlng, {icon: greenIcon}).addTo(_this.mapDiv)
+
         //console.log(_this.$parent)
         _this.$emit('mapContent', mapContent)
       }
@@ -121,8 +146,7 @@ export default {
       const provider = new OpenStreetMapProvider();
       const searchControl = new GeoSearchControl({
         provider: provider,
-        showMarker: false,
-        autoClose: true
+        showMarker: false
       });
       this.mapDiv.addControl(searchControl);
 
@@ -140,6 +164,10 @@ export default {
         }
         //console.log(_this.$parent)
         _this.$emit('mapContent', mapContent)
+
+        if(_this.clicked_marker !== null) _this.mapDiv.removeLayer(_this.clicked_marker);
+        _this.clicked_marker = L.marker({'lat': e.location.y, 'lng': e.location.x}, {icon: greenIcon}).addTo(_this.mapDiv)
+
       }
 
       this.mapDiv.on('geosearch/showlocation', searchLocation);
@@ -214,7 +242,6 @@ export default {
   mounted() {
     this.setupLeafletMap();
     this.place_markers(this.$location_markers)
-    console.log(this.$location_markers)
   }
 };
 </script>

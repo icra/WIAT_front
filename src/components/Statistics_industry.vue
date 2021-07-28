@@ -95,17 +95,35 @@ export default {
 
         })
       }
+    },
+    table_and_statistics(){
+      let _this = this
+
+      if(this.$assessments[this.assessment_id] === undefined) console.log('aaa')
+
+      this.populateTable()
+      this.functions_to_call.forEach(func => {
+        _this.labels_for_pie.push(func.description)
+        _this.dataset_for_pie[0].data.push(func.emissions.total)
+        _this.dataset_for_pie[0].backgroundColor.push(_this.getRandomColor())
+      })
     }
 },
   created()  {
-    let _this = this
-    this.populateTable()
-    this.functions_to_call.forEach(func => {
-      _this.labels_for_pie.push(func.description)
-      _this.dataset_for_pie[0].data.push(func.emissions.total)
-      _this.dataset_for_pie[0].backgroundColor.push(_this.getRandomColor())
-    })
+    if (this.industry === undefined) this.$router.push('/')
+    this.table_and_statistics()
+  },
+  watch: {
+    industry_id: function (industry_id) {
+      this.table_and_statistics()
 
+    },
+    assessment_id: function (assessment_id) {
+      this.table_and_statistics()
+    },
+    industry: function (industry) {
+      if (industry === undefined) this.$router.push('/')
+    },
   }
 
 };
