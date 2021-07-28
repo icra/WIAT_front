@@ -373,13 +373,15 @@ export default {
       let _this = this
       this.$location_markers.splice(0,this.$location_markers.length)
       for (let assessment=0; assessment<_this.$assessments.length; assessment++) {
-        for(let industry=0; industry<_this.$assessments[assessment].industries.length; industry++){
-          let marker = {
-            assessment: assessment,
-            industry: industry,
-            latlng: _this.$assessments[assessment].industries[industry].location
+        if(_this.assessment_active[assessment]){
+          for(let industry=0; industry<_this.$assessments[assessment].industries.length; industry++){
+            let marker = {
+              assessment: assessment,
+              industry: industry,
+              latlng: _this.$assessments[assessment].industries[industry].location
+            }
+            _this.$location_markers.push(marker)
           }
-          _this.$location_markers.push(marker)
         }
       }
     },
