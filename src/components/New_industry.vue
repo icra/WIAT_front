@@ -39,7 +39,8 @@
                           Estimation: {{parseFloat(estimations[key](industry)).toFixed(2)}}{{value.unit}} <!-- Botó amb estimació -->
                           </v-btn>
                         </template>
-                        <span>{{ estimations[key].toString() }}</span>
+
+                        <span style="white-space: pre;" v-html="estimations[key]"></span>
                       </v-tooltip>
 
                     </div>

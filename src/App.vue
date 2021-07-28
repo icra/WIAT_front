@@ -94,6 +94,16 @@
                 <v-expansion-panel-header disable-icon-rotate>
                   {{ assessment.name }}
                   <template v-slot:actions>
+                    <v-hover v-slot:default="{ hover }" style="margin-right: 10px">
+                      <v-icon v-if="assessment_active[assessment_index]" :color="hover ? '#463FCA' : '#1C195B'" @click="hide_show_industries(assessment_index)" @click.native.stop>
+                        mdi-eye
+                      </v-icon>
+                      <v-icon v-else :color="hover ? '#463FCA' : '#1C195B'" @click="hide_show_industries(assessment_index)" @click.native.stop>
+                        mdi-eye-off
+                      </v-icon>
+
+                    </v-hover>
+
                     <v-hover v-slot:default="{ hover }">
                       <v-icon :color="hover ? '#463FCA' : '#1C195B'" @click="open_edit_assessment_tab(assessment_index)" @click.native.stop>
                         mdi-cog
@@ -237,7 +247,7 @@
               Delete
             </v-btn>
             <v-btn small outlined :to="{ name: 'statistics_industry', params: {assessment_id: selected_assessment, industry_id: selected_industry}}">
-              STATISTICS
+              SHOW RESULTS
             </v-btn>
 
           </div>
@@ -354,9 +364,8 @@ export default {
       map_content_info: null, //Info to show when the map is clicked
       assessment_expansion_panel: undefined, //Selected assessment in expansion panel
       latlng_selected: null, //Coordinates of point in the map
-      icon_selected: 0 //first sidebar icon selected
-
-
+      icon_selected: 0, //first sidebar icon selected
+      assessment_active: [] //if assessment_active[i]=true, industries of the i-th assessment are shown on the map
     }
   },
   methods: {
@@ -392,6 +401,7 @@ export default {
       this.rightMenu = !this.rightMenu
       this.assessment_name = null
       this.snackbars.new_assessment.v_model = true
+      this.assessment_active.push(true)
     },
     open_edit_assessment_tab(assessment_index){
       this.rightMenu = true;
@@ -409,6 +419,7 @@ export default {
       this.rightMenu = false
       this.snackbars.delete_assessment.v_model = true
       this.$assessments.splice(this.selected_assessment, 1)
+      this.assessment_active.splice(this.selected_assessment, 1)
       this.update_markers()
     },
     add_factory(){
@@ -478,6 +489,22 @@ export default {
       if (assessments_with_same_name.length === 0 || (assessments_with_same_name.length === 1 && this.created_assessments[this.selected_assessment].name === value)) return true
       else return 'An assessment with same name already exists.' //If there is an assessment with the same name, must be the edited assessment
 
+    },
+    hide_show_industries(assessment_index){
+      this.assessment_active[assessment_index] = !this.assessment_active[assessment_index] //hide/show industries of the assessment
+      if(this.assessment_active[assessment_index]){
+        //show assessment
+        this.update_markers()
+      }else{
+        //hide assessment
+        let location_markers = this.$location_markers
+        for (let i = location_markers.length - 1; i >= 0; i--) {
+          if (location_markers[i].assessment === assessment_index) {
+            location_markers.splice(i, 1);
+          }
+        }
+
+      }
     }
 
 

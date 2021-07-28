@@ -435,8 +435,8 @@ export class Industry{
                 let TN = industry.wwt_tot_nit   //Total nitrogen in untreated wastewater
                 return P*W*TN
             },
-            //estimation for biogas produced
-            wwt_biog_pro(substage){
+
+            wwt_biog_pro(substage){ //estimation for biogas produced
                 let wwt_mass_slu    = substage.wwt_mass_slu;  //kg  | mass of combined sludge to digestion
                 let VS_to_digestion = wwt_mass_slu    * 0.80; //kg  | VS to digestion: 80% of sludge mass
                 let VS_destroyed    = VS_to_digestion * 0.60; //kg  | VS destroyed: 60% of VS
