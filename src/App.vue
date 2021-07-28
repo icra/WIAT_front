@@ -231,13 +231,13 @@
           </div>
           <div style="margin: 7px; padding: 7px;">
             <v-btn :to="{ name: 'edit_industry', params: {assessment_id: selected_assessment, industry_id: selected_industry}}" small outlined>
-              Advanced edit
+              Advanced INPUTS
             </v-btn>
             <v-btn @click="delete_industry" small outlined>
               Delete
             </v-btn>
             <v-btn small outlined :to="{ name: 'statistics_industry', params: {assessment_id: selected_assessment, industry_id: selected_industry}}">
-              STATISTICS
+              SHOW RESULTS
             </v-btn>
 
           </div>

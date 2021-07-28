@@ -114,9 +114,23 @@ export default {
     };
   },
   created() {
+    if (this.industry === undefined) this.$router.push('/')
   },
-  methods:  {
+
+  watch: {
+    industry_id: function (industry_id) {
+      this.industry = this.$assessments[this.assessment_id].industries[this.industry_id]
+    },
+    assessment_id: function (assessment_id) {
+      this.industry = this.$assessments[this.assessment_id].industries[this.industry_id]
+    },
+    industry: function (industry) {
+      if (industry === undefined) this.$router.push('/')
+    },
   }
+
+
+
 
 };
 </script>

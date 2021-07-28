@@ -12,13 +12,46 @@
                   mandatory
               >
                 <v-radio
-                    label="Replace current list"
                     value="replace"
-                ></v-radio>
+                    color="#1C195B"
+                >
+                  <template v-slot:label>
+                    Replace assessments
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-icon
+                            color=#1C195B
+                            v-bind="attrs"
+                            v-on="on"
+                        >
+                          mdi-information-variant
+                        </v-icon>
+                      </template>
+                      <span>Replace current assessments with imported ones</span>
+                    </v-tooltip>
+                  </template>
+                </v-radio>
                 <v-radio
-                    label="Append to current list"
                     value="append"
-                ></v-radio>
+                    color="#1C195B"
+                >
+                  <template v-slot:label>
+                    Append industries and assessments
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-icon
+                            color=#1C195B
+                            v-bind="attrs"
+                            v-on="on"
+                        >
+                          mdi-information-variant
+                        </v-icon>
+                      </template>
+                      <span>Add new industries and assessments to the current assessments, </span>
+                    </v-tooltip>
+                  </template>
+
+                </v-radio>
               </v-radio-group>
             </v-container>
           </v-col>
@@ -62,6 +95,22 @@
         </v-input>
       </v-col>
     </v-row>
+    <v-snackbar
+        v-model="snackbar_imported_file"
+    >
+      {{ snackbar_text }}
+
+      <template v-slot:action="{ attrs }">
+        <v-btn
+            color="pink"
+            text
+            v-bind="attrs"
+            @click="snackbar_imported_file = false"
+        >
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
   </div>
 </template>
 
@@ -79,7 +128,9 @@ export default {
       imported_file: null, //Imported file
       option_for_import: 'replace',  //Model for selecting option for importing
       export_file_name: 'Untitled file',
-      location_markers: this.$location_markers
+      location_markers: this.$location_markers,
+      snackbar_imported_file: false,
+      snackbar_text: ""
     }
   },
   methods: {
@@ -100,29 +151,71 @@ export default {
         fileReader.readAsText(file)
       })
     },
-    async onUpload(){
-      let _this = this
-      try {
-        let imported_assessments = await this.fileToJSON(this.imported_file)
+    async import_replace(){
+      let _this=this
+      //Empty arrays
+      _this.created_assessments.splice(0,_this.created_assessments.length)
+      _this.location_markers.splice(0,_this.location_markers.length)
 
-        if(_this.option_for_import === 'replace'){
-          //Empty arrays
-          _this.created_assessments.splice(0,_this.created_assessments.length)
-          _this.location_markers.splice(0,_this.location_markers.length)
-        }
+      let imported_assessments = await this.fileToJSON(this.imported_file)
 
-        imported_assessments.forEach((assessment, assessment_index )=> {
+      imported_assessments.forEach((assessment, assessment_index )=> {
 
-          //If there is an assessment with the same name like the one we are adding, delete the older one
-          let assessment_to_delete = this.created_assessments.findIndex(a => a.name === assessment.name)
-          if (assessment_to_delete > -1) this.created_assessments.splice(assessment_to_delete,1);
+        //If there is an assessment with the same name like the one we are adding, delete the older one
+        let assessment_to_delete = this.created_assessments.findIndex(a => a.name === assessment.name)
+        if (assessment_to_delete > -1) this.created_assessments.splice(assessment_to_delete,1);
 
+        let new_assessment = new Assessment()
+        new_assessment.name = assessment.name
+        new_assessment.assessment_period_start = assessment.assessment_period_start
+        new_assessment.assessment_period_end = assessment.assessment_period_end
 
+        let industries = assessment.industries
+        industries.forEach((industry, industry_index)=> {
+
+          //If the assessment has industry with same name that the one we are adding, delete the older one
+          let industry_to_delete = new_assessment.industries.findIndex(e => e.name === industry.name)
+          if (industry_to_delete > -1) new_assessment.industries.splice(industry_to_delete,1);
+
+          let new_industry = new Industry()
+          for(let [key, value] of Object.entries(industry)){
+            new_industry[key] = value
+          }
+          new_assessment.industries.push(new_industry)
+
+        })
+        _this.created_assessments.push(new_assessment)
+      })
+    },
+    async import_append(){
+      let _this=this
+
+      let imported_assessments = await this.fileToJSON(this.imported_file)
+
+      imported_assessments.forEach(assessment => {
+
+        //If there is an assessment with the same name like the one we are adding, delete the older one
+        let assessment_index = this.created_assessments.findIndex(a => a.name === assessment.name)
+        if (assessment_index > -1) {  //Assessment with same name
+          let industries_to_add = assessment.industries
+          let current_assessment = this.created_assessments[assessment_index] //Assessment where we are adding new industries
+          industries_to_add.forEach(industry => {
+
+            //If the assessment has industry with same name that the one we are adding, delete the older one
+            let industry_to_delete = current_assessment.industries.findIndex(e => e.name === industry.name)
+            if (industry_to_delete > -1) current_assessment.industries.splice(industry_to_delete,1);
+
+            let new_industry = new Industry()
+            for(let [key, value] of Object.entries(industry)){
+              new_industry[key] = value
+            }
+            current_assessment.industries.push(new_industry)
+          })
+        }else{
           let new_assessment = new Assessment()
           new_assessment.name = assessment.name
           new_assessment.assessment_period_start = assessment.assessment_period_start
           new_assessment.assessment_period_end = assessment.assessment_period_end
-
 
           let industries = assessment.industries
           industries.forEach((industry, industry_index)=> {
@@ -130,7 +223,6 @@ export default {
             //If the assessment has industry with same name that the one we are adding, delete the older one
             let industry_to_delete = new_assessment.industries.findIndex(e => e.name === industry.name)
             if (industry_to_delete > -1) new_assessment.industries.splice(industry_to_delete,1);
-
 
             let new_industry = new Industry()
             for(let [key, value] of Object.entries(industry)){
@@ -140,7 +232,20 @@ export default {
 
           })
           _this.created_assessments.push(new_assessment)
-        })
+
+        }
+
+      })
+    },
+    async onUpload(){
+      let _this = this
+      try {
+
+        if(_this.option_for_import === 'replace'){
+          await this.import_replace()
+        }else{
+          await this.import_append()
+        }
 
         //Repeat loop but for adding markers to map
         this.created_assessments.forEach((assessment, assessment_index )=> {
@@ -151,20 +256,21 @@ export default {
               assessment: assessment_index,
               latlng: industry.location
             })
-
           })
         })
-
+        this.snackbar_text = "FILE IMPORTED CORRECTLY"
+        this.snackbar_imported_file = true
 
       } catch (e) {
         //error
+        this.snackbar_text = "ERROR IMPORTING FILE"
+        this.snackbar_imported_file = true
+
       }
 
     }
   },
-  created()  {
 
-  }
 
 };
 </script>
