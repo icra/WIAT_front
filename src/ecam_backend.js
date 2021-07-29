@@ -936,7 +936,7 @@ let Tables={
     //ipcc 2019, table 6.3 (updated) EF (kgCH4/kgCOD)           CANVIAR PER TAULA 6.8
     "type_of_treatment":[
         {name:"Type of treatment undefined",                                  ch4_efac:0,  description: ""   },
-        {name:"Centralised, aerobic, treatment plant",                        ch4_efac:0, description: ""},
+        {name:"Centralised, aerobic, treatment plant",                        ch4_efac:0.0075, description: ""},
         {name:"Anaerobic Reactor - CH4 recovery not considered",              ch4_efac:0.2,  description: ""},
         //{name:"Anaerobic Reactor - CH4 recovery considered",                  ch4_efac:0.14,  description: ""},
         {name:"Anaerobic shallow lagoon and facultative lagoons (<2m depth)", ch4_efac:0.05,  description: ""},

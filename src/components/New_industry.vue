@@ -48,10 +48,10 @@
                       <select v-model="industry[key]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
                         <option
                             v-for="item in value.items"
-                            :value="value.estimation_based_on === null ? parseFloat(item[value.estimation_factor]).toFixed(2) : parseFloat((item[value.estimation_factor])*industry[value.estimation_based_on]).toFixed(2)"
+                            :value="value.estimation_based_on === null ? item[value.estimation_factor] : item[value.estimation_factor]*industry[value.estimation_based_on]"
                         >
                           <!--Desplegable amb estimació-->
-                          {{item.name}} {{item[value.description]}} ({{value.estimation_based_on === null ? parseFloat(item[value.estimation_factor]).toFixed(2) : parseFloat((item[value.estimation_factor])*industry[value.estimation_based_on]).toFixed(2)}} {{value.unit}})
+                          {{item.name}} {{item[value.description]}} ({{value.estimation_based_on === null ? item[value.estimation_factor] : item[value.estimation_factor]*industry[value.estimation_based_on]}} {{value.unit}})
                         </option>
                         <option :value="industry[key]">Custom value</option>
                       </select>
