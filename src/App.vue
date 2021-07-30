@@ -17,7 +17,7 @@
 
       <!-- Main sidebar (first)-->
       <v-navigation-drawer
-          style="z-index:2; max-height: 100%; min-width: 32px"
+          style="z-index:2; max-height: 100%; min-width: 35px; max-width: 70px "
           clipped
           permanent
           mini-variant
@@ -32,8 +32,11 @@
               <v-hover v-slot:default="{ hover }">
                 <v-list-item :class="hover ? 'icon_hovered_pressed' : ''" @click="secondMenu = !secondMenu" style="height: 75px">
                   <v-list-item-icon>
-                    <v-icon color = "#F2F4F3">
-                      mdi-arrow-expand-right
+                    <v-icon color = "#F2F4F3" v-if="secondMenu">
+                      mdi-arrow-left
+                    </v-icon>
+                    <v-icon color = "#F2F4F3" v-else>
+                      mdi-arrow-right
                     </v-icon>
                   </v-list-item-icon>
                   <v-list-item-content></v-list-item-content>
@@ -68,9 +71,9 @@
 
       <!-- Assessment and factory sidebar (second) -->
       <v-navigation-drawer
-          style="z-index:1; background-color: #F2F4F3; height: 100vh"
+          style="z-index:1; background-color: #F2F4F3; height: 100vh; max-width: 330px"
           v-model="secondMenu"
-          :width="secondMenu ? '15vw' : '0vw'"
+          :width="secondMenu ? '20vw' : '0vw'"
           flat
 
       >
@@ -160,8 +163,8 @@
       <!--right menu -->
       <v-navigation-drawer
           v-model="rightMenu"
-          style="background-color: #F2F4F3"
-          :width="rightMenu ? '15vw' : '0vw'"
+          style="background-color: #F2F4F3; max-width: 310px"
+          :width="rightMenu ? '18vw' : '0vw'"
           flat
       >
         <div style="padding: 17px ">

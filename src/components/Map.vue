@@ -1,14 +1,41 @@
 <template>
-  <div id="mapContainer"></div>
+  <div id="container">
+    <div id="map"></div>
+    <aside class="toolbox">
+      <div class="box">
+        <header>
+          <h1>Select layer</h1>
+        </header>
+        <section>
+          <v-container
+              class="px-0"
+              fluid
+          >
+            <v-radio-group v-model="layer_selected">
+              <v-radio
+                  v-for="layer in Object.keys(layers)"
+                  :key="layer"
+                  :label="layer"
+                  :value="layer"
+              ></v-radio>
+            </v-radio-group>
+          </v-container>
+        </section>
+        <footer class="js-footer"></footer>
+      </div>
+    </aside>
+  </div>
+
 
 </template>
 
 <script>
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-import { latLng, Icon } from "leaflet";
+import { Icon } from "leaflet";
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
 import 'leaflet-geosearch/dist/geosearch.css';
+import carto from '@carto/carto.js'
 
 delete Icon.Default.prototype._getIconUrl;
 Icon.Default.mergeOptions({
@@ -18,11 +45,9 @@ Icon.Default.mergeOptions({
 });
 
 import axios from "axios"
-import deplession_layer from "../layers/deplession_topo.json"
-import stress_layer from "../layers/stress_topo.json"
-
-import VectorTile from "leaflet.vectorgrid/dist/Leaflet.VectorGrid.js";
-import Vue from "vue";
+//import deplession_layer from "../layers/deplession_topo.json"
+//import stress_layer from "../layers/stress_topo.json"
+//import VectorTile from "leaflet.vectorgrid/dist/Leaflet.VectorGrid.js";
 
 export default {
   name: "Map",
@@ -35,7 +60,16 @@ export default {
       location_markers: this.$location_markers,  //Created industries [{assessment, industry, location}]
       mapDiv: null,
       markers: [],
-      clicked_marker: null
+      clicked_marker: null,
+      layer_selected: 'None',
+      layers: {
+        'None': null,
+        "Water depletion": null
+      },
+      client: new carto.Client({
+        apiKey: 'default_public',
+        username: 'wri-rw'
+      })
 
     };
   },
@@ -45,9 +79,19 @@ export default {
       this.delete_markers()
       this.place_markers(markers)
     },
-  },
-  methods: {
+    layer_selected: function (new_layer, old_layer) {
+      if (old_layer !== 'None'){
+        this.client.removeLayer(this.layers[old_layer])
+      }
 
+      if (new_layer !== "None"){
+        this.client.addLayer(this.layers[new_layer]);
+        this.client.getLeafletLayer().addTo(this.mapDiv);
+      }
+    },
+
+},
+  methods: {
     //Delete markers from industries
     delete_markers(){
       this.markers.forEach(marker => {
@@ -93,12 +137,13 @@ export default {
     setupLeafletMap() {
       let _this = this
 
-      this.mapDiv = L.map("mapContainer", {
+      this.mapDiv = L.map("map", {
         center: this.center2,
         zoom: 13,
         preferCanvas: true,
         renderer: L.canvas()
       })
+
       L.tileLayer(
           'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}',
           {
@@ -107,6 +152,8 @@ export default {
             accessToken: "pk.eyJ1IjoiemVwaG9sIiwiYSI6ImNrcWMyN3N6eTA1Mm8yb3Bmb29uZ3d5eWoifQ.1YD7eO3cB9lH-J2eOaC2pg\n"
           }
       ).addTo(this.mapDiv);
+
+
 
       let popup = L.popup();
 
@@ -173,8 +220,7 @@ export default {
       this.mapDiv.on('geosearch/showlocation', searchLocation);
 
 
-
-
+      /*
       //Water stress
       let water_stress =
           L.vectorGrid.slicer(stress_layer, {
@@ -232,7 +278,40 @@ export default {
         "Water Deplession": water_deplession
       }
 
-      L.control.layers(null, overlayMaps).addTo(this.mapDiv);
+      L.control.layers(null, overlayMaps).addTo(this.mapDiv);*/
+
+      const waterDepletionDataset = new carto.source.SQL('select * from "wri-rw".wat_051_aqueduct_baseline_water_depletion');
+      const waterDepletionStyle = new carto.style.CartoCSS(`
+        #layer {
+         [bwd_cat = 0]{
+           polygon-fill: #ffff99;
+         }
+         [bwd_cat = 1]{
+           polygon-fill: #ffe600;
+         }
+         [bwd_cat = 2]{
+           polygon-fill: #ff9900;
+         }
+         [bwd_cat = 3]{
+           polygon-fill: #ffa49c;
+         }
+         [bwd_cat = 4]{
+           polygon-fill: #cc0014;
+         }
+         [bwd_cat = 5]{
+           polygon-fill: #ff9900;
+         }
+         [bwd_cat = -1]{
+           polygon-fill: #4e4e4e;
+         }
+        }
+      `);
+
+
+      const waterDepletion = new carto.layer.Layer(waterDepletionDataset, waterDepletionStyle);
+      this.layers["Water depletion"] = waterDepletion
+      //client.addLayers([waterDepletion]);
+      //client.getLeafletLayer().addTo(this.mapDiv);
 
 
 
@@ -246,10 +325,14 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 
-#mapContainer {
+@import 'https://carto.com/developers/carto-js/examples/maps/public/style.css';
+
+#container {
   width: 100%;
   height: 100%;
 }
+
+
 </style>

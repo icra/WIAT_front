@@ -23,23 +23,25 @@
                   <div style="width: 100%;">
                     <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                       <span>
-                        {{value.question}}   <!-- Input -->
-                                              <v-tooltip
-                                                  bottom
-                                                  v-if="value.description_tooltip">
-                        <template v-slot:activator="{ on, attrs }">
-                        <v-icon
-                            color=#1C195B
-                            v-bind="attrs"
-                            v-on="on"
+                        {{value.question}}
+                        <!-- Input -->
+                        <v-tooltip
+                            bottom
+                            v-if="value.description_tooltip"
+                            max-width="500"
                         >
-                          mdi-information-variant
-                        </v-icon>
-
-                        </template>
-
-                        <span>{{value.description_tooltip}}</span>
-                      </v-tooltip>
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-icon
+                                color=#1C195B
+                                v-bind="attrs"
+                                v-on="on"
+                                size="20px"
+                            >
+                              mdi-information-variant
+                            </v-icon>
+                          </template>
+                          <span>{{value.description_tooltip}}</span>
+                        </v-tooltip>
 
                       </span>
 

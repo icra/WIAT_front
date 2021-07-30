@@ -16,13 +16,14 @@
                     color="#1C195B"
                 >
                   <template v-slot:label>
-                    Replace assessments
+                    <span>Replace assessments</span>
                     <v-tooltip bottom>
                       <template v-slot:activator="{ on, attrs }">
                         <v-icon
                             color=#1C195B
                             v-bind="attrs"
                             v-on="on"
+                            size="20px"
                         >
                           mdi-information-variant
                         </v-icon>
@@ -36,18 +37,19 @@
                     color="#1C195B"
                 >
                   <template v-slot:label>
-                    Append industries and assessments
+                    <span>Append industries and assessments</span>
                     <v-tooltip bottom>
                       <template v-slot:activator="{ on, attrs }">
                         <v-icon
                             color=#1C195B
                             v-bind="attrs"
                             v-on="on"
+                            size="20px"
                         >
                           mdi-information-variant
                         </v-icon>
                       </template>
-                      <span>Add new industries and assessments to the current assessments, </span>
+                      <span>Add new industries and assessments to the current assessments</span>
                     </v-tooltip>
                   </template>
 
