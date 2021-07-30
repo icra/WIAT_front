@@ -69,7 +69,7 @@ export class Industry{
                 "wwt_vol_disc" :{question:"Volume of discharged effluent to water body", value: 0},*/
 
                 //BOD (creates CH4)
-                "wwt_bod_infl": {question: "Influent COD5 load", value: 0, unit: "kg"}, //kgCOD   //No te estimacio
+                "wwt_bod_infl": {question: "Influent COD5 load", value: 0, unit: "kg", description_tooltip: "COD5 load entering the WWTP during the assessment period. It can be estimated by multiplying the average COD5 concentration in the influent by the volume entering the plant. If this is done daily and summed over the duration of the assessment period the value will be most accurate"}, //kgCOD   //No te estimacio
                 "wwt_bod_effl": {
                     question: "Effluent BOD5 load",
                     value: 0,
@@ -78,7 +78,8 @@ export class Industry{
                     items: Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"],
                     estimation_based_on: "wwt_bod_infl",
                     estimation_factor: "bod_effl",
-                    description: "bod_effl_table"
+                    description: "bod_effl_table",
+                    description_tooltip: "COD5 load at the effluent of the WWTP during the assessment period. It can be estimated by multiplying the average COD5 concentration in the effluent by the effluent volume the plant. If this is done daily and summed over the duration of the assessment period the value will be most accurate"
                 }, //kgBOD   Table 6.6B and 6.10C
 
                 "wwt_ind_prod": {question: "Total industrial product", value: 0, unit: "t/yr"},  //t/yer | Total industrial product
@@ -107,7 +108,9 @@ export class Industry{
                     items: Tables["type_of_treatment"],
                     estimation_based_on: null,
                     estimation_factor: "ch4_efac",
-                    description: "description"
+                    description: "description",
+                    description_tooltip: "Methane emission factor of selected biological wastewater aerobic treatment processes"
+
                 },  //kgCH4/kgCOD  S'obté de la taula 6.3
                 "wwt_n2o_efac_tre": {
                     question: "N2O emission factor (treatment)",
@@ -143,16 +146,17 @@ export class Industry{
                 },  //kgN2O-N/kgN  //tAULA 6.8A
 
                 //energy
-                "wwt_nrg_cons": {question: "Energy consumed from the grid", value: 0, unit: "kWh"},  //kWh | energy consumed from the grid
-                "wwt_conv_kwh": {question: "Emission factor for grid electricity", value: 0, unit: "kgCO2eq/kWh"},  //kgCO2eq/kWh | conversion factor
+                "wwt_nrg_cons": {question: "Energy consumed from the grid", value: 0, unit: "kWh", description_tooltip: "Total energy consumed during the assessment period by all wastewater treatment plants managed by the undertaking"},  //kWh | energy consumed from the grid
+                "wwt_conv_kwh": {question: "Emission factor for grid electricity", value: 0, unit: "kgCO2eq/kWh", description_tooltip: "Emission factor for grid electricity (indirect emissions)"},  //kgCO2eq/kWh | conversion factor
 
                 //SLUDGE MANAGEMENT
                 "wwt_mass_slu": {
                     question: "Sludge removed from wastewater treatment (dry weight)",
                     value: 0,
-                    unit: "kg"
+                    unit: "kg",
+                    description_tooltip: "Amount of raw sludge removed from wastewater treatment as dry mass during the assessment period"
                 },  //kg | raw sludge removed from wwtp as dry mass
-                "wwt_bod_slud": {question: "COD5 removed as sludge", value: 0, unit: "kg"},  //kg | COD removed as sludge    //Taula 6.6A
+                "wwt_bod_slud": {question: "COD5 removed as sludge", value: 0, unit: "kg", description_tooltip: "COD5 (organic component) removed from wastewater (in the form of sludge) in aerobic treatment plants (S_aerobic in eq.6.3B IPCC 2019)"},  //kg | COD removed as sludge    //Taula 6.6A
 
             },
             "Fuel engines" :{
@@ -164,13 +168,14 @@ export class Industry{
 
             "Biogas produced from anaerobic digestion" : {
                 //biogas
-                "wwt_biog_pro": {question: "Biogas produced (volume)", value: 0, unit: "Nm3", estimation_type:"equation"}, //Nm3 | total biogas produced
+                "wwt_biog_pro": {question: "Biogas produced (volume)", value: 0, unit: "Nm3", estimation_type:"equation", description_tooltip: "Biogas produced during the assessment period by the wastewater treatment plant managed by the undertaking"}, //Nm3 | total biogas produced
                 "wwt_biog_fla": {question: "% of biogas produced that is flared", value: 98, unit: "%", estimation_type: "equation"},
                 "wwt_biog_val": {
                     question: "Biogas valorised as heat and/or electricity (% volume)",
                     value: 0,
                     unit: "%",
-                    estimation_type: "equation"
+                    estimation_type: "equation",
+                    description_tooltip: "Biogas valorized in the treatment plant to heat the digesters or the building and/or to run a Co-generator to generate heat and electricity"
                 }, //% of biogas produced that is used for heat
                 "wwt_biog_lkd": {question: "Biogas leaked to the atmosphere (% volume)", value: 2, unit: "%", estimation_type: "equation"}, //% of biogas produced that is leaked
                 "wwt_biog_sold": {question: "Biogas sold (% volume)", value: 0, unit: "%", estimation_type: "equation"},
@@ -224,8 +229,8 @@ export class Industry{
                 //sludge storage
             },
             "Sludge storage in WWTP" : {
-                "wwt_mass_slu_sto": {question: "Sludge stored (dry weight)", value: 0, unit: "kg"}, //kg of sludge stored
-                "wwt_time_slu_sto": {question: "Storage time", value: 0, unit: "days"}, //days
+                "wwt_mass_slu_sto": {question: "Sludge stored (dry weight)", value: 0, unit: "kg", description_tooltip: "Amount of sludge that is stored prior to disposal (dry weight)"}, //kg of sludge stored
+                "wwt_time_slu_sto": {question: "Storage time", value: 0, unit: "days", description_tooltip: "Time interval the sludge is stored for before being sent to disposal"}, //days
                 "wwt_slu_sto_TVS": {
                     question: "Total Volatile Solids (TVS) content of sludge stored (% of dry weight)",
                     value: 0,
@@ -255,7 +260,7 @@ export class Industry{
             //sludge composting
             "Sludge composting in WWTP" : {
 
-                "wwt_mass_slu_comp": {question: "Sludge composted (dry weight)", value: 0, unit: "kg"}, //kg of sludge composted
+                "wwt_mass_slu_comp": {question: "Sludge composted (dry weight)", value: 0, unit: "kg", description_tooltip: "Amount of sludge that is sent to composting (dry weight)"}, //kg of sludge composted
                 "wwt_slu_comp_emis_treated_or_piles_covered": {
                     question: "Are composting emissions treated and/or piles are covered",
                     value: 0,
@@ -286,14 +291,15 @@ export class Industry{
                 "wwt_slu_comp_low_CN_EF": {
                     question: "N2O emission factor for low C:N ratio",
                     value: 0.015,
-                    unit: "kgN2O-N/kgN"
+                    unit: "kgN2O-N/kgN",
+                    description_tooltip: "N2O emission factor for low C:N ratio (1.5% from Brown et al, 2008)"
                 }, //kgN2O-N/kgN
                 "wwt_slu_comp_uncovered_pile_EF": {
                     question: "CH4 emission factor for uncovered pile (fractor of initial C in solids)",
                     value: 0.025,
                     unit: "kgCH4/kgC"
                 }, //kgCH4/kgC
-                "wwt_slu_comp_seqst_rate": {question: "CO2eq sequestration rate", value: 0.25, unit: "kgN2O-N/kgN"}, //kgCO2eq/kgSludge
+                "wwt_slu_comp_seqst_rate": {question: "CO2eq sequestration rate", value: 0.25, unit: "kgN2O-N/kgN", description_tooltip:"Estimated C02 equivalents sequestered per kg of sludge"}, //kgCO2eq/kgSludge
             },
             //sludge incineration
             "Sludge incineration" : {
@@ -302,7 +308,8 @@ export class Industry{
                 "wwt_temp_inc": {
                     question: "Average highest temperature of combustion achieved in a Fluidized Bed incinerator",
                     value: 1023,
-                    unit: "K"
+                    unit: "K",
+                    description_tooltip:"Incineration temperature"
                 }, //K | temperature incineration
                 "wwt_slu_inc_N_cont": {
                     question: "N content of sludge incinerated (% of dry weight)",
@@ -375,14 +382,15 @@ export class Industry{
                     estimation_factor: "TVS",
                     description: "description"
                 }, //%
-                "wwt_slu_lf_uncertainty": {question: "Uncertainty factor (UNFCCC/CCNUC, 2008)", value: 0.9}, //adimensional
-                "wwt_slu_lf_CH4_in_gas": {question: "CH4 in landfill gas", value: 50, unit: "%"}, //%
+                "wwt_slu_lf_uncertainty": {question: "Uncertainty factor (UNFCCC/CCNUC, 2008)", value: 0.9, description_tooltip:"Model uncertainty factor (default value:0.9, UNFCCC/CCNUC, 2008)"}, //adimensional
+                "wwt_slu_lf_CH4_in_gas": {question: "CH4 in landfill gas", value: 50, unit: "%", description_tooltip:"CH4 in landfill gas (50% from Clean Development Mechanism, 2008)"}, //%
                 "wwt_slu_lf_DOCf": {
                     question: "Decomposable organic fraction of raw wastewater solids",
                     value: 80,
-                    unit: "%"
+                    unit: "%",
+                    description_tooltip:"Decomposable organic fraction of raw wastewater solids (80% from Brown et al., 2008 and Metcalf & Eddy, 2003)"
                 }, //%
-                "wwt_slu_lf_decomp_3yr": {question: "Percentage decomposed in first 3 years", value: 69.9, unit: "%"}, //%
+                "wwt_slu_lf_decomp_3yr": {question: "Percentage decomposed in first 3 years", value: 69.9, unit: "%", description_tooltip:"Percentage decomposed in first 3 years of the decomposable organic fraction of raw wastewater solids"}, //%
                 "wwt_slu_lf_MCF": {
                     question: "Methane correction for anaerobic managed landfills (default=1)",
                     value: 1,
@@ -391,7 +399,9 @@ export class Industry{
                     items: Tables["Type of landfill"],
                     estimation_based_on: null,
                     estimation_factor: "MCF",
-                    description: "description"
+                    description: "description",
+                    description_tooltip:"Methane correction for anaerobic managed landfills (default=1, UNFCCC/CCNUCC, 2008)"
+
                 }, //ratio
                 "wwt_slu_lf_N_cont": {
                     question: "N content of sludge sent to land application (% of dry weight)",
@@ -405,13 +415,14 @@ export class Industry{
                 "wwt_slu_lf_low_CN_EF": {
                     question: "N2O emission factor for low C:N ratio",
                     value: 0.015,
-                    unit: "kgN2O-N/kgN"
+                    unit: "kgN2O-N/kgN",
+                    description_tooltip:"N2O emission factor for low C:N ratio (1.5% from Brown et al, 2008)"
                 } //kgN2O-N/kgN
             },
             //sludge
             "Sludge stockpiling" : {
                 "wwt_mass_slu_stock": {question: "Sludge stockpiled (dry weight)", value: 0, unit: "kg"}, //kg of sludge stockpiled
-                "wwt_slu_sp_lifespan": {question: "Stockpile lifespan", value: 0, unit: "years"}, //years
+                "wwt_slu_sp_lifespan": {question: "Stockpile lifespan", value: 0, unit: "years", description_tooltip:"Expected timespan that the biosolid stockpile (BSP) will be emitting GHGs"}, //years
             },
             //sludge truck transport
             "Sludge truck transportation to disposal site" : {

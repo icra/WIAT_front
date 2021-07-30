@@ -24,7 +24,25 @@
                     <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                       <span>
                         {{value.question}}   <!-- Input -->
+                                              <v-tooltip
+                                                  bottom
+                                                  v-if="value.description_tooltip">
+                        <template v-slot:activator="{ on, attrs }">
+                        <v-icon
+                            color=#1C195B
+                            v-bind="attrs"
+                            v-on="on"
+                        >
+                          mdi-information-variant
+                        </v-icon>
+
+                        </template>
+
+                        <span>{{value.description_tooltip}}</span>
+                      </v-tooltip>
+
                       </span>
+
                       <v-tooltip
                           bottom
                           v-if="value.estimation_type === 'equation'">
