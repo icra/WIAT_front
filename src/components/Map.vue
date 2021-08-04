@@ -64,7 +64,9 @@ export default {
       layer_selected: 'None',
       layers: {
         'None': null,
-        "Water depletion": null
+        "Baseline water depletion": null,
+        "Baseline water stress": null
+
       },
       client: new carto.Client({
         apiKey: 'default_public',
@@ -174,18 +176,31 @@ export default {
             .setContent("You clicked the map at " + population_associated.toString())
             .openOn(mapDiv);*/
 
+
         let mapContent = {
           "latlng": e.latlng,
           "right bar content": {
-            "Population associated": 45
           }
+        }
+
+        if (_this.layer_selected === "Baseline water stress"){
+          _this.layers["Baseline water stress"].on(carto.layer.events.FEATURE_CLICKED, featureEvent => {
+            mapContent["right bar content"]["Baseline water stress"] = featureEvent.data["bws_label"]
+            _this.$emit('mapContent', mapContent)
+          })
+        }else if (_this.layer_selected === "Baseline water depletion"){
+          console.log('asdasd')
+          _this.layers["Baseline water depletion"].on(carto.layer.events.FEATURE_CLICKED, featureEvent => {
+            mapContent["right bar content"]["Baseline water depletion"] = featureEvent.data["bwd_label"]
+            _this.$emit('mapContent', mapContent)
+          })
         }
 
         if(_this.clicked_marker !== null) _this.mapDiv.removeLayer(_this.clicked_marker);
         _this.clicked_marker = L.marker(e.latlng, {icon: greenIcon}).addTo(_this.mapDiv)
 
         //console.log(_this.$parent)
-        _this.$emit('mapContent', mapContent)
+
       }
 
       this.mapDiv.on('click', onMapClick);
@@ -280,8 +295,9 @@ export default {
 
       L.control.layers(null, overlayMaps).addTo(this.mapDiv);*/
 
-      const waterDepletionDataset = new carto.source.SQL('select * from "wri-rw".wat_051_aqueduct_baseline_water_depletion');
-      const waterDepletionStyle = new carto.style.CartoCSS(`
+      //Baseline water depletion
+      const baselineWaterDepletionDataset = new carto.source.SQL('select * from "wri-rw".wat_051_aqueduct_baseline_water_depletion');
+      const baselineWaterDepletionStyle = new carto.style.CartoCSS(`
         #layer {
          [bwd_cat = 0]{
            polygon-fill: #ffff99;
@@ -306,10 +322,45 @@ export default {
          }
         }
       `);
+      const baselineWaterDepletion = new carto.layer.Layer(baselineWaterDepletionDataset, baselineWaterDepletionStyle,
+          {
+            featureOverColumns: ['bwd_label']
+          });
+      this.layers["Baseline water depletion"] = baselineWaterDepletion
 
 
-      const waterDepletion = new carto.layer.Layer(waterDepletionDataset, waterDepletionStyle);
-      this.layers["Water depletion"] = waterDepletion
+      //Baseline water stress
+      const baselineWaterStressDataset = new carto.source.SQL('select * from "wri-rw".wat_050_aqueduct_baseline_water_stress');
+      const baselineWaterStressStyle = new carto.style.CartoCSS(`
+        #layer {
+         [bws_cat = 0]{
+           polygon-fill: #ffff99;
+         }
+         [bws_cat = 1]{
+           polygon-fill: #ffe600;
+         }
+         [bws_cat = 2]{
+           polygon-fill: #ff9900;
+         }
+         [bws_cat = 3]{
+           polygon-fill: #ffa49c;
+         }
+         [bws_cat = 4]{
+           polygon-fill: #cc0014;
+         }
+         [bws_cat = 5]{
+           polygon-fill: #ff9900;
+         }
+         [bws_cat = -1]{
+           polygon-fill: #4e4e4e;
+         }
+        }
+      `);
+      const baselineWaterStress = new carto.layer.Layer(baselineWaterStressDataset, baselineWaterStressStyle,
+          {
+            featureOverColumns: ['bws_label']
+          });
+      this.layers["Baseline water stress"] = baselineWaterStress
       //client.addLayers([waterDepletion]);
       //client.getLeafletLayer().addTo(this.mapDiv);
 

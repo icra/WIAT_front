@@ -364,7 +364,7 @@ export default {
         edit_industry: {v_model: false, text: "Industry edited correctly", },
         delete_industry: {v_model: false, text: "Industry deleted correctly", },
       },
-      map_content_info: null, //Info to show when the map is clicked
+      map_content_info: {}, //Info to show when the map is clicked
       assessment_expansion_panel: undefined, //Selected assessment in expansion panel
       latlng_selected: null, //Coordinates of point in the map
       icon_selected: 0, //first sidebar icon selected
