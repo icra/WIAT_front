@@ -64,6 +64,7 @@ export default {
       layer_selected: 'None',
       layers: {
         'None': null,
+        "Baseline population": null,
         "Baseline water depletion": null,
         "Baseline water stress": null
 
@@ -82,13 +83,20 @@ export default {
       this.place_markers(markers)
     },
     layer_selected: function (new_layer, old_layer) {
-      if (old_layer !== 'None'){
+      if (old_layer === 'Baseline water depletion' || old_layer === 'Baseline water stress'){
         this.client.removeLayer(this.layers[old_layer])
       }
 
       if (new_layer !== "None"){
-        this.client.addLayer(this.layers[new_layer]);
-        this.client.getLeafletLayer().addTo(this.mapDiv);
+        if (new_layer === "Baseline population"){
+          console.log("loading population layer")
+
+
+
+        }else{
+          this.client.addLayer(this.layers[new_layer]);
+          this.client.getLeafletLayer().addTo(this.mapDiv);
+        }
       }
     },
 
@@ -131,6 +139,7 @@ export default {
       return axios
           .get(call)
           .then(response => {
+            //console.log(response)
             return response.data.test[0]["0"]
           })
 
@@ -168,13 +177,15 @@ export default {
         shadowSize: [41, 41]
       });
 
-      function onMapClick(e) {
+      async function onMapClick(e) {
 
-        //let population_associated = await _this.get_population(e)
-        /*popup
+
+        /*let population_associated = await _this.get_population(e)
+
+        popup
             .setLatLng(e.latlng)
-            .setContent("You clicked the map at " + population_associated.toString())
-            .openOn(mapDiv);*/
+            .setContent("Assoaciated population " + population_associated.toString())
+            .openOn(_this.mapDiv);*/
 
 
         let mapContent = {
@@ -189,7 +200,6 @@ export default {
             _this.$emit('mapContent', mapContent)
           })
         }else if (_this.layer_selected === "Baseline water depletion"){
-          console.log('asdasd')
           _this.layers["Baseline water depletion"].on(carto.layer.events.FEATURE_CLICKED, featureEvent => {
             mapContent["right bar content"]["Baseline water depletion"] = featureEvent.data["bwd_label"]
             _this.$emit('mapContent', mapContent)

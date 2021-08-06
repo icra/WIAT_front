@@ -95,7 +95,7 @@
                   @click.native.stop
               >
                 <v-expansion-panel-header disable-icon-rotate>
-                  {{ assessment.name }}
+                  <b>{{ assessment.name }}</b>
                   <template v-slot:actions>
                     <v-hover v-slot:default="{ hover }" style="margin-right: 10px">
                       <v-icon v-if="assessment_active[assessment_index]" :color="hover ? '#463FCA' : '#1C195B'" @click="hide_show_industries(assessment_index)" @click.native.stop>
