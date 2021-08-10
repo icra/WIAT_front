@@ -49,6 +49,11 @@ import axios from "axios"
 //import stress_layer from "../layers/stress_topo.json"
 //import VectorTile from "leaflet.vectorgrid/dist/Leaflet.VectorGrid.js";
 
+let parse_georaster = require("georaster");
+let GeoRasterLayer = require("georaster-layer-for-leaflet");
+let _ = require('lodash');
+let chroma = require("chroma-js")
+
 export default {
   name: "Map",
   components: {
@@ -72,7 +77,8 @@ export default {
       client: new carto.Client({
         apiKey: 'default_public',
         username: 'wri-rw'
-      })
+      }),
+      base_layer_url: 'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}'
 
     };
   },
@@ -82,16 +88,49 @@ export default {
       this.delete_markers()
       this.place_markers(markers)
     },
-    layer_selected: function (new_layer, old_layer) {
+    layer_selected: async function (new_layer, old_layer) {
+
+      let _this = this
+
       if (old_layer === 'Baseline water depletion' || old_layer === 'Baseline water stress'){
         this.client.removeLayer(this.layers[old_layer])
+      }
+      else if(old_layer === 'Baseline population'){
+        _this.mapDiv.eachLayer(function (layer) {
+          if (_this.base_layer_url != layer._url){
+            _this.mapDiv.removeLayer(layer)
+          }
+        });
+
       }
 
       if (new_layer !== "None"){
         if (new_layer === "Baseline population"){
+
+          /*
           console.log("loading population layer")
+          let wmsLayer = L.tileLayer.wms('https://sedac.ciesin.columbia.edu/geoserver/wms', {
+            layers: 'gpw-v4:gpw-v4-population-density-rev11_2020'
+          }).addTo(this.mapDiv);*/
 
 
+          let url_to_geotiff_file = "https://wiatlayers.s3.us-east-2.amazonaws.com/population.tif";
+
+          parseGeoraster(url_to_geotiff_file).then(georaster => {
+            let scale = chroma.scale(['brown', 'orange', 'red']).domain([0,100,1000]);
+
+            let layer = new GeoRasterLayer({
+              opacity: 0.75,
+              georaster: georaster,
+              pixelValuesToColorFn: function (values) {
+                let population = values[0];
+                if (population < 0) return;
+                return scale(population).hex();
+              }
+            });
+            layer.addTo(this.mapDiv);
+
+            });
 
         }else{
           this.client.addLayer(this.layers[new_layer]);
@@ -102,6 +141,8 @@ export default {
 
 },
   methods: {
+
+
     //Delete markers from industries
     delete_markers(){
       this.markers.forEach(marker => {
@@ -156,7 +197,7 @@ export default {
       })
 
       L.tileLayer(
-          'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}',
+          _this.base_layer_url,
           {
             attribution: 'Map data (c) <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery (c) <a href="https://www.mapbox.com/">Mapbox</a>',            maxZoom: 18,
             id: 'mapbox/streets-v11',
@@ -180,12 +221,9 @@ export default {
       async function onMapClick(e) {
 
 
-        /*let population_associated = await _this.get_population(e)
+        //let population_associated = await _this.get_population(e)
 
-        popup
-            .setLatLng(e.latlng)
-            .setContent("Assoaciated population " + population_associated.toString())
-            .openOn(_this.mapDiv);*/
+
 
 
         let mapContent = {
@@ -198,11 +236,15 @@ export default {
           _this.layers["Baseline water stress"].on(carto.layer.events.FEATURE_CLICKED, featureEvent => {
             mapContent["right bar content"]["Baseline water stress"] = featureEvent.data["bws_label"]
             _this.$emit('mapContent', mapContent)
+            _this.place_pop_up_content(popup, e, "Baseline water stress: "+featureEvent.data["bws_label"])
           })
         }else if (_this.layer_selected === "Baseline water depletion"){
           _this.layers["Baseline water depletion"].on(carto.layer.events.FEATURE_CLICKED, featureEvent => {
             mapContent["right bar content"]["Baseline water depletion"] = featureEvent.data["bwd_label"]
             _this.$emit('mapContent', mapContent)
+
+            _this.place_pop_up_content(popup, e, "Baseline water depletion: "+featureEvent.data["bwd_label"])
+
           })
         }
 
@@ -377,6 +419,17 @@ export default {
 
 
     },
+    place_pop_up_content(popup, e, content){
+
+      console.log('0asdasdasd')
+      const template =
+          '<button type="button" @click="console.log(33434)" style="background-color: #1C195B;">Edit <a href="http://www.google.com">Visit Google</a></button>';
+
+      popup
+          .setLatLng(e.latlng)
+          .setContent(template)
+          .openOn(this.mapDiv)
+    }
   },
 
   mounted() {
@@ -396,4 +449,8 @@ export default {
 }
 
 
+
+.edit {
+  background-color: #1C195B;
+}
 </style>
