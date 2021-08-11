@@ -1,29 +1,6 @@
 <template>
   <div id="container">
     <div id="map"></div>
-    <aside class="toolbox">
-      <div class="box">
-        <header>
-          <h1>Select layer</h1>
-        </header>
-        <section>
-          <v-container
-              class="px-0"
-              fluid
-          >
-            <v-radio-group v-model="layer_selected">
-              <v-radio
-                  v-for="layer in Object.keys(layers)"
-                  :key="layer"
-                  :label="layer"
-                  :value="layer"
-              ></v-radio>
-            </v-radio-group>
-          </v-container>
-        </section>
-        <footer class="js-footer"></footer>
-      </div>
-    </aside>
   </div>
 
 
@@ -36,6 +13,7 @@ import { Icon } from "leaflet";
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
 import 'leaflet-geosearch/dist/geosearch.css';
 import carto from '@carto/carto.js'
+import 'leaflet-easybutton'
 
 delete Icon.Default.prototype._getIconUrl;
 Icon.Default.mergeOptions({
@@ -45,6 +23,7 @@ Icon.Default.mergeOptions({
 });
 
 import axios from "axios"
+import Vue from "vue";
 //import deplession_layer from "../layers/deplession_topo.json"
 //import stress_layer from "../layers/stress_topo.json"
 //import VectorTile from "leaflet.vectorgrid/dist/Leaflet.VectorGrid.js";
@@ -66,14 +45,8 @@ export default {
       mapDiv: null,
       markers: [],
       clicked_marker: null,
-      layer_selected: 'None',
-      layers: {
-        'None': null,
-        "Baseline population": null,
-        "Baseline water depletion": null,
-        "Baseline water stress": null
-
-      },
+      layer_selected: this.$selected_layer,
+      layers: Vue.prototype.$layers,
       client: new carto.Client({
         apiKey: 'default_public',
         username: 'wri-rw'
@@ -89,59 +62,69 @@ export default {
       this.place_markers(markers)
     },
     layer_selected: async function (new_layer, old_layer) {
+      console.log('aaaaa')
+      this.layers[old_layer].delete()
+      this.layers[new_layer].apply()
 
-      let _this = this
-
-      if (old_layer === 'Baseline water depletion' || old_layer === 'Baseline water stress'){
-        this.client.removeLayer(this.layers[old_layer])
-      }
-      else if(old_layer === 'Baseline population'){
-        _this.mapDiv.eachLayer(function (layer) {
-          if (_this.base_layer_url != layer._url){
-            _this.mapDiv.removeLayer(layer)
-          }
-        });
-
-      }
-
-      if (new_layer !== "None"){
-        if (new_layer === "Baseline population"){
-
-          /*
-          console.log("loading population layer")
-          let wmsLayer = L.tileLayer.wms('https://sedac.ciesin.columbia.edu/geoserver/wms', {
-            layers: 'gpw-v4:gpw-v4-population-density-rev11_2020'
-          }).addTo(this.mapDiv);*/
-
-
-          let url_to_geotiff_file = "https://wiatlayers.s3.us-east-2.amazonaws.com/population.tif";
-
-          parseGeoraster(url_to_geotiff_file).then(georaster => {
-            let scale = chroma.scale(['brown', 'orange', 'red']).domain([0,100,1000]);
-
-            let layer = new GeoRasterLayer({
-              opacity: 0.75,
-              georaster: georaster,
-              pixelValuesToColorFn: function (values) {
-                let population = values[0];
-                if (population < 0) return;
-                return scale(population).hex();
-              }
-            });
-            layer.addTo(this.mapDiv);
-
-            });
-
-        }else{
-          this.client.addLayer(this.layers[new_layer]);
-          this.client.getLeafletLayer().addTo(this.mapDiv);
-        }
-      }
     },
 
 },
   methods: {
 
+    define_carto_layer(dataset, style, label){
+
+      let _this = this
+      let obj = {}
+
+      //Baseline water depletion
+      const layerDataset = new carto.source.SQL(dataset);
+      const layerStyle = new carto.style.CartoCSS(style);
+
+      const layer = new carto.layer.Layer(layerDataset, layerStyle,
+          {
+            featureOverColumns: [label]
+          });
+
+      obj["apply"] = function(){
+        _this.client.addLayer(layer);
+        _this.client.getLeafletLayer().addTo(_this.mapDiv);
+      }
+      obj["delete"] = function(){
+        _this.client.removeLayer(layer)
+      }
+
+      return obj
+    },
+
+    define_raster_layer(url_to_geotiff_file, scale_color, scale_rang, min_value){
+      let _this = this
+      let obj = {}
+
+      obj["apply"] = function(){
+        parseGeoraster(url_to_geotiff_file).then(georaster => {
+          let scale = chroma.scale(scale_color).domain(scale_rang);
+
+          let layer = new GeoRasterLayer({
+            opacity: 0.75,
+            georaster: georaster,
+            pixelValuesToColorFn: function (values) {
+              let value = values[0];
+              if (value < min_value) return;
+              return scale(value).hex();
+            }
+          });
+          layer.addTo(_this.mapDiv);
+        });
+      }
+      obj["delete"] = function(){
+        _this.mapDiv.eachLayer(function (layer) {
+          if (_this.base_layer_url != layer._url){
+            _this.mapDiv.removeLayer(layer)
+          }
+        });
+      }
+      return obj
+    },
 
     //Delete markers from industries
     delete_markers(){
@@ -206,6 +189,11 @@ export default {
       ).addTo(this.mapDiv);
 
 
+      L.easyButton('<i class="material-icons">layers</i>', function(btn, map){
+        _this.$emit('selectLayer')
+      }, {position: 'topright'}).addTo( this.mapDiv );
+
+
 
       let popup = L.popup();
 
@@ -223,9 +211,6 @@ export default {
 
         //let population_associated = await _this.get_population(e)
 
-
-
-
         let mapContent = {
           "latlng": e.latlng,
           "right bar content": {
@@ -242,16 +227,14 @@ export default {
           _this.layers["Baseline water depletion"].on(carto.layer.events.FEATURE_CLICKED, featureEvent => {
             mapContent["right bar content"]["Baseline water depletion"] = featureEvent.data["bwd_label"]
             _this.$emit('mapContent', mapContent)
-
             _this.place_pop_up_content(popup, e, "Baseline water depletion: "+featureEvent.data["bwd_label"])
 
           })
+
         }
 
-        if(_this.clicked_marker !== null) _this.mapDiv.removeLayer(_this.clicked_marker);
-        _this.clicked_marker = L.marker(e.latlng, {icon: greenIcon}).addTo(_this.mapDiv)
-
-        //console.log(_this.$parent)
+        //if(_this.clicked_marker !== null) _this.mapDiv.removeLayer(_this.clicked_marker);
+        //_this.clicked_marker = L.marker(e.latlng, {icon: greenIcon}).addTo(_this.mapDiv)
 
       }
 
@@ -347,9 +330,14 @@ export default {
 
       L.control.layers(null, overlayMaps).addTo(this.mapDiv);*/
 
+      //None layer
+      this.layers["None"] = {}
+      this.layers["None"]["apply"] = function(){}
+      this.layers["None"]["delete"] = function(){}
+
       //Baseline water depletion
-      const baselineWaterDepletionDataset = new carto.source.SQL('select * from "wri-rw".wat_051_aqueduct_baseline_water_depletion');
-      const baselineWaterDepletionStyle = new carto.style.CartoCSS(`
+      const baselineWaterDepletionDataset = 'select * from "wri-rw".wat_051_aqueduct_baseline_water_depletion'
+      const baselineWaterDepletionStyle = `
         #layer {
          [bwd_cat = 0]{
            polygon-fill: #ffff99;
@@ -373,17 +361,13 @@ export default {
            polygon-fill: #4e4e4e;
          }
         }
-      `);
-      const baselineWaterDepletion = new carto.layer.Layer(baselineWaterDepletionDataset, baselineWaterDepletionStyle,
-          {
-            featureOverColumns: ['bwd_label']
-          });
-      this.layers["Baseline water depletion"] = baselineWaterDepletion
+      `
+      this.layers["Baseline water depletion"] = this.define_carto_layer(baselineWaterDepletionDataset, baselineWaterDepletionStyle, "bwd_cat")
 
 
       //Baseline water stress
-      const baselineWaterStressDataset = new carto.source.SQL('select * from "wri-rw".wat_050_aqueduct_baseline_water_stress');
-      const baselineWaterStressStyle = new carto.style.CartoCSS(`
+      const baselineWaterStressDataset = 'select * from "wri-rw".wat_050_aqueduct_baseline_water_stress'
+      const baselineWaterStressStyle = `
         #layer {
          [bws_cat = 0]{
            polygon-fill: #ffff99;
@@ -407,16 +391,11 @@ export default {
            polygon-fill: #4e4e4e;
          }
         }
-      `);
-      const baselineWaterStress = new carto.layer.Layer(baselineWaterStressDataset, baselineWaterStressStyle,
-          {
-            featureOverColumns: ['bws_label']
-          });
-      this.layers["Baseline water stress"] = baselineWaterStress
-      //client.addLayers([waterDepletion]);
-      //client.getLeafletLayer().addTo(this.mapDiv);
+      `
+      this.layers["Baseline water stress"] = this.define_carto_layer(baselineWaterStressDataset, baselineWaterStressStyle, "bws_cat")
 
-
+      //Baseline population
+      this.layers["Baseline population"] = this.define_raster_layer("https://wiatlayers.s3.us-east-2.amazonaws.com/population.tif", ['brown', 'orange', 'red'], [0, 100, 1500], 0)
 
     },
     place_pop_up_content(popup, e, content){
@@ -439,18 +418,42 @@ export default {
 };
 </script>
 
-<style scoped>
+<style >
 
-@import 'https://carto.com/developers/carto-js/examples/maps/public/style.css';
+@import "https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.css";
+@import "https://fonts.googleapis.com/icon?family=Material+Icons";
+
+.leaflet-touch .leaflet-bar button {
+  width: 70px;
+  height: 70px;
+  line-height: 30px;
+}
+
 
 #container {
   width: 100%;
   height: 100%;
 }
 
+#map {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  z-index: 0;
+}
+
 
 
 .edit {
   background-color: #1C195B;
+}
+.layer-icon{
+  font-size: 40px;
+}
+
+.leaflet-bar button {
+  height: 50px !important;
+  width: 50px !important;
+  font-size: 3.8rem;
 }
 </style>

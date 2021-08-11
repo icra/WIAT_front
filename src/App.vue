@@ -156,7 +156,7 @@
       <!-- Main content -->
       <v-main :class=class_for_main_content>
         <div class="content">
-          <router-view @mapContent="toggleMapContent" @editIndustry="open_edit_industry_tab" ref="delete_click_marker"></router-view>
+          <router-view @mapContent="toggleMapContent" @editIndustry="open_edit_industry_tab" @selectLayer="toggleLayerSelection" ref="delete_click_marker"></router-view>
         </div>
       </v-main>
 
@@ -304,6 +304,40 @@
           </div>
 
         </div>
+        <!-- Select layer -->
+        <div v-else-if="right_sidebar_content === 6">
+          <div style="margin: 7px; padding: 7px; background-color: white">
+            <h1>Layer selection</h1>
+            <v-radio-group v-model="selected_layer">
+              <v-radio
+                  key="None"
+                  label="None"
+                  value="None"
+              ></v-radio>
+              <b>General indicators</b>
+              <v-radio
+                  label="Baseline population"
+                  value="Baseline population"
+              ></v-radio>
+              <b>Indicators on water Quantity</b>
+              <v-radio
+                  value="Baseline Water Stress"
+              >
+                <template v-slot:label>
+                  Baseline Water Stress
+                  <v-icon>mdi-cog</v-icon>
+                </template>
+              </v-radio>
+              <v-radio
+                  label="Baseline Water Depletion"
+                  value="Baseline Water Depletion"
+              ></v-radio>
+
+            </v-radio-group>
+
+          </div>
+
+        </div>
 
       </v-navigation-drawer>
 
@@ -335,6 +369,7 @@
 <script>
 
 import {Assessment, Industry } from "./ecam_backend";
+import Vue from "vue";
 
 export default {
   data () {
@@ -368,7 +403,8 @@ export default {
       assessment_expansion_panel: undefined, //Selected assessment in expansion panel
       latlng_selected: null, //Coordinates of point in the map
       icon_selected: 0, //first sidebar icon selected
-      assessment_active: this.$assessment_active //if assessment_active[i]=true, industries of the i-th assessment are shown on the map
+      assessment_active: this.$assessment_active, //if assessment_active[i]=true, industries of the i-th assessment are shown on the map
+      selected_layer: this.$selected_layer  //Selected layer
     }
   },
   watch: {
@@ -389,6 +425,13 @@ export default {
             _this.$location_markers.push(marker)
           }
         }
+      }
+    },
+    toggleLayerSelection(){
+      if(this.right_sidebar_content === 6 && this.rightMenu) this.rightMenu = false
+      else{
+        this.right_sidebar_content = 6
+        this.rightMenu = true
       }
     },
     toggleMapContent(content){
