@@ -1,6 +1,44 @@
 <template>
   <div id="container">
     <div id="map"></div>
+    <!-- Description -->
+    <aside v-if="selected_layer !== null" class="toolbox">
+      <div class="box">
+
+        <b>Temporal resolution</b>
+        <v-radio-group v-model="baseline_future_model" row v-if="layers[selected_layer].future">
+          <v-radio
+              v-for="resolution of baseline_future"
+              :key="resolution.key"
+              :label="resolution.label"
+              :value="resolution.key"
+          ></v-radio>
+        </v-radio-group>
+        <div v-if="baseline_future_model === 'baseline' && layers[selected_layer].monthly ">
+          <v-radio-group v-model="annual_monthly_model" row >
+            <v-radio
+                v-for="resolution of annual_monthly"
+                :key="resolution.key"
+                :label="resolution.label"
+                :value="resolution.key"
+            ></v-radio>
+          </v-radio-group>
+          <v-row align="center" v-if="annual_monthly_model === 'monthly'">
+            <v-col
+                class="d-flex"
+                cols="12"
+            >
+              <v-select
+                  :items="months"
+                  label="Select a month"
+                  v-model="months_model"
+              ></v-select>
+            </v-col>
+          </v-row>
+        </div>
+
+      </div>
+    </aside>
   </div>
 
 
@@ -38,6 +76,7 @@ export default {
   components: {
     L
   },
+  props: ["selected_layer"],
   data() {
     return {
       center2: [47.41322, -1.219482],
@@ -45,13 +84,33 @@ export default {
       mapDiv: null,
       markers: [],
       clicked_marker: null,
-      layer_selected: this.$selected_layer,
-      layers: Vue.prototype.$layers,
-      client: new carto.Client({
-        apiKey: 'default_public',
-        username: 'wri-rw'
-      }),
-      base_layer_url: 'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}'
+      layers: Vue.prototype.$layers_description,
+      base_layer_url: 'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}',
+      baseline_future: [
+        {
+          key: "baseline",
+          label: "Baseline"
+        },
+        {
+          key: "future",
+          label: "Future"
+        },
+      ],
+      baseline_future_model: "baseline",
+      annual_monthly: [
+        {
+          key: "annual",
+          label: "Annual"
+        },
+        {
+          key: "monthly",
+          label: "Monthly"
+        },
+      ],
+      annual_monthly_model: "annual",
+      months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+      months_model: "January",
+      current_carto_client: null
 
     };
   },
@@ -61,23 +120,70 @@ export default {
       this.delete_markers()
       this.place_markers(markers)
     },
-    layer_selected: async function (new_layer, old_layer) {
-      console.log('aaaaa')
-      this.layers[old_layer].delete()
-      this.layers[new_layer].apply()
+    selected_layer: async function (new_layer, old_layer) {
+      this.delete_layer(old_layer, this.baseline_future_model, this.annual_monthly_model)
+
+      this.baseline_future_model = 'baseline'
+      this.months_model = "January"
+      this.annual_monthly_model =  "annual"
+      //if(old_layer !== null) this.layers[old_layer].layer.delete()
+      this.add_layer(new_layer)
 
     },
+    baseline_future_model: async function (new_value, old_value) {
 
+      let old_layer = this.selected_layer
+      let new_layer = this.selected_layer
+      this.delete_layer(old_layer, old_value, this.annual_monthly_model)
+      this.add_layer(new_layer)
+    },
+    //TO DO
+    /*
+    months_model: async function (new_value, old_value) {
+      let old_layer = this.selected_layer
+      let new_layer = this.selected_layer
+    },
+    annual_monthly_model: async function (new_value, old_value) {
+      let old_layer = this.selected_layer
+      let new_layer = this.selected_layer
+    },*/
 },
   methods: {
 
-    define_carto_layer(dataset, style, label){
+
+    delete_layer(layer, baseline_future, annual_monthly){
+      if(layer !== null){
+        if(baseline_future === "baseline"){
+          if(annual_monthly === "monthly"){
+
+          }else{  //Annual
+            this.layers[layer].layers.baseline.annual.layer.delete()
+          }
+        }else{  //Future
+          this.layers[layer].layers.future.layer.delete()
+        }
+      }
+    },
+    add_layer(layer){
+      if(layer !== null){
+        if(this.baseline_future_model === "baseline"){
+          if(this.annual_monthly_model === "monthly"){
+
+          }else{  //Annual
+            this.layers[layer].layers.baseline.annual.layer.apply()
+          }
+        }else{  //Future
+          this.layers[layer].layers.future.layer.apply()
+        }
+      }
+    },
+    define_carto_layer(dataset, style, label, carto_client){
 
       let _this = this
       let obj = {}
 
-      //Baseline water depletion
-      const layerDataset = new carto.source.SQL(dataset);
+      //const layerDataset = new carto.source.SQL(dataset);
+      const layerDataset = new carto.source.Dataset(dataset);
       const layerStyle = new carto.style.CartoCSS(style);
 
       const layer = new carto.layer.Layer(layerDataset, layerStyle,
@@ -86,11 +192,13 @@ export default {
           });
 
       obj["apply"] = function(){
-        _this.client.addLayer(layer);
-        _this.client.getLeafletLayer().addTo(_this.mapDiv);
+        _this.current_carto_client = carto_client
+        carto_client.addLayer(layer);
+        carto_client.getLeafletLayer().addTo(_this.mapDiv);
       }
       obj["delete"] = function(){
-        _this.client.removeLayer(layer)
+        _this.current_carto_client.removeLayer(layer)
+        _this.current_carto_client = null
       }
 
       return obj
@@ -194,7 +302,6 @@ export default {
       }, {position: 'topright'}).addTo( this.mapDiv );
 
 
-
       let popup = L.popup();
 
       let greenIcon = new L.Icon({
@@ -206,6 +313,7 @@ export default {
         shadowSize: [41, 41]
       });
 
+      /*
       async function onMapClick(e) {
 
 
@@ -238,7 +346,7 @@ export default {
 
       }
 
-      this.mapDiv.on('click', onMapClick);
+      this.mapDiv.on('click', onMapClick); */
 
       const provider = new OpenStreetMapProvider();
       const searchControl = new GeoSearchControl({
@@ -330,14 +438,19 @@ export default {
 
       L.control.layers(null, overlayMaps).addTo(this.mapDiv);*/
 
-      //None layer
-      this.layers["None"] = {}
-      this.layers["None"]["apply"] = function(){}
-      this.layers["None"]["delete"] = function(){}
+      let wri_client = new carto.Client({
+        apiKey: 'default_public',
+        username: 'wri-rw'
+      })
+
+      let own_client = new carto.Client({
+        apiKey: 'default_public',
+        username: 'jsalo'
+      })
 
       //Baseline water depletion
-      const baselineWaterDepletionDataset = 'select * from "wri-rw".wat_051_aqueduct_baseline_water_depletion'
-      const baselineWaterDepletionStyle = `
+      const annualBaselineWaterDepletionDataset = 'select * from "wri-rw".wat_051_aqueduct_baseline_water_depletion'
+      const annualBaselineWaterDepletionStyle = `
         #layer {
          [bwd_cat = 0]{
            polygon-fill: #ffff99;
@@ -362,11 +475,11 @@ export default {
          }
         }
       `
-      this.layers["Baseline water depletion"] = this.define_carto_layer(baselineWaterDepletionDataset, baselineWaterDepletionStyle, "bwd_cat")
+      //this.layers["Water depletion"].layers.baseline.annual = this.define_carto_layer(annualBaselineWaterDepletionDataset, annualBaselineWaterDepletionStyle, "bwd_cat")
 
 
       //Baseline water stress
-      const baselineWaterStressDataset = 'select * from "wri-rw".wat_050_aqueduct_baseline_water_stress'
+      const baselineWaterStressDataset = 'wat_050_aqueduct_baseline_water_stress'
       const baselineWaterStressStyle = `
         #layer {
          [bws_cat = 0]{
@@ -392,10 +505,44 @@ export default {
          }
         }
       `
-      this.layers["Baseline water stress"] = this.define_carto_layer(baselineWaterStressDataset, baselineWaterStressStyle, "bws_cat")
+      this.layers["Water stress"].layers.baseline.annual.layer = this.define_carto_layer(baselineWaterStressDataset, baselineWaterStressStyle, "bws_cat", wri_client)
+
+      //Future water stress
+      const futureWaterStressDataset = 'table_2030_values_business_as_usual_aqueduct'
+      const futureWaterStressStyle = `
+        #layer {
+         [ws3028tl = "Low (<10%)"]{
+           polygon-fill: #ffff99;
+         }
+         [ws3028tl = "Low-medium (10-20%)"]{
+           polygon-fill: #ffe600;
+         }
+         [ws3028tl = "Medium-high (20-40%)"]{
+           polygon-fill: #ff9900;
+         }
+         [ws3028tl = "High (40-80%)"]{
+           polygon-fill: #ffa49c;
+         }
+         [ws3028tl = "Extremely high (>80%)"]{
+           polygon-fill: #cc0014;
+         }
+         [ws3028tl = "Arid and low water use"]{
+           polygon-fill: #808080;
+         }
+         [ws3028tl = -1]{
+           polygon-fill: #4e4e4e;
+         }
+        }
+      `
+      this.layers["Water stress"].layers.future.layer = this.define_carto_layer(futureWaterStressDataset, futureWaterStressStyle, "ws3028tl", own_client)
+
+
 
       //Baseline population
-      this.layers["Baseline population"] = this.define_raster_layer("https://wiatlayers.s3.us-east-2.amazonaws.com/population.tif", ['brown', 'orange', 'red'], [0, 100, 1500], 0)
+      //this.layers["Baseline population"].layer = this.define_raster_layer("https://wiatlayers.s3.us-east-2.amazonaws.com/population.tif", ['brown', 'orange', 'red'], [0, 100, 1500], 0)
+      this.layers["Population"].layers.baseline.annual.layer = this.define_raster_layer("https://wiat-server.icradev.cat/baseline_population_layer", ['brown', 'orange', 'red'], [0, 100, 1500], 0)
+
+
 
     },
     place_pop_up_content(popup, e, content){
@@ -422,6 +569,16 @@ export default {
 
 @import "https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.css";
 @import "https://fonts.googleapis.com/icon?family=Material+Icons";
+@import "https://carto.com/developers/carto-js/examples/maps/public/style.css";
+
+aside.toolbox {
+  position: absolute;
+  right: 11px;
+  top: 75px;
+  min-width: 300px;
+  max-width: 300px;
+  z-index: 2;
+}
 
 .leaflet-touch .leaflet-bar button {
   width: 70px;
@@ -433,6 +590,7 @@ export default {
 #container {
   width: 100%;
   height: 100%;
+  position: relative;
 }
 
 #map {

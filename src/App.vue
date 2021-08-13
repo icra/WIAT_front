@@ -156,7 +156,7 @@
       <!-- Main content -->
       <v-main :class=class_for_main_content>
         <div class="content">
-          <router-view @mapContent="toggleMapContent" @editIndustry="open_edit_industry_tab" @selectLayer="toggleLayerSelection" ref="delete_click_marker"></router-view>
+          <router-view :selected_layer="selected_layer" @mapContent="toggleMapContent" @editIndustry="open_edit_industry_tab" @selectLayer="toggleLayerSelection"></router-view>
         </div>
       </v-main>
 
@@ -308,32 +308,43 @@
         <div v-else-if="right_sidebar_content === 6">
           <div style="margin: 7px; padding: 7px; background-color: white">
             <h1>Layer selection</h1>
-            <v-radio-group v-model="selected_layer">
-              <v-radio
-                  key="None"
-                  label="None"
-                  value="None"
-              ></v-radio>
-              <b>General indicators</b>
-              <v-radio
-                  label="Baseline population"
-                  value="Baseline population"
-              ></v-radio>
-              <b>Indicators on water Quantity</b>
-              <v-radio
-                  value="Baseline Water Stress"
-              >
-                <template v-slot:label>
-                  Baseline Water Stress
-                  <v-icon>mdi-cog</v-icon>
-                </template>
-              </v-radio>
-              <v-radio
-                  label="Baseline Water Depletion"
-                  value="Baseline Water Depletion"
-              ></v-radio>
 
-            </v-radio-group>
+            <v-row dense>
+              <v-col cols="12">
+                <div
+                    v-for="[key, layer] in Object.entries(layers_description)"
+                    :key="key"
+                >
+                  <v-card
+                      v-if="key === selected_layer"
+                      color="#463FCA"
+                      dark
+                  >
+                    <v-card-title>{{key}}</v-card-title>
+                    <v-card-subtitle><b>Category:</b> {{layer.category}} </v-card-subtitle>
+                    <v-card-actions>
+                      <v-btn text @click="applyLayer(key)">
+                        Active
+                      </v-btn>
+                    </v-card-actions>
+                  </v-card>
+                  <v-card
+                      v-else
+                      class="inactive_layer_card"
+                  >
+                    <v-card-title>{{key}}</v-card-title>
+                    <v-card-subtitle><b>Category:</b> {{layer.category}} </v-card-subtitle>
+                    <v-card-actions>
+                      <v-btn @click="applyLayer(key)" dark color="#463FCA">
+                        Add to map
+                      </v-btn>
+                    </v-card-actions>
+                  </v-card>
+                </div>
+
+
+              </v-col>
+            </v-row>
 
           </div>
 
@@ -404,13 +415,18 @@ export default {
       latlng_selected: null, //Coordinates of point in the map
       icon_selected: 0, //first sidebar icon selected
       assessment_active: this.$assessment_active, //if assessment_active[i]=true, industries of the i-th assessment are shown on the map
-      selected_layer: this.$selected_layer  //Selected layer
+      selected_layer: null,  //Selected layer
+      layers_description: this.$layers_description
     }
   },
   watch: {
 
   },
   methods: {
+    applyLayer(key){
+      if (this.selected_layer === key) this.selected_layer = null
+      else this.selected_layer = key
+    },
     update_markers(){
       let _this = this
       this.$location_markers.splice(0,this.$location_markers.length)
@@ -633,5 +649,7 @@ html::-webkit-scrollbar {
 #app{
   width: 100%;
 }
+
+
 
 </style>
