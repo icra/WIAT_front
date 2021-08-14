@@ -32,6 +32,8 @@
                   :items="months"
                   label="Select a month"
                   v-model="months_model"
+                  item-text="label"
+                  item-value="key"
               ></v-select>
             </v-col>
           </v-row>
@@ -108,8 +110,57 @@ export default {
         },
       ],
       annual_monthly_model: "annual",
-      months: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
-      months_model: "January",
+      months: [
+        {
+          key: 0,
+          label: "January"
+        },
+        {
+          key: 1,
+          label: "February"
+        },
+        {
+          key: 2,
+          label: "March"
+        },
+        {
+          key: 3,
+          label: "April"
+        },
+        {
+          key: 4,
+          label: "May"
+        },
+        {
+          key: 5,
+          label: "June"
+        },
+        {
+          key: 6,
+          label: "July"
+        },
+        {
+          key: 7,
+          label: "August"
+        },
+        {
+          key: 8,
+          label: "September"
+        },
+        {
+          key: 9,
+          label: "October"
+        },
+        {
+          key: 10,
+          label: "November"
+        },
+        {
+          key: 11,
+          label: "December"
+        },
+      ],
+      months_model: 0,
       current_carto_client: null
 
     };
@@ -121,41 +172,42 @@ export default {
       this.place_markers(markers)
     },
     selected_layer: async function (new_layer, old_layer) {
-      this.delete_layer(old_layer, this.baseline_future_model, this.annual_monthly_model)
+      this.delete_layer(old_layer, this.baseline_future_model, this.annual_monthly_model, this.months_model)
 
       this.baseline_future_model = 'baseline'
-      this.months_model = "January"
+      this.months_model = 0
       this.annual_monthly_model =  "annual"
       //if(old_layer !== null) this.layers[old_layer].layer.delete()
       this.add_layer(new_layer)
 
     },
     baseline_future_model: async function (new_value, old_value) {
-
       let old_layer = this.selected_layer
       let new_layer = this.selected_layer
-      this.delete_layer(old_layer, old_value, this.annual_monthly_model)
+      this.delete_layer(old_layer, old_value, this.annual_monthly_model, this.months_model)
       this.add_layer(new_layer)
     },
-    //TO DO
-    /*
+
     months_model: async function (new_value, old_value) {
       let old_layer = this.selected_layer
       let new_layer = this.selected_layer
+      this.delete_layer(old_layer, this.baseline_future_model, this.annual_monthly_model, old_value)
+      this.add_layer(new_layer)
     },
     annual_monthly_model: async function (new_value, old_value) {
       let old_layer = this.selected_layer
       let new_layer = this.selected_layer
-    },*/
+      this.delete_layer(old_layer, this.baseline_future_model, old_value, this.months_model)
+      this.add_layer(new_layer)
+    },
 },
   methods: {
 
-
-    delete_layer(layer, baseline_future, annual_monthly){
+    delete_layer(layer, baseline_future, annual_monthly, months_model){
       if(layer !== null){
         if(baseline_future === "baseline"){
           if(annual_monthly === "monthly"){
-
+            this.layers[layer].layers.baseline.monthly[months_model].delete()
           }else{  //Annual
             this.layers[layer].layers.baseline.annual.layer.delete()
           }
@@ -168,7 +220,7 @@ export default {
       if(layer !== null){
         if(this.baseline_future_model === "baseline"){
           if(this.annual_monthly_model === "monthly"){
-
+            this.layers[layer].layers.baseline.monthly[this.months_model].apply()
           }else{  //Annual
             this.layers[layer].layers.baseline.annual.layer.apply()
           }
@@ -448,8 +500,9 @@ export default {
         username: 'jsalo'
       })
 
+
       //Baseline water depletion
-      const annualBaselineWaterDepletionDataset = 'select * from "wri-rw".wat_051_aqueduct_baseline_water_depletion'
+      const annualBaselineWaterDepletionDataset = "wat_051_aqueduct_baseline_water_depletion"
       const annualBaselineWaterDepletionStyle = `
         #layer {
          [bwd_cat = 0]{
@@ -529,12 +582,45 @@ export default {
          [ws3028tl = "Arid and low water use"]{
            polygon-fill: #808080;
          }
-         [ws3028tl = -1]{
+        }
+      `
+      this.layers["Water stress"].layers.future.layer = this.define_carto_layer(futureWaterStressDataset, futureWaterStressStyle, "ws3028tl", own_client)
+
+
+      //Monthly water stress
+      for (let i=1; i<=12; i++){
+        let monthlyWaterStressDataset = 'baseline_monthly_aqueduct'
+        let label = "bws_"
+        if (i<10) label += "0"+i+"_lab"
+        else label += i+"_lab"
+        let monthlyWaterStressStyle = `
+        #layer {
+         [`+label+` = "Low (<10%)"]{
+           polygon-fill: #ffff99;
+         }
+         [`+label+` = "Low - Medium (10-20%)"]{
+           polygon-fill: #ffe600;
+         }
+         [`+label+` = "Medium - High (20-40%)"]{
+           polygon-fill: #ff9900;
+         }
+         [`+ label+` = "High (40-80%)"]{
+           polygon-fill: #ff1900;
+         }
+         [`+label+` = "Extremely High (>80%)"]{
+           polygon-fill: #990000;
+         }
+         [`+label+` = "Arid and Low Water Use"]{
+           polygon-fill: #808080;
+         }
+         [`+label+` = "NoData"]{
            polygon-fill: #4e4e4e;
          }
         }
       `
-      this.layers["Water stress"].layers.future.layer = this.define_carto_layer(futureWaterStressDataset, futureWaterStressStyle, "ws3028tl", own_client)
+        let layer_i = this.define_carto_layer(monthlyWaterStressDataset, monthlyWaterStressStyle, label, own_client)
+        this.layers["Water stress"].layers.baseline.monthly.push(layer_i)
+      }
 
 
 

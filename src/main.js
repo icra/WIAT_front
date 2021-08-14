@@ -28,9 +28,7 @@ Vue.prototype.$layers_description = {
         annual: {
           layer: null
         },
-        monthly: {
-          layer: null
-        },
+        monthly: []
       },
       future: {
         layer: null
@@ -46,15 +44,13 @@ Vue.prototype.$layers_description = {
         annual: {
           layer: null
         },
-        monthly: {
-          layer: null
-        },
+        monthly: []
       },
       future: {
         layer: null
       },
     },
-    monthly: false,
+    monthly: true,
     future: true,
     category: "Quantity risk",
   },
@@ -64,9 +60,7 @@ Vue.prototype.$layers_description = {
         annual: {
           layer: null
         },
-        monthly: {
-          layer: null
-        },
+        monthly: []
       },
       future: {
         layer: null
