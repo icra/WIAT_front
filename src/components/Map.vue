@@ -72,13 +72,14 @@ let parse_georaster = require("georaster");
 let GeoRasterLayer = require("georaster-layer-for-leaflet");
 let _ = require('lodash');
 let chroma = require("chroma-js")
+let $ = require( "jquery" );
 
 export default {
   name: "Map",
   components: {
     L
   },
-  props: ["selected_layer"],
+  props: ["selected_layer", "selected_assessment"],
   data() {
     return {
       center2: [47.41322, -1.219482],
@@ -161,7 +162,8 @@ export default {
         },
       ],
       months_model: 0,
-      current_carto_client: null
+      current_carto_client: null,
+      popup_info: null
 
     };
   },
@@ -173,7 +175,6 @@ export default {
     },
     selected_layer: async function (new_layer, old_layer) {
       this.delete_layer(old_layer, this.baseline_future_model, this.annual_monthly_model, this.months_model)
-
       this.baseline_future_model = 'baseline'
       this.months_model = 0
       this.annual_monthly_model =  "annual"
@@ -187,7 +188,6 @@ export default {
       this.delete_layer(old_layer, old_value, this.annual_monthly_model, this.months_model)
       this.add_layer(new_layer)
     },
-
     months_model: async function (new_value, old_value) {
       let old_layer = this.selected_layer
       let new_layer = this.selected_layer
@@ -202,35 +202,50 @@ export default {
     },
 },
   methods: {
-
-    delete_layer(layer, baseline_future, annual_monthly, months_model){
+    industry_created(){
+      console.log('sdfsdf')
+      this.mapDiv.closePopup()
+      this.clicked_marker.unbindPopup()
+      this.clicked_marker = null
+    },
+    get_layer(layer, baseline_future, annual_monthly, months_model){
       if(layer !== null){
         if(baseline_future === "baseline"){
           if(annual_monthly === "monthly"){
-            this.layers[layer].layers.baseline.monthly[months_model].delete()
+            return this.layers[layer].layers.baseline.monthly[months_model]
           }else{  //Annual
-            this.layers[layer].layers.baseline.annual.layer.delete()
+            return this.layers[layer].layers.baseline.annual.layer
           }
         }else{  //Future
-          this.layers[layer].layers.future.layer.delete()
+          return this.layers[layer].layers.future.layer
         }
+      }else{
+        return null
       }
     },
-    add_layer(layer){
-      if(layer !== null){
-        if(this.baseline_future_model === "baseline"){
-          if(this.annual_monthly_model === "monthly"){
-            this.layers[layer].layers.baseline.monthly[this.months_model].apply()
-          }else{  //Annual
-            this.layers[layer].layers.baseline.annual.layer.apply()
-          }
-        }else{  //Future
-          this.layers[layer].layers.future.layer.apply()
-        }
+
+    delete_layer(layer, baseline_future, annual_monthly, months_model){
+
+      if(this.clicked_marker !== null) this.mapDiv.removeLayer(this.clicked_marker)
+      let current_layer = this.get_layer(layer, baseline_future, annual_monthly, months_model)
+      if(current_layer !== null){
+        current_layer.delete()
       }
+    },
+    add_layer(layer, baseline_future=this.baseline_future_model, annual_monthly=this.annual_monthly_model, months_model=this.months_model){
+      let current_layer = this.get_layer(layer, baseline_future, annual_monthly, months_model)
+      if(current_layer !== null){
+        current_layer.apply()
+      }
+    },
+    toggle_popup(text){
+      if(this.popup_info===null) this.popup_info=this.clicked_marker.bindPopup()
+      text += ('<br><br><button class="trigger">ADD INDUSTRY</button>')
+
+      this.popup_info.setPopupContent(text)
+      this.popup_info.openPopup()
     },
     define_carto_layer(dataset, style, label, carto_client){
-
       let _this = this
       let obj = {}
 
@@ -238,10 +253,11 @@ export default {
       const layerDataset = new carto.source.Dataset(dataset);
       const layerStyle = new carto.style.CartoCSS(style);
 
-      const layer = new carto.layer.Layer(layerDataset, layerStyle,
+      let layer = new carto.layer.Layer(layerDataset, layerStyle,
           {
             featureOverColumns: [label]
           });
+
 
       obj["apply"] = function(){
         _this.current_carto_client = carto_client
@@ -253,13 +269,20 @@ export default {
         _this.current_carto_client = null
       }
 
+      layer.on(carto.layer.events.FEATURE_CLICKED, featureEvent => {
+        console.log('asdfsadf')
+        let popup_message = "<b>"+_this.selected_layer+"</b>: "+featureEvent.data[label]
+        _this.toggle_popup(popup_message)
+      })
+
+      obj["click"] = async function(latlng){}  //empty
       return obj
     },
 
-    define_raster_layer(url_to_geotiff_file, scale_color, scale_rang, min_value){
+    define_raster_layer(geotiff_file, scale_color, scale_rang, min_value){
       let _this = this
       let obj = {}
-
+      let url_to_geotiff_file = "https://wiat-server.icradev.cat/image?filename="+geotiff_file
       obj["apply"] = function(){
         parseGeoraster(url_to_geotiff_file).then(georaster => {
           let scale = chroma.scale(scale_color).domain(scale_rang);
@@ -282,6 +305,11 @@ export default {
             _this.mapDiv.removeLayer(layer)
           }
         });
+      }
+      obj["click"] = async function(latlng){
+        let popup_message = "<b>"+_this.selected_layer+"</b>: "
+        let value = await _this.get_raster_data(latlng, geotiff_file)
+        _this.toggle_popup(popup_message + value)
       }
       return obj
     },
@@ -315,11 +343,11 @@ export default {
       })
     },
 
-    get_population(event) {
+    get_raster_data(latlng, file_name) {
       //http://localhost:3000/bona?longitude=2.16992&latitude=41.3879
-      let lat = event.latlng.lat
-      let lng = event.latlng.lng
-      let call = "/bona?longitude="+lng+"&latitude="+lat
+      let lat = latlng.lat
+      let lng = latlng.lng
+      let call = "/data_point?filename="+file_name+"&longitude="+lng+"&latitude="+lat
       return axios
           .get(call)
           .then(response => {
@@ -354,8 +382,6 @@ export default {
       }, {position: 'topright'}).addTo( this.mapDiv );
 
 
-      let popup = L.popup();
-
       let greenIcon = new L.Icon({
         iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
         shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -365,40 +391,38 @@ export default {
         shadowSize: [41, 41]
       });
 
-      /*
+
       async function onMapClick(e) {
 
-
-        //let population_associated = await _this.get_population(e)
-
-        let mapContent = {
-          "latlng": e.latlng,
-          "right bar content": {
+        let latlng = null
+        if(e.type === "click") latlng = e.latlng
+        else {
+          latlng = {
+            'lat': e.location.y,
+            'lng': e.location.x
           }
         }
 
-        if (_this.layer_selected === "Baseline water stress"){
-          _this.layers["Baseline water stress"].on(carto.layer.events.FEATURE_CLICKED, featureEvent => {
-            mapContent["right bar content"]["Baseline water stress"] = featureEvent.data["bws_label"]
-            _this.$emit('mapContent', mapContent)
-            _this.place_pop_up_content(popup, e, "Baseline water stress: "+featureEvent.data["bws_label"])
-          })
-        }else if (_this.layer_selected === "Baseline water depletion"){
-          _this.layers["Baseline water depletion"].on(carto.layer.events.FEATURE_CLICKED, featureEvent => {
-            mapContent["right bar content"]["Baseline water depletion"] = featureEvent.data["bwd_label"]
-            _this.$emit('mapContent', mapContent)
-            _this.place_pop_up_content(popup, e, "Baseline water depletion: "+featureEvent.data["bwd_label"])
+        if(_this.clicked_marker !== null) _this.mapDiv.removeLayer(_this.clicked_marker);
+        _this.clicked_marker = L.marker(latlng, {icon: greenIcon}).addTo(_this.mapDiv)
 
-          })
-
+        if(_this.selected_assessment!==undefined || _this.selected_layer!==null) {
+          _this.popup_info=_this.clicked_marker.bindPopup()
         }
 
-        //if(_this.clicked_marker !== null) _this.mapDiv.removeLayer(_this.clicked_marker);
-        //_this.clicked_marker = L.marker(e.latlng, {icon: greenIcon}).addTo(_this.mapDiv)
+        if(_this.selected_layer !== null){
+          let current_layer = _this.get_layer(_this.selected_layer, _this.baseline_future_model, _this.annual_monthly_model, _this.months_model)
+          current_layer.click(latlng)
+        }else if(_this.selected_assessment!==undefined){
+          _this.toggle_popup("")
+        }
 
+        $('#map').on('click', '.trigger', function() {
+          _this.$emit('createIndustry', latlng)
+        });
       }
 
-      this.mapDiv.on('click', onMapClick); */
+      this.mapDiv.on('click', onMapClick);
 
       const provider = new OpenStreetMapProvider();
       const searchControl = new GeoSearchControl({
@@ -407,27 +431,8 @@ export default {
       });
       this.mapDiv.addControl(searchControl);
 
-      function searchLocation(e) {
-        let mapContent = {
-          "latlng": {
-            'lat': e.location.y,
-            'lng': e.location.x
 
-          },
-          "right bar content": {
-            "Population associated": 45
-          }
-
-        }
-        //console.log(_this.$parent)
-        _this.$emit('mapContent', mapContent)
-
-        if(_this.clicked_marker !== null) _this.mapDiv.removeLayer(_this.clicked_marker);
-        _this.clicked_marker = L.marker({'lat': e.location.y, 'lng': e.location.x}, {icon: greenIcon}).addTo(_this.mapDiv)
-
-      }
-
-      this.mapDiv.on('geosearch/showlocation', searchLocation);
+      this.mapDiv.on('geosearch/showlocation', onMapClick);
 
 
       /*
@@ -622,26 +627,13 @@ export default {
         this.layers["Water stress"].layers.baseline.monthly.push(layer_i)
       }
 
-
-
       //Baseline population
       //this.layers["Baseline population"].layer = this.define_raster_layer("https://wiatlayers.s3.us-east-2.amazonaws.com/population.tif", ['brown', 'orange', 'red'], [0, 100, 1500], 0)
-      this.layers["Population"].layers.baseline.annual.layer = this.define_raster_layer("https://wiat-server.icradev.cat/baseline_population_layer", ['brown', 'orange', 'red'], [0, 100, 1500], 0)
+      this.layers["Population"].layers.baseline.annual.layer = this.define_raster_layer("baseline_population", ['brown', 'orange', 'red'], [0, 100, 1500], 0)
 
 
 
     },
-    place_pop_up_content(popup, e, content){
-
-      console.log('0asdasdasd')
-      const template =
-          '<button type="button" @click="console.log(33434)" style="background-color: #1C195B;">Edit <a href="http://www.google.com">Visit Google</a></button>';
-
-      popup
-          .setLatLng(e.latlng)
-          .setContent(template)
-          .openOn(this.mapDiv)
-    }
   },
 
   mounted() {
@@ -686,8 +678,6 @@ aside.toolbox {
   z-index: 0;
 }
 
-
-
 .edit {
   background-color: #1C195B;
 }
@@ -699,5 +689,23 @@ aside.toolbox {
   height: 50px !important;
   width: 50px !important;
   font-size: 3.8rem;
+}
+
+.trigger {
+  background-color: rgb(70, 63, 202);
+  border-color: rgb(70, 63, 202);
+  font-size: 0.875rem;
+  color: white;
+  padding: 8px 15px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  margin: 4px 2px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.trigger:hover {
+  opacity: 0.92;
 }
 </style>

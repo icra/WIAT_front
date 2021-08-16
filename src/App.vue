@@ -156,7 +156,7 @@
       <!-- Main content -->
       <v-main :class=class_for_main_content>
         <div class="content">
-          <router-view :selected_layer="selected_layer" @mapContent="toggleMapContent" @editIndustry="open_edit_industry_tab" @selectLayer="toggleLayerSelection"></router-view>
+          <router-view :selected_assessment="assessment_expansion_panel" :selected_layer="selected_layer" @createIndustry="createNewIndustry" @editIndustry="open_edit_industry_tab" @selectLayer="toggleLayerSelection" ref="reference"></router-view>
         </div>
       </v-main>
 
@@ -192,7 +192,7 @@
             </v-btn>
           </v-form>
         </div>
-        <!-- Edit settings -->
+        <!-- Edit assessment -->
         <div v-else-if="right_sidebar_content === 2" >
           <div style="margin: 7px; padding: 7px; background-color: white">
             <h1>Edit assessment</h1>
@@ -255,7 +255,9 @@
 
           </div>
         </div>
+
         <!-- map info -->
+        <!--
         <div v-else-if="right_sidebar_content === 4">
           <div style="margin: 7px; padding: 7px; background-color: white">
             <h1>Map info</h1>
@@ -277,8 +279,9 @@
             </v-btn>
 
           </div>
-
         </div>
+        -->
+        <!-- Create industry -->
         <div v-else-if="right_sidebar_content === 5">
           <div style="margin: 7px; padding: 7px; background-color: white">
             <h1>New industry</h1>
@@ -409,6 +412,8 @@ export default {
         new_industry: {v_model: false, text: "New industry added correctly", },
         edit_industry: {v_model: false, text: "Industry edited correctly", },
         delete_industry: {v_model: false, text: "Industry deleted correctly", },
+        assessment_not_selected: {v_model: false, text: "Can't create industry, please select and assessment first", },
+
       },
       map_content_info: {}, //Info to show when the map is clicked
       assessment_expansion_panel: undefined, //Selected assessment in expansion panel
@@ -450,11 +455,21 @@ export default {
         this.rightMenu = true
       }
     },
-    toggleMapContent(content){
-      this.right_sidebar_content = 4
-      this.rightMenu = true
-      this.map_content_info = content["right bar content"]
-      this.latlng_selected = content.latlng
+
+    createNewIndustry(latlng){
+
+     // assessment_not_selected: {v_model: false, text: "Can't create industry, please select and assessment first", }
+    //assessment_expansion_panel: undefined, //Selected assessment in expansion panel
+
+      if(this.assessment_expansion_panel === undefined){
+        this.snackbars.assessment_not_selected.v_model = true
+      }else{
+        this.rightMenu = true
+        this.right_sidebar_content = 5;
+        this.factory_name = null
+        this.latlng_selected = latlng
+      }
+
     },
     class_for_main_content() {
       if (this.secondMenu && this.rightMenu) return "two_sidebar_open"
@@ -504,6 +519,7 @@ export default {
       this.rightMenu = false
       this.factory_name = null
       this.snackbars.new_industry.v_model = true
+      this.$refs.reference.industry_created()
     },
     open_edit_industry_tab(assessment_index, industry_index){
       this.right_sidebar_content = 3
@@ -524,7 +540,7 @@ export default {
       this.$assessments[this.selected_assessment].delete_industry(this.selected_industry)
       this.update_markers()
     },
-    new_factory_rules_name(value) {  //Rules for creating new factory
+    new_factory_rules_name(value) {  //Rules for creating new industry
       let factories_with_same_name = this.created_assessments[this.assessment_expansion_panel].industries.filter(company => {
         return company.name === value
       })
