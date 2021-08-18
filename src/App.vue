@@ -86,7 +86,6 @@
           <h1>Assessment list</h1>
           <!-- <div style = "overflow-y: auto; height: 75%; max-height: 75%; width: 100%"> -->
           <div style="flex: 2;  /* 1 and it will fill whole space left if no flex value are set to other children*/
-          background: gold;
           overflow: auto; width: 100%">
             <v-expansion-panels focusable v-model="assessment_expansion_panel">
               <v-expansion-panel
@@ -309,10 +308,10 @@
         </div>
         <!-- Select layer -->
         <div v-else-if="right_sidebar_content === 6">
-          <div style="margin: 7px; padding: 7px; background-color: white">
+          <div style="margin: 7px; padding: 7px; background-color: white; display: flex; flex-flow: column nowrap; width: 100%; height: 85vh">
             <h1>Layer selection</h1>
 
-            <v-row dense>
+            <v-row dense class="layer_list">
               <v-col cols="12">
                 <div
                     v-for="[key, layer] in Object.entries(layers_description)"
@@ -666,6 +665,11 @@ html::-webkit-scrollbar {
   width: 100%;
 }
 
+.layer_list{
+  overflow: auto;
+  width: 100%;
+  flex: 2;  /* 1 and it will fill whole space left if no flex value are set to other children*/
+}
 
 
 </style>

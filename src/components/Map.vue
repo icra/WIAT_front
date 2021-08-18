@@ -257,8 +257,6 @@ export default {
           {
             featureOverColumns: [label]
           });
-
-
       obj["apply"] = function(){
         _this.current_carto_client = carto_client
         carto_client.addLayer(layer);
@@ -505,68 +503,43 @@ export default {
         username: 'jsalo'
       })
 
+      //Baseline population
+      this.layers["Population"].layers.baseline.annual.layer = this.define_raster_layer("baseline_population", ['#f7e6d8', '#c36d33', '#4e2911'], [0, 35, 800], 0)
 
-      //Baseline water depletion
-      const annualBaselineWaterDepletionDataset = "wat_051_aqueduct_baseline_water_depletion"
-      const annualBaselineWaterDepletionStyle = `
-        #layer {
-         [bwd_cat = 0]{
-           polygon-fill: #ffff99;
-         }
-         [bwd_cat = 1]{
-           polygon-fill: #ffe600;
-         }
-         [bwd_cat = 2]{
-           polygon-fill: #ff9900;
-         }
-         [bwd_cat = 3]{
-           polygon-fill: #ffa49c;
-         }
-         [bwd_cat = 4]{
-           polygon-fill: #cc0014;
-         }
-         [bwd_cat = 5]{
-           polygon-fill: #ff9900;
-         }
-         [bwd_cat = -1]{
-           polygon-fill: #4e4e4e;
-         }
-        }
-      `
-      //this.layers["Water depletion"].layers.baseline.annual = this.define_carto_layer(annualBaselineWaterDepletionDataset, annualBaselineWaterDepletionStyle, "bwd_cat")
-
+      //Baseline aridity
+      this.layers["Aridity index"].layers.baseline.annual.layer = this.define_raster_layer("aridity_baseline", ['#cf7563', '#d2fa32', '#5de833', '#3d5894'], [0, 5000, 6500, 15000], 0)
 
       //Baseline water stress
       const baselineWaterStressDataset = 'wat_050_aqueduct_baseline_water_stress'
       const baselineWaterStressStyle = `
         #layer {
-         [bws_cat = 0]{
+         [bws_label = "Low (<10%)"]{
            polygon-fill: #ffff99;
          }
-         [bws_cat = 1]{
+         [bws_label = "Low - Medium (10-20%)"]{
            polygon-fill: #ffe600;
          }
-         [bws_cat = 2]{
+         [bws_label = "Medium - High (20-40%)"]{
            polygon-fill: #ff9900;
          }
-         [bws_cat = 3]{
-           polygon-fill: #ffa49c;
+         [bws_label = "High (40-80%)"]{
+           polygon-fill: #ff1900;
          }
-         [bws_cat = 4]{
-           polygon-fill: #cc0014;
+         [bws_label = "Extremely High (>80%)"]{
+           polygon-fill: #990000;
          }
-         [bws_cat = 5]{
-           polygon-fill: #ff9900;
+         [bws_label = "Arid and Low Water Use"]{
+           polygon-fill: #808080;
          }
-         [bws_cat = -1]{
+         [bws_label = "No Data"]{
            polygon-fill: #4e4e4e;
          }
         }
       `
-      this.layers["Water stress"].layers.baseline.annual.layer = this.define_carto_layer(baselineWaterStressDataset, baselineWaterStressStyle, "bws_cat", wri_client)
+      this.layers["Water stress"].layers.baseline.annual.layer = this.define_carto_layer(baselineWaterStressDataset, baselineWaterStressStyle, "bws_label", wri_client)
 
       //Future water stress
-      const futureWaterStressDataset = 'table_2030_values_business_as_usual_aqueduct'
+      const futureWaterStressDataset = 'aqueduct_projections_20150309'
       const futureWaterStressStyle = `
         #layer {
          [ws3028tl = "Low (<10%)"]{
@@ -579,18 +552,20 @@ export default {
            polygon-fill: #ff9900;
          }
          [ws3028tl = "High (40-80%)"]{
-           polygon-fill: #ffa49c;
+           polygon-fill: #ff1900;
          }
          [ws3028tl = "Extremely high (>80%)"]{
-           polygon-fill: #cc0014;
+           polygon-fill: #990000;
          }
          [ws3028tl = "Arid and low water use"]{
            polygon-fill: #808080;
          }
+         [ws3028tl = "No data"]{
+           polygon-fill: #4e4e4e;
+         }
         }
       `
-      this.layers["Water stress"].layers.future.layer = this.define_carto_layer(futureWaterStressDataset, futureWaterStressStyle, "ws3028tl", own_client)
-
+      this.layers["Water stress"].layers.future.layer = this.define_carto_layer(futureWaterStressDataset, futureWaterStressStyle, "ws3028tl", wri_client)
 
       //Monthly water stress
       for (let i=1; i<=12; i++){
@@ -627,11 +602,390 @@ export default {
         this.layers["Water stress"].layers.baseline.monthly.push(layer_i)
       }
 
-      //Baseline population
-      //this.layers["Baseline population"].layer = this.define_raster_layer("https://wiatlayers.s3.us-east-2.amazonaws.com/population.tif", ['brown', 'orange', 'red'], [0, 100, 1500], 0)
-      this.layers["Population"].layers.baseline.annual.layer = this.define_raster_layer("baseline_population", ['brown', 'orange', 'red'], [0, 100, 1500], 0)
+      //Baseline water depletion
+      const annualBaselineWaterDepletionDataset = "wat_051_aqueduct_baseline_water_depletion"
+      const annualBaselineWaterDepletionStyle = `
+        #layer {
+         [bwd_label = "Low (<5%)"]{
+           polygon-fill: #ffff99;
+         }
+         [bwd_label = "Low - Medium (5-25%)"]{
+           polygon-fill: #ffe600;
+         }
+         [bwd_label = "Medium - High (25-50%)"]{
+           polygon-fill: #ff9900;
+         }
+         [bwd_label = "High (50-75%)"]{
+           polygon-fill: #ff1900;
+         }
+         [bwd_label = "Extremely High (>75%)"]{
+           polygon-fill: #990000;
+         }
+         [bwd_label = "Arid and Low Water Use"]{
+           polygon-fill: #808080;
+         }
+         [bwd_label = "No Data"]{
+           polygon-fill: #4e4e4e;
+         }
+        }
+      `
+      this.layers["Water depletion"].layers.baseline.annual.layer = this.define_carto_layer(annualBaselineWaterDepletionDataset, annualBaselineWaterDepletionStyle, "bwd_label", wri_client)
 
+      //Monthly water depletion
+      for (let i=1; i<=12; i++){
+        let monthlyWaterDepletionDataset = 'baseline_monthly_aqueduct'
+        let label = "bwd_"
+        if (i<10) label += "0"+i+"_lab"
+        else label += i+"_lab"
+        let monthlyWaterDepletionStyle = `
+        #layer {
+         [`+label+` = "Low (<5%)"]{
+           polygon-fill: #ffff99;
+         }
+         [`+label+` = "Low - Medium (5-25%)"]{
+           polygon-fill: #ffe600;
+         }
+         [`+label+` = "Medium - High (25-50%)"]{
+           polygon-fill: #ff9900;
+         }
+         [`+ label+` = "High (50-75%)"]{
+           polygon-fill: #ff1900;
+         }
+         [`+label+` = "Extremely High (>75%)"]{
+           polygon-fill: #990000;
+         }
+         [`+label+` = "Arid and Low Water Use"]{
+           polygon-fill: #808080;
+         }
+         [`+label+` = "NoData"]{
+           polygon-fill: #4e4e4e;
+         }
+        }
+      `
+        let layer_i = this.define_carto_layer(monthlyWaterDepletionDataset, monthlyWaterDepletionStyle, label, own_client)
+        this.layers["Water depletion"].layers.baseline.monthly.push(layer_i)
+      }
 
+      //Baseline interannual variability
+      const baselineInterannualVariabilityDataset = 'wat_052_aqueduct_interannual_variability'
+      const baselineInterannualVariabilityStyle = `
+        #layer {
+         [iav_label = "Low (<0.25)"]{
+           polygon-fill: #ffff99;
+         }
+         [iav_label = "Low - Medium (0.25-0.50)"]{
+           polygon-fill: #ffe600;
+         }
+         [iav_label = "Medium - High (0.50-0.75)"]{
+           polygon-fill: #ff9900;
+         }
+         [iav_label = "High (0.75-1.00)"]{
+           polygon-fill: #ff1900;
+         }
+         [iav_label = "Extremely High (>1.00)"]{
+           polygon-fill: #990000;
+         }
+         [iav_label = "No Data"]{
+           polygon-fill: #4e4e4e;
+         }
+        }
+      `
+      this.layers["Interannual variability"].layers.baseline.annual.layer = this.define_carto_layer(baselineInterannualVariabilityDataset, baselineInterannualVariabilityStyle, "iav_label", wri_client)
+
+      //Monthly interannual variability
+      for (let i=1; i<=12; i++){
+        let monthlyInterannualVariabilityDataset = 'baseline_monthly_aqueduct'
+        let label = "iav_"
+        if (i<10) label += "0"+i+"_lab"
+        else label += i+"_lab"
+        let monthlyInterannualVariabilityStyle = `
+        #layer {
+         [`+label+` = "Low (<0.25)"]{
+           polygon-fill: #ffff99;
+         }
+         [`+label+` = "Low - Medium (0.25-0.50)"]{
+           polygon-fill: #ffe600;
+         }
+         [`+label+` = "Medium - High (0.50-0.75)"]{
+           polygon-fill: #ff9900;
+         }
+         [`+ label+` = "High (0.75-1.00)"]{
+           polygon-fill: #ff1900;
+         }
+         [`+label+` = "Extremely High (>1.00)"]{
+           polygon-fill: #990000;
+         }
+         [`+label+` = "NoData"]{
+           polygon-fill: #4e4e4e;
+         }
+        }
+      `
+        let layer_i = this.define_carto_layer(monthlyInterannualVariabilityDataset, monthlyInterannualVariabilityStyle, label, own_client)
+        this.layers["Interannual variability"].layers.baseline.monthly.push(layer_i)
+      }
+
+      //Baseline seasonal variability
+      const baselineSeasonalVariabilityDataset = 'wat_053_aqueduct_seasonal_variability'
+      const baselineSeasonalVariabilityStyle = `
+        #layer {
+         [sev_label = "Low (<0.33)"]{
+           polygon-fill: #ffff99;
+         }
+         [sev_label = "Low - Medium (0.33-0.66)"]{
+           polygon-fill: #ffe600;
+         }
+         [sev_label = "Medium - High (0.66-1.00)"]{
+           polygon-fill: #ff9900;
+         }
+         [sev_label = "High (1.00-1.33)"]{
+           polygon-fill: #ff1900;
+         }
+         [sev_label = "Extremely High (>1.33)"]{
+           polygon-fill: #990000;
+         }
+         [sev_label = "No Data"]{
+           polygon-fill: #4e4e4e;
+         }
+        }
+      `
+      this.layers["Seasonal variability"].layers.baseline.annual.layer = this.define_carto_layer(baselineSeasonalVariabilityDataset, baselineSeasonalVariabilityStyle, "sev_label", wri_client)
+
+      //Future Seasonal Variability
+      const futureSeasonalVariabilityDataset = 'aqueduct_projections_20150309'
+      const futureSeasonalVariabilityStyle = `
+        #layer {
+         [sv3028tl = "Low (<0.33)"]{
+           polygon-fill: #ffff99;
+         }
+         [sv3028tl = "Low-medium (0.33-0.66)"]{
+           polygon-fill: #ffe600;
+         }
+         [sv3028tl = "Medium-high (0.66-1.0)"]{
+           polygon-fill: #ff9900;
+         }
+         [sv3028tl = "High (1.0-1.33)"]{
+           polygon-fill: #ff1900;
+         }
+         [sv3028tl = "Extremely High (>1.33)"]{
+           polygon-fill: #990000;
+         }
+         [sv3028tl = "No data"]{
+           polygon-fill: #4e4e4e;
+         }
+        }
+      `
+      this.layers["Seasonal variability"].layers.future.layer = this.define_carto_layer(futureSeasonalVariabilityDataset, futureSeasonalVariabilityStyle, "sv3028tl", wri_client)
+
+      //Baseline groundwater table decline
+      const baselineGroundwaterTableDeclineDataset = 'wat_054_aqueduct_groundwater_table_decline'
+      const baselineGroundwaterTableDeclineStyle = `
+        #layer {
+         [gtd_label = "Low (<0 cm/y)"]{
+           polygon-fill: #ffff99;
+         }
+         [gtd_label = "Low - Medium (0-2 cm/y)"]{
+           polygon-fill: #ffe600;
+         }
+         [gtd_label = "Medium - High (2-4 cm/y)"]{
+           polygon-fill: #ff9900;
+         }
+         [gtd_label = "High (4-8 cm/y)"]{
+           polygon-fill: #ff1900;
+         }
+         [gtd_label = "Extremely High (>8 cm/y)"]{
+           polygon-fill: #990000;
+         }
+         [gtd_label = "Insignificant Trend"]{
+           polygon-fill: #808080;
+         }
+         [gtd_label = "No Data"]{
+           polygon-fill: #4e4e4e;
+         }
+        }
+      `
+      this.layers["Groundwater table decline"].layers.baseline.annual.layer = this.define_carto_layer(baselineGroundwaterTableDeclineDataset, baselineGroundwaterTableDeclineStyle, "gtd_label", wri_client)
+
+      //Baseline riverine flood risk
+      const baselineRiverineFloodRiskDataset = 'wat_055_aqueduct_riverine_flood_risk'
+      const baselineRiverineFloodRiskStyle = `
+        #layer {
+         [rfr_label = "Low (0 to 1 in 1,000)"]{
+           polygon-fill: #ffff99;
+         }
+         [rfr_label = "Low - Medium (1 in 1,000 to 2 in 1,000)"]{
+           polygon-fill: #ffe600;
+         }
+         [rfr_label = "Medium - High (2 in 1,000 to 6 in 1,000)"]{
+           polygon-fill: #ff9900;
+         }
+         [rfr_label = "High (6 in 1,000 to 1 in 100)"]{
+           polygon-fill: #ff1900;
+         }
+         [rfr_label = "Extremely High (more than 1 in 100)"]{
+           polygon-fill: #990000;
+         }
+         [rfr_label = "No Data"]{
+           polygon-fill: #4e4e4e;
+         }
+        }
+      `
+      this.layers["Riverine flood risk"].layers.baseline.annual.layer = this.define_carto_layer(baselineRiverineFloodRiskDataset, baselineRiverineFloodRiskStyle, "rfr_label", wri_client)
+
+      //Baseline coastal flood risk
+      const baselineCoastalFloodRiskDataset = 'wat_056_aqueduct_coastal_flood_risk'
+      const baselineCoastalFloodRiskStyle = `
+        #layer {
+         [cfr_label = "Low (0 to 9 in 1,000,000)"]{
+           polygon-fill: #ffff99;
+         }
+         [cfr_label = "Low - Medium (9 in 1,000,000 to 7 in 100,000)"]{
+           polygon-fill: #ffe600;
+         }
+         [cfr_label = "Medium - High (7 in 100,000 to 3 in 10,000)"]{
+           polygon-fill: #ff9900;
+         }
+         [cfr_label = "High (3 in 10,000 to 2 in 1,000)"]{
+           polygon-fill: #ff1900;
+         }
+         [cfr_label = "Extremely High (more than 2 in 1,000)"]{
+           polygon-fill: #990000;
+         }
+         [cfr_label = "No Data"]{
+           polygon-fill: #4e4e4e;
+         }
+        }
+      `
+      this.layers["Coastal flood risk"].layers.baseline.annual.layer = this.define_carto_layer(baselineCoastalFloodRiskDataset, baselineCoastalFloodRiskStyle, "cfr_label", wri_client)
+
+      //Baseline Drought risk
+      const baselineDroughtRiskDataset = 'wat_057_aqueduct_drought_risk'
+      const baselineDroughtRiskStyle = `
+        #layer {
+         [drr_label = "Low (0.0-0.2)"]{
+           polygon-fill: #ffff99;
+         }
+         [drr_label = "Low - Medium (0.2-0.4)"]{
+           polygon-fill: #ffe600;
+         }
+         [drr_label = "Medium (0.4-0.6)"]{
+           polygon-fill: #ff9900;
+         }
+         [drr_label = "Medium - High (0.6-0.8)"]{
+           polygon-fill: #ff1900;
+         }
+         [drr_label = "High (0.8-1.0)"]{
+           polygon-fill: #990000;
+         }
+         [drr_label = "No Data"]{
+           polygon-fill: #4e4e4e;
+         }
+        }
+      `
+      this.layers["Drought risk"].layers.baseline.annual.layer = this.define_carto_layer(baselineDroughtRiskDataset, baselineDroughtRiskStyle, "drr_label", wri_client)
+
+      //Baseline Coastal Eutrophication Potential
+      const baselineCoastalEutrophicationPotentialDataset = 'wat_059_aqueduct_coastal_eutrophication_potential'
+      const baselineCoastalEutrophicationPotentialStyle = `
+        #layer {
+         [cep_label = "Low (<-5)"]{
+           polygon-fill: #ffff99;
+         }
+         [cep_label = "Low - Medium (-5 to 0)"]{
+           polygon-fill: #ffe600;
+         }
+         [cep_label = "Medium - High (0 to 1)"]{
+           polygon-fill: #ff9900;
+         }
+         [cep_label = "High (1 to 5)"]{
+           polygon-fill: #ff1900;
+         }
+         [cep_label = "Extremely High (>5)"]{
+           polygon-fill: #990000;
+         }
+         [cep_label = "No Data"]{
+           polygon-fill: #4e4e4e;
+         }
+        }
+      `
+      this.layers["Coastal Eutrophication Potential"].layers.baseline.annual.layer = this.define_carto_layer(baselineCoastalEutrophicationPotentialDataset, baselineCoastalEutrophicationPotentialStyle, "cep_label", wri_client)
+
+      //Baseline No Drinking Water
+      const baselineNoDrinkingWaterDataset = 'wat_060_aqueduct_unimproved_or_no_drinking_water_access'
+      const baselineNoDrinkingWaterStyle = `
+        #layer {
+         [udw_label = "Low (<2.5%)"]{
+           polygon-fill: #ffff99;
+         }
+         [udw_label = "Low - Medium (2.5-5%)"]{
+           polygon-fill: #ffe600;
+         }
+         [udw_label = "Medium - High (5-10%)"]{
+           polygon-fill: #ff9900;
+         }
+         [udw_label = "High (10-20%)"]{
+           polygon-fill: #ff1900;
+         }
+         [udw_label = "Extremely High (>20%)"]{
+           polygon-fill: #990000;
+         }
+         [udw_label = "No Data"]{
+           polygon-fill: #4e4e4e;
+         }
+        }
+      `
+      this.layers["Unimproved/No Drinking Water"].layers.baseline.annual.layer = this.define_carto_layer(baselineNoDrinkingWaterDataset, baselineNoDrinkingWaterStyle, "udw_label", wri_client)
+
+      //Baseline No sanitation
+      const baselineNoSanitationDataset = 'wat_061_aqueduct_unimproved_or_no_sanitation_access'
+      const baselineNoSanitationStyle = `
+        #layer {
+         [usa_label = "Low (<2.5%)"]{
+           polygon-fill: #ffff99;
+         }
+         [usa_label = "Low - Medium (2.5-5%)"]{
+           polygon-fill: #ffe600;
+         }
+         [usa_label = "Medium - High (5-10%)"]{
+           polygon-fill: #ff9900;
+         }
+         [usa_label = "High (10-20%)"]{
+           polygon-fill: #ff1900;
+         }
+         [usa_label = "Extremely High (>20%)"]{
+           polygon-fill: #990000;
+         }
+         [usa_label = "No Data"]{
+           polygon-fill: #4e4e4e;
+         }
+        }
+      `
+      this.layers["Unimproved/No Sanitation"].layers.baseline.annual.layer = this.define_carto_layer(baselineNoSanitationDataset, baselineNoSanitationStyle, "usa_label", wri_client)
+
+      //Baseline RepRisk
+      const baselineRepRiskDataset = 'baseline_rri_aqueduct'
+      const baselineRepRiskStyle = `
+        #layer {
+         [rri_label = "Low (<25%)"]{
+           polygon-fill: #ffff99;
+         }
+         [rri_label = "Low - Medium (25-50%)"]{
+           polygon-fill: #ffe600;
+         }
+         [rri_label = "Medium - High (50-60%)"]{
+           polygon-fill: #ff9900;
+         }
+         [rri_label = "High (60-75%)"]{
+           polygon-fill: #ff1900;
+         }
+         [rri_label = "Extremely High (>75%)"]{
+           polygon-fill: #990000;
+         }
+         [rri_label = null]{
+           polygon-fill: #4e4e4e;
+         }
+        }
+      `
+      this.layers["Peak RepRisk Country ESG Risk Index"].layers.baseline.annual.layer = this.define_carto_layer(baselineRepRiskDataset, baselineRepRiskStyle, "rri_label", own_client)
 
     },
   },
