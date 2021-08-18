@@ -268,7 +268,6 @@ export default {
       }
 
       layer.on(carto.layer.events.FEATURE_CLICKED, featureEvent => {
-        console.log('asdfsadf')
         let popup_message = "<b>"+_this.selected_layer+"</b>: "+featureEvent.data[label]
         _this.toggle_popup(popup_message)
       })
@@ -286,7 +285,7 @@ export default {
           let scale = chroma.scale(scale_color).domain(scale_rang);
 
           let layer = new GeoRasterLayer({
-            opacity: 0.75,
+            opacity: 0.5,
             georaster: georaster,
             pixelValuesToColorFn: function (values) {
               let value = values[0];
@@ -506,13 +505,22 @@ export default {
       //Baseline population
       this.layers["Population"].layers.baseline.annual.layer = this.define_raster_layer("baseline_population", ['#f7e6d8', '#c36d33', '#4e2911'], [0, 35, 800], 0)
 
+      //Future population
+      this.layers["Population"].layers.future.layer = this.define_raster_layer("future_population", ['#f7e6d8', '#c36d33', '#4e2911'], [0, 35, 800], 0)
+
+
       //Baseline aridity
       this.layers["Aridity index"].layers.baseline.annual.layer = this.define_raster_layer("aridity_baseline", ['#cf7563', '#d2fa32', '#5de833', '#3d5894'], [0, 5000, 6500, 15000], 0)
+
+      //Baseline runoff
+      this.layers["RUN-OFF"].layers.baseline.annual.layer = this.define_raster_layer("baseline_runoff", ['#FFFFFF', '#06f2f9', '#0000ff'], [0, 100, 2000], 0)
+
 
       //Baseline water stress
       const baselineWaterStressDataset = 'wat_050_aqueduct_baseline_water_stress'
       const baselineWaterStressStyle = `
         #layer {
+        opacity: 0.5;
          [bws_label = "Low (<10%)"]{
            polygon-fill: #ffff99;
          }
@@ -986,6 +994,116 @@ export default {
         }
       `
       this.layers["Peak RepRisk Country ESG Risk Index"].layers.baseline.annual.layer = this.define_carto_layer(baselineRepRiskDataset, baselineRepRiskStyle, "rri_label", own_client)
+
+      //Baseline Water supply
+      const baselineWaterSupplyDataset = 'aqueduct_projections_20150309'
+      const baselineWaterSupplyStyle = `
+        #layer {
+         [bt2028tl = ">1000 cm"]{
+           polygon-fill: #0000ff;
+         }
+         [bt2028tl = "300-1000 cm"]{
+           polygon-fill: #4169e1;
+         }
+         [bt2028tl = "100-300 cm"]{
+           polygon-fill: #1e90ff;
+         }
+         [bt2028tl = "30-100 cm"]{
+           polygon-fill: #00bfff;
+         }
+         [bt2028tl = "10-30 cm"]{
+           polygon-fill: #87ceeb;
+         }
+         [bt2028tl = "3-10 cm"]{
+           polygon-fill: #b0e0e6;
+         }
+         [bt2028tl = "1-3 cm"]{
+           polygon-fill: #add8e6;
+         }
+         [bt2028tl = "< 1 cm"]{
+           polygon-fill: #b0c4de;
+         }
+        }
+      `
+      this.layers["Water supply"].layers.baseline.annual.layer = this.define_carto_layer(baselineWaterSupplyDataset, baselineWaterSupplyStyle, "bt2028tl", wri_client)
+
+      //Future Water supply
+      const futureWaterSupplyDataset = 'aqueduct_projections_20150309'
+      const futureWaterSupplyStyle = `
+        #layer {
+         [bt3038tl = ">1000 cm"]{
+           polygon-fill: #0000ff;
+         }
+         [bt3038tl = "300-1000 cm"]{
+           polygon-fill: #4169e1;
+         }
+         [bt3038tl = "100-300 cm"]{
+           polygon-fill: #1e90ff;
+         }
+         [bt3038tl = "30-100 cm"]{
+           polygon-fill: #00bfff;
+         }
+         [bt3038tl = "10-30 cm"]{
+           polygon-fill: #87ceeb;
+         }
+         [bt3038tl = "3-10 cm"]{
+           polygon-fill: #b0e0e6;
+         }
+         [bt3038tl = "1-3 cm"]{
+           polygon-fill: #add8e6;
+         }
+         [bt3038tl = "< 1 cm"]{
+           polygon-fill: #b0c4de;
+         }
+        }
+      `
+      this.layers["Water supply"].layers.future.layer = this.define_carto_layer(futureWaterSupplyDataset, futureWaterSupplyStyle, "bt3038tl", wri_client)
+
+      //Baseline Water demand
+      const baselineWaterDemandDataset = 'aqueduct_projections_20150309'
+      const baselineWaterDemandStyle = `
+        #layer {
+         [ut2028tl = ">30 cm"]{
+           polygon-fill: #8b4513;
+         }
+         [ut2028tl = "10-30 cm"]{
+           polygon-fill: #daa520;
+         }
+         [ut2028tl = "3-10 cm"]{
+           polygon-fill: #d2b48c;
+         }
+         [ut2028tl = "1-3 cm"]{
+           polygon-fill: #ffdead;
+         }
+         [ut2028tl = "< 1 cm"]{
+           polygon-fill: #fff8dc;
+         }
+        }
+      `
+      this.layers["Water demand"].layers.baseline.annual.layer = this.define_carto_layer(baselineWaterDemandDataset, baselineWaterDemandStyle, "ut2028tl", wri_client)
+
+      //Future Water demand
+      const futureWaterDemandDataset = 'aqueduct_projections_20150309'
+      const futureWaterDemandStyle = `
+        #layer {
+         [ut3028tl = ">30 cm"]{
+           polygon-fill: #8b4513;
+         }
+         [ut3028tl = "10-30 cm"]{
+           polygon-fill: #daa520;
+         }
+         [ut3028tl = "3-10 cm"]{
+           polygon-fill: #d2b48c;
+         }
+         [ut3028tl = "1-3 cm"]{
+           polygon-fill: #ffdead;
+         }
+         [ut3028tl = "< 1 cm"]{
+           polygon-fill: #fff8dc;
+         }
+        }
+      `
+      this.layers["Water demand"].layers.future.layer = this.define_carto_layer(futureWaterDemandDataset, futureWaterDemandStyle, "ut3028tl", wri_client)
 
     },
   },

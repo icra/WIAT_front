@@ -36,10 +36,26 @@ Vue.prototype.$layers_description = {
       },
     },
     monthly: false,
-    future: false,
+    future: true,
     category: "Population indicators",
   },
   'Aridity index': {
+    layers: {
+      baseline: {
+        annual: {
+          layer: null
+        },
+        monthly: []
+      },
+      future: {
+        layer: null
+      },
+    },
+    monthly: false,
+    future: false,
+    category: "Quantity Risk",
+  },
+  'RUN-OFF': {
     layers: {
       baseline: {
         annual: {
@@ -247,7 +263,38 @@ Vue.prototype.$layers_description = {
     future: false,
     category: "Reputational risk"
   },
-
+  'Water supply': {
+    layers: {
+      baseline: {
+        annual: {
+          layer: null
+        },
+        monthly: []
+      },
+      future: {
+        layer: null
+      },
+    },
+    monthly: false,
+    future: true,
+    category: "-"
+  },
+  'Water demand': {
+    layers: {
+      baseline: {
+        annual: {
+          layer: null
+        },
+        monthly: []
+      },
+      future: {
+        layer: null
+      },
+    },
+    monthly: false,
+    future: true,
+    category: "-"
+  },
 
 }
 
