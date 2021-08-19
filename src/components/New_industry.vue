@@ -129,6 +129,7 @@ export default {
   },
   data() {
     return {
+      assessment: this.$assessments[this.assessment_id],
       industry: this.$assessments[this.assessment_id].industries[this.industry_id],
       inputs: Industry.info_inputs(),
       estimations: Industry.get_estimations()
@@ -137,7 +138,6 @@ export default {
   created() {
     if (this.industry === undefined) this.$router.push('/')
   },
-
   watch: {
     industry_id: function (industry_id) {
       this.industry = this.$assessments[this.assessment_id].industries[this.industry_id]
@@ -148,6 +148,18 @@ export default {
     industry: function (industry) {
       if (industry === undefined) this.$router.push('/')
     },
+  },
+  methods: {
+    industries_deleted(){ //An industry or assessment has been deleted, if it's the current one return to map
+      let _this = this
+      let assessment_index =  this.$assessments.findIndex(assessment => assessment.name === _this.assessment.name)
+      if(assessment_index === -1) this.$router.push('/')
+      else {
+        let assessment = this.$assessments[assessment_index]
+        let industry_index = assessment.industries.findIndex(industry => industry.name === _this.industry.name)
+        if(industry_index === -1) this.$router.push('/')
+      }
+    }
   }
 
 

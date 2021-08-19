@@ -49,7 +49,7 @@
                     :key="item.title"
                 >
                   <v-list-item
-                      @click="icon_selected = index"
+                      @click="left_side_menu_icon_selected(index)"
                       :class="(hover || icon_selected === index)? 'icon_hovered_pressed' : ''"
                       :to="{ name: item.to}"
                       style="height: 75px" :value="index"
@@ -144,7 +144,7 @@
             <v-btn
                 style="width: 100%; "
                 @click="rightMenu = true; right_sidebar_content = 1; assessment_name = null"
-                small outlined>
+                small outlined block>
               Create assessment
             </v-btn>
           </div>
@@ -186,6 +186,7 @@
                 @click="create_assessment"
                 small
                 outlined
+                block
             >
               Create assessment
             </v-btn>
@@ -236,19 +237,20 @@
                   @click="edit_industry"
                   small
                   outlined
+                  block
               >
                 Edit industry
               </v-btn>
             </v-form>
           </div>
           <div style="margin: 7px; padding: 7px;">
-            <v-btn :to="{ name: 'edit_industry', params: {assessment_id: selected_assessment, industry_id: selected_industry}}" small outlined>
+            <v-btn :to="{ name: 'edit_industry', params: {assessment_id: selected_assessment, industry_id: selected_industry}}" small outlined block @click="icon_selected = -1">
               Advanced INPUTS
             </v-btn>
-            <v-btn @click="delete_industry" small outlined>
+            <v-btn @click="delete_industry" small outlined block>
               Delete
             </v-btn>
-            <v-btn small outlined :to="{ name: 'statistics_industry', params: {assessment_id: selected_assessment, industry_id: selected_industry}}">
+            <v-btn block small outlined :to="{ name: 'statistics_industry', params: {assessment_id: selected_assessment, industry_id: selected_industry}}" @click="icon_selected = -1">
               SHOW RESULTS
             </v-btn>
 
@@ -296,7 +298,9 @@
               <v-btn
                   :disabled="!new_factory_valid"
                   @click="add_factory"
-                  small outlined
+                  small
+                  outlined
+                  block
 
               >
                 Add industry
@@ -308,40 +312,51 @@
         </div>
         <!-- Select layer -->
         <div v-else-if="right_sidebar_content === 6">
-          <div style="margin: 7px; padding: 7px; background-color: white; display: flex; flex-flow: column nowrap; width: 100%; height: 85vh">
+          <div style="margin: 7px; padding: 7px; background-color: white;">
             <h1>Layer selection</h1>
 
-            <v-row dense class="layer_list">
+            <v-row dense>
+
               <v-col cols="12">
-                <div
-                    v-for="[key, layer] in Object.entries(layers_description)"
-                    :key="key"
-                >
-                  <v-card
-                      v-if="key === selected_layer"
-                      color="#463FCA"
-                      dark
+
+                <v-text-field
+                    prepend-inner-icon="mdi-magnify"
+                    v-model="search_layer_model"
+                    label="Search layer"
+                ></v-text-field>
+
+                <div class="layer_list" style="display: flex; flex-flow: column nowrap; width: 100%; height: 70vh">
+                  <div
+                      v-for="[key, layer] in Object.entries(layers_filtered)"
+                      :key="key"
                   >
-                    <v-card-title>{{key}}</v-card-title>
-                    <v-card-subtitle><b>Category:</b> {{layer.category}} </v-card-subtitle>
-                    <v-card-actions>
-                      <v-btn text @click="applyLayer(key)">
-                        Active
-                      </v-btn>
-                    </v-card-actions>
-                  </v-card>
-                  <v-card
-                      v-else
-                      class="inactive_layer_card"
-                  >
-                    <v-card-title>{{key}}</v-card-title>
-                    <v-card-subtitle><b>Category:</b> {{layer.category}} </v-card-subtitle>
-                    <v-card-actions>
-                      <v-btn @click="applyLayer(key)" dark color="#463FCA">
-                        Add to map
-                      </v-btn>
-                    </v-card-actions>
-                  </v-card>
+                    <v-card
+                        v-if="key === selected_layer"
+                        color="#463FCA"
+                        dark
+                    >
+                      <v-card-title>{{key}}</v-card-title>
+                      <v-card-subtitle><b>Category:</b> {{layer.category}} </v-card-subtitle>
+                      <v-card-actions>
+                        <v-btn text @click="applyLayer(key)">
+                          Active
+                        </v-btn>
+                      </v-card-actions>
+                    </v-card>
+                    <v-card
+                        v-else
+                        class="inactive_layer_card"
+                    >
+                      <v-card-title>{{key}}</v-card-title>
+                      <v-card-subtitle><b>Category:</b> {{layer.category}} </v-card-subtitle>
+                      <v-card-actions>
+                        <v-btn @click="applyLayer(key)" dark color="#463FCA">
+                          Add to map
+                        </v-btn>
+                      </v-card-actions>
+                    </v-card>
+                  </div>
+
                 </div>
 
 
@@ -393,7 +408,7 @@ export default {
       items: [  //Icons for the main sidebar
         { title: "Maps and Datasets", icon: 'mdi-map', to:"map" },
         { title: "Import assessment", icon: 'mdi-import', to:"import"},
-        { title: "Show statistics", icon: 'mdi-chart-areaspline', to:"map" },
+        { title: "Report", icon: 'mdi-file-chart', to:"report" },
       ],
       created_assessments: this.$assessments,  //Created assessments
       assessment_name: null,     //V-model name for creating/editing an assessment
@@ -412,6 +427,7 @@ export default {
         edit_industry: {v_model: false, text: "Industry edited correctly", },
         delete_industry: {v_model: false, text: "Industry deleted correctly", },
         assessment_not_selected: {v_model: false, text: "Can't create industry, please select and assessment first", },
+        create_industry_not_in_map: {v_model: false, text: "Can't create industry, please return to the map tab and try again", },
 
       },
       map_content_info: {}, //Info to show when the map is clicked
@@ -420,14 +436,19 @@ export default {
       icon_selected: 0, //first sidebar icon selected
       assessment_active: this.$assessment_active, //if assessment_active[i]=true, industries of the i-th assessment are shown on the map
       selected_layer: null,  //Selected layer
-      layers_description: this.$layers_description
+      layers_description: this.$layers_description,
+      search_layer_model: "",
     }
   },
   watch: {
 
   },
   methods: {
-    applyLayer(key){
+    left_side_menu_icon_selected(index){
+      this.icon_selected = index;
+      if (this.icon_selected !== 0 && this.right_sidebar_content === 6) this.rightMenu=false  //Close layer selection menu if map is not active
+    },
+    applyLayer(key){  //Selected layer to apply
       if (this.selected_layer === key) this.selected_layer = null
       else this.selected_layer = key
     },
@@ -447,7 +468,7 @@ export default {
         }
       }
     },
-    toggleLayerSelection(){
+    toggleLayerSelection(){ //Open or close layer selection menu
       if(this.right_sidebar_content === 6 && this.rightMenu) this.rightMenu = false
       else{
         this.right_sidebar_content = 6
@@ -455,10 +476,7 @@ export default {
       }
     },
 
-    createNewIndustry(latlng){
-
-     // assessment_not_selected: {v_model: false, text: "Can't create industry, please select and assessment first", }
-    //assessment_expansion_panel: undefined, //Selected assessment in expansion panel
+    createNewIndustry(latlng){  //Function called from Map component
 
       if(this.assessment_expansion_panel === undefined){
         this.snackbars.assessment_not_selected.v_model = true
@@ -502,23 +520,31 @@ export default {
       this.$assessments.splice(this.selected_assessment, 1)
       this.assessment_active.splice(this.selected_assessment, 1)
       this.update_markers()
+      try {
+        this.$refs.reference.industries_deleted()
+      } catch (error) {}
+
     },
     add_factory(){
-      let industry = new Industry()
-      industry.name = this.factory_name
-      industry.location = this.latlng_selected
-      let assessment = this.$assessments[this.assessment_expansion_panel]
-      let marker = {
-        assessment: this.assessment_expansion_panel,
-        industry: assessment.industries.length,
-        latlng: this.latlng_selected
+      if(this.icon_selected === 0){
+        let industry = new Industry()
+        industry.name = this.factory_name
+        industry.location = this.latlng_selected
+        let assessment = this.$assessments[this.assessment_expansion_panel]
+        let marker = {
+          assessment: this.assessment_expansion_panel,
+          industry: assessment.industries.length,
+          latlng: this.latlng_selected
+        }
+        this.$location_markers.push(marker)
+        assessment.add_industry(industry)
+        this.snackbars.new_industry.v_model = true
+        this.$refs.reference.industry_created()
+      }else {
+        this.snackbars.create_industry_not_in_map.v_model = true
       }
-      this.$location_markers.push(marker)
-      assessment.add_industry(industry)
       this.rightMenu = false
       this.factory_name = null
-      this.snackbars.new_industry.v_model = true
-      this.$refs.reference.industry_created()
     },
     open_edit_industry_tab(assessment_index, industry_index){
       this.right_sidebar_content = 3
@@ -538,6 +564,9 @@ export default {
       this.snackbars.delete_industry.v_model = true
       this.$assessments[this.selected_assessment].delete_industry(this.selected_industry)
       this.update_markers()
+      try {
+        this.$refs.reference.industries_deleted()
+      } catch (error) {}
     },
     new_factory_rules_name(value) {  //Rules for creating new industry
       let factories_with_same_name = this.created_assessments[this.assessment_expansion_panel].industries.filter(company => {
@@ -588,8 +617,21 @@ export default {
 
       }
     }
+  },
+  computed: {
+    layers_filtered: function() {
+      if(!this.search_layer_model) return this.layers_description
+      else {
+        let filtered = {}
+        for(let [key, value] of Object.entries(this.layers_description)){
+          console.log(value)
+          if(key.toLowerCase().includes(this.search_layer_model.toLowerCase())) filtered[key] = value //name matches
+          else if(value.category.toLowerCase().includes(this.search_layer_model.toLowerCase())) filtered[key] = value //category matches
+        }
+        return filtered
 
-
+      }
+    }
   }
 
 }

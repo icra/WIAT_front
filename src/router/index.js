@@ -5,6 +5,7 @@ import New_assessment from "../components/New_assessment";
 import New_industry from "../components/New_industry";
 import Statistics_industry from "../components/Statistics_industry";
 import Import from "../components/Import";
+import Make_report from "../components/Make_report";
 Vue.use(VueRouter)
 
 const routes = [
@@ -34,7 +35,11 @@ const routes = [
     path: '/import',
     name: 'import',
     component: Import
-
+  },
+  {
+    path: '/make_report',
+    name: 'report',
+    component: Make_report
   }
 
 ]
