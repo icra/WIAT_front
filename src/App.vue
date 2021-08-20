@@ -155,7 +155,7 @@
       <!-- Main content -->
       <v-main :class=class_for_main_content>
         <div class="content">
-          <router-view :selected_assessment="assessment_expansion_panel" :selected_layer="selected_layer" @createIndustry="createNewIndustry" @editIndustry="open_edit_industry_tab" @selectLayer="toggleLayerSelection" ref="reference"></router-view>
+          <router-view :selected_assessment="assessment_expansion_panel" :selected_layer="selected_layer" @createIndustry="createNewIndustry" @editIndustry="open_edit_industry_tab" @selectLayer="toggleLayerSelection" @closeLayer="applyLayer(selected_layer)" ref="reference"></router-view>
         </div>
       </v-main>
 
@@ -444,6 +444,8 @@ export default {
 
   },
   methods: {
+
+
     left_side_menu_icon_selected(index){
       this.icon_selected = index;
       if (this.icon_selected !== 0 && this.right_sidebar_content === 6) this.rightMenu=false  //Close layer selection menu if map is not active

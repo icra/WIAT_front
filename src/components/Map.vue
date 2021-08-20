@@ -5,7 +5,11 @@
     <aside v-if="selected_layer !== null" class="toolbox">
       <div class="box">
 
-        <b>Temporal resolution</b>
+        <div>
+          <b>Temporal resolution</b>
+          <v-icon style="float: right;" @click="delete_layer(selected_layer, baseline_future_model, annual_monthly_model, months_model); $emit('closeLayer')">mdi-layers-remove</v-icon>
+        </div>
+
         <v-radio-group v-model="baseline_future_model" row v-if="layers[selected_layer].future">
           <v-radio
               v-for="resolution of baseline_future"
@@ -82,7 +86,7 @@ export default {
   props: ["selected_layer", "selected_assessment"],
   data() {
     return {
-      center2: [47.41322, -1.219482],
+      center: [41.9672203,2.8385181],
       location_markers: this.$location_markers,  //Created industries [{assessment, industry, location}]
       mapDiv: null,
       markers: [],
@@ -274,12 +278,12 @@ export default {
 
       obj["click"] = async function(latlng){}  //empty
 
-      obj["get_data_on_coord"] = function(lat, lng){
-        fetch("https://"+username+".carto.com:443/api/v2/sql?q=select "+label+" from "+dataset+" where ST_Intersects( the_geom, cdb_latlng("+lat+","+lng+"))")
+      obj["get_data_on_coord"] = async function(lat, lng){
+        return fetch("https://"+username+".carto.com:443/api/v2/sql?q=select "+label+" from "+dataset+" where ST_Intersects( the_geom, cdb_latlng("+lat+","+lng+"))")
             // we transform the response from the Fetch API into a JSON format
-            .then((resp) => resp.json())
-
-            .then((response) => {
+            .then(resp => {
+              return resp.json()
+            }).then((response) => {
               // we get the data from the request response
               return(response.rows[0][label])
             })
@@ -384,9 +388,10 @@ export default {
     setupLeafletMap() {
       let _this = this
 
+
       this.mapDiv = L.map("map", {
-        center: this.center2,
-        zoom: 13,
+        center: this.center,
+        zoom: 6,
         preferCanvas: true,
         renderer: L.canvas()
       })
