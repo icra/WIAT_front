@@ -71,7 +71,7 @@ export class Industry{
                 //BOD (creates CH4)
                 "wwt_bod_infl": {question: "Influent COD5 load", value: 0, unit: "kg", description_tooltip: "COD5 load entering the WWTP during the assessment period. It can be estimated by multiplying the average COD5 concentration in the influent by the volume entering the plant. If this is done daily and summed over the duration of the assessment period the value will be most accurate"}, //kgCOD   //No te estimacio
                 "wwt_bod_effl": {
-                    question: "Effluent BOD5 load",
+                    question: "Effluent COD5 load",
                     value: 0,
                     unit: "kg",
                     estimation_type: "option",
@@ -486,6 +486,32 @@ export class Industry{
     /*
       GHG emissions (kgCO2eq)
     */
+
+    //emissions with description
+    emissions_and_descriptions(){
+        return [
+            {description: "Indirect emissions from electricity consumption", emissions: this.wwt_KPI_GHG_elec()},
+            {description: "Emissions from fuel engines", emissions: this.wwt_KPI_GHG_fuel()},
+            {description: "Emissions from biogas (fuel used in digester)", emissions: this.wwt_KPI_GHG_biog_dig()},
+            {description: "Emissions from treatment", emissions: this.wwt_KPI_GHG_tre()},
+            {description: "Emissions from biogas", emissions: this.wwt_KPI_GHG_biog()},
+            {description: "Emissions from biogas flared", emissions: this.wwt_KPI_GHG_biog_flared()},
+            {description: "Biogas valorized emissions", emissions: this.wwt_KPI_GHG_biog_valorized()},
+            {description: "Biogas leaked emissions", emissions: this.wwt_KPI_GHG_biog_leaked()},
+            {description: "GHG from sludge management", emissions: this.wwt_KPI_GHG_slu()},
+            {description: "Emissions from sludge storage", emissions: this.wwt_KPI_GHG_sludge_storage()},
+            {description: "Emissions from sludge composting", emissions: this.wwt_KPI_GHG_sludge_composting()},
+            {description: "Emissions from sludge incineration", emissions: this.wwt_KPI_GHG_sludge_incineration()},
+            {description: "Emissions from sludge applied to land", emissions: this.wwt_KPI_GHG_sludge_land_application()},
+            {description: "Emissions from sludge used for landfilling", emissions: this.wwt_KPI_GHG_sludge_landfilling()},
+            {description: "Emissions from sludge stockpiled", emissions: this.wwt_KPI_GHG_sludge_stockpilling()},
+            {description: "Emissions from sludge transport", emissions: this.wwt_KPI_GHG_sludge_transport()},
+            {description: "Emissions from water reuse transport", emissions: this.wwt_KPI_GHG_reus_trck()},
+            {description: "Emissions from water discharged", emissions: this.wwt_KPI_GHG_disc()},
+        ]
+    }
+
+
     //total GHG emissions
     wwt_KPI_GHG(){
         let sources=[

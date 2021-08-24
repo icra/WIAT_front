@@ -626,7 +626,6 @@ export default {
       else {
         let filtered = {}
         for(let [key, value] of Object.entries(this.layers_description)){
-          console.log(value)
           if(key.toLowerCase().includes(this.search_layer_model.toLowerCase())) filtered[key] = value //name matches
           else if(value.category.toLowerCase().includes(this.search_layer_model.toLowerCase())) filtered[key] = value //category matches
         }

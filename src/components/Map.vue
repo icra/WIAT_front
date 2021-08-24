@@ -10,7 +10,7 @@
         <div v-html="html_legend"></div>
 
       </div>
-      <div class="box legend" >
+      <div class="box legend" v-if="layers[selected_layer].future || layers[selected_layer].monthly">
 
         <div>
           <b>Temporal resolution</b>
@@ -179,6 +179,9 @@ export default {
 
     };
   },
+  created() {
+
+  },
   watch: {
     location_markers: function (markers) {
       //Delete markers first
@@ -296,6 +299,9 @@ export default {
       obj["delete"] = function(){
         _this.current_carto_client.removeLayer(layer)
         _this.current_carto_client = null
+        _this.delete_markers()
+        _this.place_markers(_this.$location_markers)
+
       }
 
       layer.on(carto.layer.events.FEATURE_CLICKED, featureEvent => {
@@ -325,30 +331,18 @@ export default {
       }
 
       obj["get_data_on_coord"] = async function(lat, lng){
-        /*
-        return fetch("https://"+username+".carto.com:443/api/v2/sql?q=select "+label+" from "+dataset+" where ST_Intersects( the_geom, cdb_latlng("+lat+","+lng+"))")
-            // we transform the response from the Fetch API into a JSON format
-            .then(resp => {
-              return resp.json()
-            }).then((response) => {
-              // we get the data from the request response
-              return(response.rows[0][label])
-            })
-            .catch(function (error) {
-              // check if the request is returning an error
-              console.log(error)
-            });*/
         return data_on_point(lat, lng)
       }
       return obj
     },
 
-    define_raster_layer(geotiff_file, scale_color, scale_rang, min_value, units="", layer_name){
+    define_raster_layer(geotiff_file, color_function, color_legend, label_legend, units="", layer_name){
       let _this = this
       let obj = {}
       let url_to_geotiff_file = "https://wiat-server.icradev.cat/image?filename="+geotiff_file
 
 
+      /*
       const scale = chroma.scale(scale_color).domain(scale_rang);
 
 
@@ -366,29 +360,33 @@ export default {
         }
         labels.push(label)
         colors.push(color)
-      }
+      }*/
 
 
 
       obj["apply"] = function(){
+
+        //let scale = chroma.scale(scale_color).classes(scale_rang);
+
         parseGeoraster(url_to_geotiff_file).then(georaster => {
 
           let layer = new GeoRasterLayer({
             opacity: 0.5,
             georaster: georaster,
-            pixelValuesToColorFn: function (values) {
+            /*pixelValuesToColorFn: function (values) {
               let value = values[0];
               if (value < min_value) return;
               return scale(value).hex();
-            }
+            }*/
+            pixelValuesToColorFn: color_function
           });
           layer.addTo(_this.mapDiv);
         });
 
         _this.html_legend = "<br>"
         // loop through our density intervals and generate a label with a colored square for each interval
-        for (let i = 0; i < colors.length; i++) {
-          _this.html_legend += '<i style="opacity: 0.5; background:' + colors[i] + '"></i> ' + labels[i]+units + '<br>';
+        for (let i = 0; i < color_legend.length; i++) {
+          _this.html_legend += '<i style="opacity: 0.5; background:' + color_legend[i] + '"></i> ' + label_legend[i]+units + '<br>';
         }
 
       }
@@ -452,7 +450,6 @@ export default {
             let current_layer = _this.get_layer(_this.selected_layer, _this.baseline_future_model, _this.annual_monthly_model, _this.months_model)
             current_layer.click(marker.latlng, false)
           }else{
-            console.log('asdfsdf')
           }
 
         });
@@ -467,7 +464,6 @@ export default {
       return axios
           .get(call)
           .then(response => {
-            //console.log(response)
             return response.data.test[0]["0"]
           })
 
@@ -627,12 +623,43 @@ export default {
       //Future population
       this.layers["Population"].layers.future.layer = this.define_raster_layer("future_population", ['#f7e6d8', '#c36d33', '#4e2911'], [0, 35, 800], 0, " people", "Population")
 
-
       //Baseline aridity
-      this.layers["Aridity index"].layers.baseline.annual.layer = this.define_raster_layer("aridity_baseline", ['#cf7563', '#d2fa32', '#5de833', '#3d5894'], [0, 5000, 6500, 15000], 0, "e-4", "Aridity index")
+      let color_function_baseline_aridity = function(values) {
+        let value = values[0]*0.0001
+        if (value < 0) return
+        else if(value <= 0.03) return '#cf7563'
+        else if(value <= 0.2) return '#e09053'
+        else if(value <= 0.35) return '#f2ba41'
+        else if(value <= 0.5) return '#fae039'
+        else if(value <= 0.65) return '#d2fa32'
+        else if(value <= 0.8) return '#5de833'
+        else if(value <= 1) return '#3fd168'
+        else if(value <= 1.25) return '#4ab09c'
+        else if(value <= 1.5) return '#458aa1'
+        else return '#'
+      }
+      let color_legend_baseline_aridity = ['#cf7563', '#e09053', '#f2ba41', '#fae039', '#d2fa32', '#5de833', '#3fd168', '#4ab09c', '#458aa1','#3d5894' ]
+      let label_legend_baseline_aridity = ["0-0.03", "0.03-0.2", "0.2-0.35", "0.35-0.5","0.5-0.65","0.65-0.8","0.8-1.0","1.0-1.25","1.25-1.5",">1.50"]
+
+
+      this.layers["Aridity index"].layers.baseline.annual.layer = this.define_raster_layer("aridity_baseline", color_function_baseline_aridity, color_legend_baseline_aridity, label_legend_baseline_aridity,"e-4", "Aridity index")
 
       //Baseline runoff
-      this.layers["RUN-OFF"].layers.baseline.annual.layer = this.define_raster_layer("baseline_runoff", ['#FFFFFF', '#06f2f9', '#0000ff'], [0, 100, 2000], 0, " mm/year", "RUN-OFF")
+      let color_function_baseline_runoff = function(values) {
+        let value = values[0]
+        if (value < 0) return
+        else if(value < 10) return '#c8ffff'
+        else if(value < 50) return '#79fffe'
+        else if(value < 100) return '#00feff'
+        else if(value < 500) return '#00d5f0'
+        else if(value < 1000) return '#01c4ff'
+        else if(value < 5000) return '#007dff'
+        else return '#0007a1'
+      }
+      let color_legend_baseline_runoff = ['#c8ffff', '#79fffe', '#00feff', '#00d5f0', '#01c4ff', '#007dff', '#0007a1' ]
+      let label_legend_baseline_runoff = ["<10", "10-50", "50-100", "100-500","500-1000","1000-5000",">5000"]
+
+      this.layers["RUN-OFF"].layers.baseline.annual.layer = this.define_raster_layer("baseline_runoff",  color_function_baseline_runoff, color_legend_baseline_runoff, label_legend_baseline_runoff, " mm/year", "RUN-OFF")
 
 
       //Baseline water stress
@@ -1243,6 +1270,20 @@ export default {
         }
       `
       this.layers["Water demand"].layers.future.layer = this.define_carto_layer(futureWaterDemandDataset, futureWaterDemandStyle, "ut3028tl", wri_client, "wri-rw", "Water demand")
+
+      //Baseline Surface Water Pharmaceutical Pollution
+      let color_function_Baseline_Surface_Water_Pharmaceutical_Pollution = function(values) {
+        let value = values[0]
+        if (value < 0) return
+        else if (value === 0) return '#09bbfb'
+        else if(value <= 10) return '#3ad110'
+        else if(value <= 30) return '#faed08'
+        else if(value <= 100) return '#fe0000'
+        else return '#010103'
+      }
+      let color_legend_Baseline_Surface_Water_Pharmaceutical_Pollution = ['#09bbfb', '#3ad110', '#faed08', '#fe0000', '#010103' ]
+      let label_legend_Baseline_Surface_Water_Pharmaceutical_Pollution = ["0", ">0-10", "10-30", "30-100",">100"]
+      this.layers["Surface Water Pharmaceutical Pollution"].layers.baseline.annual.layer = this.define_raster_layer("surface_pharmaceutical_pollution_baseline", color_function_Baseline_Surface_Water_Pharmaceutical_Pollution, color_legend_Baseline_Surface_Water_Pharmaceutical_Pollution, label_legend_Baseline_Surface_Water_Pharmaceutical_Pollution, " ng/L", "Surface Water Pharmaceutical Pollution")
 
     },
   },

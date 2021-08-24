@@ -13,7 +13,7 @@
     "chroma-js": "^1.4.1",
     "core-js": "^3.6.5",
     "georaster": "^1.5.4",
-    "georaster-layer-for-leaflet": "^2.0.2",
+    "georaster-layer-for-leaflet": "^3.0.1",
     "jquery": "^3.6.0",
     "leaflet": "^1.7.1",
     "leaflet-easybutton": "^2.4.0",

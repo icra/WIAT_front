@@ -30,26 +30,7 @@ export default {
     return {
       industry: defaultIndustry,
       inputs: Industry.info_inputs(),
-      functions_to_call: [
-        {description: "Indirect emissions from electricity consumption", emissions: defaultIndustry.wwt_KPI_GHG_elec()},
-        {description: "Emissions from fuel engines", emissions: defaultIndustry.wwt_KPI_GHG_fuel()},
-        {description: "Emissions from biogas (fuel used in digester)", emissions: defaultIndustry.wwt_KPI_GHG_biog_dig()},
-        {description: "Emissions from treatment", emissions: defaultIndustry.wwt_KPI_GHG_tre()},
-        {description: "Emissions from biogas", emissions: defaultIndustry.wwt_KPI_GHG_biog()},
-        {description: "Emissions from biogas flared", emissions: defaultIndustry.wwt_KPI_GHG_biog_flared()},
-        {description: "Biogas valorized emissions", emissions: defaultIndustry.wwt_KPI_GHG_biog_valorized()},
-        {description: "Biogas leaked emissions", emissions: defaultIndustry.wwt_KPI_GHG_biog_leaked()},
-        {description: "GHG from sludge management", emissions: defaultIndustry.wwt_KPI_GHG_slu()},
-        {description: "Emissions from sludge storage", emissions: defaultIndustry.wwt_KPI_GHG_sludge_storage()},
-        {description: "Emissions from sludge composting", emissions: defaultIndustry.wwt_KPI_GHG_sludge_composting()},
-        {description: "Emissions from sludge incineration", emissions: defaultIndustry.wwt_KPI_GHG_sludge_incineration()},
-        {description: "Emissions from sludge applied to land", emissions: defaultIndustry.wwt_KPI_GHG_sludge_land_application()},
-        {description: "Emissions from sludge used for landfilling", emissions: defaultIndustry.wwt_KPI_GHG_sludge_landfilling()},
-        {description: "Emissions from sludge stockpiled", emissions: defaultIndustry.wwt_KPI_GHG_sludge_stockpilling()},
-        {description: "Emissions from sludge transport", emissions: defaultIndustry.wwt_KPI_GHG_sludge_transport()},
-        {description: "Emissions from water reuse transport", emissions: defaultIndustry.wwt_KPI_GHG_reus_trck()},
-        {description: "Emissions from water discharged", emissions: defaultIndustry.wwt_KPI_GHG_disc()},
-      ],
+      functions_to_call: defaultIndustry.emissions_and_descriptions(),
       headers: [
         {
           text: 'Emission',
@@ -99,7 +80,6 @@ export default {
     table_and_statistics(){
       let _this = this
 
-      if(this.$assessments[this.assessment_id] === undefined) console.log('aaa')
 
       this.populateTable()
       this.functions_to_call.forEach(func => {

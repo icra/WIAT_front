@@ -295,6 +295,22 @@ Vue.prototype.$layers_description = {
     future: true,
     category: "-"
   },
+  'Surface Water Pharmaceutical Pollution': {
+    layers: {
+      baseline: {
+        annual: {
+          layer: null
+        },
+        monthly: []
+      },
+      future: {
+        layer: null
+      },
+    },
+    monthly: false,
+    future: false,
+    category: "Water quality"
+  },
 
 }
 

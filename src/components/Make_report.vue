@@ -90,6 +90,8 @@ export default {
           let lat = industry.location.lat
           let lng = industry.location.lng
 
+
+          //Layer values on industry
           dd.content.push("Layer information:\n\n")
 
           let layers_description = {
@@ -119,50 +121,34 @@ export default {
             layers_description.table.body.push(current_layer)
 
           }
-
           dd.content.push(layers_description)
+
+          //Industry emissions
+          dd.content.push("\nIndustry emissions:\n\n")
+          let industry_emissions = {
+            table: {
+              widths: ['*','*','*','*','*'],
+              body: [
+                [{text: 'Emission', style: 'tableHeader'},{text: 'Total GHG Emission', style: 'tableHeader'},{text: 'CO2 emission', style: 'tableHeader'},{text: 'CH4 emission', style: 'tableHeader'},{text: 'N20 emission', style: 'tableHeader'}],
+              ]
+            }
+          }
+
+          let emissions_and_descriptions = industry.emissions_and_descriptions()
+          for (let emission_and_description of emissions_and_descriptions){
+            let description = emission_and_description.description
+            let emission = emission_and_description.emissions
+
+            let emission_row = [description, emission.total, emission.co2, emission.ch4, emission.n2o]
+            industry_emissions.table.body.push(emission_row)
+          }
+          dd.content.push(industry_emissions)
 
         }
       }
 
 
 
-        /*
-        content: [
-          {text: 'Column/row spans', style: 'subheader'},
-          'Each cell-element can set a rowSpan or colSpan',
-          {
-            color: '#444',
-            table: {
-
-              //headerRows: 2,
-              // keepWithHeaderRows: 1,
-              widths: ['*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*', '*' ],
-              body: [
-                [{text: 'Baseline', style: 'tableHeader', colSpan: 12, alignment: 'center'}, {}, {}, {}, {}, {}, {}, {},{},{},{},{},{},{text: 'Future', style: 'tableHeader', alignment: 'center'}],
-                [
-                  {text: 'Annual', style: 'tableHeader', alignment: 'center'},
-                  {text: 'Jan.', style: 'tableHeader', alignment: 'center'},
-                  {text: 'Feb.', style: 'tableHeader', alignment: 'center'},
-                  {text: 'Mar.', style: 'tableHeader', alignment: 'center'},
-                  {text: 'Apr.', style: 'tableHeader', alignment: 'center'},
-                  {text: 'May', style: 'tableHeader', alignment: 'center'},
-                  {text: 'June', style: 'tableHeader', alignment: 'center'},
-                  {text: 'July', style: 'tableHeader', alignment: 'center'},
-                  {text: 'Aug.', style: 'tableHeader', alignment: 'center'},
-                  {text: 'Sept.', style: 'tableHeader', alignment: 'center'},
-                  {text: 'Oct.', style: 'tableHeader', alignment: 'center'},
-                  {text: 'Nov.', style: 'tableHeader', alignment: 'center'},
-                  {text: 'Dec.', style: 'tableHeader', alignment: 'center'},
-                  {text: 'Header 4', style: 'tableHeader', alignment: 'center'},
-
-                ],
-
-              ]
-            }
-          },
-        ]
-      }*/
 
       this.doc = pdfMake.createPdf(dd);
 
