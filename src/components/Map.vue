@@ -341,10 +341,7 @@ export default {
       let obj = {}
       let url_to_geotiff_file = "https://wiat-server.icradev.cat/image?filename="+geotiff_file
 
-
-
       obj["apply"] = function(){
-
 
         parseGeoraster(url_to_geotiff_file).then(georaster => {
 
@@ -437,7 +434,7 @@ export default {
 
     get_raster_data(lat, lng, file_name) {
       //http://localhost:3000/bona?longitude=2.16992&latitude=41.3879
-      let call = "/data_point?filename="+file_name+"&longitude="+lng+"&latitude="+lat
+      let call = "https://wiat-server.icradev.cat/data_point?filename="+file_name+"&longitude="+lng+"&latitude="+lat
       return axios
           .get(call)
           .then(response => {
