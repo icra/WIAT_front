@@ -484,7 +484,7 @@ export class Industry{
     }
 
     /*
-      GHG emissions (kgCO2eq)
+      Functions for calling data from other components
     */
 
     //emissions with description
@@ -511,7 +511,9 @@ export class Industry{
         ]
     }
 
-
+    /*
+      GHG emissions (kgCO2eq)
+    */
     //total GHG emissions
     wwt_KPI_GHG(){
         let sources=[

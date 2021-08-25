@@ -1,7 +1,7 @@
 <template>
   <div class="outer">
     <h1>Report</h1>
-    <p>Select the assessments/industries to include in the report.</p>
+    <p>Select the industries to include in the report.</p>
     <v-treeview
         :items="assessments_and_industries_tree"
         dense
@@ -12,7 +12,8 @@
         v-model="selected_industries"
     ></v-treeview>
 
-    <PDFJSViewer :pdf_doc="doc"/>
+    <PDFJSViewer v-if="selected_industries.length > 0" :pdf_doc="doc"/>
+    <canvas v-show="false" id="chart" width="300" height="150"> </canvas>
 
 
     <br>
@@ -25,6 +26,7 @@ let _ = require('lodash');
 import PDFJSViewer from "@/components/PDFJSViewer";
 import pdfMake from 'pdfmake/build/pdfmake.js'
 import Vue from "vue";
+import utils from "../utils"
 export default {
   name: "Make_report",
   components: {
@@ -46,7 +48,6 @@ export default {
         let pdfFonts = require('pdfmake/build/vfs_fonts.js')
         pdfMake.vfs = pdfFonts.pdfMake.vfs;
       }
-
 
       let dd = {
         pageSize: 'A4',
@@ -129,7 +130,7 @@ export default {
             table: {
               widths: ['*','*','*','*','*'],
               body: [
-                [{text: 'Emission', style: 'tableHeader'},{text: 'Total GHG Emission', style: 'tableHeader'},{text: 'CO2 emission', style: 'tableHeader'},{text: 'CH4 emission', style: 'tableHeader'},{text: 'N20 emission', style: 'tableHeader'}],
+                [{text: 'Emission', style: 'tableHeader'},{text: 'Total GHG Emission / year', style: 'tableHeader'},{text: 'CO2 emission / year', style: 'tableHeader'},{text: 'CH4 emission / year', style: 'tableHeader'},{text: 'N20 emission / year', style: 'tableHeader'}],
               ]
             }
           }
@@ -144,15 +145,56 @@ export default {
           }
           dd.content.push(industry_emissions)
 
+          //Pie chart
+          let pie = _this.pieChart_base64(industry)
+          dd.content.push({
+            image: pie,
+            width: 500
+          })
+
         }
       }
-
-
-
 
       this.doc = pdfMake.createPdf(dd);
 
     }
+  },
+  methods: {
+    pieChart_base64(industry){
+      let labels_for_pie = []
+      let dataset_for_pie= [{
+        borderWidth: 1,
+        data: [],
+        backgroundColor: []
+      }]
+
+      industry.emissions_and_descriptions().forEach(func => {
+        labels_for_pie.push(func.description)
+        dataset_for_pie[0].data.push(func.emissions.total)
+        dataset_for_pie[0].backgroundColor.push(utils.getRandomColor())
+      })
+
+      let options = {
+        animation:false
+      };
+      let content = {
+        type: 'pie',
+        data: {
+          datasets: dataset_for_pie,
+          labels: labels_for_pie,
+        },
+        options: options
+      };
+      let pieChart = new Chart(document.getElementById('chart').getContext('2d'), content);
+      return pieChart.toBase64Image()
+
+
+
+
+
+
+    }
+
   },
   computed: {
     assessments_and_industries_tree: function () {

@@ -17,6 +17,8 @@
 
 import {Assessment, Industry } from "../ecam_backend";
 import Industry_pie_chart from "@/components/Industry_pie_chart";
+import utils from "../utils";
+
 export default {
   name: "new_assessment",
   props: ['assessment_id', 'industry_id'],
@@ -39,11 +41,10 @@ export default {
           value: 'emission',
         },
 
-
-        { text: 'Total GHG emission', value: 'total GHG emission' },
-        { text: 'CO2 emission', value: 'CO2 emission' },
-        { text: 'CH4 emission', value: 'CH4 emission' },
-        { text: 'N2O emission', value: 'N2O emission' },
+        { text: 'Total GHG emission / year', value: 'total GHG emission' },
+        { text: 'CO2 emission / year', value: 'CO2 emission' },
+        { text: 'CH4 emission / year', value: 'CH4 emission' },
+        { text: 'N2O emission / year', value: 'N2O emission' },
 
       ],
       tableData: [],
@@ -56,14 +57,7 @@ export default {
     };
   },
   methods: {
-    getRandomColor: function () {
-      let letters = '0123456789ABCDEF';
-      let color = '#';
-      for (let  i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
-      }
-      return color
-    },
+
     populateTable(){
       this.tableData = []
       for(let row of this.functions_to_call){
@@ -85,7 +79,7 @@ export default {
       this.functions_to_call.forEach(func => {
         _this.labels_for_pie.push(func.description)
         _this.dataset_for_pie[0].data.push(func.emissions.total)
-        _this.dataset_for_pie[0].backgroundColor.push(_this.getRandomColor())
+        _this.dataset_for_pie[0].backgroundColor.push(utils.getRandomColor())
       })
     },
     industries_deleted(){ //An industry or assessment has been deleted, if it's the current one return to map

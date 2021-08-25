@@ -335,7 +335,7 @@
                         color="#463FCA"
                         dark
                     >
-                      <v-card-title>{{key}}</v-card-title>
+                      <v-card-title><h5>{{key}}</h5></v-card-title>
                       <v-card-subtitle><b>Category:</b> {{layer.category}} </v-card-subtitle>
                       <v-card-actions>
                         <v-btn text @click="applyLayer(key)">
@@ -347,7 +347,7 @@
                         v-else
                         class="inactive_layer_card"
                     >
-                      <v-card-title>{{key}}</v-card-title>
+                      <v-card-title><h5>{{key}}</h5></v-card-title>
                       <v-card-subtitle><b>Category:</b> {{layer.category}} </v-card-subtitle>
                       <v-card-actions>
                         <v-btn @click="applyLayer(key)" dark color="#463FCA">
@@ -712,6 +712,10 @@ html::-webkit-scrollbar {
   overflow: auto;
   width: 100%;
   flex: 2;  /* 1 and it will fill whole space left if no flex value are set to other children*/
+}
+
+.v-card__text, .v-card__title {
+  word-break: normal !important; /* maybe !important  */
 }
 
 

@@ -308,10 +308,25 @@ Vue.prototype.$layers_description = {
       },
     },
     monthly: false,
+    future: true,
+    category: "Water quality"
+  },
+  'Coastal Pharmaceutical Pollution': {
+    layers: {
+      baseline: {
+        annual: {
+          layer: null
+        },
+        monthly: []
+      },
+      future: {
+        layer: null
+      },
+    },
+    monthly: false,
     future: false,
     category: "Water quality"
   },
-
 }
 
 

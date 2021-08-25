@@ -342,42 +342,16 @@ export default {
       let url_to_geotiff_file = "https://wiat-server.icradev.cat/image?filename="+geotiff_file
 
 
-      /*
-      const scale = chroma.scale(scale_color).domain(scale_rang);
-
-
-      let colors = []
-      let labels = []
-
-      for(let i=0; i<=5; i++){
-
-        let porcentage = (scale_rang[scale_rang.length - 1]-min_value)*(i/5) + min_value
-        let color = scale(porcentage).hex();
-
-        let label = porcentage
-        if (i===5) {
-          label = "+"+Math.round(porcentage)
-        }
-        labels.push(label)
-        colors.push(color)
-      }*/
-
-
 
       obj["apply"] = function(){
 
-        //let scale = chroma.scale(scale_color).classes(scale_rang);
 
         parseGeoraster(url_to_geotiff_file).then(georaster => {
 
           let layer = new GeoRasterLayer({
             opacity: 0.5,
             georaster: georaster,
-            /*pixelValuesToColorFn: function (values) {
-              let value = values[0];
-              if (value < min_value) return;
-              return scale(value).hex();
-            }*/
+
             pixelValuesToColorFn: color_function
           });
           layer.addTo(_this.mapDiv);
@@ -404,17 +378,20 @@ export default {
         let value_string = ""
         let value_number = Number.parseFloat(value)
         if(value_number === NaN) value_string = value
-        else value_string = +value_number.toFixed(2).toString()
+        else {
+          if (value_number < 0) value_string = "No data"
+          else value_string = +value_number.toFixed(2).toString() + units
+        }
         return value_string
       }
 
       obj["click"] = async function(latlng, add_industry=true){
         let popup_message = "<b>"+_this.selected_layer+"</b>: "
         let value_string = await data_on_point(latlng.lat, latlng.lng)
-        _this.toggle_popup(popup_message + value_string + units, add_industry)
+        _this.toggle_popup(popup_message + value_string, add_industry)
       }
       obj["get_data_on_coord"] = async function(lat, lng){
-        let str = await data_on_point(lat, lng) + units
+        let str = await data_on_point(lat, lng)
         return str
       }
       return obj
@@ -617,11 +594,28 @@ export default {
         username: 'jsalo'
       })
 
+      //Baseline aridity
+      let color_function_population = function(values) {
+        let value = values[0]
+        if (value < 0) return
+        else if (value === 0) return '#e1e1e1'
+        else if(value <= 25) return '#ffedde'
+        else if(value <= 100) return '#fccfa2'
+        else if(value <= 250) return '#fcae6a'
+        else if(value <= 1000) return '#fc8d3d'
+        else if(value <= 5000) return '#f26913'
+        else if(value <= 100000) return '#d94800'
+        else return '#8c2d04'
+      }
+      let color_legend_population = ['#e1e1e1','#ffedde','#fccfa2','#fcae6a','#fc8d3d','#f26913','#d94800','#8c2d04']
+      let label_legend_population = ["0","1-25","100-250","250-1000","1000-5000","5000-100000",">100000"]
+
+
       //Baseline population
-      this.layers["Population"].layers.baseline.annual.layer = this.define_raster_layer("baseline_population", ['#f7e6d8', '#c36d33', '#4e2911'], [0, 35, 800], 0, " people", "Population")
+      this.layers["Population"].layers.baseline.annual.layer = this.define_raster_layer("baseline_population", color_function_population, color_legend_population, label_legend_population, " people", "Population")
 
       //Future population
-      this.layers["Population"].layers.future.layer = this.define_raster_layer("future_population", ['#f7e6d8', '#c36d33', '#4e2911'], [0, 35, 800], 0, " people", "Population")
+      this.layers["Population"].layers.future.layer = this.define_raster_layer("future_population", color_function_population, color_legend_population, label_legend_population, " people", "Population")
 
       //Baseline aridity
       let color_function_baseline_aridity = function(values) {
@@ -636,7 +630,7 @@ export default {
         else if(value <= 1) return '#3fd168'
         else if(value <= 1.25) return '#4ab09c'
         else if(value <= 1.5) return '#458aa1'
-        else return '#'
+        else return '#3d5894'
       }
       let color_legend_baseline_aridity = ['#cf7563', '#e09053', '#f2ba41', '#fae039', '#d2fa32', '#5de833', '#3fd168', '#4ab09c', '#458aa1','#3d5894' ]
       let label_legend_baseline_aridity = ["0-0.03", "0.03-0.2", "0.2-0.35", "0.35-0.5","0.5-0.65","0.65-0.8","0.8-1.0","1.0-1.25","1.25-1.5",">1.50"]
@@ -1272,7 +1266,7 @@ export default {
       this.layers["Water demand"].layers.future.layer = this.define_carto_layer(futureWaterDemandDataset, futureWaterDemandStyle, "ut3028tl", wri_client, "wri-rw", "Water demand")
 
       //Baseline Surface Water Pharmaceutical Pollution
-      let color_function_Baseline_Surface_Water_Pharmaceutical_Pollution = function(values) {
+      let color_function_Surface_Water_Pharmaceutical_Pollution = function(values) {
         let value = values[0]
         if (value < 0) return
         else if (value === 0) return '#09bbfb'
@@ -1281,9 +1275,28 @@ export default {
         else if(value <= 100) return '#fe0000'
         else return '#010103'
       }
-      let color_legend_Baseline_Surface_Water_Pharmaceutical_Pollution = ['#09bbfb', '#3ad110', '#faed08', '#fe0000', '#010103' ]
-      let label_legend_Baseline_Surface_Water_Pharmaceutical_Pollution = ["0", ">0-10", "10-30", "30-100",">100"]
-      this.layers["Surface Water Pharmaceutical Pollution"].layers.baseline.annual.layer = this.define_raster_layer("surface_pharmaceutical_pollution_baseline", color_function_Baseline_Surface_Water_Pharmaceutical_Pollution, color_legend_Baseline_Surface_Water_Pharmaceutical_Pollution, label_legend_Baseline_Surface_Water_Pharmaceutical_Pollution, " ng/L", "Surface Water Pharmaceutical Pollution")
+      let color_legend_Surface_Water_Pharmaceutical_Pollution = ['#09bbfb', '#3ad110', '#faed08', '#fe0000', '#010103' ]
+      let label_legend_Surface_Water_Pharmaceutical_Pollution = ["0", ">0-10", "10-30", "30-100",">100"]
+      //this.layers["Surface Water Pharmaceutical Pollution"].layers.baseline.annual.layer = this.define_raster_layer("surface_pharmaceutical_pollution_baseline", color_function_Surface_Water_Pharmaceutical_Pollution, color_legend_Surface_Water_Pharmaceutical_Pollution, label_legend_Surface_Water_Pharmaceutical_Pollution, " ng/L", "Surface Water Pharmaceutical Pollution")
+      this.layers["Surface Water Pharmaceutical Pollution"].layers.baseline.annual.layer = this.define_raster_layer("contaminant_C", color_function_Surface_Water_Pharmaceutical_Pollution, color_legend_Surface_Water_Pharmaceutical_Pollution, label_legend_Surface_Water_Pharmaceutical_Pollution, " ng/L", "Surface Water Pharmaceutical Pollution")
+
+      //Future Surface Water Pharmaceutical Pollution
+      this.layers["Surface Water Pharmaceutical Pollution"].layers.future.layer = this.define_raster_layer("contaminant_C_BAU", color_function_Surface_Water_Pharmaceutical_Pollution, color_legend_Surface_Water_Pharmaceutical_Pollution, label_legend_Surface_Water_Pharmaceutical_Pollution, " ng/L", "Surface Water Pharmaceutical Pollution")
+
+      //Coastal Pharmaceutical Pollution
+      let color_function_coastal_Pharmaceutical_Pollution = function(values) {
+        let value = values[0]
+        if (value < 0) return
+        else if(value < 10) return '#02b5fd'
+        else if(value <= 50) return '#34d10e'
+        else if(value <= 1000) return '#f8ee04'
+        else if(value <= 100000) return '#fe0000'
+        else return '#000000'
+      }
+      let color_legend_coastal_Pharmaceutical_Pollution = ['#02b5fd', '#34d10e', '#f8ee04', '#fe0000', '#000000' ]
+      let label_legend_coastal_Pharmaceutical_Pollution = ["<10", "10-50", "50-1000", "1000-100000",">100000"]
+      this.layers["Coastal Pharmaceutical Pollution"].layers.baseline.annual.layer = this.define_raster_layer("contaminant_L_baseline", color_function_coastal_Pharmaceutical_Pollution, color_legend_coastal_Pharmaceutical_Pollution, label_legend_coastal_Pharmaceutical_Pollution, " g/(km*y)", "Surface Water Pharmaceutical Pollution")
+
 
     },
   },
