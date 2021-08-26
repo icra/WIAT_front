@@ -1317,8 +1317,8 @@ export default {
 
 aside.toolbox {
   position: absolute;
-  right: 11px;
-  top: 75px;
+  right: 15px;
+  top: 80px;
   min-width: 300px;
   max-width: 300px;
   z-index: 2;
@@ -1327,8 +1327,8 @@ aside.toolbox {
 #toggle_layer{
   position: absolute;
   z-index: 2;
-  right: 10px;
-  top: -50px;
+  right: 0px;
+  top: -58px;
   min-width: 50px;
   max-width: 50px;
   min-height: 50px;

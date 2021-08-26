@@ -116,9 +116,9 @@
                 </v-expansion-panel-header>
                 <v-expansion-panel-content>
                   <div
-                    v-for="(industry,industry_index ) in created_assessments[assessment_index].industries"
-                    :key="industry.name"
-                    style="display: flex; align-items: flex-end"
+                      v-for="(industry,industry_index ) in created_assessments[assessment_index].industries"
+                      :key="industry.name"
+                      style="display: flex; align-items: flex-end"
                   >
                     <div>
                       {{industry.name}}
@@ -153,7 +153,7 @@
       </v-navigation-drawer>
 
       <!-- Main content -->
-      <v-main :class=class_for_main_content>
+      <v-main class="main">
         <div class="content">
           <router-view :selected_assessment="assessment_expansion_panel" :selected_layer="selected_layer" @createIndustry="createNewIndustry" @editIndustry="open_edit_industry_tab" @selectLayer="toggleLayerSelection" @closeLayer="applyLayer(selected_layer)" ref="reference"></router-view>
         </div>
@@ -278,7 +278,6 @@
             >
               ADD NEW INDUSTRY
             </v-btn>
-
           </div>
         </div>
         -->
@@ -359,7 +358,6 @@
 
                 </div>
 
-
               </v-col>
             </v-row>
 
@@ -395,16 +393,13 @@
 </template>
 
 <script>
-
 import {Assessment, Industry } from "./ecam_backend";
 import Vue from "vue";
-
 export default {
   data () {
     return {
       secondMenu: true, //Assessment/factory sidebar
       rightMenu: false, //Assessment/Company creation sidebar
-
       items: [  //Icons for the main sidebar
         { title: "Maps and Datasets", icon: 'mdi-map', to:"map" },
         { title: "Import assessment", icon: 'mdi-import', to:"import"},
@@ -417,7 +412,6 @@ export default {
       selected_assessment: null,  //Id of the assessment to edit
       factory_name: null, //v-model for creating new factory
       new_factory_valid: false, //Enable or disable button for creating new factory
-
       selected_industry: null, //Id of the company to edit
       snackbars: {
         new_assessment: {v_model: false, text: "New assessment created correctly", },
@@ -428,7 +422,6 @@ export default {
         delete_industry: {v_model: false, text: "Industry deleted correctly", },
         assessment_not_selected: {v_model: false, text: "Can't create industry, please select and assessment first", },
         create_industry_not_in_map: {v_model: false, text: "Can't create industry, please return to the map tab and try again", },
-
       },
       map_content_info: {}, //Info to show when the map is clicked
       assessment_expansion_panel: undefined, //Selected assessment in expansion panel
@@ -441,11 +434,8 @@ export default {
     }
   },
   watch: {
-
   },
   methods: {
-
-
     left_side_menu_icon_selected(index){
       this.icon_selected = index;
       if (this.icon_selected !== 0 && this.right_sidebar_content === 6) this.rightMenu=false  //Close layer selection menu if map is not active
@@ -477,9 +467,7 @@ export default {
         this.rightMenu = true
       }
     },
-
     createNewIndustry(latlng){  //Function called from Map component
-
       if(this.assessment_expansion_panel === undefined){
         this.snackbars.assessment_not_selected.v_model = true
       }else{
@@ -488,7 +476,6 @@ export default {
         this.factory_name = null
         this.latlng_selected = latlng
       }
-
     },
     class_for_main_content() {
       if (this.secondMenu && this.rightMenu) return "two_sidebar_open"
@@ -509,7 +496,6 @@ export default {
       this.right_sidebar_content = 2;
       this.selected_assessment = assessment_index
       this.assessment_name = this.created_assessments[assessment_index].name
-
     },
     edit_assessment(){
       this.rightMenu = false
@@ -525,7 +511,6 @@ export default {
       try {
         this.$refs.reference.industries_deleted()
       } catch (error) {}
-
     },
     add_factory(){
       if(this.icon_selected === 0){
@@ -601,7 +586,6 @@ export default {
       })
       if (assessments_with_same_name.length === 0 || (assessments_with_same_name.length === 1 && this.created_assessments[this.selected_assessment].name === value)) return true
       else return 'An assessment with same name already exists.' //If there is an assessment with the same name, must be the edited assessment
-
     },
     hide_show_industries(assessment_index){
       this.assessment_active[assessment_index] = !this.assessment_active[assessment_index] //hide/show industries of the assessment
@@ -616,7 +600,6 @@ export default {
             location_markers.splice(i, 1);
           }
         }
-
       }
     }
   },
@@ -630,16 +613,17 @@ export default {
           else if(value.category.toLowerCase().includes(this.search_layer_model.toLowerCase())) filtered[key] = value //category matches
         }
         return filtered
-
       }
     }
   }
-
 }
 </script>
 
 <style>
 
+.main {
+  height: 95%;
+}
 
 html {
   overflow: hidden !important;
@@ -648,7 +632,6 @@ html {
   width: 100%;
   height:100%;
 }
-
 html::-webkit-scrollbar {
   width: 0;
   height: 0;
@@ -669,54 +652,41 @@ html::-webkit-scrollbar {
   display: flex;
   align-items: center;
   justify-content: space-evenly;
-
 }
-
 .icon_sidebar_container {
   background-color: #1C195B;
   height: 100%;
-
-
 }
 .icon_sidebar_list {
   height: 100%;
 }
-
 .content{
   width: 100%;
-  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: #F2F4F3;
+  height: 100%;
+  position: absolute;
 }
-
 .icon_hovered_pressed{
   background-color: #463FCA;
 }
-
-
 #app {
   background-color: #F2F4F3;
 }
-
 .assessment_list{
   background-color: red;
 }
-
 #app{
   width: 100%;
 }
-
 .layer_list{
   overflow: auto;
   width: 100%;
   flex: 2;  /* 1 and it will fill whole space left if no flex value are set to other children*/
 }
-
 .v-card__text, .v-card__title {
   word-break: normal !important; /* maybe !important  */
 }
-
-
 </style>
