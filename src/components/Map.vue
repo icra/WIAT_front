@@ -1,55 +1,63 @@
 <template>
   <div id="container">
     <div id="map"></div>
-    <!-- Description -->
-    <aside class="toolbox" v-if="selected_layer !== null">
-      <div class="box legend">
-        <div>
-          <b>{{ selected_layer }}</b> <v-icon style="float: right;" @click="delete_layer(selected_layer, baseline_future_model, annual_monthly_model, months_model); $emit('closeLayer')">mdi-layers-remove</v-icon>
-        </div>
-        <div v-html="html_legend"></div>
 
+    <aside class="toolbox" >
+
+      <div id="toggle_layer" @click="toggle_layer_selection_menu">
+          <v-icon large style="display: table-cell;vertical-align: middle;text-align: center;">mdi-layers</v-icon>
       </div>
-      <div class="box legend" v-if="layers[selected_layer].future || layers[selected_layer].monthly">
 
-        <div>
-          <b>Temporal resolution</b>
+      <div v-if="selected_layer !== null">
+        <div class="box legend">
+          <div>
+            <b>{{ selected_layer }}</b> <v-icon style="float: right;" @click="delete_layer(selected_layer, baseline_future_model, annual_monthly_model, months_model); $emit('closeLayer')">mdi-layers-remove</v-icon>
+          </div>
+          <div v-html="html_legend"></div>
+
         </div>
+        <div class="box legend" v-if="layers[selected_layer].future || layers[selected_layer].monthly">
 
-        <v-radio-group v-model="baseline_future_model" row v-if="layers[selected_layer].future">
-          <v-radio
-              v-for="resolution of baseline_future"
-              :key="resolution.key"
-              :label="resolution.label"
-              :value="resolution.key"
-          ></v-radio>
-        </v-radio-group>
-        <div v-if="baseline_future_model === 'baseline' && layers[selected_layer].monthly ">
-          <v-radio-group v-model="annual_monthly_model" row >
+          <div>
+            <b>Temporal resolution</b>
+          </div>
+
+          <v-radio-group v-model="baseline_future_model" row v-if="layers[selected_layer].future">
             <v-radio
-                v-for="resolution of annual_monthly"
+                v-for="resolution of baseline_future"
                 :key="resolution.key"
                 :label="resolution.label"
                 :value="resolution.key"
             ></v-radio>
           </v-radio-group>
-          <v-row align="center" v-if="annual_monthly_model === 'monthly'">
-            <v-col
-                class="d-flex"
-                cols="12"
-            >
-              <v-select
-                  :items="months"
-                  label="Select a month"
-                  v-model="months_model"
-                  item-text="label"
-                  item-value="key"
-              ></v-select>
-            </v-col>
-          </v-row>
-        </div>
+          <div v-if="baseline_future_model === 'baseline' && layers[selected_layer].monthly ">
+            <v-radio-group v-model="annual_monthly_model" row >
+              <v-radio
+                  v-for="resolution of annual_monthly"
+                  :key="resolution.key"
+                  :label="resolution.label"
+                  :value="resolution.key"
+              ></v-radio>
+            </v-radio-group>
+            <v-row align="center" v-if="annual_monthly_model === 'monthly'">
+              <v-col
+                  class="d-flex"
+                  cols="12"
+              >
+                <v-select
+                    :items="months"
+                    label="Select a month"
+                    v-model="months_model"
+                    item-text="label"
+                    item-value="key"
+                ></v-select>
+              </v-col>
+            </v-row>
+          </div>
 
+        </div>
       </div>
+
 
     </aside>
   </div>
@@ -64,7 +72,6 @@ import { Icon } from "leaflet";
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
 import 'leaflet-geosearch/dist/geosearch.css';
 import carto from '@carto/carto.js'
-import 'leaflet-easybutton'
 
 delete Icon.Default.prototype._getIconUrl;
 Icon.Default.mergeOptions({
@@ -217,6 +224,9 @@ export default {
     },
 },
   methods: {
+    toggle_layer_selection_menu(){
+      this.$emit('selectLayer');
+    },
     industry_created(){ //Delete clicked marker and add industry marker
       this.mapDiv.closePopup()
       this.clicked_marker.unbindPopup()
@@ -463,11 +473,6 @@ export default {
       ).addTo(this.mapDiv);
 
 
-      L.easyButton('<i class="material-icons">layers</i>', function(btn, map){
-        _this.$emit('selectLayer')
-      }, {position: 'topright'}).addTo( this.mapDiv );
-
-
       let greenIcon = new L.Icon({
         iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
         shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
@@ -605,7 +610,7 @@ export default {
         else return '#8c2d04'
       }
       let color_legend_population = ['#e1e1e1','#ffedde','#fccfa2','#fcae6a','#fc8d3d','#f26913','#d94800','#8c2d04']
-      let label_legend_population = ["0","1-25","100-250","250-1000","1000-5000","5000-100000",">100000"]
+      let label_legend_population = ["0","1-25","25-100","100-250","250-1000","1000-5000","5000-100000",">100000"]
 
 
       //Baseline population
@@ -1307,7 +1312,6 @@ export default {
 
 <style >
 
-@import "https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.css";
 @import "https://fonts.googleapis.com/icon?family=Material+Icons";
 @import "https://carto.com/developers/carto-js/examples/maps/public/style.css";
 
@@ -1319,6 +1323,22 @@ aside.toolbox {
   max-width: 300px;
   z-index: 2;
 }
+
+#toggle_layer{
+  position: absolute;
+  z-index: 2;
+  right: 10px;
+  top: -50px;
+  min-width: 50px;
+  max-width: 50px;
+  min-height: 50px;
+  max-height: 50px;
+  border-radius: 5px;
+  border-color: #1C195B;
+  border-style: solid;
+  border-width: 1px;
+  background-color: white;
+  display: table}
 
 .leaflet-touch .leaflet-bar button {
   width: 70px;
@@ -1382,6 +1402,7 @@ aside.toolbox {
   margin-right: 8px;
   opacity: 0.5;
 }
+
 
 
 
