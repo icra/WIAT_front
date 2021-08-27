@@ -252,7 +252,7 @@
             <v-btn @click="delete_industry" small outlined block>
               Delete
             </v-btn>
-            <v-btn block small outlined :to="{ name: 'statistics_industry', params: {assessment_id: selected_assessment, industry_id: selected_industry}}" @click="icon_selected = -1; selected_layer=null; secondMenu=false; rightMenu=false"">
+            <v-btn block small outlined :to="{ name: 'statistics_industry', params: {assessment_id: selected_assessment, industry_id: selected_industry}}" @click="icon_selected = -1; selected_layer=null; secondMenu=false; rightMenu=false">
               SHOW RESULTS
             </v-btn>
 
@@ -323,7 +323,7 @@
                       label="Search layer"
                   ></v-text-field>
 
-                  <div class="layer_list" style=" width: 100%; height: 70vh; overflow-y: auto;">
+                  <div class="layer_list" style=" width: 100%;">
                     <div
                         v-for="[key, layer] in Object.entries(layers_filtered)"
                         :key="key"
