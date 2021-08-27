@@ -146,7 +146,9 @@ export default {
       this.industry = this.$assessments[this.assessment_id].industries[this.industry_id]
     },
     industry: function (industry) {
-      if (industry === undefined) this.$router.push('/')
+      if (industry === undefined) {
+        this.$router.push('/')
+      }
     },
   },
   methods: {

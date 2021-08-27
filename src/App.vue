@@ -1,29 +1,29 @@
 <template>
-  <v-app id="app">
+  <v-app>
 
     <!-- Header -->
-    <v-toolbar
+    <v-app-bar
         height="75px"
         width="100%"
+        app
+        absolute
+        style="left: 0px"
     >
       <div class="header">
         <v-icon size="90">$icra_logo</v-icon>
         <v-icon size="90">$icra_logo</v-icon>
         <v-icon size="90">$icra_logo</v-icon>
       </div>
-
-    </v-toolbar>
-    <v-layout fill-height>
+    </v-app-bar>
 
       <!-- Main sidebar (first)-->
       <v-navigation-drawer
-          style="z-index:2; max-height: 100%; min-width: 35px; max-width: 70px "
+          style="z-index:2; max-height: 100%;"
           clipped
           permanent
-          mini-variant
-          mini-variant-width="3.25vw"
-          height="100%"
-
+          width="4rem"
+          app
+          absolute
       >
 
         <div class="icon_sidebar_container">
@@ -49,7 +49,7 @@
                     :key="item.title"
                 >
                   <v-list-item
-                      @click="left_side_menu_icon_selected(index)"
+                      @click="left_side_menu_icon_selected(index); selected_layer=null; secondMenu=false; rightMenu=false"
                       :class="(hover || icon_selected === index)? 'icon_hovered_pressed' : ''"
                       :to="{ name: item.to}"
                       style="height: 75px" :value="index"
@@ -69,103 +69,105 @@
         </div>
       </v-navigation-drawer>
 
-      <!-- Assessment and factory sidebar (second) -->
-      <v-navigation-drawer
-          style="z-index:1; background-color: #F2F4F3; height: 100vh; max-width: 330px"
-          v-model="secondMenu"
-          :width="secondMenu ? '20vw' : '0vw'"
-          flat
-
-      >
-
-        <div style=" height: 90vh; display: flex; flex-flow: column; width: 100%; padding: 10px">
-          <div style="display: flex; justify-content: flex-end; padding: 7px ">
-            <v-icon @click="secondMenu = !secondMenu">mdi-close</v-icon>
-          </div>
-
-          <h1>Assessment list</h1>
-          <!-- <div style = "overflow-y: auto; height: 75%; max-height: 75%; width: 100%"> -->
-          <div style="flex: 2;  /* 1 and it will fill whole space left if no flex value are set to other children*/
-          overflow: auto; width: 100%">
-            <v-expansion-panels focusable v-model="assessment_expansion_panel">
-              <v-expansion-panel
-                  v-for="(assessment, assessment_index ) in created_assessments"
-                  :key="assessment.name"
-                  @click.native.stop
-              >
-                <v-expansion-panel-header disable-icon-rotate>
-                  <b>{{ assessment.name }}</b>
-                  <template v-slot:actions>
-                    <v-hover v-slot:default="{ hover }" style="margin-right: 10px">
-                      <v-icon v-if="assessment_active[assessment_index]" :color="hover ? '#463FCA' : '#1C195B'" @click="hide_show_industries(assessment_index)" @click.native.stop>
-                        mdi-eye
-                      </v-icon>
-                      <v-icon v-else :color="hover ? '#463FCA' : '#1C195B'" @click="hide_show_industries(assessment_index)" @click.native.stop>
-                        mdi-eye-off
-                      </v-icon>
-
-                    </v-hover>
-
-                    <v-hover v-slot:default="{ hover }">
-                      <v-icon :color="hover ? '#463FCA' : '#1C195B'" @click="open_edit_assessment_tab(assessment_index)" @click.native.stop>
-                        mdi-cog
-                      </v-icon>
-                    </v-hover>
-
-                  </template>
-                </v-expansion-panel-header>
-                <v-expansion-panel-content>
-                  <div
-                      v-for="(industry,industry_index ) in created_assessments[assessment_index].industries"
-                      :key="industry.name"
-                      style="display: flex; align-items: flex-end"
-                  >
-                    <div>
-                      {{industry.name}}
-                    </div>
-                    <div style="flex-grow: 1; display: block;">
-                      <v-hover v-slot:default="{ hover }">
-                        <v-icon
-                            @click = "open_edit_industry_tab(assessment_index, industry_index)"
-                            style="float: right; margin-right: 3px"
-                            :color="hover ? '#463FCA' : '#1C195B'"
-                            size="18px"
-                        >
-                          mdi-circle-edit-outline
-                        </v-icon>
-                      </v-hover>
-                    </div>
-                  </div>
-                </v-expansion-panel-content>
-              </v-expansion-panel>
-            </v-expansion-panels>
-          </div>
-          <div style="padding-bottom: 20px; min-width: 100px; margin-top: 10px">
-            <v-btn
-                style="width: 100%; "
-                @click="rightMenu = true; right_sidebar_content = 1; assessment_name = null"
-                small outlined block>
-              Create assessment
-            </v-btn>
-          </div>
+    <!-- Assessment and factory sidebar (second) -->
+    <v-navigation-drawer
+        style="z-index:1; background-color: #F2F4F3; left: 4rem"
+        v-model="secondMenu"
+        :width="secondMenu ? '20rem' : '0rem'"
+        app
+        clipped
+    >
+      <div style=" height: 100%; display: flex; flex-flow: column; width: 100%; padding: 10px; overflow: hidden">
+        <div style="display: flex; justify-content: flex-end; padding: 7px ">
+          <v-icon @click="secondMenu = !secondMenu">mdi-close</v-icon>
         </div>
 
-      </v-navigation-drawer>
+        <h1>Assessment list</h1>
+        <!-- <div style = "overflow-y: auto; height: 75%; max-height: 75%; width: 100%"> -->
+        <div style="flex: 2; overflow-y: auto; width: 100%; position: relative; height: 100%" >
+          <v-expansion-panels focusable v-model="assessment_expansion_panel">
+            <v-expansion-panel
+                v-for="(assessment, assessment_index ) in created_assessments"
+                :key="assessment.name"
+                @click.native.stop
+            >
+              <v-expansion-panel-header disable-icon-rotate>
+                <b>{{ assessment.name }}</b>
+                <template v-slot:actions>
+                  <v-hover v-slot:default="{ hover }" style="margin-right: 10px">
+                    <v-icon v-if="assessment_active[assessment_index]" :color="hover ? '#463FCA' : '#1C195B'" @click="hide_show_industries(assessment_index)" @click.native.stop>
+                      mdi-eye
+                    </v-icon>
+                    <v-icon v-else :color="hover ? '#463FCA' : '#1C195B'" @click="hide_show_industries(assessment_index)" @click.native.stop>
+                      mdi-eye-off
+                    </v-icon>
+
+                  </v-hover>
+
+                  <v-hover v-slot:default="{ hover }">
+                    <v-icon :color="hover ? '#463FCA' : '#1C195B'" @click="open_edit_assessment_tab(assessment_index)" @click.native.stop>
+                      mdi-cog
+                    </v-icon>
+                  </v-hover>
+
+                </template>
+              </v-expansion-panel-header>
+              <v-expansion-panel-content>
+                <div
+                    v-for="(industry,industry_index ) in created_assessments[assessment_index].industries"
+                    :key="industry.name"
+                    style="display: flex; align-items: flex-end"
+                >
+                  <div>
+                    {{industry.name}}
+                  </div>
+                  <div style="flex-grow: 1; display: block;">
+                    <v-hover v-slot:default="{ hover }">
+                      <v-icon
+                          @click = "open_edit_industry_tab(assessment_index, industry_index)"
+                          style="float: right; margin-right: 3px"
+                          :color="hover ? '#463FCA' : '#1C195B'"
+                          size="18px"
+                      >
+                        mdi-circle-edit-outline
+                      </v-icon>
+                    </v-hover>
+                  </div>
+                </div>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </v-expansion-panels>
+        </div>
+        <div style="padding-bottom: 20px; min-width: 100px; margin-top: 10px">
+          <v-btn
+              style="width: 100%; "
+              @click="rightMenu = true; right_sidebar_content = 1; assessment_name = null"
+              small outlined block>
+            Create assessment
+          </v-btn>
+        </div>
+      </div>
+    </v-navigation-drawer>
+
 
       <!-- Main content -->
-      <v-main class="main">
-        <div class="content">
-          <router-view :selected_assessment="assessment_expansion_panel" :selected_layer="selected_layer" @createIndustry="createNewIndustry" @editIndustry="open_edit_industry_tab" @selectLayer="toggleLayerSelection" @closeLayer="applyLayer(selected_layer)" ref="reference"></router-view>
-        </div>
-      </v-main>
+    <div style="position: absolute; height: 100%; width: 100%">
+      <div class="content" :class="manageContentClass">
+        <router-view :selected_assessment="assessment_expansion_panel" :selected_layer="selected_layer" @createIndustry="createNewIndustry" @editIndustry="open_edit_industry_tab" @selectLayer="toggleLayerSelection" @closeLayer="applyLayer(selected_layer)" ref="reference"></router-view>
+      </div>
+    </div>
 
-      <!--right menu -->
-      <v-navigation-drawer
-          v-model="rightMenu"
-          style="background-color: #F2F4F3; max-width: 310px"
-          :width="rightMenu ? '18vw' : '0vw'"
-          flat
-      >
+    <!--right menu -->
+    <v-navigation-drawer
+        v-model="rightMenu"
+        style="background-color: #F2F4F3;"
+        :width="rightMenu ? '20rem' : '0rem'"
+        flat
+        app
+        right
+        clipped
+    >
+      <div style=" width: 100%; padding: 10px; ">
         <div style="padding: 17px ">
           <v-icon @click="rightMenu = !rightMenu">mdi-close</v-icon>
         </div>
@@ -244,13 +246,13 @@
             </v-form>
           </div>
           <div style="margin: 7px; padding: 7px;">
-            <v-btn :to="{ name: 'edit_industry', params: {assessment_id: selected_assessment, industry_id: selected_industry}}" small outlined block @click="icon_selected = -1">
+            <v-btn :to="{ name: 'edit_industry', params: {assessment_id: selected_assessment, industry_id: selected_industry}}" small outlined block @click="icon_selected = -1; selected_layer=null; secondMenu=false; rightMenu=false">
               Advanced INPUTS
             </v-btn>
             <v-btn @click="delete_industry" small outlined block>
               Delete
             </v-btn>
-            <v-btn block small outlined :to="{ name: 'statistics_industry', params: {assessment_id: selected_assessment, industry_id: selected_industry}}" @click="icon_selected = -1">
+            <v-btn block small outlined :to="{ name: 'statistics_industry', params: {assessment_id: selected_assessment, industry_id: selected_industry}}" @click="icon_selected = -1; selected_layer=null; secondMenu=false; rightMenu=false"">
               SHOW RESULTS
             </v-btn>
 
@@ -300,7 +302,6 @@
                   small
                   outlined
                   block
-
               >
                 Add industry
               </v-btn>
@@ -311,63 +312,59 @@
         </div>
         <!-- Select layer -->
         <div v-else-if="right_sidebar_content === 6">
-          <div style="margin: 7px; padding: 7px; background-color: white;">
+          <div style="margin: 7px; padding: 7px; background-color: white; height: 100%; overflow: hidden">
             <h1>Layer selection</h1>
 
-            <v-row dense>
+              <v-row dense>
+                <v-col cols="12">
+                  <v-text-field
+                      prepend-inner-icon="mdi-magnify"
+                      v-model="search_layer_model"
+                      label="Search layer"
+                  ></v-text-field>
 
-              <v-col cols="12">
-
-                <v-text-field
-                    prepend-inner-icon="mdi-magnify"
-                    v-model="search_layer_model"
-                    label="Search layer"
-                ></v-text-field>
-
-                <div class="layer_list" style="display: flex; flex-flow: column nowrap; width: 100%; height: 70vh">
-                  <div
-                      v-for="[key, layer] in Object.entries(layers_filtered)"
-                      :key="key"
-                  >
-                    <v-card
-                        v-if="key === selected_layer"
-                        color="#463FCA"
-                        dark
+                  <div class="layer_list" style=" width: 100%; height: 70vh; overflow-y: auto;">
+                    <div
+                        v-for="[key, layer] in Object.entries(layers_filtered)"
+                        :key="key"
                     >
-                      <v-card-title><h5>{{key}}</h5></v-card-title>
-                      <v-card-subtitle><b>Category:</b> {{layer.category}} </v-card-subtitle>
-                      <v-card-actions>
-                        <v-btn text @click="applyLayer(key)">
-                          Active
-                        </v-btn>
-                      </v-card-actions>
-                    </v-card>
-                    <v-card
-                        v-else
-                        class="inactive_layer_card"
-                    >
-                      <v-card-title><h5>{{key}}</h5></v-card-title>
-                      <v-card-subtitle><b>Category:</b> {{layer.category}} </v-card-subtitle>
-                      <v-card-actions>
-                        <v-btn @click="applyLayer(key)" dark color="#463FCA">
-                          Add to map
-                        </v-btn>
-                      </v-card-actions>
-                    </v-card>
+                      <v-card
+                          v-if="key === selected_layer"
+                          color="#463FCA"
+                          dark
+                      >
+                        <v-card-title><h5>{{key}}</h5></v-card-title>
+                        <v-card-subtitle><b>Category:</b> {{layer.category}} </v-card-subtitle>
+                        <v-card-actions>
+                          <v-btn text @click="applyLayer(key)">
+                            Active
+                          </v-btn>
+                        </v-card-actions>
+                      </v-card>
+                      <v-card
+                          v-else
+                          class="inactive_layer_card"
+                      >
+                        <v-card-title><h5>{{key}}</h5></v-card-title>
+                        <v-card-subtitle><b>Category:</b> {{layer.category}} </v-card-subtitle>
+                        <v-card-actions>
+                          <v-btn @click="applyLayer(key)" dark color="#463FCA">
+                            Add to map
+                          </v-btn>
+                        </v-card-actions>
+                      </v-card>
+                    </div>
+
                   </div>
 
-                </div>
-
-              </v-col>
-            </v-row>
-
+                </v-col>
+              </v-row>
           </div>
-
         </div>
+      </div>
 
-      </v-navigation-drawer>
+    </v-navigation-drawer>
 
-    </v-layout>
 
     <!-- Snackbars -->
     <v-snackbar
@@ -433,8 +430,7 @@ export default {
       search_layer_model: "",
     }
   },
-  watch: {
-  },
+
   methods: {
     left_side_menu_icon_selected(index){
       this.icon_selected = index;
@@ -477,11 +473,6 @@ export default {
         this.latlng_selected = latlng
       }
     },
-    class_for_main_content() {
-      if (this.secondMenu && this.rightMenu) return "two_sidebar_open"
-      else if (this.secondMenu || this.rightMenu) return "one_sidebar_open"
-      else return "zero_sidebar_open"
-    },
     create_assessment() {
       let new_assessment = new Assessment()
       new_assessment.name = this.assessment_name
@@ -503,6 +494,7 @@ export default {
       this.snackbars.edit_assessment.v_model = true
     },
     delete_assessment(){
+      if(this.icon_selected === -1) this.icon_selected = 0
       this.rightMenu = false
       this.snackbars.delete_assessment.v_model = true
       this.$assessments.splice(this.selected_assessment, 1)
@@ -547,6 +539,7 @@ export default {
       this.snackbars.edit_industry.v_model = true
     },
     delete_industry(){
+      if(this.icon_selected === -1) this.icon_selected = 0
       this.rightMenu = false
       this.snackbars.delete_industry.v_model = true
       this.$assessments[this.selected_assessment].delete_industry(this.selected_industry)
@@ -604,6 +597,16 @@ export default {
     }
   },
   computed: {
+
+    manageContentClass: function(){
+      return {
+        'left_sidebar_opened': !this.rightMenu && this.secondMenu,
+        'right_sidebar_opened': this.rightMenu && !this.secondMenu,
+        'right_and_left_opened': this.rightMenu && this.secondMenu,
+        'zero_sidebar_opened': !this.rightMenu && !this.secondMenu,
+
+      }
+    },
     layers_filtered: function() {
       if(!this.search_layer_model) return this.layers_description
       else {
@@ -620,11 +623,6 @@ export default {
 </script>
 
 <style>
-
-.main {
-  height: 95%;
-}
-
 html {
   overflow: hidden !important;
   scrollbar-width: none;
@@ -636,15 +634,25 @@ html::-webkit-scrollbar {
   width: 0;
   height: 0;
 }
-.zero_sidebar_open{
-  width: 95vw;
+
+
+.zero_sidebar_opened{
+  left: 4rem;
+  width: calc(100% - 4rem);
 }
-.one_sidebar_open{
-  width: 80vw;
+.left_sidebar_opened{
+  left: 24rem;
+  width: calc(100% - 24rem);
 }
-.two_sidebar_open{
-  width: 65vw;
+.right_sidebar_opened{
+  left: 4rem;
+  width: calc(100% - 24rem);
 }
+.right_and_left_opened{
+  left: 24rem;
+  width: calc(100% - 44rem);
+}
+
 .header{
   background-color: white;
   width: 100%;
@@ -661,22 +669,20 @@ html::-webkit-scrollbar {
   height: 100%;
 }
 .content{
-  width: 100%;
+  height: calc(100% - 75px);
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: #F2F4F3;
-  height: 100%;
   position: absolute;
+  top: 75px;
+
 }
 .icon_hovered_pressed{
   background-color: #463FCA;
 }
 #app {
   background-color: #F2F4F3;
-}
-.assessment_list{
-  background-color: red;
 }
 #app{
   width: 100%;

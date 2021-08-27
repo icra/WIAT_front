@@ -30,6 +30,7 @@ export default {
   data() {
     let defaultIndustry = this.$assessments[this.assessment_id].industries[this.industry_id]
     return {
+      assessment: this.$assessments[this.assessment_id],
       industry: defaultIndustry,
       inputs: Industry.info_inputs(),
       functions_to_call: defaultIndustry.emissions_and_descriptions(),

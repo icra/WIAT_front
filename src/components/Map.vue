@@ -1391,9 +1391,7 @@ aside.toolbox {
   opacity: 0.92;
 }
 
-.leaflet-bottom {
-  margin-bottom: 90px;
-}
+
 
 .legend i {
   width: 18px;
