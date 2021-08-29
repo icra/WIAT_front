@@ -83,7 +83,7 @@ export class Industry{
                 }, //kgBOD   Table 6.6B and 6.10C
 
                 "wwt_ind_prod": {question: "Total industrial product", value: 0, unit: "t/yr"},  //t/yer | Total industrial product
-                "wwt_wwt_generated": {question: "Wastewater generated", value: 0, unit: "m3/t"},  //m3/t | Wastewater generated
+                "wwt_wwt_generated": {question: "Wastewater generated for industrial sector", value: 0, unit: "m3/t"},  //m3/t | Wastewater generated
                 "wwt_tot_nit": {question: "Total nitrogen in untreated wastewater", value: 0, unit: "kgTN/m3"},  //kgTN/m3 | Total nitrogen in untreated wastewater
 
                 //TN (creates N2O)
@@ -168,8 +168,19 @@ export class Industry{
 
             "Biogas produced from anaerobic digestion" : {
                 //biogas
-                "wwt_biog_pro": {question: "Biogas produced (volume)", value: 0, unit: "Nm3", estimation_type:"equation", description_tooltip: "Biogas produced during the assessment period by the wastewater treatment plant managed by the undertaking"}, //Nm3 | total biogas produced
-                "wwt_biog_fla": {question: "% of biogas produced that is flared", value: 98, unit: "%", estimation_type: "equation"},
+                "wwt_biog_pro": {
+                    question: "Biogas produced (volume)",
+                    value: 0,
+                    unit: "Nm3",
+                    estimation_type: "equation",
+                    description_tooltip: "Biogas produced during the assessment period by the wastewater treatment plant managed by the undertaking"
+                }, //Nm3 | total biogas produced
+                "wwt_biog_fla": {
+                    question: "% of biogas produced that is flared",
+                    value: 98,
+                    unit: "%",
+                    estimation_type: "equation"
+                },
                 "wwt_biog_val": {
                     question: "Biogas valorised as heat and/or electricity (% volume)",
                     value: 0,
@@ -177,7 +188,12 @@ export class Industry{
                     estimation_type: "equation",
                     description_tooltip: "Biogas valorized in the treatment plant to heat the digesters or the building and/or to run a Co-generator to generate heat and electricity"
                 }, //% of biogas produced that is used for heat
-                "wwt_biog_lkd": {question: "Biogas leaked to the atmosphere (% volume)", value: 2, unit: "%", estimation_type: "equation"}, //% of biogas produced that is leaked
+                "wwt_biog_lkd": {
+                    question: "Biogas leaked to the atmosphere (% volume)",
+                    value: 2,
+                    unit: "%",
+                    estimation_type: "equation"
+                }, //% of biogas produced that is leaked
                 "wwt_biog_sold": {question: "Biogas sold (% volume)", value: 0, unit: "%", estimation_type: "equation"},
                 "wwt_ch4_biog": {question: "Percentage of methane in the biogas (% volume)", value: 59, unit: "%"}, //% of CH4 in biogas (volume)
                 "wwt_dige_typ": {
@@ -189,7 +205,7 @@ export class Industry{
                 "wwt_fuel_dig": {question: "Fuel consumed for the digester", value: 0, unit: "L"}, //L | volume of fuel used in the digester
                 //"wwt_nrg_biog_eff" :{question:"Energy efficiency for biogas valorization with respect to the theoretical maximum", value: 43},
                 //"wwt_nrg_biog" :{question:"Electrical energy produced from biogas valorization", value: 0},
-
+            },
                 //Treatment performance
                 /*
                 "wwt_trea_cap" :{question:"Treatment capacity", value: 0},
@@ -210,8 +226,8 @@ export class Industry{
                 "wwt_pmp_amps" :{question:"Measured pump current", value: 0},
                 "wwt_pmp_pf" :{question:"Power factor", value: 0},
                 "wwt_pmp_exff" :{question:"Expected electromechanical efficiency of new pump", value: 0},*/
-
-                //fuel used in water reuse trucks
+            //fuel used in water reuse trucks
+            "fuel used in water reuse trucks": {
                 "wwt_reus_trck_typ": {
                     question: "Fuel type (trucks)",
                     value: 0,
@@ -220,14 +236,15 @@ export class Industry{
                 }, //Option | type of fuel
                 "wwt_reus_vol_trck": {question: "Volume of fuel consumed (trucks)", value: 0}, //L | volume of fuel used
 
-                //GHG emissions avoided from reusing water
+            },
+            //GHG emissions avoided from reusing water
                 /*
                 "wwt_vol_nonp" :{question:"Volume of reused effluent", value: 0},
                 "wwt_wr_N_rec" :{question:"Total Nitrogen recovered", value: 0},
                 "wwt_wr_P_rec" :{question:"Total Phosphorus recovered", value: 0},*/
 
                 //sludge storage
-            },
+
             "Sludge storage in WWTP" : {
                 "wwt_mass_slu_sto": {question: "Sludge stored (dry weight)", value: 0, unit: "kg", description_tooltip: "Amount of sludge that is stored prior to disposal (dry weight)"}, //kg of sludge stored
                 "wwt_time_slu_sto": {question: "Storage time", value: 0, unit: "days", description_tooltip: "Time interval the sludge is stored for before being sent to disposal"}, //days
@@ -299,7 +316,7 @@ export class Industry{
                     value: 0.025,
                     unit: "kgCH4/kgC"
                 }, //kgCH4/kgC
-                "wwt_slu_comp_seqst_rate": {question: "CO2eq sequestration rate", value: 0.25, unit: "kgN2O-N/kgN", description_tooltip:"Estimated C02 equivalents sequestered per kg of sludge"}, //kgCO2eq/kgSludge
+                "wwt_slu_comp_seqst_rate": {question: "CO2eq sequestration rate", value: 0.25, unit: "kgCO2eq/kgSludge", description_tooltip:"Estimated C02 equivalents sequestered per kg of sludge"}, //kgCO2eq/kgSludge
             },
             //sludge incineration
             "Sludge incineration" : {
