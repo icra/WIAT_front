@@ -69,9 +69,9 @@ export class Industry{
                 "wwt_vol_disc" :{question:"Volume of discharged effluent to water body", value: 0},*/
 
                 //BOD (creates CH4)
-                "wwt_bod_infl": {question: "Influent COD5 load", value: 0, unit: "kg", description_tooltip: "COD5 load entering the WWTP during the assessment period. It can be estimated by multiplying the average COD5 concentration in the influent by the volume entering the plant. If this is done daily and summed over the duration of the assessment period the value will be most accurate"}, //kgCOD   //No te estimacio
+                "wwt_bod_infl": {question: "Influent COD load", value: 0, unit: "kg", description_tooltip: "COD load entering the WWTP during the assessment period. It can be estimated by multiplying the average COD concentration in the influent by the volume entering the plant. If this is done daily and summed over the duration of the assessment period the value will be most accurate"}, //kgCOD   //No te estimacio
                 "wwt_bod_effl": {
-                    question: "Effluent COD5 load",
+                    question: "Effluent COD load",
                     value: 0,
                     unit: "kg",
                     estimation_type: "option",
@@ -79,7 +79,7 @@ export class Industry{
                     estimation_based_on: "wwt_bod_infl",
                     estimation_factor: "bod_effl",
                     description: "bod_effl_table",
-                    description_tooltip: "COD5 load at the effluent of the WWTP during the assessment period. It can be estimated by multiplying the average COD5 concentration in the effluent by the effluent volume the plant. If this is done daily and summed over the duration of the assessment period the value will be most accurate"
+                    description_tooltip: "COD load at the effluent of the WWTP during the assessment period. It can be estimated by multiplying the average COD concentration in the effluent by the effluent volume the plant. If this is done daily and summed over the duration of the assessment period the value will be most accurate"
                 }, //kgBOD   Table 6.6B and 6.10C
 
                 "wwt_ind_prod": {question: "Total industrial product", value: 0, unit: "t/yr"},  //t/yer | Total industrial product
@@ -156,7 +156,7 @@ export class Industry{
                     unit: "kg",
                     description_tooltip: "Amount of raw sludge removed from wastewater treatment as dry mass during the assessment period"
                 },  //kg | raw sludge removed from wwtp as dry mass
-                "wwt_bod_slud": {question: "COD5 removed as sludge", value: 0, unit: "kg", description_tooltip: "COD5 (organic component) removed from wastewater (in the form of sludge) in aerobic treatment plants (S_aerobic in eq.6.3B IPCC 2019)"},  //kg | COD removed as sludge    //Taula 6.6A
+                "wwt_bod_slud": {question: "COD removed as sludge", value: 0, unit: "kg", description_tooltip: "COD (organic component) removed from wastewater (in the form of sludge) in aerobic treatment plant"},  //kg | COD removed as sludge    //Taula 6.6A
 
             },
             "Fuel engines" :{
@@ -972,7 +972,7 @@ let Tables={
     ],
 
 
-    //ipcc 2019, table 6.3 (updated) EF (kgCH4/kgBOD)
+    //ipcc 2019, table 6.3 (updated) EF (kgCH4/kgCOD)
     "type_of_water_body":[
         {name:"Water body undefined",                                                                   ch4_efac:0, description:""     },
         {name:"Discharge to aquatic environments (Tier 1)",                                             ch4_efac:0.028, description:"" },
@@ -989,10 +989,10 @@ let Tables={
         {name:"Flowing sewer (open or closed)",         ch4_efac:0},
     ],
 
-    //ipcc 2019, table 6.3 (updated) EF (kgCH4/kgCOD)           CANVIAR PER TAULA 6.8
+    //ipcc 2019, table 6.3 (updated) EF (kgCH4/kgCOD)           C
     "type_of_treatment":[
         {name:"Type of treatment undefined",                                  ch4_efac:0,  description: ""   },
-        {name:"Centralised, aerobic, treatment plant",                        ch4_efac:0.0075, description: ""},
+        {name:"Centralised, aerobic, treatment plant",                        ch4_efac:0, description: ""},
         {name:"Anaerobic Reactor - CH4 recovery not considered",              ch4_efac:0.2,  description: ""},
         //{name:"Anaerobic Reactor - CH4 recovery considered",                  ch4_efac:0.14,  description: ""},
         {name:"Anaerobic shallow lagoon and facultative lagoons (<2m depth)", ch4_efac:0.05,  description: ""},
