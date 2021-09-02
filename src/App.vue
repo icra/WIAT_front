@@ -157,18 +157,16 @@
       </div>
     </div>
 
-    <!--right menu -->
     <v-navigation-drawer
-        v-model="rightMenu"
         style="background-color: #F2F4F3;"
+        v-model="rightMenu"
         :width="rightMenu ? '20rem' : '0rem'"
         flat
         app
         right
-        clipped
-    >
-      <div style=" width: 100%; padding: 10px; ">
-        <div style="padding: 17px ">
+        clipped    >
+      <div style=" height: 100%; overflow: hidden">
+        <div style="padding: 17px; height: fit-content">
           <v-icon @click="rightMenu = !rightMenu">mdi-close</v-icon>
         </div>
         <!-- Assessment creation -->
@@ -221,7 +219,6 @@
               Delete
             </v-btn>
           </div>
-
         </div>
         <!-- edit industry -->
         <div v-else-if="right_sidebar_content === 3">
@@ -310,61 +307,73 @@
           </div>
 
         </div>
-        <!-- Select layer -->
-        <div v-else-if="right_sidebar_content === 6">
-          <div style="margin: 7px; padding: 7px; background-color: white; height: 100%; overflow: hidden">
-            <h1>Layer selection</h1>
-
-              <v-row dense>
-                <v-col cols="12">
-                  <v-text-field
-                      prepend-inner-icon="mdi-magnify"
-                      v-model="search_layer_model"
-                      label="Search layer"
-                  ></v-text-field>
-
-                  <div class="layer_list" style=" width: 100%;">
-                    <div
-                        v-for="[key, layer] in Object.entries(layers_filtered)"
-                        :key="key"
+        <div v-else-if="right_sidebar_content === 6" style=" height: 100%; display: flex; flex-flow: column; width: 100%; padding: 10px; overflow: hidden">
+          <h1>Assessment list</h1>
+          <div>
+            <v-row dense>
+              <v-col cols="12">
+                <v-text-field
+                    prepend-inner-icon="mdi-magnify"
+                    v-model="search_layer_model"
+                    label="Search layer"
+                ></v-text-field>
+              </v-col>
+            </v-row>
+          </div>
+          <!-- <div style = "overflow-y: auto; height: 75%; max-height: 75%; width: 100%"> -->
+          <div style="flex: 2; overflow-y: auto; overflow-x: hidden; width: 100%; position: relative; height: 100%" >
+            <v-row dense>
+              <v-col cols="12">
+                <div class="layer_list" style=" width: 100%;">
+                  <div
+                      v-for="[key, layer] in Object.entries(layers_filtered)"
+                      :key="key"
+                  >
+                    <v-card
+                        v-if="key === selected_layer"
+                        color="#463FCA"
+                        dark
                     >
-                      <v-card
-                          v-if="key === selected_layer"
-                          color="#463FCA"
-                          dark
-                      >
-                        <v-card-title><h5>{{key}}</h5></v-card-title>
-                        <v-card-subtitle><b>Category:</b> {{layer.category}} </v-card-subtitle>
-                        <v-card-actions>
-                          <v-btn text @click="applyLayer(key)">
-                            Active
-                          </v-btn>
-                        </v-card-actions>
-                      </v-card>
-                      <v-card
-                          v-else
-                          class="inactive_layer_card"
-                      >
-                        <v-card-title><h5>{{key}}</h5></v-card-title>
-                        <v-card-subtitle><b>Category:</b> {{layer.category}} </v-card-subtitle>
-                        <v-card-actions>
-                          <v-btn @click="applyLayer(key)" dark color="#463FCA">
-                            Add to map
-                          </v-btn>
-                        </v-card-actions>
-                      </v-card>
-                    </div>
-
+                      <v-card-title><h5>{{key}}</h5></v-card-title>
+                      <v-card-subtitle><b>Category:</b> {{layer.category}} </v-card-subtitle>
+                      <v-card-actions>
+                        <v-btn text @click="applyLayer(key)">
+                          Active
+                        </v-btn>
+                      </v-card-actions>
+                    </v-card>
+                    <v-card
+                        v-else
+                        class="inactive_layer_card"
+                    >
+                      <v-card-title><h5>{{key}}</h5></v-card-title>
+                      <v-card-subtitle><b>Category:</b> {{layer.category}} </v-card-subtitle>
+                      <v-card-actions>
+                        <v-btn @click="applyLayer(key)" dark color="#463FCA">
+                          Add to map
+                        </v-btn>
+                      </v-card-actions>
+                    </v-card>
                   </div>
 
-                </v-col>
-              </v-row>
+                </div>
+
+              </v-col>
+            </v-row>
+
           </div>
+          <div style="padding-bottom: 20px; min-width: 100px; margin-top: 10px">
+            <v-btn
+                style="width: 100%; "
+                @click="rightMenu = true; right_sidebar_content = 1; assessment_name = null"
+                small outlined block>
+              Create assessment
+            </v-btn>
+          </div>
+
         </div>
       </div>
-
     </v-navigation-drawer>
-
 
     <!-- Snackbars -->
     <v-snackbar
