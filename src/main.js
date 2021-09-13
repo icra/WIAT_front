@@ -14,16 +14,96 @@ Vue.prototype.$clicked_point = null    //Location of the point clicked on the ma
 Vue.prototype.$assessment_active = []    //active assessments shown on map
 Vue.prototype.$selected_layer = "None"
 
-Vue.prototype.$layers = {
-  'None': null,
-  "Baseline population": null,
-  "Baseline water depletion": null,
-  "Baseline water stress": null
-}
 
+Vue.prototype.$layers_description = [
 
-Vue.prototype.$layers_description = {
-  'Population': {
+  {
+    name: "Population",
+    layer:
+        {
+          layers: {
+            baseline: {
+              annual: {
+                layer: null
+              },
+              monthly: []
+            },
+            future: {
+              layer: null
+            },
+          },
+          monthly: false,
+          future: true
+        },
+  },
+  {
+    name: "Water quantity",
+    children: [
+      {
+        name: "Water available",
+        children: [
+          {
+            name: "Water supply",
+            layer: {
+              layers: {
+                baseline: {
+                  annual: {
+                    layer: null
+                  },
+                  monthly: []
+                },
+                future: {
+                  layer: null
+                },
+              },
+              monthly: false,
+              future: true,
+            },
+          },
+          {
+            name: "RUN-OFF",
+            layer: {
+              layers: {
+                baseline: {
+                  annual: {
+                    layer: null
+                  },
+                  monthly: []
+                },
+                future: {
+                  layer: null
+                },
+              },
+              monthly: false,
+              future: false,
+            },
+          },
+        ]
+      },
+      {
+        name: "Aridity index water demand",
+        children: [
+          {
+            name: "Water demand",
+            layer: {
+              baseline: {
+                annual: {
+                  layer: null
+                },
+                monthly: []
+              },
+              future: {
+                layer: null
+              },
+            },
+          },
+        ]
+      }
+
+    ]
+  }
+
+  /*'Population': {
     layers: {
       baseline: {
         annual: {
@@ -37,7 +117,7 @@ Vue.prototype.$layers_description = {
     },
     monthly: false,
     future: true,
-    category: "Population indicators",
+    category: ["Population indicators"],
   },
   'Aridity index': {
     layers: {
@@ -53,7 +133,7 @@ Vue.prototype.$layers_description = {
     },
     monthly: false,
     future: false,
-    category: "Quantity Risk",
+    category: ["Quantity Risk"],
   },
   'RUN-OFF': {
     layers: {
@@ -69,7 +149,7 @@ Vue.prototype.$layers_description = {
     },
     monthly: false,
     future: false,
-    category: "Quantity Risk",
+    category: ["Quantity Risk"],
   },
   'Water stress': {
     layers: {
@@ -85,7 +165,7 @@ Vue.prototype.$layers_description = {
     },
     monthly: true,
     future: true,
-    category: "Quantity risk",
+    category: ["Quantity risk"],
   },
   'Water depletion': {
     layers: {
@@ -101,7 +181,7 @@ Vue.prototype.$layers_description = {
     },
     monthly: true,
     future: false,
-    category: "Quantity risk"
+    category: ["Quantity risk"]
   },
   'Interannual variability': {
     layers: {
@@ -117,7 +197,7 @@ Vue.prototype.$layers_description = {
     },
     monthly: true,
     future: false,
-    category: "Quantity risk"
+    category: ["Quantity risk"]
   },
   'Seasonal variability': {
     layers: {
@@ -133,7 +213,7 @@ Vue.prototype.$layers_description = {
     },
     monthly: false,
     future: true,
-    category: "Quantity risk"
+    category: ["Quantity risk"]
   },
   'Groundwater table decline': {
     layers: {
@@ -149,7 +229,7 @@ Vue.prototype.$layers_description = {
     },
     monthly: false,
     future: false,
-    category: "Quantity risk"
+    category: ["Quantity risk"]
   },
   'Riverine flood risk': {
     layers: {
@@ -165,7 +245,7 @@ Vue.prototype.$layers_description = {
     },
     monthly: false,
     future: false,
-    category: "Flood risk"
+    category: ["Flood risk"]
   },
   'Coastal flood risk': {
     layers: {
@@ -181,7 +261,7 @@ Vue.prototype.$layers_description = {
     },
     monthly: false,
     future: false,
-    category: "Flood risk"
+    category: ["Flood risk"]
   },
   'Drought risk': {
     layers: {
@@ -197,7 +277,7 @@ Vue.prototype.$layers_description = {
     },
     monthly: false,
     future: false,
-    category: "Drought risk"
+    category: ["Drought risk"]
   },
   'Coastal Eutrophication Potential': {
     layers: {
@@ -213,7 +293,7 @@ Vue.prototype.$layers_description = {
     },
     monthly: false,
     future: false,
-    category: "Water quality"
+    category: ["Water quality"]
   },
   'Unimproved/No Drinking Water': {
     layers: {
@@ -229,7 +309,7 @@ Vue.prototype.$layers_description = {
     },
     monthly: false,
     future: false,
-    category: "Reputational risk"
+    category: ["Reputational risk"]
   },
   'Unimproved/No Sanitation': {
     layers: {
@@ -245,7 +325,7 @@ Vue.prototype.$layers_description = {
     },
     monthly: false,
     future: false,
-    category: "Reputational risk"
+    category: ["Reputational risk"]
   },
   'Peak RepRisk Country ESG Risk Index': {
     layers: {
@@ -261,7 +341,7 @@ Vue.prototype.$layers_description = {
     },
     monthly: false,
     future: false,
-    category: "Reputational risk"
+    category: ["Reputational risk"]
   },
   'Water supply': {
     layers: {
@@ -277,7 +357,7 @@ Vue.prototype.$layers_description = {
     },
     monthly: false,
     future: true,
-    category: "-"
+    category: ["-"]
   },
   'Water demand': {
     layers: {
@@ -293,7 +373,7 @@ Vue.prototype.$layers_description = {
     },
     monthly: false,
     future: true,
-    category: "-"
+    category: ["-"]
   },
   'Surface Water Pharmaceutical Pollution': {
     layers: {
@@ -309,7 +389,7 @@ Vue.prototype.$layers_description = {
     },
     monthly: false,
     future: true,
-    category: "Water quality"
+    category: ["Water quality"]
   },
   'Coastal Pharmaceutical Pollution': {
     layers: {
@@ -325,9 +405,9 @@ Vue.prototype.$layers_description = {
     },
     monthly: false,
     future: false,
-    category: "Water quality"
-  },
-}
+    category: ["Water quality"]
+  },*/
+]
 
 
 

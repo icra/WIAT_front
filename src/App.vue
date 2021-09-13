@@ -325,36 +325,15 @@
             <v-row dense>
               <v-col cols="12">
                 <div class="layer_list" style=" width: 100%;">
-                  <div
-                      v-for="[key, layer] in Object.entries(layers_filtered)"
-                      :key="key"
-                  >
-                    <v-card
-                        v-if="key === selected_layer"
-                        color="#463FCA"
-                        dark
-                    >
-                      <v-card-title><h5>{{key}}</h5></v-card-title>
-                      <v-card-subtitle><b>Category:</b> {{layer.category}} </v-card-subtitle>
-                      <v-card-actions>
-                        <v-btn text @click="applyLayer(key)">
-                          Active
-                        </v-btn>
-                      </v-card-actions>
-                    </v-card>
-                    <v-card
-                        v-else
-                        class="inactive_layer_card"
-                    >
-                      <v-card-title><h5>{{key}}</h5></v-card-title>
-                      <v-card-subtitle><b>Category:</b> {{layer.category}} </v-card-subtitle>
-                      <v-card-actions>
-                        <v-btn @click="applyLayer(key)" dark color="#463FCA">
-                          Add to map
-                        </v-btn>
-                      </v-card-actions>
-                    </v-card>
-                  </div>
+                  <v-treeview
+                      :items="layer_tree"
+                      dense
+                      hoverable
+                      selectable
+                      selection-type="leaf"
+                      return-object
+                      v-model="selected_layers"
+                  ></v-treeview>
 
                 </div>
 
@@ -434,13 +413,30 @@ export default {
       latlng_selected: null, //Coordinates of point in the map
       icon_selected: 0, //first sidebar icon selected
       assessment_active: this.$assessment_active, //if assessment_active[i]=true, industries of the i-th assessment are shown on the map
-      selected_layer: null,  //Selected layer
+      selected_layer: null,  //Layer displayed in the map
       layers_description: this.$layers_description,
       search_layer_model: "",
+      selected_layers: [], //layers included in the report
     }
   },
 
   methods: {
+    add_identifier: function (category, id){
+      let _this = this
+      category.id = id
+      id++
+
+      if(category.hasOwnProperty("children")){
+        category.children.forEach(subcategory => {
+          id = _this.add_identifier(subcategory, id)
+        })
+
+      }
+
+      return id
+
+    },
+
     left_side_menu_icon_selected(index){
       this.icon_selected = index;
       if (this.icon_selected !== 0 && this.right_sidebar_content === 6) this.rightMenu=false  //Close layer selection menu if map is not active
@@ -606,6 +602,16 @@ export default {
     }
   },
   computed: {
+    layer_tree: function () {
+      let _this = this
+      let id = 1
+      this.layers_description.forEach(category => {
+        id = _this.add_identifier(category, id)  //id has the new id to add
+      })
+
+      console.log(this.layers_description)
+      return this.layers_description
+    },
 
     manageContentClass: function(){
       return {
