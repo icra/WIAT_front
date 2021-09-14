@@ -61,44 +61,33 @@ export class Industry{
 
     static info_inputs(){
         return {
-
-            "Basic inputs": {
+            "Industry characteristics": {
 
                 /*"wwt_serv_pop" :{question:"Serviced population", value: 0},
                 "wwt_vol_trea" :{question:"Volume of treated wastewater", value: 0},
                 "wwt_vol_disc" :{question:"Volume of discharged effluent to water body", value: 0},*/
 
-                //BOD (creates CH4)
-                "wwt_bod_infl": {question: "Influent COD load", value: 0, unit: "kg", description_tooltip: "COD load entering the WWTP during the assessment period. It can be estimated by multiplying the average COD concentration in the influent by the volume entering the plant. If this is done daily and summed over the duration of the assessment period the value will be most accurate"}, //kgCOD   //No te estimacio
-                "wwt_bod_effl": {
-                    question: "Effluent COD load",
-                    value: 0,
-                    unit: "kg",
-                    estimation_type: "option",
-                    items: Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"],
-                    estimation_based_on: "wwt_bod_infl",
-                    estimation_factor: "bod_effl",
-                    description: "bod_effl_table",
-                    description_tooltip: "COD load at the effluent of the WWTP during the assessment period. It can be estimated by multiplying the average COD concentration in the effluent by the effluent volume the plant. If this is done daily and summed over the duration of the assessment period the value will be most accurate"
-                }, //kgBOD   Table 6.6B and 6.10C
 
                 "wwt_ind_prod": {question: "Total industrial product", value: 0, unit: "t/yr"},  //t/yer | Total industrial product
                 "wwt_wwt_generated": {question: "Wastewater generated for industrial sector", value: 0, unit: "m3/t"},  //m3/t | Wastewater generated
                 "wwt_tot_nit": {question: "Total nitrogen in untreated wastewater", value: 0, unit: "kgTN/m3"},  //kgTN/m3 | Total nitrogen in untreated wastewater
 
-                //TN (creates N2O)
-                "wwt_tn_infl": {question: "Total Nitrogen load in the influent", value: 0, unit: "kg", estimation_type: "equation"},  //kgN    Equacio 6.13
-                "wwt_tn_effl": {
-                    question: "Total Nitrogen load in the effluent",
+                //energy
+                "wwt_nrg_cons": {question: "Energy consumed from the grid", value: 0, unit: "kWh", description_tooltip: "Total energy consumed during the assessment period by all wastewater treatment plants managed by the undertaking"},  //kWh | energy consumed from the grid
+                "wwt_conv_kwh": {question: "Emission factor for grid electricity", value: 0, unit: "kgCO2eq/kWh", description_tooltip: "Emission factor for grid electricity (indirect emissions)"},  //kgCO2eq/kWh | conversion factor
+
+                //SLUDGE MANAGEMENT
+                "wwt_mass_slu": {
+                    question: "Sludge removed from wastewater treatment (dry weight)",
                     value: 0,
                     unit: "kg",
-                    estimation_type: "option",
-                    items: Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"],
-                    estimation_based_on: "wwt_tn_infl",
-                    estimation_factor: "N_effl",
-                    description: "N_effl_table"
-                },  //kgN   TAULA 6.10c
+                    description_tooltip: "Amount of raw sludge removed from wastewater treatment as dry mass during the assessment period"
+                },  //kg | raw sludge removed from wwtp as dry mass
+                "wwt_bod_slud": {question: "COD removed as sludge", value: 0, unit: "kg", description_tooltip: "COD (organic component) removed from wastewater (in the form of sludge) in aerobic treatment plant"},  //kg | COD removed as sludge    //Taula 6.6A
 
+            },
+
+            "Treatment characteristics": {
                 //emission factors (treatment)
                 "wwt_ch4_efac_tre": {
                     question: "CH4 emission factor (treatment)",
@@ -145,20 +134,35 @@ export class Industry{
                     description: "description"
                 },  //kgN2O-N/kgN  //tAULA 6.8A
 
-                //energy
-                "wwt_nrg_cons": {question: "Energy consumed from the grid", value: 0, unit: "kWh", description_tooltip: "Total energy consumed during the assessment period by all wastewater treatment plants managed by the undertaking"},  //kWh | energy consumed from the grid
-                "wwt_conv_kwh": {question: "Emission factor for grid electricity", value: 0, unit: "kgCO2eq/kWh", description_tooltip: "Emission factor for grid electricity (indirect emissions)"},  //kgCO2eq/kWh | conversion factor
-
-                //SLUDGE MANAGEMENT
-                "wwt_mass_slu": {
-                    question: "Sludge removed from wastewater treatment (dry weight)",
+            },
+            "Influent and effluent wastewater characteristics": {
+                //BOD (creates CH4)
+                "wwt_bod_infl": {question: "Influent COD load", value: 0, unit: "kg", description_tooltip: "COD load entering the WWTP during the assessment period. It can be estimated by multiplying the average COD concentration in the influent by the volume entering the plant. If this is done daily and summed over the duration of the assessment period the value will be most accurate"}, //kgCOD   //No te estimacio
+                "wwt_bod_effl": {
+                    question: "Effluent COD load",
                     value: 0,
                     unit: "kg",
-                    description_tooltip: "Amount of raw sludge removed from wastewater treatment as dry mass during the assessment period"
-                },  //kg | raw sludge removed from wwtp as dry mass
-                "wwt_bod_slud": {question: "COD removed as sludge", value: 0, unit: "kg", description_tooltip: "COD (organic component) removed from wastewater (in the form of sludge) in aerobic treatment plant"},  //kg | COD removed as sludge    //Taula 6.6A
-
+                    estimation_type: "option",
+                    items: Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"],
+                    estimation_based_on: "wwt_bod_infl",
+                    estimation_factor: "bod_effl",
+                    description: "bod_effl_table",
+                    description_tooltip: "COD load at the effluent of the WWTP during the assessment period. It can be estimated by multiplying the average COD concentration in the effluent by the effluent volume the plant. If this is done daily and summed over the duration of the assessment period the value will be most accurate"
+                }, //kgBOD   Table 6.6B and 6.10C
+                //TN (creates N2O)
+                "wwt_tn_infl": {question: "Total Nitrogen load in the influent", value: 0, unit: "kg", estimation_type: "equation"},  //kgN    Equacio 6.13
+                "wwt_tn_effl": {
+                    question: "Total Nitrogen load in the effluent",
+                    value: 0,
+                    unit: "kg",
+                    estimation_type: "option",
+                    items: Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"],
+                    estimation_based_on: "wwt_tn_infl",
+                    estimation_factor: "N_effl",
+                    description: "N_effl_table"
+                },  //kgN   TAULA 6.10c
             },
+
             "Fuel engines" :{
 
                 //fuel engines
@@ -227,7 +231,7 @@ export class Industry{
                 "wwt_pmp_pf" :{question:"Power factor", value: 0},
                 "wwt_pmp_exff" :{question:"Expected electromechanical efficiency of new pump", value: 0},*/
             //fuel used in water reuse trucks
-            "fuel used in water reuse trucks": {
+            "Fuel used in water reuse trucks": {
                 "wwt_reus_trck_typ": {
                     question: "Fuel type (trucks)",
                     value: 0,
@@ -525,6 +529,14 @@ export class Industry{
             {description: "Emissions from sludge transport", emissions: this.wwt_KPI_GHG_sludge_transport()},
             {description: "Emissions from water reuse transport", emissions: this.wwt_KPI_GHG_reus_trck()},
             {description: "Emissions from water discharged", emissions: this.wwt_KPI_GHG_disc()},
+        ]
+    }
+    water_quality_indicators(){
+        return [
+
+            {type: "COD load at the effluent of the WWTP", value: this.wwt_bod_effl, unit: "kg"},
+            {type: "Total Nitrogen load in the effluent", value: this.wwt_tn_effl, unit: "kg"},
+
         ]
     }
 

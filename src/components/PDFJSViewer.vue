@@ -7,12 +7,11 @@
 <script>
 export default {
   name: 'PDFJSViewer',
-  props: ["pdf_doc"],
-  watch: {
-    pdf_doc: function(){
+  methods: {
+    make_pdf(pdf_doc){
       let f = document.getElementById('visualizer');
-      let callback = function(url) { f.setAttribute('src',url)}
-      this.pdf_doc.getDataUrl(callback, this.pdf_doc);
+      let callback = function(url) { f.setAttribute('src', url)}
+      pdf_doc.getDataUrl(callback, pdf_doc);
       return this.fileName
     }
   }

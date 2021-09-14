@@ -85,6 +85,7 @@
         <h1>Assessment list</h1>
         <!-- <div style = "overflow-y: auto; height: 75%; max-height: 75%; width: 100%"> -->
         <div style="flex: 2; overflow-y: auto; width: 100%; position: relative; height: 100%" >
+
           <v-expansion-panels focusable v-model="assessment_expansion_panel">
             <v-expansion-panel
                 v-for="(assessment, assessment_index ) in created_assessments"
@@ -137,6 +138,7 @@
               </v-expansion-panel-content>
             </v-expansion-panel>
           </v-expansion-panels>
+
         </div>
         <div style="padding-bottom: 20px; min-width: 100px; margin-top: 10px">
           <v-btn
@@ -153,7 +155,7 @@
       <!-- Main content -->
     <div style="position: absolute; height: 100%; width: 100%">
       <div class="content" :class="manageContentClass">
-        <router-view :selected_assessment="assessment_expansion_panel" :selected_layer="selected_layer" @createIndustry="createNewIndustry" @editIndustry="open_edit_industry_tab" @selectLayer="toggleLayerSelection" @closeLayer="applyLayer(selected_layer)" ref="reference"></router-view>
+        <router-view :selected_layers="selected_layers" :selected_assessment="assessment_expansion_panel" :selected_layer="selected_layer" @createIndustry="createNewIndustry" @editIndustry="open_edit_industry_tab" @selectLayer="toggleLayerSelection" @closeLayer="applyLayer(selected_layer)" ref="reference"></router-view>
       </div>
     </div>
 
@@ -164,7 +166,8 @@
         flat
         app
         right
-        clipped    >
+        clipped
+    >
       <div style=" height: 100%; overflow: hidden">
         <div style="padding: 17px; height: fit-content">
           <v-icon @click="rightMenu = !rightMenu">mdi-close</v-icon>
@@ -308,21 +311,28 @@
 
         </div>
         <div v-else-if="right_sidebar_content === 6" style=" height: 100%; display: flex; flex-flow: column; width: 100%; padding: 10px; overflow: hidden">
-          <h1>Assessment list</h1>
           <div>
             <v-row dense>
               <v-col cols="12">
-                <v-text-field
-                    prepend-inner-icon="mdi-magnify"
-                    v-model="search_layer_model"
-                    label="Search layer"
-                ></v-text-field>
+                <v-sheet class="pa-4 search_box">
+                  <v-text-field
+                      v-model="search_layer_model"
+                      label="Search layer"
+                      dark
+                      flat
+                      solo-inverted
+                      hide-details
+                      clearable
+                  ></v-text-field>
+
+                </v-sheet>
+
               </v-col>
             </v-row>
           </div>
           <!-- <div style = "overflow-y: auto; height: 75%; max-height: 75%; width: 100%"> -->
           <div style="flex: 2; overflow-y: auto; overflow-x: hidden; width: 100%; position: relative; height: 100%" >
-            <v-row dense>
+            <v-row dense style="background-color: white">
               <v-col cols="12">
                 <div class="layer_list" style=" width: 100%;">
                   <v-treeview
@@ -333,7 +343,26 @@
                       selection-type="leaf"
                       return-object
                       v-model="selected_layers"
-                  ></v-treeview>
+                      open-on-click
+                      color="#1C195B"
+                      selected-color="#1C195B"
+                      clear-icon="mdi-close-circle-outline"
+                      :search="search_layer_model"
+                  >
+                    <template v-slot:append="{ item }">
+                      <v-hover v-slot:default="{ hover }" style="margin-right: 10px">
+                        <v-icon v-if="selected_layer === item.name && item.layer" :color="hover ? '#463FCA' : '#1C195B'" @click="applyLayer(item.name)">
+                          mdi-layers-remove
+                        </v-icon>
+                        <v-icon v-else-if="item.layer" :color="hover ? '#463FCA' : '#1C195B'" @click="applyLayer(item.name)">
+                          mdi-layers-plus
+                        </v-icon>
+
+                      </v-hover>
+
+                    </template>
+                  </v-treeview>
+
 
                 </div>
 
@@ -602,6 +631,8 @@ export default {
     }
   },
   computed: {
+
+
     layer_tree: function () {
       let _this = this
       let id = 1
@@ -609,7 +640,6 @@ export default {
         id = _this.add_identifier(category, id)  //id has the new id to add
       })
 
-      console.log(this.layers_description)
       return this.layers_description
     },
 
@@ -622,7 +652,7 @@ export default {
 
       }
     },
-    layers_filtered: function() {
+    /*layers_filtered: function() {
       if(!this.search_layer_model) return this.layers_description
       else {
         let filtered = {}
@@ -632,7 +662,7 @@ export default {
         }
         return filtered
       }
-    }
+    }*/
   }
 }
 </script>
@@ -707,7 +737,19 @@ html::-webkit-scrollbar {
   width: 100%;
   flex: 2;  /* 1 and it will fill whole space left if no flex value are set to other children*/
 }
-.v-card__text, .v-card__title {
-  word-break: normal !important; /* maybe !important  */
+
+
+.v-treeview-node__content, .v-treeview-node__label {
+  flex-shrink: 1;
+  word-break: normal;
+  white-space: normal !important;
+}
+.v-treeview-node__root {
+  height: auto;
+}
+
+.search_box {
+  background-color: #1C195B !important;
+  border-color: #1C195B !important;
 }
 </style>

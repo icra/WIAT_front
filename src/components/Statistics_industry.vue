@@ -1,14 +1,55 @@
 <template>
   <div class="outer">
+    <div>
+      <h1> {{ this.industry.name}} </h1>
+    </div>
+    <br>
 
-    <v-data-table
-        :headers="headers"
-        :items="tableData"
-        class="elevation-1"
-    ></v-data-table>
+    <v-tabs
+        v-model="tab_model"
+        align-with-title
+        fixed-tabs
+        dark
+        background-color="indigo"
 
-    <industry_pie_chart v-bind:dataset="dataset_for_pie" v-bind:labels='labels_for_pie'
-    ></industry_pie_chart>
+
+    >
+      <v-tabs-slider color="yellow"></v-tabs-slider>
+
+      <v-tab
+          v-for="item in tab_item"
+          :key="item"
+      >
+        {{ item }}
+      </v-tab>
+    </v-tabs>
+
+    <v-tabs-items v-model="tab_model">
+      <v-tab-item
+        key="GHG emission"
+      >
+        <v-data-table
+            :headers="headers"
+            :items="tableData"
+            class="elevation-1"
+        ></v-data-table>
+
+        <br>
+
+        <industry_pie_chart v-bind:dataset="dataset_for_pie" v-bind:labels='labels_for_pie'
+        ></industry_pie_chart>
+      </v-tab-item>
+      <v-tab-item
+          key="Water quality indicators"
+      >
+        <v-data-table
+            :headers="waterQualityHeader"
+            :items="tableDataQualityIndicators"
+            class="elevation-1"
+        ></v-data-table>
+      </v-tab-item>
+    </v-tabs-items>
+
 
   </div>
 </template>
@@ -32,8 +73,8 @@ export default {
     return {
       assessment: this.$assessments[this.assessment_id],
       industry: defaultIndustry,
-      inputs: Industry.info_inputs(),
       functions_to_call: defaultIndustry.emissions_and_descriptions(),
+      water_quality_indicators: defaultIndustry.water_quality_indicators(),
       headers: [
         {
           text: 'Emission',
@@ -48,13 +89,36 @@ export default {
         { text: 'N2O emission / year', value: 'N2O emission' },
 
       ],
+      waterQualityHeader: [
+        {
+          text: '',
+          align: 'start',
+          sortable: false,
+          value: 'type',
+        },
+        {
+          text: 'Value',
+          sortable: false,
+          value: 'value',
+        },
+        {
+          text: 'Unit',
+          sortable: false,
+          value: 'unit',
+        },
+
+
+      ],
       tableData: [],
+      tableDataQualityIndicators: [],
       labels_for_pie: [],
       dataset_for_pie: [{
         borderWidth: 1,
         data: [],
         backgroundColor: []
       }],
+      tab_item: ["GHG emission", "Water quality indicators"],
+      tab_model: "GHG emission"
     };
   },
   methods: {
@@ -71,6 +135,17 @@ export default {
 
         })
       }
+
+      this.tableDataQualityIndicators = this.water_quality_indicators
+      /*for(let row of this.water_quality_indicators){
+        this.tableDataQualityIndicators.push({
+          "type": row.type,
+          "value": row.emissions["total"],
+          "unit": row.emissions["co2"],
+
+
+        })*/
+
     },
     table_and_statistics(){
       let _this = this

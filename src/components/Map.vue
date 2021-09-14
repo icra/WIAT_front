@@ -91,6 +91,8 @@ let GeoRasterLayer = require("georaster-layer-for-leaflet");
 let _ = require('lodash');
 let chroma = require("chroma-js")
 let $ = require( "jquery" );
+import utils from "../utils"
+
 
 export default {
   name: "Map",
@@ -105,7 +107,7 @@ export default {
       mapDiv: null,
       markers: [],
       clicked_marker: null,
-      layers: this.format_layer_description(Vue.prototype.$layers_description),
+      layers: utils.format_layer_description(Vue.prototype.$layers_description),
       base_layer_url: 'https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}',
       baseline_future: [
         {
@@ -224,30 +226,6 @@ export default {
     },
 },
   methods: {
-
-    //FUNCTIONS FOR GETTING AND CHANGE FORMAT OF DATA LAYER
-    format_layer_description(categories){
-      let _this = this
-      let object_to_return = {}
-      categories.forEach(category => {
-        object_to_return = {...object_to_return, ..._this.get_layers_from_category(category)}
-      })
-      return object_to_return
-    },
-    get_layers_from_category(category){
-      let _this = this
-      if(category.hasOwnProperty("layer")) {
-        let obj = {}
-        obj[category["name"]]= category["layer"]
-        return obj
-      }else{
-        let obj = {}
-        category.children.forEach(subcategory => {
-          obj = {...obj, ..._this.get_layers_from_category(subcategory)}
-        })
-        return obj
-      }
-    },
 
     //FUNCTIONS FOR DISPLAYING LAYERS ON THE MAP
 

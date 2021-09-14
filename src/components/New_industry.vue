@@ -3,7 +3,7 @@
     <div>
       <h1> {{ this.industry.name}} </h1>
     </div>
-
+    <br>
     <v-expansion-panels>
       <v-expansion-panel
         v-for="[title, form] of Object.entries(this.inputs)"
