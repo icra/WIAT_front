@@ -8,6 +8,7 @@
           <v-icon large style="display: table-cell;vertical-align: middle;text-align: center;">mdi-layers</v-icon>
       </div>
 
+
       <div v-if="selected_layer !== null">
         <div class="box legend">
           <div>
@@ -69,9 +70,11 @@
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { Icon } from "leaflet";
-import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
+import { GeoSearchControl, EsriProvider } from 'leaflet-geosearch';
 import 'leaflet-geosearch/dist/geosearch.css';
 import carto from '@carto/carto.js'
+
+
 
 delete Icon.Default.prototype._getIconUrl;
 Icon.Default.mergeOptions({
@@ -520,8 +523,8 @@ export default {
 
       this.mapDiv.on('click', onMapClick);
 
-      const provider = new OpenStreetMapProvider();
-      const searchControl = new GeoSearchControl({
+      const provider = new EsriProvider();
+      let searchControl = new GeoSearchControl({
         provider: provider,
         showMarker: false
       });
@@ -1397,7 +1400,6 @@ aside.toolbox {
 }
 
 
-
 .legend i {
   width: 18px;
   height: 18px;
@@ -1405,6 +1407,7 @@ aside.toolbox {
   margin-right: 8px;
   opacity: 0.5;
 }
+
 
 
 
