@@ -86,6 +86,47 @@ export class Industry{
                 "wwt_bod_slud": {question: "COD removed as sludge", value: 0, unit: "kg", description_tooltip: "COD (organic component) removed from wastewater (in the form of sludge) in aerobic treatment plant"},  //kg | COD removed as sludge    //Taula 6.6A
 
             },
+            "Wastewater treatment": {
+                "wwt_bod_infl": {question: "Influent COD load", value: 0, unit: "kg", description_tooltip: "COD load entering the WWTP during the assessment period. It can be estimated by multiplying the average COD concentration in the influent by the volume entering the plant. If this is done daily and summed over the duration of the assessment period the value will be most accurate"}, //kgCOD   //No te estimacio
+
+                "wwt_tn_infl": {question: "Total Nitrogen load in the influent", value: 0, unit: "kg", estimation_type: "equation"},  //kgN    Equacio 6.13
+
+                "wwt_P_infl": {question: "Influent P load", value: 0, unit: "kg"}, //kgP
+
+                "wwt_has_local_wwt_plant": {
+                    question: "Is water treated in a local wastewater plant?",
+                    value: 0,
+                    type: "option",
+                    items: Tables["Yes/No"]
+                }, //yes/no
+
+                "wwt_bod_effl": {
+                    question: "Effluent COD load",
+                    value: 0,
+                    unit: "kg",
+                    estimation_type: "option",
+                    items: Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"],
+                    estimation_based_on: "wwt_bod_infl",
+                    estimation_factor: "bod_effl",
+                    description: "bod_effl_table",
+                    description_tooltip: "COD load at the effluent of the WWTP during the assessment period. It can be estimated by multiplying the average COD concentration in the effluent by the effluent volume the plant. If this is done daily and summed over the duration of the assessment period the value will be most accurate",
+                    depends_on: "wwt_has_local_wwt_plant"
+                }, //kgBOD   Table 6.6B and 6.10C
+
+                /*
+                "wwt_tn_effl": {
+                    question: "Total Nitrogen load in the effluent",
+                    value: 0,
+                    unit: "kg",
+                    estimation_type: "option",
+                    items: Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"],
+                    estimation_based_on: "wwt_tn_infl",
+                    estimation_factor: "N_effl",
+                    description: "N_effl_table"
+                },  //kgN   TAULA 6.10c*/
+
+
+            },
 
             "Treatment characteristics": {
                 //emission factors (treatment)
@@ -134,33 +175,6 @@ export class Industry{
                     description: "description"
                 },  //kgN2O-N/kgN  //tAULA 6.8A
 
-            },
-            "Influent and effluent wastewater characteristics": {
-                //BOD (creates CH4)
-                "wwt_bod_infl": {question: "Influent COD load", value: 0, unit: "kg", description_tooltip: "COD load entering the WWTP during the assessment period. It can be estimated by multiplying the average COD concentration in the influent by the volume entering the plant. If this is done daily and summed over the duration of the assessment period the value will be most accurate"}, //kgCOD   //No te estimacio
-                "wwt_bod_effl": {
-                    question: "Effluent COD load",
-                    value: 0,
-                    unit: "kg",
-                    estimation_type: "option",
-                    items: Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"],
-                    estimation_based_on: "wwt_bod_infl",
-                    estimation_factor: "bod_effl",
-                    description: "bod_effl_table",
-                    description_tooltip: "COD load at the effluent of the WWTP during the assessment period. It can be estimated by multiplying the average COD concentration in the effluent by the effluent volume the plant. If this is done daily and summed over the duration of the assessment period the value will be most accurate"
-                }, //kgBOD   Table 6.6B and 6.10C
-                //TN (creates N2O)
-                "wwt_tn_infl": {question: "Total Nitrogen load in the influent", value: 0, unit: "kg", estimation_type: "equation"},  //kgN    Equacio 6.13
-                "wwt_tn_effl": {
-                    question: "Total Nitrogen load in the effluent",
-                    value: 0,
-                    unit: "kg",
-                    estimation_type: "option",
-                    items: Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"],
-                    estimation_based_on: "wwt_tn_infl",
-                    estimation_factor: "N_effl",
-                    description: "N_effl_table"
-                },  //kgN   TAULA 6.10c
             },
 
             "Fuel engines" :{
@@ -500,6 +514,9 @@ export class Industry{
         for(let items of Object.values(Industry.info_inputs())){
             for(let [clau, valor] of Object.entries(items)){
                 _this[clau] = valor.value
+
+                if(clau === "wwt_has_local_wwt_plant") console.log(valor.value)
+
             }
         }
     }

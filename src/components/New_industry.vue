@@ -18,7 +18,7 @@
               :key="key"
           >
             <div>
-              <v-row style="background-color: #F2F4F3" align="center">
+              <v-row style="background-color: #F2F4F3" align="center" v-if="!value.depends_on || (industry[value.depends_on] === 1)">
                 <v-col cols="8" >
                   <div style="width: 100%;">
                     <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
@@ -85,7 +85,7 @@
                   <div>
                     <div v-if="value.type === 'option'">
                       <v-select
-                          v-model="value.value"
+                          v-model="industry[key]"
                           :items="value.items"
                           item-text="text"
                           item-value="value"
