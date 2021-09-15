@@ -39,8 +39,49 @@ Vue.prototype.$layers_description = [
     name: "Water quantity",
     children: [
       {
-        name: "Water available",
+        name: "Water availability",
         children: [
+          {
+            name: "Water variability ",
+            children: [
+              {
+                name: "Seasonal variability",
+                layer: {
+                  layers: {
+                    baseline: {
+                      annual: {
+                        layer: null
+                      },
+                      monthly: []
+                    },
+                    future: {
+                      layer: null
+                    },
+                  },
+                  monthly: false,
+                  future: true,
+                }
+              },
+              {
+                name: "Interannual variability",
+                layer: {
+                  layers: {
+                    baseline: {
+                      annual: {
+                        layer: null
+                      },
+                      monthly: []
+                    },
+                    future: {
+                      layer: null
+                    },
+                  },
+                  monthly: true,
+                  future: false,
+                }
+              },
+            ]
+          },
           {
             name: "Water supply",
             layer: {
@@ -60,7 +101,7 @@ Vue.prototype.$layers_description = [
             },
           },
           {
-            name: "RUN-OFF",
+            name: "Specific discharge",
             layer: {
               layers: {
                 baseline: {
@@ -100,28 +141,10 @@ Vue.prototype.$layers_description = [
               future: true,
             }
           },
-          {
-            name: "Aridity index",
-            layer: {
-              layers: {
-                baseline: {
-                  annual: {
-                    layer: null
-                  },
-                  monthly: []
-                },
-                future: {
-                  layer: null
-                },
-              },
-              monthly: false,
-              future: false,
-            }
-          },
         ]
       },
       {
-        name: "Water available/withdrawals ratios",
+        name: "Water scarcity ratios",
         children: [
           {
             name: "Water stress",
@@ -159,13 +182,8 @@ Vue.prototype.$layers_description = [
               future: false,
             },
           },
-        ]
-      },
-      {
-        name: "Water variability ",
-        children: [
           {
-            name: "Seasonal variability",
+            name: "Aridity index",
             layer: {
               layers: {
                 baseline: {
@@ -179,24 +197,6 @@ Vue.prototype.$layers_description = [
                 },
               },
               monthly: false,
-              future: true,
-            }
-          },
-          {
-            name: "Interannual variability",
-            layer: {
-              layers: {
-                baseline: {
-                  annual: {
-                    layer: null
-                  },
-                  monthly: []
-                },
-                future: {
-                  layer: null
-                },
-              },
-              monthly: true,
               future: false,
             }
           },
