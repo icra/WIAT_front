@@ -134,7 +134,7 @@ export default {
 
                 //headerRows: 2,
                 // keepWithHeaderRows: 1,
-                widths: ['*','*', '*'],
+                widths: ['*','*','*'],
                 body: [
                   [{},{text: 'Baseline', style: 'tableHeader'},{text: 'Future', style: 'tableHeader'}],
                 ]

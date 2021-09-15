@@ -86,6 +86,8 @@
         <!-- <div style = "overflow-y: auto; height: 75%; max-height: 75%; width: 100%"> -->
         <div style="flex: 2; overflow-y: auto; width: 100%; position: relative; height: 100%" >
 
+
+
           <v-expansion-panels focusable v-model="assessment_expansion_panel">
             <v-expansion-panel
                 v-for="(assessment, assessment_index ) in created_assessments"
@@ -113,31 +115,38 @@
 
                 </template>
               </v-expansion-panel-header>
-              <v-expansion-panel-content>
+              <v-expansion-panel-content v-if="created_assessments[assessment_index].industries.length > 0" >
+
                 <div
                     v-for="(industry,industry_index ) in created_assessments[assessment_index].industries"
                     :key="industry.name"
-                    style="display: flex; align-items: flex-end"
+                    style="width: 100%;"
+                    @click = "open_edit_industry_tab(assessment_index, industry_index)"
+
                 >
-                  <div>
-                    {{industry.name}}
-                  </div>
-                  <div style="flex-grow: 1; display: block;">
-                    <v-hover v-slot:default="{ hover }">
-                      <v-icon
-                          @click = "open_edit_industry_tab(assessment_index, industry_index)"
-                          style="float: right; margin-right: 3px"
-                          :color="hover ? '#463FCA' : '#1C195B'"
-                          size="18px"
-                      >
-                        mdi-circle-edit-outline
-                      </v-icon>
-                    </v-hover>
-                  </div>
+                  <v-hover v-slot:default="{ hover }">
+                    <div style="padding: 7px 26px 7px 35px; display: flex; align-items: flex-end; width: 100%;" :class="{ 'hover_industry': hover }">
+                      <div >
+                        {{industry.name}}
+                      </div>
+                      <div style="flex-grow: 1; display: block;">
+                        <v-icon
+                            style="float: right; margin-right: 3px; padding-bottom: 3px"
+                            color="#1C195B"
+                            size="18px"
+                        >
+                          mdi-circle-edit-outline
+                        </v-icon>
+                      </div>
+                    </div>
+                  </v-hover>
+
+
                 </div>
               </v-expansion-panel-content>
             </v-expansion-panel>
           </v-expansion-panels>
+
 
         </div>
         <div style="padding-bottom: 20px; min-width: 100px; margin-top: 10px">
@@ -340,6 +349,7 @@
                       dense
                       hoverable
                       selectable
+                      activatable
                       selection-type="leaf"
                       return-object
                       v-model="selected_layers"
@@ -348,17 +358,15 @@
                       selected-color="#1C195B"
                       clear-icon="mdi-close-circle-outline"
                       :search="search_layer_model"
+                      @update:active="layerTreeSelected"
                   >
                     <template v-slot:append="{ item }">
-                      <v-hover v-slot:default="{ hover }" style="margin-right: 10px">
-                        <v-icon v-if="selected_layer === item.name && item.layer" :color="hover ? '#463FCA' : '#1C195B'" @click="applyLayer(item.name)">
-                          mdi-layers-remove
-                        </v-icon>
-                        <v-icon v-else-if="item.layer" :color="hover ? '#463FCA' : '#1C195B'" @click="applyLayer(item.name)">
-                          mdi-layers-plus
-                        </v-icon>
-
-                      </v-hover>
+                      <v-icon v-if="selected_layer === item.name && item.layer" color='#1C195B'>
+                        mdi-layers-remove
+                      </v-icon>
+                      <v-icon v-else-if="item.layer" color='#1C195B'>
+                        mdi-layers-plus
+                      </v-icon>
 
                     </template>
                   </v-treeview>
@@ -450,6 +458,27 @@ export default {
   },
 
   methods: {
+    assessmentTreeSelected(nodeAssessment){
+
+      console.log('sadfasdf')
+
+      if(nodeAssessment.length > 0){ //Node selected
+        if(nodeAssessment[0].hasOwnProperty("children")){  //Assessment selected
+          this.assessment_expansion_panel = nodeAssessment[0].idx
+        }
+      }else{  //Node unselected
+        console.log('asdfsdaf')
+        this.assessment_expansion_panel = undefined
+      }
+
+    },
+
+    layerTreeSelected(nodeLayer){
+      if(nodeLayer.length > 0) this.applyLayer(nodeLayer[0].name)
+      else this.applyLayer(this.selected_layer)
+
+    },
+
     add_identifier: function (category, id){
       let _this = this
       category.id = id
@@ -633,6 +662,41 @@ export default {
   computed: {
 
 
+    assessment_tree: function () {
+
+      let _this = this
+      let items = []
+      let id = 1
+      let assessment_idx = 0
+      this.created_assessments.forEach(assessment => {
+        let obj = {
+          name: assessment.name,
+          id: id,
+          idx: assessment_idx,
+          children: []
+        }
+        id++
+        assessment_idx++
+
+        let industry_idx = 0
+        assessment.industries.forEach(industry => {
+          obj.children.push({
+            name: industry.name,
+            idx: industry_idx,
+            id: id,
+            locked: true
+          })
+        })
+        id++
+        industry_idx++
+        items.push(obj)
+      })
+
+      return items
+
+    },
+
+
     layer_tree: function () {
       let _this = this
       let id = 1
@@ -752,4 +816,16 @@ html::-webkit-scrollbar {
   background-color: #1C195B !important;
   border-color: #1C195B !important;
 }
+
+.v-expansion-panel-content__wrap {
+  padding: unset !important;
+  flex: 1 1 auto;
+  width: 100%;
+}
+
+.hover_industry{
+  background-color: #f0f2f1;
+  transition: 0.3s;
+}
+
 </style>

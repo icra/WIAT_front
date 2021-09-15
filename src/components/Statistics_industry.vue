@@ -10,11 +10,10 @@
         align-with-title
         fixed-tabs
         dark
-        background-color="indigo"
-
+        background-color="#1C195B"
 
     >
-      <v-tabs-slider color="yellow"></v-tabs-slider>
+      <v-tabs-slider color="#463FCA"></v-tabs-slider>
 
       <v-tab
           v-for="item in tab_item"

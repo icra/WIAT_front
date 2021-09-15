@@ -113,7 +113,7 @@ export class Industry{
                     depends_on: "wwt_has_local_wwt_plant"
                 }, //kgBOD   Table 6.6B and 6.10C
 
-                /*
+
                 "wwt_tn_effl": {
                     question: "Total Nitrogen load in the effluent",
                     value: 0,
@@ -123,7 +123,7 @@ export class Industry{
                     estimation_based_on: "wwt_tn_infl",
                     estimation_factor: "N_effl",
                     description: "N_effl_table"
-                },  //kgN   TAULA 6.10c*/
+                },  //kgN   TAULA 6.10c
 
 
             },

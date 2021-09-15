@@ -16,24 +16,28 @@ Vue.prototype.$selected_layer = "None"
 
 
 Vue.prototype.$layers_description = [
-
   {
     name: "Population",
-    layer: {
-      layers: {
-        baseline: {
-          annual: {
-            layer: null
+    children: [
+      {
+        name: "Population",
+        layer: {
+          layers: {
+            baseline: {
+              annual: {
+                layer: null
+              },
+              monthly: []
+            },
+            future: {
+              layer: null
+            },
           },
-          monthly: []
-        },
-        future: {
-          layer: null
+          monthly: false,
+          future: true
         },
       },
-      monthly: false,
-      future: true
-    },
+    ]
   },
   {
     name: "Water quantity",
@@ -121,7 +125,7 @@ Vue.prototype.$layers_description = [
         ]
       },
       {
-        name: "Aridity index water demand",
+        name: "water demand",
         children: [
           {
             name: "Water demand",
