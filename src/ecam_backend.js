@@ -8,6 +8,12 @@
 //sum array of numbers
 Array.prototype.sum=function(){return this.reduce((p,c)=>(p+c),0)};
 
+function daysBetween(date1String, date2String){
+    let d1 = new Date(date1String);
+    let d2 = new Date(date2String);
+    return (d2-d1)/(1000*3600*24);
+}
+
 /*
   ASSESSMENT: main class
 */
@@ -16,8 +22,8 @@ export class Assessment{
         this.name="new assessment";
 
         //assessment period
-        this.assessment_period_start = new Date();
-        this.assessment_period_end   = new Date();
+        this.assessment_period_start = (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)
+        this.assessment_period_end   = new Date(new Date().setFullYear((new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).getFullYear() + 1)).toISOString().substr(0, 10)
 
         //array for "Industry" objects
         this.industries=[];
@@ -528,7 +534,7 @@ export class Industry{
     //emissions with description
     emissions_and_descriptions(){
         return [
-            {description: "Indirect emissions from electricity consumption", emissions: this.wwt_KPI_GHG_elec()},
+            {description: "Indirect emissions from electricity consumption", emissions: this.wwt_KPI_GHG_elec()*global.assessment},
             {description: "Emissions from fuel engines", emissions: this.wwt_KPI_GHG_fuel()},
             {description: "Emissions from biogas (fuel used in digester)", emissions: this.wwt_KPI_GHG_biog_dig()},
             {description: "Emissions from treatment", emissions: this.wwt_KPI_GHG_tre()},

@@ -152,7 +152,7 @@
         <div style="padding-bottom: 20px; min-width: 100px; margin-top: 10px">
           <v-btn
               style="width: 100%; "
-              @click="rightMenu = true; right_sidebar_content = 1; assessment_name = null"
+              @click="open_create_assessment_tab"
               small outlined block>
             Create assessment
           </v-btn>
@@ -193,6 +193,52 @@
                 label="Assessment name"
                 :rules="[new_assessment_rules_name, rules_required]"
             ></v-text-field>
+
+
+
+            <v-menu
+                v-model="start_date_modal"
+                :close-on-content-click="false"
+                transition="scale-transition"
+                offset-y
+                min-width="auto"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                    v-model="start_date_model_assessment"
+                    label="Beginning of assessment period"
+                    readonly
+                    v-bind="attrs"
+                    v-on="on"
+                ></v-text-field>
+              </template>
+              <v-date-picker
+                  v-model="start_date_model_assessment"
+                  @input="start_date_modal = false"
+              ></v-date-picker>
+            </v-menu>
+            <v-menu
+                v-model="end_date_modal"
+                :close-on-content-click="false"
+                transition="scale-transition"
+                offset-y
+                min-width="auto"
+            >
+              <template v-slot:activator="{ on, attrs }">
+                <v-text-field
+                    v-model="end_date_model_assessment"
+                    label="End of assessment period"
+                    readonly
+                    v-bind="attrs"
+                    v-on="on"
+                    :rules="[assessment_date_rules]"
+                ></v-text-field>
+              </template>
+              <v-date-picker
+                  v-model="end_date_model_assessment"
+                  @input="end_date_modal = false"
+              ></v-date-picker>
+            </v-menu>
             <v-btn
                 :disabled="!new_assessment_valid"
                 @click="create_assessment"
@@ -214,8 +260,53 @@
               <v-text-field
                   v-model="assessment_name"
                   :rules="[edit_assessment_rules, rules_required]"
-
               ></v-text-field>
+
+              <v-menu
+                  v-model="start_date_modal"
+                  :close-on-content-click="false"
+                  transition="scale-transition"
+                  offset-y
+                  min-width="auto"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field
+                      v-model="start_date_model_assessment"
+                      label="Beginning of assessment period"
+                      readonly
+                      v-bind="attrs"
+                      v-on="on"
+                  ></v-text-field>
+                </template>
+                <v-date-picker
+                    v-model="start_date_model_assessment"
+                    @input="start_date_modal = false"
+                ></v-date-picker>
+              </v-menu>
+              <v-menu
+                  v-model="end_date_modal"
+                  :close-on-content-click="false"
+                  transition="scale-transition"
+                  offset-y
+                  min-width="auto"
+              >
+                <template v-slot:activator="{ on, attrs }">
+                  <v-text-field
+                      v-model="end_date_model_assessment"
+                      label="End of assessment period"
+                      readonly
+                      v-bind="attrs"
+                      v-on="on"
+                      :rules="[assessment_date_rules]"
+                  ></v-text-field>
+                </template>
+                <v-date-picker
+                    v-model="end_date_model_assessment"
+                    @input="end_date_modal = false"
+                ></v-date-picker>
+              </v-menu>
+
+
               <v-btn
                   :disabled="!new_assessment_valid"
                   @click="edit_assessment"
@@ -381,7 +472,7 @@
           <div style="padding-bottom: 20px; min-width: 100px; margin-top: 10px">
             <v-btn
                 style="width: 100%; "
-                @click="rightMenu = true; right_sidebar_content = 1; assessment_name = null"
+                @click="open_create_assessment_tab"
                 small outlined block>
               Create assessment
             </v-btn>
@@ -454,13 +545,16 @@ export default {
       layers_description: this.$layers_description,
       search_layer_model: "",
       selected_layers: [], //layers included in the report
+      start_date_model_assessment: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
+      start_date_modal: false,
+      end_date_model_assessment: new Date(new Date().setFullYear((new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).getFullYear() + 1)).toISOString().substr(0, 10),
+      end_date_modal: false
+
     }
   },
 
   methods: {
-    assessmentTreeSelected(nodeAssessment){
-
-      console.log('sadfasdf')
+    /*assessmentTreeSelected(nodeAssessment){
 
       if(nodeAssessment.length > 0){ //Node selected
         if(nodeAssessment[0].hasOwnProperty("children")){  //Assessment selected
@@ -471,9 +565,10 @@ export default {
         this.assessment_expansion_panel = undefined
       }
 
-    },
+    },*/
 
     layerTreeSelected(nodeLayer){
+
       if(nodeLayer.length > 0) this.applyLayer(nodeLayer[0].name)
       else this.applyLayer(this.selected_layer)
 
@@ -539,21 +634,44 @@ export default {
     create_assessment() {
       let new_assessment = new Assessment()
       new_assessment.name = this.assessment_name
+
+      new_assessment.assessment_period_start = this.start_date_model_assessment
+      new_assessment.assessment_period_end   = this.end_date_model_assessment
+      this.start_date_model_assessment = (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)
+      this.end_date_model_assessment   = new Date(new Date().setFullYear((new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).getFullYear() + 1)).toISOString().substr(0, 10)
+      this.assessment_name = null
+
       this.$assessments.push(new_assessment)
       this.rightMenu = !this.rightMenu
-      this.assessment_name = null
       this.snackbars.new_assessment.v_model = true
       this.assessment_active.push(true)
+
+    },
+    open_create_assessment_tab(){
+      this.rightMenu = true;
+      this.right_sidebar_content = 1;
+      this.assessment_name = null
+      this.start_date_model_assessment = (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)
+      this.end_date_model_assessment   = new Date(new Date().setFullYear((new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).getFullYear() + 1)).toISOString().substr(0, 10)
+
     },
     open_edit_assessment_tab(assessment_index){
       this.rightMenu = true;
       this.right_sidebar_content = 2;
       this.selected_assessment = assessment_index
       this.assessment_name = this.created_assessments[assessment_index].name
+      this.start_date_model_assessment = this.created_assessments[assessment_index].assessment_period_start
+      this.end_date_model_assessment = this.created_assessments[assessment_index].assessment_period_end
     },
     edit_assessment(){
       this.rightMenu = false
       this.$assessments[this.selected_assessment].name = this.assessment_name
+      this.$assessments[this.selected_assessment].assessment_period_start = this.start_date_model_assessment
+      this.$assessments[this.selected_assessment].assessment_period_end   = this.end_date_model_assessment
+      this.start_date_model_assessment = (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)
+      this.end_date_model_assessment   = new Date(new Date().setFullYear((new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).getFullYear() + 1)).toISOString().substr(0, 10)
+      this.assessment_name = null
+
       this.snackbars.edit_assessment.v_model = true
     },
     delete_assessment(){
@@ -657,6 +775,10 @@ export default {
           }
         }
       }
+    },
+    assessment_date_rules(finish_date){
+      if(finish_date>this.start_date_model_assessment) return true
+      else return "End date is after beginning date"
     }
   },
   computed: {
