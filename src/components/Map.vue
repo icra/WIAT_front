@@ -61,6 +61,28 @@
 
 
     </aside>
+
+    <v-dialog
+        v-model="dialog"
+        max-width="290"
+    >
+      <v-card>
+        <v-card-title class="text-h5">
+          Use Google's location service?
+        </v-card-title>
+
+        <v-card-text>
+          Let Google help apps determine location. This means sending anonymous location data to Google, even when no apps are running.
+        </v-card-text>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+
   </div>
 
 
@@ -73,6 +95,8 @@ import { Icon } from "leaflet";
 import { GeoSearchControl, EsriProvider } from 'leaflet-geosearch';
 import 'leaflet-geosearch/dist/geosearch.css';
 import carto from '@carto/carto.js'
+import "leaflet-easybutton"
+import "leaflet-easybutton/src/easy-button.css"
 
 
 
@@ -187,7 +211,8 @@ export default {
       months_model: 0,
       current_carto_client: null,
       popup_info: null,
-      html_legend: ""
+      html_legend: "",
+      dialog:false
 
     };
   },
@@ -546,6 +571,7 @@ export default {
 
       this.mapDiv.on('click', onMapClick);
 
+      /*
       const provider = new EsriProvider();
       let searchControl = new GeoSearchControl({
         provider: provider,
@@ -554,7 +580,11 @@ export default {
       this.mapDiv.addControl(searchControl);
 
 
-      this.mapDiv.on('geosearch/showlocation', onMapClick);
+      this.mapDiv.on('geosearch/showlocation', onMapClick);*/
+      L.easyButton('<img src="/path/to/img/of/penguin.png">', function(btn, map){
+        console.log('cacac')
+        _this.dialog = true
+      }).addTo( this.mapDiv );
 
 
       /*
