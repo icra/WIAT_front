@@ -8,9 +8,16 @@ let utils = {
         return color
     },
 
+    daysBetween(date1String, date2String){
+        let d1 = new Date(date1String);
+        let d2 = new Date(date2String);
+        return (d2-d1)/(1000*3600*24);
+    },
 
 
-    //FUNCTIONS FOR GETTING AND CHANGE FORMAT OF DATA LAYER
+
+
+//FUNCTIONS FOR GETTING AND CHANGE FORMAT OF DATA LAYER
     format_layer_description(categories){
         let _this = this
         let object_to_return = {}

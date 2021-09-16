@@ -164,7 +164,7 @@
       <!-- Main content -->
     <div style="position: absolute; height: 100%; width: 100%">
       <div class="content" :class="manageContentClass">
-        <router-view :selected_layers="selected_layers" :selected_assessment="assessment_expansion_panel" :selected_layer="selected_layer" @createIndustry="createNewIndustry" @editIndustry="open_edit_industry_tab" @selectLayer="toggleLayerSelection" @closeLayer="applyLayer(selected_layer)" ref="reference"></router-view>
+        <router-view :selected_layers="selected_layers" :selected_assessment="assessment_expansion_panel" :selected_layer="selected_layer" @createIndustry="createNewIndustry" @editIndustry="open_edit_industry_tab" @selectLayer="toggleLayerSelection" @closeRightMenu="closeRightMenu" @closeLayer="applyLayer(selected_layer)" ref="reference"></router-view>
       </div>
     </div>
 
@@ -621,6 +621,12 @@ export default {
         this.rightMenu = true
       }
     },
+
+    closeRightMenu(){ //Open or close layer selection menu
+      this.rightMenu = false
+    },
+
+
     createNewIndustry(latlng){  //Function called from Map component
       if(this.assessment_expansion_panel === undefined){
         this.snackbars.assessment_not_selected.v_model = true
@@ -637,6 +643,7 @@ export default {
 
       new_assessment.assessment_period_start = this.start_date_model_assessment
       new_assessment.assessment_period_end   = this.end_date_model_assessment
+
       this.start_date_model_assessment = (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10)
       this.end_date_model_assessment   = new Date(new Date().setFullYear((new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).getFullYear() + 1)).toISOString().substr(0, 10)
       this.assessment_name = null
@@ -705,6 +712,7 @@ export default {
       }
       this.rightMenu = false
       this.factory_name = null
+
     },
     open_edit_industry_tab(assessment_index, industry_index){
       this.right_sidebar_content = 3

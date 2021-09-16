@@ -2,7 +2,7 @@
   <div class="outer">
     <h1>Load and save file</h1>
     <v-row class="mt-3">
-      <v-col class="load_and_save ma-2" cols="6">
+      <v-col class="load_and_save ma-2" cols="12">
 
         <v-row>
           <v-col>
@@ -69,7 +69,7 @@
 
 
       </v-col>
-      <v-col class="load_and_save ma-2 flex" cols="5">
+      <v-col class="load_and_save ma-2 flex" cols="12">
         <v-input>
           <div  class="flex">
             <v-text-field
@@ -244,6 +244,8 @@ export default {
     async onUpload(){
       let _this = this
       try {
+
+        this.$emit('closeRightMenu');
 
         if(_this.option_for_import === 'replace'){
           await this.import_replace()

@@ -74,7 +74,7 @@ export class Industry{
                 "wwt_vol_disc" :{question:"Volume of discharged effluent to water body", value: 0},*/
 
 
-                "wwt_ind_prod": {question: "Total industrial product", value: 0, unit: "t/yr"},  //t/yer | Total industrial product
+                "wwt_ind_prod": {question: "Total industrial product", value: 0, unit: "t"},  //t/ | Total industrial product
                 "wwt_wwt_generated": {question: "Wastewater generated for industrial sector", value: 0, unit: "m3/t"},  //m3/t | Wastewater generated
                 "wwt_tot_nit": {question: "Total nitrogen in untreated wastewater", value: 0, unit: "kgTN/m3"},  //kgTN/m3 | Total nitrogen in untreated wastewater
 
@@ -116,7 +116,7 @@ export class Industry{
                     estimation_factor: "bod_effl",
                     description: "bod_effl_table",
                     description_tooltip: "COD load at the effluent of the WWTP during the assessment period. It can be estimated by multiplying the average COD concentration in the effluent by the effluent volume the plant. If this is done daily and summed over the duration of the assessment period the value will be most accurate",
-                    depends_on: "wwt_has_local_wwt_plant"
+                    //depends_on: "wwt_has_local_wwt_plant"
                 }, //kgBOD   Table 6.6B and 6.10C
 
 
@@ -520,9 +520,6 @@ export class Industry{
         for(let items of Object.values(Industry.info_inputs())){
             for(let [clau, valor] of Object.entries(items)){
                 _this[clau] = valor.value
-
-                if(clau === "wwt_has_local_wwt_plant") console.log(valor.value)
-
             }
         }
     }
@@ -534,7 +531,7 @@ export class Industry{
     //emissions with description
     emissions_and_descriptions(){
         return [
-            {description: "Indirect emissions from electricity consumption", emissions: this.wwt_KPI_GHG_elec()*global.assessment},
+            {description: "Indirect emissions from electricity consumption", emissions: this.wwt_KPI_GHG_elec()},
             {description: "Emissions from fuel engines", emissions: this.wwt_KPI_GHG_fuel()},
             {description: "Emissions from biogas (fuel used in digester)", emissions: this.wwt_KPI_GHG_biog_dig()},
             {description: "Emissions from treatment", emissions: this.wwt_KPI_GHG_tre()},

@@ -82,10 +82,10 @@ export default {
           value: 'emission',
         },
 
-        { text: 'Total GHG emission / year', value: 'total GHG emission' },
-        { text: 'CO2 emission / year', value: 'CO2 emission' },
-        { text: 'CH4 emission / year', value: 'CH4 emission' },
-        { text: 'N2O emission / year', value: 'N2O emission' },
+        { text: 'Total GHG emission', value: 'total GHG emission' },
+        { text: 'CO2 emission', value: 'CO2 emission' },
+        { text: 'CH4 emission', value: 'CH4 emission' },
+        { text: 'N2O emission', value: 'N2O emission' },
 
       ],
       waterQualityHeader: [

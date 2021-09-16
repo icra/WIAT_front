@@ -102,15 +102,23 @@ export default {
         }
       }
 
+      console.log(this.selected_industries)
+
       const groupedByAssessments = _.groupBy(this.selected_industries, function(n) {
-        return n["assessment name"];
+        return n.assessment.name;
       });
 
-      for(const [assessment, industries] of Object.entries(groupedByAssessments)){
+
+      for(const [assessment_name, industries] of Object.entries(groupedByAssessments)){
         dd.content.push({
-          text: "Assessment "+assessment+"\n\n",
+          text: "Assessment "+assessment_name+"\n\n",
           style: 'header'
         })
+
+        let assessment = industries[0].assessment
+
+        dd.content.push("Assessment period: "+ assessment.assessment_period_start + " to "+ assessment.assessment_period_end + " ("+ utils.daysBetween(assessment.assessment_period_start, assessment.assessment_period_end) +" days)\n\n")
+
         for(const industryAux of industries){
 
           let industry = industryAux.industry
@@ -167,7 +175,7 @@ export default {
             table: {
               widths: ['*','*','*','*','*'],
               body: [
-                [{text: 'Emission', style: 'tableHeader'},{text: 'Total GHG Emission / year', style: 'tableHeader'},{text: 'CO2 emission / year', style: 'tableHeader'},{text: 'CH4 emission / year', style: 'tableHeader'},{text: 'N20 emission / year', style: 'tableHeader'}],
+                [{text: 'Emission', style: 'tableHeader'},{text: 'Total GHG Emission', style: 'tableHeader'},{text: 'CO2 emission', style: 'tableHeader'},{text: 'CH4 emission', style: 'tableHeader'},{text: 'N20 emission', style: 'tableHeader'}],
               ]
             }
           }
@@ -274,7 +282,7 @@ export default {
           obj["children"].push({
             "industry":  industry,
             "id": id,
-            "assessment name": assessment.name,
+            "assessment": assessment,
             "name": industry.name
           })
           id++
