@@ -64,12 +64,12 @@
 
     <v-dialog
         v-model="dialog"
-        max-width="500"
+        max-width="540"
     >
       <v-container
         style="background-color: white"
       >
-        <b>Search a location by address, decimal degrees or coordinates:</b>
+        <b>Search a location by address, decimal degrees or in DMS (degrees, minutes and seconds) :</b>
         <v-radio-group v-model="searchAddressModel" row>
           <v-radio
               label="Address"
@@ -84,7 +84,7 @@
               @click="latitudeModel=null; longitudeModel=null"
           ></v-radio>
           <v-radio
-              label="Coordinates"
+              label="Degrees Minutes Seconds"
               value="coordinates"
               color="#1C195B"
           ></v-radio>
@@ -103,11 +103,12 @@
               item-value="label"
               placeholder="Start typing to search"
               return-object
+              clearable
           ></v-autocomplete>
         </div>
         <div v-else-if="searchAddressModel === 'decimal_degrees'">
           <v-form
-            v-model="coords_valid"
+            v-model="decimal_degrees_valid"
           >
             <v-row>
               <v-col
@@ -129,13 +130,12 @@
                     :rules="longitudeRules"
                     label="Longitude"
                     required
-                    value="number"
                     type="number"
                 ></v-text-field>
               </v-col>
             </v-row>
             <v-btn
-                :disabled="!coords_valid"
+                :disabled="!decimal_degrees_valid"
                 small
                 outlined
                 block
@@ -143,8 +143,103 @@
             >
               SEARCH
             </v-btn>
-
           </v-form>
+        </div>
+        <div v-else-if="searchAddressModel === 'coordinates'">
+          <v-form
+            v-model="coordinates_valid"
+          >
+            <v-row><b style="margin-top: 15px; margin-left: 12px; margin-bottom: -15px">Latitude:</b></v-row>
+            <v-row>
+              <v-col cols="3">
+                <v-text-field
+                    v-model="latitude_degree"
+                    :rules="degree_rules"
+                    label="Degrees"
+                    required
+                    type="number"
+                    append-icon="º"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="3">
+                <v-text-field
+                    v-model="latitude_minutes"
+                    :rules="minutes_rules"
+                    label="Minutes"
+                    required
+                    type="number"
+                    append-icon="'"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="3">
+                <v-text-field
+                    v-model="latitude_seconds"
+                    :rules="secondsRules"
+                    label="Seconds"
+                    required
+                    type="number"
+                    append-icon='"'
+                ></v-text-field>
+              </v-col>
+              <v-col cols="3">
+                <v-select
+                    :items=latitude_direction
+                    label="Direction"
+                    v-model="north_south_model"
+                ></v-select>
+              </v-col>
+            </v-row>
+            <v-row><b style="margin-top: 15px; margin-left: 12px; margin-bottom: -15px">Longitude:</b></v-row>
+            <v-row>
+              <v-col cols="3">
+                <v-text-field
+                    v-model="longitude_degrees"
+                    :rules="degree_rules"
+                    label="Degrees"
+                    required
+                    type="number"
+                    append-icon="º"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="3">
+                <v-text-field
+                    v-model="longitude_minutes"
+                    :rules="minutes_rules"
+                    label="Minutes"
+                    required
+                    type="number"
+                    append-icon="'"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="3">
+                <v-text-field
+                    v-model="longitude_seconds"
+                    :rules="secondsRules"
+                    label="Seconds"
+                    required
+                    type="number"
+                    append-icon='"'
+                ></v-text-field>
+              </v-col>
+              <v-col cols="3">
+                <v-select
+                    :items=longitude_direction
+                    label="Direction"
+                    v-model="east_west_model"
+                ></v-select>
+              </v-col>
+            </v-row>
+          </v-form>
+
+          <v-btn
+              :disabled="!coordinates_valid"
+              small
+              outlined
+              block
+              @click="searchCoordinates"
+          >
+            SEARCH
+          </v-btn>
         </div>
       </v-container>
 
@@ -170,7 +265,6 @@ import "leaflet-easybutton"
 import "leaflet-easybutton/src/easy-button.css"
 
 
-
 delete Icon.Default.prototype._getIconUrl;
 Icon.Default.mergeOptions({
   iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
@@ -192,7 +286,7 @@ import utils from "../utils"
 export default {
   name: "Map",
   components: {
-    L
+    L,
   },
   props: ["selected_layer", "selected_assessment"],
   data() {
@@ -291,29 +385,57 @@ export default {
       latitudeModel: null,
       latitudeRules: [
         v => !!v || 'Latitude is required',
-        v => (v>=-90 && v<=90) || "Latitude should be greater than -90 and lower than 90",
+        v => (v>=-90 && v<=90) || "Latitude should be >= -90 and <= 90",
       ],
       longitudeModel: null,
       longitudeRules: [
         v => !!v || 'Longitude is required',
-        v => (v>=-180 && v<=180) || "Longitude should be greater than -180 and lower than 180",
+        v => (v>=-180 && v<=180) || "Longitude should be >= -180 and <= 180",
       ],
-      coords_valid: true
+      decimal_degrees_valid: true,
+      latitude_degree: null,
+      degree_rules: [
+        v => !!v || 'Degrees are required',
+        v => (v>=0 && v<=59) || "Degrees should be >= 0 and <= 59",
+        v => (utils.is_Natural(parseFloat(v))) || "Degrees should be a natural value"
 
+      ],
+      latitude_minutes: null,
+      minutes_rules: [
+        v => !!v || 'Minutes are required',
+        v => (v>=0 && v<=59) || "Minutes should be >= 0 and <= 59",
+        v => (utils.is_Natural(parseFloat(v))) || "Minutes should be a natural value"
+      ],
+      latitude_seconds: null,
+      secondsRules: [
+        v => !!v || 'Seconds are required',
+        v => (v>=0 && v<60) || "Seconds should be >= 0 and < 60",
+      ],
+      latitude_direction: ["North", "South"],
+      north_south_model: "North",
 
+      longitude_degrees: null,
+      longitude_minutes: null,
+      longitude_seconds: null,
+      longitude_direction: ["East", "West"],
+      east_west_model: "East",
+      coordinates_valid: false
 
-  };
+    };
   },
-  created() {
 
-  },
   watch: {
 
     address_model: function(address) {
       if(address !== null){
         this.onMapClick({latlng: address.latlng})
         this.dialog = false
+        this.$nextTick(() => {
+          this.address_model = null
+          this.searchAddress = null
+        });
       }
+
     },
 
     searchAddress: function (address) {
@@ -415,6 +537,35 @@ export default {
       });
     },
 
+    searchCoordinates(){
+
+      let lat_decimal = Number.parseFloat(this.latitude_degree) + Number.parseFloat(this.latitude_minutes)/60 + Number.parseFloat(this.latitude_seconds)/3600
+      let lng_decimal = Number.parseFloat(this.longitude_degrees) + Number.parseFloat(this.longitude_minutes)/60 + Number.parseFloat(this.longitude_seconds)/3600
+
+      if(this.east_west_model === "West") lng_decimal = -1*lng_decimal
+      if(this.north_south_model === "South") lat_decimal = -1*lat_decimal
+
+
+      let e = {
+        latlng: {
+          lat: lat_decimal,
+          lng: lng_decimal
+        }
+      }
+
+      this.onMapClick(e)
+
+      this.latitude_degree= null
+      this.latitude_minutes= null
+      this.latitude_seconds= null
+      this.north_south_model= "North"
+      this.longitude_degrees= null
+      this.longitude_minutes= null
+      this.longitude_seconds= null
+      this.east_west_model= "East"
+      this.dialog = false
+
+    },
 
     searchDecimalsDegrees(){
       let _this = this
@@ -704,21 +855,16 @@ export default {
 
       this.mapDiv.on('click', this.onMapClick);
 
-      /*
-      const provider = new EsriProvider();
-      let searchControl = new GeoSearchControl({
-        provider: provider,
-        showMarker: false
-      });
-      this.mapDiv.addControl(searchControl);
 
+      /*L.easyButton('<img src="https://www.vhv.rs/dpng/d/281-2813882_compass-icon-svg-hd-png-download.png" style="width:20px">', function(btn, map){
+        _this.searchAddressModel = "address"
+        _this.dialog = true
+      }).addTo( this.mapDiv );*/
 
-      this.mapDiv.on('geosearch/showlocation', onMapClick);*/
-      L.easyButton('<img src="https://www.vhv.rs/dpng/d/281-2813882_compass-icon-svg-hd-png-download.png" style="width:20px">', function(btn, map){
+      L.easyButton('<span compass_icon="star">&target;</span>', function(btn, map){
+        _this.searchAddressModel = "address"
         _this.dialog = true
       }).addTo( this.mapDiv );
-
-
       /*
       //Water stress
       let water_stress =
@@ -1594,7 +1740,7 @@ aside.toolbox {
   opacity: 0.5;
 }
 
-
+.leaflet-bar button { height: 30px !important; width: 30px !important; font-size: 2.9em;  color: #1976d2}
 
 
 
