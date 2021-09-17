@@ -64,22 +64,93 @@
 
     <v-dialog
         v-model="dialog"
-        max-width="290"
+        max-width="500"
     >
-      <v-card>
-        <v-card-title class="text-h5">
-          Use Google's location service?
-        </v-card-title>
+      <v-container
+        style="background-color: white"
+      >
+        <b>Search a location by address, decimal degrees or coordinates:</b>
+        <v-radio-group v-model="searchAddressModel" row>
+          <v-radio
+              label="Address"
+              value="address"
+              color="#1C195B"
+              @click="address_model = null"
+          ></v-radio>
+          <v-radio
+              label="Decimal degrees"
+              value="decimal_degrees"
+              color= "#1C195B"
+              @click="latitudeModel=null; longitudeModel=null"
+          ></v-radio>
+          <v-radio
+              label="Coordinates"
+              value="coordinates"
+              color="#1C195B"
+          ></v-radio>
+        </v-radio-group>
 
-        <v-card-text>
-          Let Google help apps determine location. This means sending anonymous location data to Google, even when no apps are running.
-        </v-card-text>
+        <div v-if="searchAddressModel === 'address'">
+          <v-autocomplete
+              v-model="address_model"
+              :items="address_suggestions"
+              label="Address"
+              :loading="isLoading"
+              :search-input.sync="searchAddress"
+              hide-no-data
+              hide-selected
+              item-text="label"
+              item-value="label"
+              placeholder="Start typing to search"
+              return-object
+          ></v-autocomplete>
+        </div>
+        <div v-else-if="searchAddressModel === 'decimal_degrees'">
+          <v-form
+            v-model="coords_valid"
+          >
+            <v-row>
+              <v-col
+                  cols="6"
+              >
+                <v-text-field
+                    v-model="latitudeModel"
+                    :rules="latitudeRules"
+                    label="Latitude"
+                    required
+                    type="number"
+                ></v-text-field>
+              </v-col>
 
-        <v-card-actions>
-          <v-spacer></v-spacer>
+              <v-col
+                  cols="6">
+                <v-text-field
+                    v-model="longitudeModel"
+                    :rules="longitudeRules"
+                    label="Longitude"
+                    required
+                    value="number"
+                    type="number"
+                ></v-text-field>
+              </v-col>
+            </v-row>
+            <v-btn
+                :disabled="!coords_valid"
+                small
+                outlined
+                block
+                @click="searchDecimalsDegrees"
+            >
+              SEARCH
+            </v-btn>
 
-        </v-card-actions>
-      </v-card>
+          </v-form>
+        </div>
+      </v-container>
+
+
+
+
     </v-dialog>
 
 
@@ -92,7 +163,7 @@
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { Icon } from "leaflet";
-import { GeoSearchControl, EsriProvider } from 'leaflet-geosearch';
+import { OpenStreetMapProvider } from 'leaflet-geosearch';
 import 'leaflet-geosearch/dist/geosearch.css';
 import carto from '@carto/carto.js'
 import "leaflet-easybutton"
@@ -109,9 +180,6 @@ Icon.Default.mergeOptions({
 
 import axios from "axios"
 import Vue from "vue";
-//import deplession_layer from "../layers/deplession_topo.json"
-//import stress_layer from "../layers/stress_topo.json"
-//import VectorTile from "leaflet.vectorgrid/dist/Leaflet.VectorGrid.js";
 
 let parse_georaster = require("georaster");
 let GeoRasterLayer = require("georaster-layer-for-leaflet");
@@ -212,14 +280,69 @@ export default {
       current_carto_client: null,
       popup_info: null,
       html_legend: "",
-      dialog:false
+      dialog:false,
+      searchAddressModel: "address",
+      address_model: null,
+      provider: new OpenStreetMapProvider(),
+      address_suggestions: [],
+      isLoading: false,
+      searchAddress: null,
 
-    };
+      latitudeModel: null,
+      latitudeRules: [
+        v => !!v || 'Latitude is required',
+        v => (v>=-90 && v<=90) || "Latitude should be greater than -90 and lower than 90",
+      ],
+      longitudeModel: null,
+      longitudeRules: [
+        v => !!v || 'Longitude is required',
+        v => (v>=-180 && v<=180) || "Longitude should be greater than -180 and lower than 180",
+      ],
+      coords_valid: true
+
+
+
+  };
   },
   created() {
 
   },
   watch: {
+
+    address_model: function(address) {
+      if(address !== null){
+        this.onMapClick({latlng: address.latlng})
+        this.dialog = false
+      }
+    },
+
+    searchAddress: function (address) {
+
+      //if (this.address_suggestions.length > 0) return
+      //if(this.isLoading) return
+
+      this.isLoading = true
+      //fetch("https://nominatim.openstreetmap.org/search?q="+address+"&format=json")
+      fetch("https://photon.komoot.io/api/?q="+address)
+          .then(res => res.json())
+          .then(res => {
+            let items = res.features.map(feature => {
+              return {label: feature.properties.name, latlng: {lat: feature.geometry.coordinates[1], lng: feature.geometry.coordinates[0]}}
+            })
+            this.address_suggestions = items
+          })
+          .catch(err => {
+            console.log(err)
+          })
+          .finally(() => (this.isLoading = false))
+      //const results = await this.provider.search({ query: address });
+      //this.address_suggestions = results
+
+
+      this.isLoading = false
+
+    },
+
     location_markers: function (markers) {
       //Delete markers first
       this.delete_markers()
@@ -255,7 +378,56 @@ export default {
 },
   methods: {
 
-    //FUNCTIONS FOR DISPLAYING LAYERS ON THE MAP
+    async onMapClick(e) {
+
+      let _this = this
+
+      let greenIcon = new L.Icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [25, 41],
+        iconAnchor: [12, 41],
+        popupAnchor: [1, -34],
+        shadowSize: [41, 41]
+      });
+
+
+      let latlng = e.latlng
+
+      this.mapDiv.setView([latlng.lat, latlng.lng]);
+
+      if(_this.clicked_marker !== null) _this.mapDiv.removeLayer(_this.clicked_marker);
+      _this.clicked_marker = L.marker(latlng, {icon: greenIcon}).addTo(_this.mapDiv)
+
+      if(_this.selected_assessment!==undefined || _this.selected_layer!==null) {
+        _this.popup_info=_this.clicked_marker.bindPopup()
+      }
+
+      if(_this.selected_layer !== null){
+        let current_layer = _this.get_layer(_this.selected_layer, _this.baseline_future_model, _this.annual_monthly_model, _this.months_model)
+        current_layer.click(latlng)
+      }else if(_this.selected_assessment!==undefined){
+        _this.toggle_popup("")
+      }
+
+      $('#map').on('click', '.trigger', function() {
+        _this.$emit('createIndustry', latlng)
+      });
+    },
+
+
+    searchDecimalsDegrees(){
+      let _this = this
+      let e = {
+        latlng: {
+          lat: _this.latitudeModel,
+          lng: _this.longitudeModel
+        }
+      }
+
+      this.dialog = false
+      this.onMapClick(e)
+    },
 
     toggle_layer_selection_menu(){
       this.$emit('selectLayer');
@@ -529,47 +701,8 @@ export default {
       ).addTo(this.mapDiv);
 
 
-      let greenIcon = new L.Icon({
-        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
-        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
-        iconSize: [25, 41],
-        iconAnchor: [12, 41],
-        popupAnchor: [1, -34],
-        shadowSize: [41, 41]
-      });
 
-
-      async function onMapClick(e) {
-
-        let latlng = null
-        if(e.type === "click") latlng = e.latlng
-        else {
-          latlng = {
-            'lat': e.location.y,
-            'lng': e.location.x
-          }
-        }
-
-        if(_this.clicked_marker !== null) _this.mapDiv.removeLayer(_this.clicked_marker);
-        _this.clicked_marker = L.marker(latlng, {icon: greenIcon}).addTo(_this.mapDiv)
-
-        if(_this.selected_assessment!==undefined || _this.selected_layer!==null) {
-          _this.popup_info=_this.clicked_marker.bindPopup()
-        }
-
-        if(_this.selected_layer !== null){
-          let current_layer = _this.get_layer(_this.selected_layer, _this.baseline_future_model, _this.annual_monthly_model, _this.months_model)
-          current_layer.click(latlng)
-        }else if(_this.selected_assessment!==undefined){
-          _this.toggle_popup("")
-        }
-
-        $('#map').on('click', '.trigger', function() {
-          _this.$emit('createIndustry', latlng)
-        });
-      }
-
-      this.mapDiv.on('click', onMapClick);
+      this.mapDiv.on('click', this.onMapClick);
 
       /*
       const provider = new EsriProvider();
@@ -581,8 +714,7 @@ export default {
 
 
       this.mapDiv.on('geosearch/showlocation', onMapClick);*/
-      L.easyButton('<img src="/path/to/img/of/penguin.png">', function(btn, map){
-        console.log('cacac')
+      L.easyButton('<img src="https://www.vhv.rs/dpng/d/281-2813882_compass-icon-svg-hd-png-download.png" style="width:20px">', function(btn, map){
         _this.dialog = true
       }).addTo( this.mapDiv );
 

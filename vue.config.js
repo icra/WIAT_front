@@ -1,7 +1,7 @@
 module.exports = {
-  /*devServer: {
-    proxy: 'https://wiat-server.icradev.cat'
-  },*/
+  devServer: {
+    proxy: 'https://photon.komoot.io'
+  },
 
   transpileDependencies: [
     'vuetify'
