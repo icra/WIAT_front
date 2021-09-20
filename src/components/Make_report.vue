@@ -155,11 +155,11 @@ export default {
               let current_layer = [layer_name]
 
               //Baseline
-              let baseline_data = await info.layers.baseline.annual.layer["get_data_on_coord"](lat, lng)
+              let baseline_data = await info.layers.baseline.annual.layer["get_label_on_coord"](lat, lng)
               current_layer.push(baseline_data)
               //Future
               if(info.future){
-                let future_data = await info.layers.future.layer["get_data_on_coord"](lat, lng)
+                let future_data = await info.layers.future.layer["get_label_on_coord"](lat, lng)
                 current_layer.push(future_data)
               }else current_layer.push('-')
               layers_description.table.body.push(current_layer)

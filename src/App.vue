@@ -790,8 +790,6 @@ export default {
     }
   },
   computed: {
-
-
     assessment_tree: function () {
 
       let _this = this

@@ -125,7 +125,7 @@ Vue.prototype.$layers_description = [
         ]
       },
       {
-        name: "water demand",
+        name: "Water demand",
         children: [
           {
             name: "Water demand",
