@@ -18,8 +18,6 @@ let utils = {
         else return (n >= 0.0) && (Math.floor(n) === n) && n !== Infinity;
     },
 
-
-
     //FUNCTIONS FOR GETTING AND CHANGE FORMAT OF DATA LAYER
     format_layer_description(categories){
         let _this = this

@@ -816,14 +816,17 @@ export default {
     },
 
 
-    define_raster_layer(geotiff_file, color_function, color_legend, label_legend, units="", scale=1, resolution=16){
+    define_raster_layer(geotiff_file_data, geotiff_file_palette, color_function, color_legend, label_legend, units="", scale=1, resolution=16){
       let _this = this
       let obj = {}
-      let url_to_geotiff_file = "https://wiat-server.icradev.cat/image?filename="+geotiff_file
+      let url_to_geotiff_data = "https://wiat-server.icradev.cat/image?filename="+geotiff_file_data
+      let url_to_geotiff_palette = url_to_geotiff_data
+      if(geotiff_file_palette !== null) url_to_geotiff_palette = "https://wiat-server.icradev.cat/image?filename="+geotiff_file_palette
+
 
       obj["apply"] = function(){
 
-        parseGeoraster(url_to_geotiff_file).then(georaster => {
+        parseGeoraster(url_to_geotiff_palette).then(georaster => {
 
           let layer = new GeoRasterLayer({
             opacity: 0.7,
@@ -851,7 +854,7 @@ export default {
       }
 
       async function data_on_point(lat, lng){
-        let value = await _this.get_raster_data(lat, lng, geotiff_file)*scale
+        let value = await _this.get_raster_data(lat, lng, geotiff_file_data)*scale
         return value
       }
 
@@ -864,8 +867,11 @@ export default {
           if (value_number < 0) value_string = "No data"
 
           else {
-            if(units ==! "%") value_string = value_number.toExponential(3) + units
-            else value_string = +value_number.toFixed(3).toString() + units
+            if(units !== "%") {
+              value_string = value_number.toExponential(3) + units
+            } else {
+              value_string = +value_number.toFixed(3).toString() + units
+            }
           }
 
         }
@@ -928,6 +934,7 @@ export default {
       return axios
           .get(call)
           .then(response => {
+
             return response.data.test[0]["0"]
           })
 
@@ -1053,10 +1060,10 @@ export default {
 
 
       //Baseline population
-      this.layers["Population"].layers.baseline.annual.layer = this.define_raster_layer("baseline_population", color_function_population, color_legend_population, label_legend_population, " people")
+      this.layers["Population"].layers.baseline.annual.layer = this.define_raster_layer("baseline_population", null, color_function_population, color_legend_population, label_legend_population, " people")
 
       //Future population
-      this.layers["Population"].layers.future.layer = this.define_raster_layer("future_population", color_function_population, color_legend_population, label_legend_population, " people")
+      this.layers["Population"].layers.future.layer = this.define_raster_layer("future_population", null, color_function_population, color_legend_population, label_legend_population, " people")
 
       //Baseline aridity
       let color_function_baseline_aridity = function(values) {
@@ -1077,7 +1084,7 @@ export default {
       let label_legend_baseline_aridity = ["0-0.03", "0.03-0.2", "0.2-0.35", "0.35-0.5","0.5-0.65","0.65-0.8","0.8-1.0","1.0-1.25","1.25-1.5",">1.50"]
 
 
-      this.layers["Aridity index"].layers.baseline.annual.layer = this.define_raster_layer("aridity_baseline", color_function_baseline_aridity, color_legend_baseline_aridity, label_legend_baseline_aridity,"", 1/10000)
+      this.layers["Aridity index"].layers.baseline.annual.layer = this.define_raster_layer("aridity_baseline", null, color_function_baseline_aridity, color_legend_baseline_aridity, label_legend_baseline_aridity,"", 1/10000)
 
       //Baseline runoff
       let color_function_baseline_runoff = function(values) {
@@ -1094,7 +1101,7 @@ export default {
       let color_legend_baseline_runoff = ['#c8ffff', '#79fffe', '#00feff', '#00d5f0', '#01c4ff', '#007dff', '#0007a1' ]
       let label_legend_baseline_runoff = ["<10 mm/year", "10-50 mm/year", "50-100 mm/year", "100-500 mm/year","500-1000 mm/year","1000-5000 mm/year",">5000 mm/year"]
 
-      this.layers["Specific discharge"].layers.baseline.annual.layer = this.define_raster_layer("baseline_runoff",  color_function_baseline_runoff, color_legend_baseline_runoff, label_legend_baseline_runoff, " mm/year")
+      this.layers["Specific discharge"].layers.baseline.annual.layer = this.define_raster_layer("baseline_runoff",  null, color_function_baseline_runoff, color_legend_baseline_runoff, label_legend_baseline_runoff, " mm/year")
 
 
       //Baseline water stress
@@ -1809,12 +1816,12 @@ export default {
       let color_legend_Surface_Water_Pharmaceutical_Pollution = ['#09bbfb', '#3ad110', '#faed08', '#fe0000', '#010103' ]
       let label_legend_Surface_Water_Pharmaceutical_Pollution = ["0 ng/L", ">0-10 ng/L", "10-30 ng/L", "30-100 ng/L",">100 ng/L"]
       //this.layers["Surface Water Pharmaceutical Pollution"].layers.baseline.annual.layer = this.define_raster_layer("surface_pharmaceutical_pollution_baseline", color_function_Surface_Water_Pharmaceutical_Pollution, color_legend_Surface_Water_Pharmaceutical_Pollution, label_legend_Surface_Water_Pharmaceutical_Pollution, " ng/L")
-      this.layers["Surface Water Pharmaceutical Pollution"].layers.baseline.annual.layer = this.define_raster_layer("contaminant_C_consum_mask", undefined, color_legend_Surface_Water_Pharmaceutical_Pollution, label_legend_Surface_Water_Pharmaceutical_Pollution, " ng/L", 1, 512)
+      this.layers["Surface Water Pharmaceutical Pollution"].layers.baseline.annual.layer = this.define_raster_layer("contaminant_C", "contaminant_C_palette", undefined, color_legend_Surface_Water_Pharmaceutical_Pollution, label_legend_Surface_Water_Pharmaceutical_Pollution, " ng/L", 1, 32)
 
 
 
       //Future Surface Water Pharmaceutical Pollution
-      this.layers["Surface Water Pharmaceutical Pollution"].layers.future.layer = this.define_raster_layer("contaminant_C_BAU", color_function_Surface_Water_Pharmaceutical_Pollution, color_legend_Surface_Water_Pharmaceutical_Pollution, label_legend_Surface_Water_Pharmaceutical_Pollution, " ng/L", 1, 512)
+      this.layers["Surface Water Pharmaceutical Pollution"].layers.future.layer = this.define_raster_layer("contaminant_C_BAU", "contaminant_C_BAU_palette", undefined, color_legend_Surface_Water_Pharmaceutical_Pollution, label_legend_Surface_Water_Pharmaceutical_Pollution, " ng/L", 1, 32)
 
 
       const coastal_pollution_dataset = 'raster_to_points'
