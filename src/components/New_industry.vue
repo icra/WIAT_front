@@ -6,12 +6,11 @@
     <br>
 
 
-    <v-stepper v-model="stepper_model">
+    <v-stepper v-model="stepper_model" alt-labels>
       <v-stepper-header>
         <v-stepper-step
             :complete="stepper_model > 1"
             step="1"
-            editable
         >
           Water withdrawal and industry
         </v-stepper-step>
@@ -21,7 +20,6 @@
         <v-stepper-step
             :complete="stepper_model > 2"
             step="2"
-            editable
         >
           On-site industrial WWTP
         </v-stepper-step>
@@ -31,17 +29,12 @@
         <v-stepper-step
             :complete="stepper_model > 3"
             step="3"
-            editable
         >
           External WWTP
         </v-stepper-step>
 
         <v-divider></v-divider>
 
-
-        <v-stepper-step step="4" editable>
-          Advanced
-        </v-stepper-step>
       </v-stepper-header>
 
       <v-stepper-items>
@@ -67,34 +60,26 @@
                     type="number"
                     :rules="[rules_required]"
                 ></v-text-field>
-                <v-text-field
-                    v-model="amount_used"
-                    label="Amount of water used in the industry"
-                    suffix="m3"
-                    type="number"
-                    :rules="[rules_required]"
-                ></v-text-field>
-                <v-text-field
-                    v-model="cod_leaving_industry"
-                    label="Effluent COD load leaving the industry"
-                    :rules="[rules_required]"
-                    suffix="kg"
-                    type="number"
-                ></v-text-field>
-                <v-text-field
-                    v-model="p_leaving_industry"
-                    label="Effluent P load leaving the industry"
-                    :rules="[rules_required]"
-                    suffix="kg"
-                    type="number"
-                ></v-text-field>
-                <v-text-field
-                    v-model="n_leaving_industry"
-                    label="Effluent N load leaving the industry"
-                    :rules="[rules_required]"
-                    suffix="kg"
-                    type="number"
-                ></v-text-field>
+                <v-select
+                    v-model="has_onsite_wwtp"
+                    :items="yes_no"
+                    filled
+                    label="Has the industry an on-site treatment wastewater plant?"
+                ></v-select>
+                <v-select
+                    v-model="has_offsite_wwtp"
+                    :items="yes_no"
+                    filled
+                    label="Has the industry an off-site treatment wastewater plant?"
+                ></v-select>
+                <v-select
+                    v-model="offsite_wwtp_type"
+                    :items="industrial_domestic"
+                    filled
+                    label="Off-site treatment wastewater plant type"
+                    v-if="has_offsite_wwtp === 'Yes'"
+                ></v-select>
+
               </v-form>
             </v-col>
 
@@ -102,7 +87,7 @@
           <br>
           <v-btn
               color="primary"
-              @click="this.stepper_model = 2"
+              @click="tab_1_continue"
               :disabled="!water_withdrawal_valid"
           >
             Continue
@@ -174,30 +159,33 @@
             -->
             <v-col cols="12">
               <v-img
-                  :src="onsite_industrial_image"
+                  :src="onsite_external_image"
                   height="600"
                   class="grey darken-4"
+                  v-if="has_offsite_wwtp === 'Yes'"
               ></v-img>
+              <v-img
+                  :src="onsite_no_external_image"
+                  height="600"
+                  class="grey darken-4"
+                  v-else
+              ></v-img>
+
             </v-col>
           </v-row>
           <br>
-          <v-select
-              v-model="has_onsite_wwtp"
-              :items="yes_no"
-              filled
-              label="Has the industry an on-site treatment wastewater plant?"
-          ></v-select>
-          <!-- Show inputs under "None" key -->
-          <div
-              v-for="[key, value] of Object.entries(this.industrial_inputs.None)"
-              :key="key"
-              v-if="has_onsite_wwtp === 'Yes'"
-          >
-            <div>
-              <v-row style="background-color: #F2F4F3" align="center">
-                <v-col cols="8" >
-                  <div style="width: 100%;">
-                    <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+          <div v-if="stepper_model === 2">
+            <!-- Show inputs under "None" key -->
+            <div
+                v-for="[key, value] of Object.entries(this.onsite_inputs.None)"
+                :key="key"
+                v-if="has_onsite_wwtp === 'Yes'"
+            >
+              <div>
+                <v-row style="background-color: #F2F4F3" align="center">
+                  <v-col cols="8" >
+                    <div style="width: 100%;">
+                      <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                       <span>
                         {{value.question}}
                         <!-- Input -->
@@ -221,90 +209,90 @@
 
                       </span>
 
-                      <v-tooltip
-                          bottom
-                          v-if="value.estimation_type === 'equation'">
-                        <template v-slot:activator="{ on, attrs }">
-                          <v-btn
-                              v-bind="attrs"
-                              v-on="on"
-                              outlined
-                              x-small
-                              @click="industry.onsite_wwtp[key] = parseFloat(estimations[key](industry.onsite_wwtp)).toFixed(2)"
+                        <v-tooltip
+                            bottom
+                            v-if="value.estimation_type === 'equation'">
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-btn
+                                v-bind="attrs"
+                                v-on="on"
+                                outlined
+                                x-small
+                                @click="industry.onsite_wwtp[key] = parseFloat(estimations[key](industry.onsite_wwtp)).toFixed(2)"
+                            >
+                              Estimation: {{parseFloat(estimations[key](industry.onsite_wwtp)).toFixed(2)}}{{value.unit}} <!-- Botó amb estimació -->
+                            </v-btn>
+                          </template>
+
+                          <span style="white-space: pre;" v-html="estimations[key]"></span>
+                        </v-tooltip>
+
+                      </div>
+                      <div v-if="value.estimation_type === 'option'" style="width: 100%">
+                        <select v-model="industry.onsite_wwtp[key]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                          <option
+                              v-for="item in value.items"
+                              :value="value.estimation_based_on === null ? item[value.estimation_factor] : item[value.estimation_factor]*industry.onsite_wwtp[value.estimation_based_on]"
                           >
-                            Estimation: {{parseFloat(estimations[key](industry.onsite_wwtp)).toFixed(2)}}{{value.unit}} <!-- Botó amb estimació -->
-                          </v-btn>
-                        </template>
+                            <!--Desplegable amb estimació-->
+                            {{item.name}} {{item[value.description]}} ({{value.estimation_based_on === null ? item[value.estimation_factor] : item[value.estimation_factor]*industry.onsite_wwtp[value.estimation_based_on]}} {{value.unit}})
+                          </option>
+                          <option :value="industry.onsite_wwtp[key]">Custom value</option>
+                        </select>
+                      </div>
 
-                        <span style="white-space: pre;" v-html="estimations[key]"></span>
-                      </v-tooltip>
+
 
                     </div>
-                    <div v-if="value.estimation_type === 'option'" style="width: 100%">
-                      <select v-model="industry.onsite_wwtp[key]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
-                        <option
-                            v-for="item in value.items"
-                            :value="value.estimation_based_on === null ? item[value.estimation_factor] : item[value.estimation_factor]*industry.onsite_wwtp[value.estimation_based_on]"
-                        >
-                          <!--Desplegable amb estimació-->
-                          {{item.name}} {{item[value.description]}} ({{value.estimation_based_on === null ? item[value.estimation_factor] : item[value.estimation_factor]*industry.onsite_wwtp[value.estimation_based_on]}} {{value.unit}})
-                        </option>
-                        <option :value="industry.onsite_wwtp[key]">Custom value</option>
-                      </select>
+                  </v-col>
+                  <v-col cols="4">
+                    <div>
+                      <div v-if="value.type === 'option'">
+                        <v-select
+                            v-model="industry.onsite_wwtp[key]"
+                            :items="value.items"
+                            item-text="text"
+                            item-value="value"
+                            label="Select"
+                        ></v-select>
+                      </div>
+                      <div v-else >
+                        <v-text-field
+                            v-model="industry.onsite_wwtp[key]"
+                            :suffix="value.unit"
+                            type="number"
+                        ></v-text-field>
+
+                      </div>
                     </div>
 
+                  </v-col>
+
+                </v-row>
 
 
-                  </div>
-                </v-col>
-                <v-col cols="4">
-                  <div>
-                    <div v-if="value.type === 'option'">
-                      <v-select
-                          v-model="industry.onsite_wwtp[key]"
-                          :items="value.items"
-                          item-text="text"
-                          item-value="value"
-                          label="Select"
-                      ></v-select>
-                    </div>
-                    <div v-else >
-                      <v-text-field
-                          v-model="industry.onsite_wwtp[key]"
-                          :suffix="value.unit"
-                          type="number"
-                      ></v-text-field>
-
-                    </div>
-                  </div>
-
-                </v-col>
-
-              </v-row>
-
-
+              </div>
             </div>
-          </div>
-          <!-- Show other -->
-          <v-expansion-panels v-if="has_onsite_wwtp === 'Yes'">
-            <v-expansion-panel
-                v-for="[title, form] of Object.entries(this.industrial_inputs)"
-                :key="title"
-                v-if="title !== 'None'"
-            >
-              <v-expansion-panel-header>
-                {{ title }}
-              </v-expansion-panel-header>
-              <v-expansion-panel-content>
-                <div
-                    v-for="[key, value] of Object.entries(form)"
-                    :key="key"
-                >
-                  <div>
-                    <v-row style="background-color: #F2F4F3" align="center">
-                      <v-col cols="8" >
-                        <div style="margin-left: 12px;">
-                          <div style="height: 100%;  display: flex; justify-content: space-between; max-width: 90%;">
+            <!-- Show other -->
+            <v-expansion-panels>
+              <v-expansion-panel
+                  v-for="[title, form] of Object.entries(this.onsite_inputs)"
+                  :key="title"
+                  v-if="title !== 'None'"
+              >
+                <v-expansion-panel-header>
+                  {{ title }}
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                  <div
+                      v-for="[key, value] of Object.entries(form)"
+                      :key="key"
+                  >
+                    <div>
+                      <v-row style="background-color: #F2F4F3" align="center">
+                        <v-col cols="8" >
+                          <div style="margin-left: 12px;">
+                            <div style="height: 100%;  display: flex; justify-content: space-between; max-width: 90%;">
                             <span>
                               {{value.question}}
                               <!-- Input -->
@@ -328,75 +316,76 @@
 
                             </span>
 
-                            <v-tooltip
-                                bottom
-                                v-if="value.estimation_type === 'equation'">
-                              <template v-slot:activator="{ on, attrs }">
-                                <v-btn
-                                    v-bind="attrs"
-                                    v-on="on"
-                                    outlined
-                                    x-small
-                                    @click="industry.onsite_wwtp[key] = parseFloat(estimations[key](industry.onsite_wwtp)).toFixed(2)"
+                              <v-tooltip
+                                  bottom
+                                  v-if="value.estimation_type === 'equation'">
+                                <template v-slot:activator="{ on, attrs }">
+                                  <v-btn
+                                      v-bind="attrs"
+                                      v-on="on"
+                                      outlined
+                                      x-small
+                                      @click="industry.onsite_wwtp[key] = parseFloat(estimations[key](industry.onsite_wwtp)).toFixed(2)"
+                                  >
+                                    Estimation: {{parseFloat(estimations[key](industry.onsite_wwtp)).toFixed(2)}}{{value.unit}} <!-- Botó amb estimació -->
+                                  </v-btn>
+                                </template>
+
+                                <span style="white-space: pre;" v-html="estimations[key]"></span>
+                              </v-tooltip>
+
+                            </div>
+                            <div v-if="value.estimation_type === 'option'" style="width: 100%">
+                              <select v-model="industry.onsite_wwtp[key]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                                <option
+                                    v-for="item in value.items"
+                                    :value="value.estimation_based_on === null ? item[value.estimation_factor] : item[value.estimation_factor]*industry.onsite_wwtp[value.estimation_based_on]"
                                 >
-                                  Estimation: {{parseFloat(estimations[key](industry.onsite_wwtp)).toFixed(2)}}{{value.unit}} <!-- Botó amb estimació -->
-                                </v-btn>
-                              </template>
+                                  <!--Desplegable amb estimació-->
+                                  {{item.name}} {{item[value.description]}} ({{value.estimation_based_on === null ? item[value.estimation_factor] : item[value.estimation_factor]*industry.onsite_wwtp[value.estimation_based_on]}} {{value.unit}})
+                                </option>
+                                <option :value="industry.onsite_wwtp[key]">Custom value</option>
+                              </select>
+                            </div>
 
-                              <span style="white-space: pre;" v-html="estimations[key]"></span>
-                            </v-tooltip>
+
 
                           </div>
-                          <div v-if="value.estimation_type === 'option'" style="width: 100%">
-                            <select v-model="industry.onsite_wwtp[key]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
-                              <option
-                                  v-for="item in value.items"
-                                  :value="value.estimation_based_on === null ? item[value.estimation_factor] : item[value.estimation_factor]*industry.onsite_wwtp[value.estimation_based_on]"
-                              >
-                                <!--Desplegable amb estimació-->
-                                {{item.name}} {{item[value.description]}} ({{value.estimation_based_on === null ? item[value.estimation_factor] : item[value.estimation_factor]*industry.onsite_wwtp[value.estimation_based_on]}} {{value.unit}})
-                              </option>
-                              <option :value="industry.onsite_wwtp[key]">Custom value</option>
-                            </select>
+                        </v-col>
+                        <v-col cols="4">
+
+                          <div style="margin: 12px">
+                            <div v-if="value.type === 'option'">
+                              <v-select
+                                  v-model="industry.onsite_wwtp[key]"
+                                  :items="value.items"
+                                  item-text="text"
+                                  item-value="value"
+                                  label="Select"
+                              ></v-select>
+                            </div>
+                            <div v-else >
+                              <v-text-field
+                                  v-model="industry.onsite_wwtp[key]"
+                                  :suffix="value.unit"
+                                  type="number"
+                              ></v-text-field>
+
+                            </div>
                           </div>
 
+                        </v-col>
+
+                      </v-row>
 
 
-                        </div>
-                      </v-col>
-                      <v-col cols="4">
-
-                        <div style="margin: 12px">
-                          <div v-if="value.type === 'option'">
-                            <v-select
-                                v-model="industry.onsite_wwtp[key]"
-                                :items="value.items"
-                                item-text="text"
-                                item-value="value"
-                                label="Select"
-                            ></v-select>
-                          </div>
-                          <div v-else >
-                            <v-text-field
-                                v-model="industry.onsite_wwtp[key]"
-                                :suffix="value.unit"
-                                type="number"
-                            ></v-text-field>
-
-                          </div>
-                        </div>
-
-                      </v-col>
-
-                    </v-row>
-
-
+                    </div>
                   </div>
-                </div>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-          </v-expansion-panels>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+            </v-expansion-panels>
 
+          </div>
           <br>
           <v-btn
               color="primary"
@@ -455,7 +444,7 @@
 
 <script>
 
-import {Assessment, Industry, Industrial_wwtp } from "../ecam_backend";
+import {Assessment, Industry, Industrial_wwtp_onsite, Industrial_wwtp_onsite_external_domestic} from "../ecam_backend";
 
 export default {
   name: "new_assessment",
@@ -463,31 +452,32 @@ export default {
   components: {
     Industry,
     Assessment,
-    Industrial_wwtp
   },
   data() {
     return {
       assessment: this.$assessments[this.assessment_id],
       industry: this.$assessments[this.assessment_id].industries[this.industry_id],
-      industrial_inputs: Industrial_wwtp.info_inputs(),
-      estimations: Industrial_wwtp.get_estimations(),
+      onsite_inputs: {},
+      estimations: Industrial_wwtp_onsite.get_estimations(),
       stepper_model: 1,
       water_withdrawal_image: require("@/../public/water_flow/water_withdrawal.jpg"),
       onsite_industrial_image: require("@/../public/water_flow/onsite.jpg"),
+      onsite_no_external_image: require("../../public/water_flow/onsite_no_external.jpg"),
+      onsite_external_image: require("../../public/water_flow/onsite_external.jpg"),
+
+
 
       water_withdrawal_valid: false,
       water_needed: "0",
-      amount_used: "0",
-      cod_leaving_industry: "0",
       n_leaving_industry: "0",
       p_leaving_industry: "0",
       has_onsite_wwtp: "No",
       yes_no: ["No", "Yes"],
       water_treated_onsite: "0",
       onsite_valid: true,
-      cod_leaving_onsite: "0",
-      n_leaving_onsite: "0",
-      p_leaving_onsite: "0"
+      has_offsite_wwtp: "No",
+      offsite_wwtp_type: "Domestic",
+      industrial_domestic: ["Domestic", "Industrial"],
     };
   },
   created() {
@@ -509,8 +499,38 @@ export default {
   methods: {
     tab_2_continue(){
       this.stepper_model = 3
+    },
+
+    tab_1_continue(){
+      if(this.has_onsite_wwtp === "No"){
+        this.stepper_model = 3
+      }else{
+        this.stepper_model = 2
+        if(this.has_offsite_wwtp){
+          if(this.offsite_wwtp_type === "Domestic"){
+            console.log('ssdf')
+            this.industry.onsite_wwtp = new Industrial_wwtp_onsite_external_domestic()
+            this.onsite_inputs = Industrial_wwtp_onsite_external_domestic.info_inputs()
+          }else{  //Industrial
+          }
+        }else{
+          this.industry.onsite_wwtp = new Industrial_wwtp_onsite()
+          this.onsite_inputs = Industrial_wwtp_onsite.info_inputs()
+
+        }
+
+
+
+
+
+      }
+
+
+
+
       console.log(this.industry.onsite_wwtp.wwt_KPI_GHG_biog_dig())
     },
+
     rules_required(value) {
       if(!!value){
         if(Number.parseFloat(value) < 0) return 'Real positive value required.'
