@@ -73,7 +73,8 @@ export class Industry{
         this.has_offsite_wwtp = false
         this.offsite_wwtp_type = "Domestic" //Domestic or Industrial
         this.volume_withdrawn = 0   //Amount of water withdrown from the wb(m3)
-        this.direct_discharge = false
+        this.has_direct_discharge = false
+        this.direct_discharge = null
     }
 };
 
@@ -90,7 +91,7 @@ export class Direct_discharge{
             },
 
             "wwt_tn_effl_to_wb": {
-                question: "Total Niitrogen load directly discharged to water body",
+                question: "Total Nitrogen load directly discharged to water body",
                 value: 0,
                 unit: "kg",
             },
@@ -127,7 +128,7 @@ export class Direct_discharge{
     constructor(){
         let _this = this
 
-        for(let items of Object.values(Industrial_wwtp.info_inputs())){
+        for(let items of Object.values(Direct_discharge.info_inputs())){
             for(let [clau, valor] of Object.entries(items)){
                 _this[clau] = valor.value
             }

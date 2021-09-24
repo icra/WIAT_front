@@ -32,9 +32,9 @@
         <v-stepper-step
             :complete="stepper_model > 3"
             step="3"
-            :editable="industry.has_offsite_wwtp"
+            :editable="industry.has_direct_discharge"
         >
-          External WWTP
+          Direct discharge
         </v-stepper-step>
 
         <v-divider></v-divider>
@@ -69,6 +69,12 @@
                     :items="yes_no"
                     filled
                     label="Has the industry an on-site treatment wastewater plant?"
+                ></v-select>
+                <v-select
+                    v-model="has_direct_discharge"
+                    :items="yes_no"
+                    filled
+                    label="Does the industry directly discharge wastewater into the water body?"
                 ></v-select>
                 <v-select
                     v-model="has_offsite_wwtp"
@@ -179,7 +185,7 @@
                             <!--Desplegable amb estimació-->
                             {{item.name}} {{item[value.description]}} ({{value.estimation_based_on === null ? item[value.estimation_factor] : parseFloat(item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]).toFixed(3)}} {{value.unit}})
                           </option>
-                          <option :value="industry.onsite_wwtp[key]">Custom value</option>
+                          <option :value="wwtp_aux_inputs[key]">Custom value</option>
                         </select>
                       </div>
                     </div>
@@ -283,7 +289,7 @@
                                   <!--Desplegable amb estimació-->
                                   {{item.name}} {{item[value.description]}} ({{value.estimation_based_on === null ? item[value.estimation_factor] : parseFloat(item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]).toFixed(3)}} {{value.unit}})
                                 </option>
-                                <option :value="industry.onsite_wwtp[key]">Custom value</option>
+                                <option :value="wwtp_aux_inputs[key]">Custom value</option>
                               </select>
                             </div>
                           </div>
@@ -330,21 +336,124 @@
             SAVE AND CONTINUE
           </v-btn>
 
-          <v-btn text>
-            Cancel
-          </v-btn>
         </v-stepper-content>
 
         <v-stepper-content step="3">
-          <v-card
-              class="mb-12"
-              color="grey lighten-1"
-              height="200px"
-          ></v-card>
+
+          <v-row>
+            <v-col cols="12">
+              <v-img
+                  :src="direct_discharge_image"
+                  height="600"
+                  class="grey darken-4"
+              ></v-img>
+
+            </v-col>
+          </v-row>
+          <br>
+          <div v-if="industry.has_direct_discharge && stepper_model == 3">
+
+            <!-- Show inputs under "None" key -->
+            <div
+                v-for="[key, value] of Object.entries(this.direct_discharge_inputs.None)"
+                :key="key"
+            >
+              <div>
+                <v-row style="background-color: #F2F4F3" align="center">
+                  <v-col cols="8" >
+                    <div style="width: 100%;">
+                      <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                      <span>
+                        {{value.question}}
+                        <!-- Input -->
+                        <v-tooltip
+                            bottom
+                            v-if="value.description_tooltip"
+                            max-width="500"
+                        >
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-icon
+                                color=#1C195B
+                                v-bind="attrs"
+                                v-on="on"
+                                size="20px"
+                            >
+                              mdi-information-variant
+                            </v-icon>
+                          </template>
+                          <span>{{value.description_tooltip}}</span>
+                        </v-tooltip>
+
+                      </span>
+
+                        <v-tooltip
+                            bottom
+                            v-if="value.estimation_type === 'equation'">
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-btn
+                                v-bind="attrs"
+                                v-on="on"
+                                outlined
+                                x-small
+                                @click="wwtp_aux_inputs[key] = parseFloat(estimations[key](wwtp_aux_inputs))"
+                            >
+                              Estimation: {{parseFloat(estimations[key](wwtp_aux_inputs)).toFixed(2)}}{{value.unit}} <!-- Botó amb estimació -->
+                            </v-btn>
+                          </template>
+
+                          <span style="white-space: pre;" v-html="estimations[key]"></span>
+                        </v-tooltip>
+
+                      </div>
+                      <div v-if="value.estimation_type === 'option'" style="width: 100%">
+                        <select v-model="wwtp_aux_inputs[key]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                          <option
+                              v-for="item in value.items"
+                              :value="value.estimation_based_on === null ? item[value.estimation_factor] : item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]"
+                          >
+                            <!--Desplegable amb estimació-->
+                            {{item.name}} {{item[value.description]}} ({{value.estimation_based_on === null ? item[value.estimation_factor] : parseFloat(item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]).toFixed(3)}} {{value.unit}})
+                          </option>
+                          <option :value="wwtp_aux_inputs[key]">Custom value</option>
+                        </select>
+                      </div>
+                    </div>
+                  </v-col>
+                  <v-col cols="4">
+                    <div>
+                      <div v-if="value.type === 'option'">
+                        <v-select
+                            v-model="wwtp_aux_inputs[key]"
+                            :items="value.items"
+                            item-text="text"
+                            item-value="value"
+                            label="Select"
+                        ></v-select>
+                      </div>
+                      <div v-else >
+                        <v-text-field
+                            v-model="wwtp_aux_inputs[key]"
+                            :suffix="value.unit"
+                            type="number"
+                        ></v-text-field>
+
+                      </div>
+                    </div>
+
+                  </v-col>
+
+                </v-row>
+
+
+              </div>
+            </div>
+
+          </div>
+          <br>
 
           <v-btn
               color="primary"
-              @click="stepper_model = 4"
+              @click="tab_3_continue"
           >
             SAVE AND CONTINUE
           </v-btn>
@@ -353,20 +462,7 @@
             Cancel
           </v-btn>
         </v-stepper-content>
-        <v-stepper-content step="4">
 
-
-          <v-btn
-              color="primary"
-              @click="stepper_model = 1"
-          >
-            SAVE AND CONTINUE
-          </v-btn>
-
-          <v-btn text>
-            Cancel
-          </v-btn>
-        </v-stepper-content>
 
       </v-stepper-items>
     </v-stepper>
@@ -384,7 +480,7 @@ import {
   Industry,
   Industrial_wwtp_onsite,
   Industrial_wwtp_onsite_external_domestic,
-  Industrial_wwtp_onsite_external_industrial
+  Industrial_wwtp_onsite_external_industrial, Direct_discharge
 } from "../ecam_backend";
 
 export default {
@@ -403,12 +499,14 @@ export default {
       industry: defaultIndustry,
 
       onsite_inputs: {},
+      direct_discharge_inputs: {},
       estimations: Industrial_wwtp_onsite.get_estimations(),
       stepper_model: 1,
       water_withdrawal_image: require("@/../public/water_flow/water_withdrawal.jpg"),
-      onsite_industrial_image: require("@/../public/water_flow/onsite.jpg"),
       onsite_no_external_image: require("../../public/water_flow/onsite_no_external.jpg"),
       onsite_external_image: require("../../public/water_flow/onsite_external.jpg"),
+      direct_discharge_image: require("../../public/water_flow/direct_discharge.jpg"),
+
 
       water_withdrawal_valid: true,
       water_withdrawn: defaultIndustry.volume_withdrawn,
@@ -420,7 +518,8 @@ export default {
       has_offsite_wwtp: defaultIndustry.has_offsite_wwtp,
       offsite_wwtp_type: defaultIndustry.offsite_wwtp_type,
       industrial_domestic: ["Domestic", "Industrial"],
-      wwtp_aux_inputs: {}
+      wwtp_aux_inputs: {},
+      has_direct_discharge: defaultIndustry.has_direct_discharge
     };
   },
   created() {
@@ -437,6 +536,15 @@ export default {
             this.$set(this.wwtp_aux_inputs, clau, this.industry.onsite_wwtp[clau]);
           }
         }
+      }if(step == 3){
+        if(this.industry.direct_discharge === null) this.industry.direct_discharge = new Direct_discharge()
+        this.direct_discharge_inputs = this.industry.direct_discharge.get_inputs()
+        this.wwtp_aux_inputs = {}
+        for(let items of Object.values(this.direct_discharge_inputs)){
+          for(let clau of Object.keys(items)){
+            this.$set(this.wwtp_aux_inputs, clau, this.industry.direct_discharge[clau]);
+          }
+        }
       }
     },
     industry_id: function (industry_id) {
@@ -449,16 +557,35 @@ export default {
       if (industry === undefined) {
         this.$router.push('/')
       }
+      this.stepper_model = 1
+      this.water_withdrawn = industry.volume_withdrawn
+      this.has_onsite_wwtp = industry.has_onsite_wwtp
+      this.has_offsite_wwtp = industry.has_offsite_wwtp
+      this.offsite_wwtp_type = industry.offsite_wwtp_type
+      this.has_direct_discharge = industry.has_direct_discharge
     },
   },
   methods: {
-    tab_2_continue(){
 
+    tab_3_continue(){
+      for (let [key, value] of Object.entries(this.wwtp_aux_inputs)){
+        this.industry.direct_discharge[key] = value
+      }
+      if(this.has_offsite_wwtp) {
+        this.stepper_model = 4
+      }
+      else this.stepper_model = 1
+    },
+
+    tab_2_continue(){
       for (let [key, value] of Object.entries(this.wwtp_aux_inputs)){
         this.industry.onsite_wwtp[key] = value
       }
-
-      this.stepper_model = 3
+      if(this.has_direct_discharge) {
+        this.stepper_model = 3
+      }
+      else if(this.has_offsite_wwtp) this.stepper_model = 4
+      else this.stepper_model = 1
     },
 
     tab_1_continue(){
@@ -467,9 +594,12 @@ export default {
       this.industry.has_onsite_wwtp = this.has_onsite_wwtp
       this.industry.has_offsite_wwtp = this.has_offsite_wwtp
       this.industry.offsite_wwtp_type = this.offsite_wwtp_type
+      this.industry.has_direct_discharge = this.has_direct_discharge
 
       if(!this.has_onsite_wwtp){
-        this.stepper_model = 3
+        if(this.has_direct_discharge) this.stepper_model = 3
+        else if(this.has_offsite_wwtp) this.stepper_model = 4
+
       }else{
         this.stepper_model = 2
         if(this.has_offsite_wwtp){
@@ -488,7 +618,7 @@ export default {
     water_withdrawn_rule(str) {
 
       if (typeof str === "number") return true
-      else if(typeof str != "string"){
+      else if(typeof str === "string"){
         if(!isNaN(str) && !isNaN(parseFloat(str)) && parseFloat(str) >=0 ) return true
         return 'Real positive value required.'
       }
