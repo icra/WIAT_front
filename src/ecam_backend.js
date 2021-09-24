@@ -69,10 +69,118 @@ export class Industry{
         this.name = "new industry";
         this.location = null
         this.onsite_wwtp = null
+        this.has_onsite_wwtp = false
+        this.has_offsite_wwtp = false
+        this.offsite_wwtp_type = "Domestic" //Domestic or Industrial
+        this.volume_withdrawn = 0   //Amount of water withdrown from the wb(m3)
+        this.direct_discharge = false
+    }
+};
 
+export class Direct_discharge{
+
+    static info_inputs(){
+        let inputs = {}
+        inputs["None"] = {
+
+            "wwt_bod_effl_to_wb": {
+                question: "COD load directly discharged to water body",
+                value: 0,
+                unit: "kg",
+            },
+
+            "wwt_tn_effl_to_wb": {
+                question: "Total Niitrogen load directly discharged to water body",
+                value: 0,
+                unit: "kg",
+            },
+
+            //emission factors (discharge)
+            "wwt_ch4_efac_dis": {
+                question: "CH4 emission factor (discharge)",
+                value: 0,
+                unit: "kgCH4/kgCOD",
+                estimation_type: "option",
+                items: Tables["type_of_water_body"],
+                estimation_based_on: null,
+                estimation_factor: "ch4_efac",
+                description: "description"
+            },  //kgCH4/kgCOD   Table 6.8
+            "wwt_n2o_efac_dis": {
+                question: "N2O emission factor (discharge)",
+                value: 0,
+                unit: "kgN2O-N/kgN",
+                estimation_type: "option",
+                items: Tables["N2O EF effluent (Table 6.8A)"],
+                estimation_based_on: null,
+                estimation_factor: "n2o_efac",
+                description: "description"
+            },  //kgN2O-N/kgN  //tAULA 6.8A
+        }
+        return inputs
     }
 
-};
+    get_inputs(){
+        return Direct_discharge.info_inputs()
+    }
+
+    constructor(){
+        let _this = this
+
+        for(let items of Object.values(Industrial_wwtp.info_inputs())){
+            for(let [clau, valor] of Object.entries(items)){
+                _this[clau] = valor.value
+            }
+        }
+    }
+
+    /*
+      Functions for calling data from other components
+    */
+    //emissions with description
+    emissions_and_descriptions(){
+        return [
+            {description: "Emissions from water discharged", emissions: this.wwt_KPI_GHG_disc()},
+        ]
+    }
+    water_quality_indicators(){
+        return [
+
+            {type: "COD load at the effluent of the WWTP", value: this.wwt_bod_effl, unit: "kg"},
+            {type: "Total Nitrogen load in the effluent", value: this.wwt_tn_effl, unit: "kg"},
+
+        ]
+    }
+
+    /*
+      GHG emissions (kgCO2eq)
+    */
+    //total GHG emissions
+    wwt_KPI_GHG(){
+        let sources=[
+            this.wwt_KPI_GHG_disc(),
+        ];
+
+        //gases (numbers)
+        let co2 = sources.map(s=>s.co2).sum();
+        let ch4 = sources.map(s=>s.ch4).sum();
+        let n2o = sources.map(s=>s.n2o).sum();
+
+        //total
+        let total = sources.map(s=>s.total).sum();
+        return {total,co2,ch4,n2o};
+    }
+
+    //emissions from water discharged
+    wwt_KPI_GHG_disc(){
+        let co2   = 0;
+        let ch4   = this.wwt_bod_effl_to_wb*this.wwt_ch4_efac_dis*Cts.ct_ch4_eq.value;    //Equacio 6.2
+        let n2o   = this.wwt_bod_effl_to_wb *this.wwt_n2o_efac_dis*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;    //Equacio 6.12
+        let total = co2+ch4+n2o;
+        return {total,co2,ch4,n2o};
+    }
+
+};  //Direct discharge
 
 export class WWTP{
     static info_inputs(){
@@ -371,6 +479,10 @@ export class WWTP{
                 "wwt_vol_tslu": {question: "Volume of fuel consumed (trucks)", value: 0, unit: "L"}, //L | volume of fuel
             }
         }
+    }
+
+    get_inputs(){
+        return WWTP.info_inputs()
     }
 
     static get_estimations(){
@@ -916,6 +1028,10 @@ export class Industrial_wwtp extends WWTP{
         return inputs
     }
 
+    get_inputs(){
+        return Industrial_wwtp.info_inputs()
+    }
+
     constructor(){
         super();
         let _this = this
@@ -999,7 +1115,7 @@ export class Industrial_wwtp extends WWTP{
     //emissions from water discharged
     wwt_KPI_GHG_disc(){
         let co2   = 0;
-        let ch4   = this.wwt_bod_effl_to_wb*this.wwt_ch4_efac_dis*Cts.ct_ch4_eq.value*Cts.ct_maximum_ch4_producing_capacity_cod;    //Equacio 6.2
+        let ch4   = this.wwt_bod_effl_to_wb*this.wwt_ch4_efac_dis*Cts.ct_ch4_eq.value;    //Equacio 6.2
         let n2o   = this.wwt_bod_effl_to_wb *this.wwt_n2o_efac_dis*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;    //Equacio 6.12
         let total = co2+ch4+n2o;
         return {total,co2,ch4,n2o};
@@ -1013,6 +1129,10 @@ export class Industrial_wwtp_onsite extends Industrial_wwtp{
         let inputs = Industrial_wwtp.info_inputs()
         inputs["None"]["wwt_vol_reused"] = {question: "Volume of water reuse/recycled on the WWTP", value: 0, unit: "m3"}
         return inputs
+    }
+
+    get_inputs(){
+        return Industrial_wwtp_onsite.info_inputs()
     }
 
     constructor(){
@@ -1065,13 +1185,22 @@ export class Industrial_wwtp_onsite extends Industrial_wwtp{
 export class Industrial_wwtp_onsite_external_domestic extends Industrial_wwtp_onsite{  //Industrial onsite WWTP with domestic off-site WWTP
 
     static info_inputs(){
-        console.log('aquiiiii')
         let inputs = Industrial_wwtp_onsite.info_inputs()
         inputs["None"]["wwt_vol_treated_external"] = {question: "Volume of water from the WWTP treated in an off-site WWTP", value: 0, unit: "m3"}
         inputs["None"]["wwt_bod_effl_treated_external"] = {question: "Effluent BOD load leaving the WWTP to external WWTP ", value: 0, unit: "kg"}
         inputs["None"]["wwt_tn_effl_treated_external"] = {question: "Effluent Total Nitrogen load leaving the WWTP to external WWTP ", value: 0, unit: "kg"}
         return inputs
     }
+
+    get_inputs(){
+        return Industrial_wwtp_onsite_external_domestic.info_inputs()
+    }
+
+
+    get_inputs(){
+        return Industrial_wwtp_onsite_external_domestic.info_inputs()
+    }
+
 
     constructor(){
         super();
@@ -1176,7 +1305,6 @@ export class Industrial_wwtp_onsite_external_industrial extends Industrial_wwtp_
         ]
     }
 }; //Industrial onsite WWTP with industrial off-site WWTP
-
 
 export class Domestic_wwtp{
     static info_inputs(){
@@ -2356,16 +2484,6 @@ let Cts={
         descr:"Organic Carbon content in Volatile Solids",
         unit:"gOC/gVS",
     },
-    ct_maximum_ch4_producing_capacity_Bod:{
-        value:0.6,
-        descr:"Default maximum CH4 producing capacity",
-        unit:"kgCH4/kgBOD",
-    },
-    ct_maximum_ch4_producing_capacity_cod:{
-        value:0.25,
-        descr:"Default maximum CH4 producing capacity",
-        unit:"kgCH4/kgcOD",
-    }
 };
 
 
