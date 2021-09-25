@@ -9,7 +9,6 @@
     <v-stepper v-model="stepper_model" alt-labels>
       <v-stepper-header>
         <v-stepper-step
-            :complete="stepper_model > 1"
             step="1"
             editable
         >
@@ -19,23 +18,29 @@
         <v-divider></v-divider>
 
         <v-stepper-step
-            :complete="stepper_model > 2"
             step="2"
             :editable="industry.has_onsite_wwtp"
 
         >
-          On-site industrial WWTP
+          On-site WWTP
         </v-stepper-step>
 
         <v-divider></v-divider>
 
         <v-stepper-step
-            :complete="stepper_model > 3"
             step="3"
             :editable="industry.has_direct_discharge"
         >
           Direct discharge
         </v-stepper-step>
+
+        <v-stepper-step
+            step="4"
+            :editable="industry.has_offsite_wwtp"
+        >
+          Offsite WWTP
+        </v-stepper-step>
+
 
         <v-divider></v-divider>
 
@@ -110,7 +115,7 @@
                   :src="onsite_external_image"
                   height="600"
                   class="grey darken-4"
-                  v-if="has_offsite_wwtp"
+                  v-if="industry.has_offsite_wwtp"
               ></v-img>
               <v-img
                   :src="onsite_no_external_image"
@@ -463,6 +468,240 @@
           </v-btn>
         </v-stepper-content>
 
+        <v-stepper-content step="4">
+          <v-row>
+            <v-col cols="12">
+              <v-img
+                  :src="external_internal_image"
+                  height="600"
+                  class="grey darken-4"
+                  v-if="industry.has_onsite_wwtp"
+              ></v-img>
+              <v-img
+                  :src="external_no_internal_image"
+                  height="600"
+                  class="grey darken-4"
+                  v-else
+              ></v-img>
+
+            </v-col>
+          </v-row>
+          <br>
+          <div v-if="industry.has_offsite_wwtp && stepper_model == 4">
+
+            <!-- Show inputs under "None" key -->
+            <div
+                v-for="[key, value] of Object.entries(this.offsite_inputs.None)"
+                :key="key"
+            >
+              <div>
+                <v-row style="background-color: #F2F4F3" align="center">
+                  <v-col cols="8" >
+                    <div style="width: 100%;">
+                      <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                      <span>
+                        {{value.question}}
+                        <!-- Input -->
+                        <v-tooltip
+                            bottom
+                            v-if="value.description_tooltip"
+                            max-width="500"
+                        >
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-icon
+                                color=#1C195B
+                                v-bind="attrs"
+                                v-on="on"
+                                size="20px"
+                            >
+                              mdi-information-variant
+                            </v-icon>
+                          </template>
+                          <span>{{value.description_tooltip}}</span>
+                        </v-tooltip>
+
+                      </span>
+
+                        <v-tooltip
+                            bottom
+                            v-if="value.estimation_type === 'equation'">
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-btn
+                                v-bind="attrs"
+                                v-on="on"
+                                outlined
+                                x-small
+                                @click="wwtp_aux_inputs[key] = parseFloat(estimations[key](wwtp_aux_inputs))"
+                            >
+                              Estimation: {{parseFloat(estimations[key](wwtp_aux_inputs)).toFixed(2)}}{{value.unit}} <!-- Botó amb estimació -->
+                            </v-btn>
+                          </template>
+
+                          <span style="white-space: pre;" v-html="estimations[key]"></span>
+                        </v-tooltip>
+
+                      </div>
+                      <div v-if="value.estimation_type === 'option'" style="width: 100%">
+                        <select v-model="wwtp_aux_inputs[key]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                          <option
+                              v-for="item in value.items"
+                              :value="value.estimation_based_on === null ? item[value.estimation_factor] : item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]"
+                          >
+                            <!--Desplegable amb estimació-->
+                            {{item.name}} {{item[value.description]}} ({{value.estimation_based_on === null ? item[value.estimation_factor] : parseFloat(item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]).toFixed(3)}} {{value.unit}})
+                          </option>
+                          <option :value="wwtp_aux_inputs[key]">Custom value</option>
+                        </select>
+                      </div>
+                    </div>
+                  </v-col>
+                  <v-col cols="4">
+                    <div>
+                      <div v-if="value.type === 'option'">
+                        <v-select
+                            v-model="wwtp_aux_inputs[key]"
+                            :items="value.items"
+                            item-text="text"
+                            item-value="value"
+                            label="Select"
+                        ></v-select>
+                      </div>
+                      <div v-else >
+                        <v-text-field
+                            v-model="wwtp_aux_inputs[key]"
+                            :suffix="value.unit"
+                            type="number"
+                        ></v-text-field>
+
+                      </div>
+                    </div>
+
+                  </v-col>
+
+                </v-row>
+
+
+              </div>
+            </div>
+            <!-- Show other -->
+            <v-expansion-panels>
+              <v-expansion-panel
+                  v-for="[title, form] of Object.entries(this.offsite_inputs)"
+                  :key="title"
+                  v-if="title !== 'None'"
+              >
+                <v-expansion-panel-header>
+                  {{ title }}
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                  <div
+                      v-for="[key, value] of Object.entries(form)"
+                      :key="key"
+                  >
+                    <div>
+                      <v-row style="background-color: #F2F4F3" align="center">
+                        <v-col cols="8" >
+                          <div style="width: 100%;">
+                            <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                      <span>
+                        {{value.question}}
+                        <!-- Input -->
+                        <v-tooltip
+                            bottom
+                            v-if="value.description_tooltip"
+                            max-width="500"
+                        >
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-icon
+                                color=#1C195B
+                                v-bind="attrs"
+                                v-on="on"
+                                size="20px"
+                            >
+                              mdi-information-variant
+                            </v-icon>
+                          </template>
+                          <span>{{value.description_tooltip}}</span>
+                        </v-tooltip>
+
+                      </span>
+
+                              <v-tooltip
+                                  bottom
+                                  v-if="value.estimation_type === 'equation'">
+                                <template v-slot:activator="{ on, attrs }">
+                                  <v-btn
+                                      v-bind="attrs"
+                                      v-on="on"
+                                      outlined
+                                      x-small
+                                      @click="wwtp_aux_inputs[key] = parseFloat(estimations[key](wwtp_aux_inputs))"
+                                  >
+                                    Estimation: {{parseFloat(estimations[key](wwtp_aux_inputs)).toFixed(2)}}{{value.unit}} <!-- Botó amb estimació -->
+                                  </v-btn>
+                                </template>
+
+                                <span style="white-space: pre;" v-html="estimations[key]"></span>
+                              </v-tooltip>
+
+                            </div>
+                            <div v-if="value.estimation_type === 'option'" style="width: 100%">
+                              <select v-model="wwtp_aux_inputs[key]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                                <option
+                                    v-for="item in value.items"
+                                    :value="value.estimation_based_on === null ? item[value.estimation_factor] : item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]"
+                                >
+                                  <!--Desplegable amb estimació-->
+                                  {{item.name}} {{item[value.description]}} ({{value.estimation_based_on === null ? item[value.estimation_factor] : parseFloat(item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]).toFixed(3)}} {{value.unit}})
+                                </option>
+                                <option :value="wwtp_aux_inputs[key]">Custom value</option>
+                              </select>
+                            </div>
+                          </div>
+                        </v-col>
+                        <v-col cols="4">
+                          <div>
+                            <div v-if="value.type === 'option'">
+                              <v-select
+                                  v-model="wwtp_aux_inputs[key]"
+                                  :items="value.items"
+                                  item-text="text"
+                                  item-value="value"
+                                  label="Select"
+                              ></v-select>
+                            </div>
+                            <div v-else >
+                              <v-text-field
+                                  v-model="wwtp_aux_inputs[key]"
+                                  :suffix="value.unit"
+                                  type="number"
+                              ></v-text-field>
+
+                            </div>
+                          </div>
+
+                        </v-col>
+
+                      </v-row>
+
+
+                    </div>
+                  </div>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+            </v-expansion-panels>
+
+          </div>
+          <br>
+          <v-btn
+              color="primary"
+              @click="tab_2_continue"
+              :disabled="has_onsite_wwtp && !onsite_valid"
+          >
+            SAVE AND CONTINUE
+          </v-btn>
+
+        </v-stepper-content>
 
       </v-stepper-items>
     </v-stepper>
@@ -480,7 +719,7 @@ import {
   Industry,
   Industrial_wwtp_onsite,
   Industrial_wwtp_onsite_external_domestic,
-  Industrial_wwtp_onsite_external_industrial, Direct_discharge
+  Industrial_wwtp_onsite_external_industrial, Direct_discharge, Industrial_wwtp_offsite
 } from "../ecam_backend";
 
 export default {
@@ -500,12 +739,15 @@ export default {
 
       onsite_inputs: {},
       direct_discharge_inputs: {},
+      offsite_inputs: {},
       estimations: Industrial_wwtp_onsite.get_estimations(),
       stepper_model: 1,
       water_withdrawal_image: require("@/../public/water_flow/water_withdrawal.jpg"),
       onsite_no_external_image: require("../../public/water_flow/onsite_no_external.jpg"),
       onsite_external_image: require("../../public/water_flow/onsite_external.jpg"),
       direct_discharge_image: require("../../public/water_flow/direct_discharge.jpg"),
+      external_no_internal_image: require("../../public/water_flow/external_no_internal.jpg"),
+      external_internal_image: require("../../public/water_flow/external_internal.jpg"),
 
 
       water_withdrawal_valid: true,
@@ -536,8 +778,7 @@ export default {
             this.$set(this.wwtp_aux_inputs, clau, this.industry.onsite_wwtp[clau]);
           }
         }
-      }if(step == 3){
-        if(this.industry.direct_discharge === null) this.industry.direct_discharge = new Direct_discharge()
+      }else if(step == 3){
         this.direct_discharge_inputs = this.industry.direct_discharge.get_inputs()
         this.wwtp_aux_inputs = {}
         for(let items of Object.values(this.direct_discharge_inputs)){
@@ -545,6 +786,19 @@ export default {
             this.$set(this.wwtp_aux_inputs, clau, this.industry.direct_discharge[clau]);
           }
         }
+      }else if(step == 4){
+
+        this.offsite_inputs = this.industry.offsite_wwtp.get_inputs()
+        this.wwtp_aux_inputs = {}
+        for(let items of Object.values(this.offsite_inputs)){
+          for(let clau of Object.keys(items)){
+            this.$set(this.wwtp_aux_inputs, clau, this.industry.offsite_wwtp[clau]);
+          }
+        }
+        console.log(this.industry.offsite_wwtp.vol_infl_wwtp)
+        console.log(this.industry.offsite_wwtp.bod_infl_wwtp)
+        console.log(this.industry.offsite_wwtp.tn_infl_wwtp)
+
       }
     },
     industry_id: function (industry_id) {
@@ -581,6 +835,13 @@ export default {
       for (let [key, value] of Object.entries(this.wwtp_aux_inputs)){
         this.industry.onsite_wwtp[key] = value
       }
+
+      if(this.has_offsite_wwtp){
+        this.industry.offsite_wwtp.vol_infl_wwtp = this.industry.onsite_wwtp.wwt_vol_treated_external
+        this.industry.offsite_wwtp.bod_infl_wwtp = this.industry.onsite_wwtp.wwt_cod_effl_treated_external
+        this.industry.offsite_wwtp.tn_infl_wwtp = this.industry.onsite_wwtp.wwt_tn_effl_treated_external
+      }
+
       if(this.has_direct_discharge) {
         this.stepper_model = 3
       }
@@ -596,22 +857,35 @@ export default {
       this.industry.offsite_wwtp_type = this.offsite_wwtp_type
       this.industry.has_direct_discharge = this.has_direct_discharge
 
+      //Local wwtp
+      if(this.has_offsite_wwtp){
+        if(this.offsite_wwtp_type === "Domestic"){
+          if(this.industry.onsite_wwtp === null || this.industry.onsite_wwtp.constructor.name !== "Industrial_wwtp_onsite_external_domestic") this.industry.onsite_wwtp = new Industrial_wwtp_onsite_external_domestic()
+        }else{  //Industrial
+          if(this.industry.onsite_wwtp === null || this.industry.onsite_wwtp.constructor.name !== "Industrial_wwtp_onsite_external_industrial") {
+            this.industry.onsite_wwtp = new Industrial_wwtp_onsite_external_industrial()
+          }
+        }
+      }else{
+        if(this.industry.onsite_wwtp === null || this.industry.onsite_wwtp.constructor.name !== "Industrial_wwtp_onsite") this.industry.onsite_wwtp = new Industrial_wwtp_onsite()
+      }
+
+      //Direct discharge
+      if(this.industry.direct_discharge === null) this.industry.direct_discharge = new Direct_discharge()
+
+      //Industrial offsite wwtp
+      if(this.has_offsite_wwtp){
+        if(this.offsite_wwtp_type == "Industrial"){
+          if(this.industry.offsite_wwtp === null || this.industry.offsite_wwtp.constructor.name !== "Industrial_wwtp_offsite") this.industry.offsite_wwtp = new Industrial_wwtp_offsite()
+
+        }
+      }
+
       if(!this.has_onsite_wwtp){
         if(this.has_direct_discharge) this.stepper_model = 3
         else if(this.has_offsite_wwtp) this.stepper_model = 4
-
       }else{
         this.stepper_model = 2
-        if(this.has_offsite_wwtp){
-          if(this.offsite_wwtp_type === "Domestic"){
-            if(this.industry.onsite_wwtp === null || this.industry.onsite_wwtp.constructor.name !== "Industrial_wwtp_onsite_external_domestic") this.industry.onsite_wwtp = new Industrial_wwtp_onsite_external_domestic()
-          }else{  //Industrial
-            if(this.industry.onsite_wwtp === null || this.industry.onsite_wwtp.constructor.name !== "Industrial_wwtp_onsite_external_industrial") this.industry.onsite_wwtp = new Industrial_wwtp_onsite_external_industrial()
-          }
-        }else{
-          if(this.industry.onsite_wwtp === null || this.industry.onsite_wwtp.constructor.name !== "Industrial_wwtp_onsite") this.industry.onsite_wwtp = new Industrial_wwtp_onsite()
-        }
-
       }
     },
 
