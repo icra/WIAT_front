@@ -280,7 +280,7 @@ let GeoRasterLayer = require("georaster-layer-for-leaflet");
 let _ = require('lodash');
 let chroma = require("chroma-js")
 let $ = require( "jquery" );
-import utils from "../utils"
+import {utils} from "../utils"
 
 
 export default {
@@ -1091,21 +1091,12 @@ export default {
       this.layers["Aridity index"].layers.baseline.annual.layer = this.define_raster_layer("aridity_baseline", null, color_function_baseline_aridity, color_legend_baseline_aridity, label_legend_baseline_aridity,"", 1/10000)
 
       //Baseline runoff
-      let color_function_baseline_runoff = function(values) {
-        let value = values[0]
-        if (value < 0) return
-        else if(value < 10) return '#c8ffff'
-        else if(value < 50) return '#79fffe'
-        else if(value < 100) return '#00feff'
-        else if(value < 500) return '#00d5f0'
-        else if(value < 1000) return '#01c4ff'
-        else if(value < 5000) return '#007dff'
-        else return '#0007a1'
-      }
-      let color_legend_baseline_runoff = ['#c8ffff', '#79fffe', '#00feff', '#00d5f0', '#01c4ff', '#007dff', '#0007a1' ]
-      let label_legend_baseline_runoff = ["<10 mm/year", "10-50 mm/year", "50-100 mm/year", "100-500 mm/year","500-1000 mm/year","1000-5000 mm/year",">5000 mm/year"]
+      let color_legend_baseline_runoff = ['#bed1e3', '#4f9ce3', '#2171b5', '#19598d', '#08306b' ]
+      let label_legend_baseline_runoff = ["<=1e+7 m3/year", "<=1e+8 m3/year", "<=1e+9 m3/year", "<=1e+10 m3/year", ">1e+10 m3/year"]
 
-      this.layers["Specific discharge"].layers.baseline.annual.layer = this.define_raster_layer("baseline_runoff",  null, color_function_baseline_runoff, color_legend_baseline_runoff, label_legend_baseline_runoff, " mm/year")
+      this.layers["Flow accumulation"].layers.baseline.annual.layer = this.define_raster_layer("flow_accumulated",  "flow_accumulated_palette", undefined, color_legend_baseline_runoff, label_legend_baseline_runoff, " m3/year")
+      this.layers["Flow accumulation"].layers.future.layer = this.define_raster_layer("flow_acc_bau",  "flow_acc_bau_palette", undefined, color_legend_baseline_runoff, label_legend_baseline_runoff, " m3/year")
+
 
 
       //Baseline water stress

@@ -14,7 +14,7 @@ Vue.prototype.$clicked_point = null    //Location of the point clicked on the ma
 Vue.prototype.$assessment_active = []    //active assessments shown on map
 Vue.prototype.$selected_layer = "None"
 
-let layers = [
+Vue.prototype.$layers_description = [
   {
     name: "Population",
     children: [
@@ -104,7 +104,7 @@ let layers = [
             },
           },
           {
-            name: "Specific discharge",
+            name: "Flow accumulation",
             layer: {
               layers: {
                 baseline: {
@@ -118,7 +118,7 @@ let layers = [
                 },
               },
               monthly: false,
-              future: false,
+              future: true,
             },
           },
         ]
@@ -317,7 +317,7 @@ let layers = [
             monthly: false,
             future: false,
           }
-          },
+        },
           {
             name: 'Coastal Pharmaceutical Pollution',
             layer: {
@@ -419,9 +419,7 @@ let layers = [
     ]
   },
 ]
-Vue.prototype.$layers_description = layers
 
-export {layers as layers}
 new Vue({
   router,
   vuetify,

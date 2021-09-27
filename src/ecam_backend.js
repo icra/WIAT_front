@@ -7,13 +7,6 @@
 */
 //sum array of numbers
 Array.prototype.sum=function(){return this.reduce((p,c)=>(p+c),0)};
-var global_layers = require("./main")
-
-function daysBetween(date1String, date2String){
-    let d1 = new Date(date1String);
-    let d2 = new Date(date2String);
-    return (d2-d1)/(1000*3600*24);
-}
 
 /*
   ASSESSMENT: main class
@@ -74,30 +67,9 @@ export class Industry{
         this.has_offsite_wwtp = false
         this.offsite_wwtp = null
         this.offsite_wwtp_type = "Domestic" //Domestic or Industrial
-        this.volume_withdrawn = 0   //Amount of water withdrown from the wb(m3)
+        this.volume_withdrawn = 0   //Amount of water withdrawn from the wb(m3)
         this.has_direct_discharge = false
         this.direct_discharge = null
-    }
-
-    dillution_factor(){
-        let dillution_factor = 0
-
-        let water_discharged = 0
-        if(this.has_onsite_wwtp) water_discharged += this.onsite_wwtp.wwt_vol_disc
-        if(this.has_direct_discharge) water_discharged += this.direct_discharge.wwt_vol_disc
-        if(this.has_offsite_wwtp) water_discharged += this.offsite_wwtp.wwt_vol_disc
-    }
-
-    recycled_water_factor(){
-        let recycled_water_factor = 0
-        if(this.has_onsite_wwtp && this.volume_withdrawn > 0) recycled_water_factor = this.onsite_wwtp.wwt_vol_reused / this.volume_withdrawn
-        return recycled_water_factor
-    }
-
-    async dbo_in_river(){
-        console.log(global_layers)
-        let dbo_concentration = await global_layers.layers[2].children[0].children[2].layer.layers.baseline.annual.layer.data_on_point(this.location.lat, this.location.lon)
-        console.log(dbo_concentration)
     }
 
 };

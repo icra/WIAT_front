@@ -57,7 +57,7 @@
 
 import {Assessment, Industry } from "../ecam_backend";
 import Industry_pie_chart from "@/components/Industry_pie_chart";
-import utils from "../utils";
+import {utils} from "../utils";
 
 export default {
   name: "new_assessment",

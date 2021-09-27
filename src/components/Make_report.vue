@@ -49,7 +49,7 @@ let _ = require('lodash');
 import PDFJSViewer from "@/components/PDFJSViewer";
 import pdfMake from 'pdfmake/build/pdfmake.js'
 import Vue from "vue";
-import utils from "../utils"
+import {utils} from "../utils"
 export default {
   name: "Make_report",
   components: {

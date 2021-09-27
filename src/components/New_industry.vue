@@ -716,6 +716,8 @@ import {
   Industrial_wwtp_onsite_external_domestic,
   Industrial_wwtp_onsite_external_industrial, Direct_discharge, Industrial_wwtp_offsite, Domestic_wwtp
 } from "../ecam_backend";
+import Vue from 'vue'
+import {utils, metrics} from "../utils"
 
 export default {
   name: "new_assessment",
@@ -756,7 +758,11 @@ export default {
       offsite_wwtp_type: defaultIndustry.offsite_wwtp_type,
       industrial_domestic: ["Domestic", "Industrial"],
       wwtp_aux_inputs: {},
-      has_direct_discharge: defaultIndustry.has_direct_discharge
+      has_direct_discharge: defaultIndustry.has_direct_discharge,
+
+
+      global_layers: utils.format_layer_description(Vue.prototype.$layers_description),
+
     };
   },
   created() {
@@ -785,7 +791,10 @@ export default {
           this.$set(this.wwtp_aux_inputs, clau, valor);
         }
 
-        this.industry.dbo_in_river()
+
+        metrics.dilution_factor(this.global_layers, this.industry)
+        metrics.recycled_water_factor(this.industry)
+        metrics.dbo_in_river(this.global_layers, this.industry)
 
       }
     },
