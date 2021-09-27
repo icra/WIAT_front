@@ -185,10 +185,10 @@
                         <select v-model="wwtp_aux_inputs[key]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
                           <option
                               v-for="item in value.items"
-                              :value="value.estimation_based_on === null ? item[value.estimation_factor] : item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]"
+                              :value="value.estimation_based_on === null ? item[value.estimation_factor] : (typeof wwtp_aux_inputs[value.estimation_based_on] == 'function' ? item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]() : item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on])"
                           >
                             <!--Desplegable amb estimació-->
-                            {{item.name}} {{item[value.description]}} ({{value.estimation_based_on === null ? item[value.estimation_factor] : parseFloat(item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]).toFixed(3)}} {{value.unit}})
+                            {{item.name}} {{item[value.description]}} ({{value.estimation_based_on === null ? item[value.estimation_factor] : (typeof wwtp_aux_inputs[value.estimation_based_on] == 'function' ? parseFloat(item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]()).toFixed(3) : parseFloat(item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]).toFixed(3))}} {{value.unit}})
                           </option>
                           <option :value="wwtp_aux_inputs[key]">Custom value</option>
                         </select>
@@ -289,10 +289,10 @@
                               <select v-model="wwtp_aux_inputs[key]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
                                 <option
                                     v-for="item in value.items"
-                                    :value="value.estimation_based_on === null ? item[value.estimation_factor] : item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]"
+                                    :value="value.estimation_based_on === null ? item[value.estimation_factor] : (typeof wwtp_aux_inputs[value.estimation_based_on] == 'function' ? item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]() : item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on])"
                                 >
                                   <!--Desplegable amb estimació-->
-                                  {{item.name}} {{item[value.description]}} ({{value.estimation_based_on === null ? item[value.estimation_factor] : parseFloat(item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]).toFixed(3)}} {{value.unit}})
+                                  {{item.name}} {{item[value.description]}} ({{value.estimation_based_on === null ? item[value.estimation_factor] : (typeof wwtp_aux_inputs[value.estimation_based_on] == 'function' ? parseFloat(item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]()).toFixed(3) : parseFloat(item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]).toFixed(3))}} {{value.unit}})
                                 </option>
                                 <option :value="wwtp_aux_inputs[key]">Custom value</option>
                               </select>
@@ -336,7 +336,6 @@
           <v-btn
               color="primary"
               @click="tab_2_continue"
-              :disabled="has_onsite_wwtp && !onsite_valid"
           >
             SAVE AND CONTINUE
           </v-btn>
@@ -414,10 +413,10 @@
                         <select v-model="wwtp_aux_inputs[key]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
                           <option
                               v-for="item in value.items"
-                              :value="value.estimation_based_on === null ? item[value.estimation_factor] : item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]"
+                              :value="value.estimation_based_on === null ? item[value.estimation_factor] : (typeof wwtp_aux_inputs[value.estimation_based_on] == 'function' ? item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]() : item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on])"
                           >
                             <!--Desplegable amb estimació-->
-                            {{item.name}} {{item[value.description]}} ({{value.estimation_based_on === null ? item[value.estimation_factor] : parseFloat(item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]).toFixed(3)}} {{value.unit}})
+                            {{item.name}} {{item[value.description]}} ({{value.estimation_based_on === null ? item[value.estimation_factor] : (typeof wwtp_aux_inputs[value.estimation_based_on] == 'function' ? parseFloat(item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]()).toFixed(3) : parseFloat(item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]).toFixed(3))}} {{value.unit}})
                           </option>
                           <option :value="wwtp_aux_inputs[key]">Custom value</option>
                         </select>
@@ -463,9 +462,6 @@
             SAVE AND CONTINUE
           </v-btn>
 
-          <v-btn text>
-            Cancel
-          </v-btn>
         </v-stepper-content>
 
         <v-stepper-content step="4">
@@ -545,10 +541,10 @@
                         <select v-model="wwtp_aux_inputs[key]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
                           <option
                               v-for="item in value.items"
-                              :value="value.estimation_based_on === null ? item[value.estimation_factor] : item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]"
+                              :value="value.estimation_based_on === null ? item[value.estimation_factor] : (typeof wwtp_aux_inputs[value.estimation_based_on] == 'function' ? item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]() : item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on])"
                           >
                             <!--Desplegable amb estimació-->
-                            {{item.name}} {{item[value.description]}} ({{value.estimation_based_on === null ? item[value.estimation_factor] : parseFloat(item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]).toFixed(3)}} {{value.unit}})
+                            {{item.name}} {{item[value.description]}} ({{value.estimation_based_on === null ? item[value.estimation_factor] : (typeof wwtp_aux_inputs[value.estimation_based_on] == 'function' ? parseFloat(item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]()).toFixed(3) : parseFloat(item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]).toFixed(3))}} {{value.unit}})
                           </option>
                           <option :value="wwtp_aux_inputs[key]">Custom value</option>
                         </select>
@@ -649,10 +645,10 @@
                               <select v-model="wwtp_aux_inputs[key]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
                                 <option
                                     v-for="item in value.items"
-                                    :value="value.estimation_based_on === null ? item[value.estimation_factor] : item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]"
+                                    :value="value.estimation_based_on === null ? item[value.estimation_factor] : (typeof wwtp_aux_inputs[value.estimation_based_on] == 'function' ? item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]() : item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on])"
                                 >
                                   <!--Desplegable amb estimació-->
-                                  {{item.name}} {{item[value.description]}} ({{value.estimation_based_on === null ? item[value.estimation_factor] : parseFloat(item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]).toFixed(3)}} {{value.unit}})
+                                  {{item.name}} {{item[value.description]}} ({{value.estimation_based_on === null ? item[value.estimation_factor] : (typeof wwtp_aux_inputs[value.estimation_based_on] == 'function' ? parseFloat(item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]()).toFixed(3) : parseFloat(item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]).toFixed(3))}} {{value.unit}})
                                 </option>
                                 <option :value="wwtp_aux_inputs[key]">Custom value</option>
                               </select>
@@ -695,8 +691,7 @@
           <br>
           <v-btn
               color="primary"
-              @click="tab_2_continue"
-              :disabled="has_onsite_wwtp && !onsite_valid"
+              @click="tab_4_continue"
           >
             SAVE AND CONTINUE
           </v-btn>
@@ -719,7 +714,7 @@ import {
   Industry,
   Industrial_wwtp_onsite,
   Industrial_wwtp_onsite_external_domestic,
-  Industrial_wwtp_onsite_external_industrial, Direct_discharge, Industrial_wwtp_offsite
+  Industrial_wwtp_onsite_external_industrial, Direct_discharge, Industrial_wwtp_offsite, Domestic_wwtp
 } from "../ecam_backend";
 
 export default {
@@ -773,31 +768,24 @@ export default {
       if(step == 2 ){
         this.onsite_inputs = this.industry.onsite_wwtp.get_inputs()
         this.wwtp_aux_inputs = {}
-        for(let items of Object.values(this.onsite_inputs)){
-          for(let clau of Object.keys(items)){
-            this.$set(this.wwtp_aux_inputs, clau, this.industry.onsite_wwtp[clau]);
-          }
+        for(let [clau, valor] of Object.entries(this.industry.onsite_wwtp)){
+          this.$set(this.wwtp_aux_inputs, clau, valor);
         }
       }else if(step == 3){
         this.direct_discharge_inputs = this.industry.direct_discharge.get_inputs()
         this.wwtp_aux_inputs = {}
-        for(let items of Object.values(this.direct_discharge_inputs)){
-          for(let clau of Object.keys(items)){
-            this.$set(this.wwtp_aux_inputs, clau, this.industry.direct_discharge[clau]);
-          }
+        for(let [clau, valor] of Object.entries(this.industry.direct_discharge)){
+          this.$set(this.wwtp_aux_inputs, clau, valor);
         }
       }else if(step == 4){
 
         this.offsite_inputs = this.industry.offsite_wwtp.get_inputs()
         this.wwtp_aux_inputs = {}
-        for(let items of Object.values(this.offsite_inputs)){
-          for(let clau of Object.keys(items)){
-            this.$set(this.wwtp_aux_inputs, clau, this.industry.offsite_wwtp[clau]);
-          }
+        for(let [clau, valor] of Object.entries(this.industry.offsite_wwtp)){
+          this.$set(this.wwtp_aux_inputs, clau, valor);
         }
-        console.log(this.industry.offsite_wwtp.vol_infl_wwtp)
-        console.log(this.industry.offsite_wwtp.bod_infl_wwtp)
-        console.log(this.industry.offsite_wwtp.tn_infl_wwtp)
+
+        this.industry.dbo_in_river()
 
       }
     },
@@ -821,10 +809,19 @@ export default {
   },
   methods: {
 
+    tab_4_continue(){
+      for (let [key, value] of Object.entries(this.wwtp_aux_inputs)){
+        if(Number(value) != NaN) this.industry.offsite_wwtp[key] = Number(value)
+      }
+      this.stepper_model = 1
+    },
+
+
     tab_3_continue(){
       for (let [key, value] of Object.entries(this.wwtp_aux_inputs)){
-        this.industry.direct_discharge[key] = value
+        if(Number(value) != NaN) this.industry.direct_discharge[key] = Number(value)
       }
+
       if(this.has_offsite_wwtp) {
         this.stepper_model = 4
       }
@@ -833,7 +830,7 @@ export default {
 
     tab_2_continue(){
       for (let [key, value] of Object.entries(this.wwtp_aux_inputs)){
-        this.industry.onsite_wwtp[key] = value
+        if(Number(value) != NaN) this.industry.onsite_wwtp[key] = Number(value)
       }
 
       if(this.has_offsite_wwtp){
@@ -858,6 +855,7 @@ export default {
       this.industry.has_direct_discharge = this.has_direct_discharge
 
       //Local wwtp
+
       if(this.has_offsite_wwtp){
         if(this.offsite_wwtp_type === "Domestic"){
           if(this.industry.onsite_wwtp === null || this.industry.onsite_wwtp.constructor.name !== "Industrial_wwtp_onsite_external_domestic") this.industry.onsite_wwtp = new Industrial_wwtp_onsite_external_domestic()
@@ -873,10 +871,12 @@ export default {
       //Direct discharge
       if(this.industry.direct_discharge === null) this.industry.direct_discharge = new Direct_discharge()
 
-      //Industrial offsite wwtp
+      //Offsite wwtp
       if(this.has_offsite_wwtp){
         if(this.offsite_wwtp_type == "Industrial"){
           if(this.industry.offsite_wwtp === null || this.industry.offsite_wwtp.constructor.name !== "Industrial_wwtp_offsite") this.industry.offsite_wwtp = new Industrial_wwtp_offsite()
+        }else {
+          if(this.industry.offsite_wwtp === null || this.industry.offsite_wwtp.constructor.name !== "Domestic_wwtp") this.industry.offsite_wwtp = new Domestic_wwtp()
 
         }
       }

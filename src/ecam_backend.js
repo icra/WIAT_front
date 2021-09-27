@@ -7,6 +7,7 @@
 */
 //sum array of numbers
 Array.prototype.sum=function(){return this.reduce((p,c)=>(p+c),0)};
+var global_layers = require("./main")
 
 function daysBetween(date1String, date2String){
     let d1 = new Date(date1String);
@@ -77,6 +78,28 @@ export class Industry{
         this.has_direct_discharge = false
         this.direct_discharge = null
     }
+
+    dillution_factor(){
+        let dillution_factor = 0
+
+        let water_discharged = 0
+        if(this.has_onsite_wwtp) water_discharged += this.onsite_wwtp.wwt_vol_disc
+        if(this.has_direct_discharge) water_discharged += this.direct_discharge.wwt_vol_disc
+        if(this.has_offsite_wwtp) water_discharged += this.offsite_wwtp.wwt_vol_disc
+    }
+
+    recycled_water_factor(){
+        let recycled_water_factor = 0
+        if(this.has_onsite_wwtp && this.volume_withdrawn > 0) recycled_water_factor = this.onsite_wwtp.wwt_vol_reused / this.volume_withdrawn
+        return recycled_water_factor
+    }
+
+    async dbo_in_river(){
+        console.log(global_layers)
+        let dbo_concentration = await global_layers.layers[2].children[0].children[2].layer.layers.baseline.annual.layer.data_on_point(this.location.lat, this.location.lon)
+        console.log(dbo_concentration)
+    }
+
 };
 
 export class Direct_discharge{
@@ -86,7 +109,6 @@ export class Direct_discharge{
         inputs["None"] = {
 
             "wwt_vol_disc" :{question:"Volume of discharged waste water to water body", value: 0},
-
 
             "wwt_bod_effl_to_wb": {
                 question: "COD load directly discharged to water body",
@@ -151,8 +173,8 @@ export class Direct_discharge{
     water_quality_indicators(){
         return [
 
-            {type: "COD load at the effluent of the WWTP", value: this.wwt_bod_effl, unit: "kg"},
-            {type: "Total Nitrogen load in the effluent", value: this.wwt_tn_effl, unit: "kg"},
+            {type: "COD load at the effluent of the WWTP", value: this.wwt_bod_effl_to_wb, unit: "kg"},
+            {type: "Total Nitrogen load in the effluent", value: this.wwt_tn_effl_to_wb, unit: "kg"},
 
         ]
     }
@@ -180,7 +202,7 @@ export class Direct_discharge{
     wwt_KPI_GHG_disc(){
         let co2   = 0;
         let ch4   = this.wwt_bod_effl_to_wb*this.wwt_ch4_efac_dis*Cts.ct_ch4_eq.value;    //Equacio 6.2
-        let n2o   = this.wwt_bod_effl_to_wb *this.wwt_n2o_efac_dis*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;    //Equacio 6.12
+        let n2o   = this.wwt_tn_effl_to_wb *this.wwt_n2o_efac_dis*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;    //Equacio 6.12
         let total = co2+ch4+n2o;
         return {total,co2,ch4,n2o};
     }
@@ -492,13 +514,6 @@ export class WWTP{
 
     static get_estimations(){
         return {
-            /*wwt_tn_infl(industry){  //Equation 6.13
-                let P = industry.wwt_ind_prod   //Total industrial product
-                let W = industry.wwt_wwt_generated  //Wastewater generated
-                let TN = industry.wwt_tot_nit   //Total nitrogen in untreated wastewater
-                return P*W*TN
-            },*/
-
             wwt_biog_pro(substage){ //estimation for biogas produced
                 let wwt_mass_slu    = substage.wwt_mass_slu;  //kg  | mass of combined sludge to digestion
                 let VS_to_digestion = wwt_mass_slu    * 0.80; //kg  | VS to digestion: 80% of sludge mass
@@ -552,7 +567,6 @@ export class WWTP{
             //{description: "Emissions from water discharged", emissions: this.wwt_KPI_GHG_disc()},
         ]
     }
-
 
     //indirect emissions from electricity consumption
     wwt_KPI_GHG_elec(){
@@ -951,7 +965,6 @@ export class Industrial_wwtp extends WWTP{
                 question: "Effluent COD load leaving the WWTP to water body",
                 value: 0,
                 unit: "kg",
-                description: "bod_effl_table",
                 description_tooltip: "COD load at the effluent of the WWTP during the assessment period. It can be estimated by multiplying the average COD concentration in the effluent by the effluent volume of the plant discharged to the water body. If this is done daily and summed over the duration of the assessment period the value will be most accurate",
                 //depends_on: "wwt_has_local_wwt_plant"
             }, //kgCOD   Table 6.6B and 6.10C
@@ -1077,8 +1090,8 @@ export class Industrial_wwtp extends WWTP{
     water_quality_indicators(){
         return [
 
-            {type: "COD load at the effluent of the WWTP", value: this.wwt_bod_effl, unit: "kg"},
-            {type: "Total Nitrogen load in the effluent", value: this.wwt_tn_effl, unit: "kg"},
+            {type: "COD load at the effluent of the WWTP", value: this.wwt_bod_effl_to_wb, unit: "kg"},
+            {type: "Total Nitrogen load in the effluent", value: this.wwt_tn_effl_to_wb, unit: "kg"},
 
         ]
     }
@@ -1155,7 +1168,7 @@ export class Industrial_wwtp_onsite extends Industrial_wwtp{
       Functions for calling data from other components
     */
     //emissions with description
-    emissions_and_descriptions(){
+    /*emissions_and_descriptions(){
         return [
             {description: "Indirect emissions from electricity consumption", emissions: this.wwt_KPI_GHG_elec()},
             {description: "Emissions from fuel engines", emissions: this.wwt_KPI_GHG_fuel()},
@@ -1180,11 +1193,11 @@ export class Industrial_wwtp_onsite extends Industrial_wwtp{
     water_quality_indicators(){
         return [
 
-            {type: "COD load at the effluent of the WWTP", value: this.wwt_bod_effl, unit: "kg"},
-            {type: "Total Nitrogen load in the effluent", value: this.wwt_tn_effl, unit: "kg"},
+            {type: "COD load at the effluent of the WWTP", value: this.wwt_bod_effl_to_wb, unit: "kg"},
+            {type: "Total Nitrogen load in the effluent", value: this.wwt_tn_effl_to_wb, unit: "kg"},
 
         ]
-    }
+    }*/
 }; //Industrial onsite WWTP
 
 export class Industrial_wwtp_onsite_external_domestic extends Industrial_wwtp_onsite{  //Industrial onsite WWTP with domestic off-site WWTP
@@ -1214,40 +1227,6 @@ export class Industrial_wwtp_onsite_external_domestic extends Industrial_wwtp_on
         }
     }
 
-    /*
-      Functions for calling data from other components
-    */
-    //emissions with description
-    emissions_and_descriptions(){
-        return [
-            {description: "Indirect emissions from electricity consumption", emissions: this.wwt_KPI_GHG_elec()},
-            {description: "Emissions from fuel engines", emissions: this.wwt_KPI_GHG_fuel()},
-            {description: "Emissions from biogas (fuel used in digester)", emissions: this.wwt_KPI_GHG_biog_dig()},
-            {description: "Emissions from treatment", emissions: this.wwt_KPI_GHG_tre()},
-            {description: "Emissions from biogas", emissions: this.wwt_KPI_GHG_biog()},
-            {description: "Emissions from biogas flared", emissions: this.wwt_KPI_GHG_biog_flared()},
-            {description: "Biogas valorized emissions", emissions: this.wwt_KPI_GHG_biog_valorized()},
-            {description: "Biogas leaked emissions", emissions: this.wwt_KPI_GHG_biog_leaked()},
-            {description: "GHG from sludge management", emissions: this.wwt_KPI_GHG_slu()},
-            {description: "Emissions from sludge storage", emissions: this.wwt_KPI_GHG_sludge_storage()},
-            {description: "Emissions from sludge composting", emissions: this.wwt_KPI_GHG_sludge_composting()},
-            {description: "Emissions from sludge incineration", emissions: this.wwt_KPI_GHG_sludge_incineration()},
-            {description: "Emissions from sludge applied to land", emissions: this.wwt_KPI_GHG_sludge_land_application()},
-            {description: "Emissions from sludge used for landfilling", emissions: this.wwt_KPI_GHG_sludge_landfilling()},
-            {description: "Emissions from sludge stockpiled", emissions: this.wwt_KPI_GHG_sludge_stockpilling()},
-            {description: "Emissions from sludge transport", emissions: this.wwt_KPI_GHG_sludge_transport()},
-            {description: "Emissions from water reuse transport", emissions: this.wwt_KPI_GHG_reus_trck()},
-            {description: "Emissions from water discharged", emissions: this.wwt_KPI_GHG_disc()},
-        ]
-    }
-    water_quality_indicators(){
-        return [
-
-            {type: "COD load at the effluent of the WWTP", value: this.wwt_bod_effl, unit: "kg"},
-            {type: "Total Nitrogen load in the effluent", value: this.wwt_tn_effl, unit: "kg"},
-
-        ]
-    }
 }; //Industrial onsite WWTP with domestic off-site WWTP
 
 export class Industrial_wwtp_onsite_external_industrial extends Industrial_wwtp_onsite{
@@ -1276,46 +1255,23 @@ export class Industrial_wwtp_onsite_external_industrial extends Industrial_wwtp_
         }
     }
 
-    /*
-      Functions for calling data from other components
-    */
-    //emissions with description
-    emissions_and_descriptions(){
-        return [
-            {description: "Indirect emissions from electricity consumption", emissions: this.wwt_KPI_GHG_elec()},
-            {description: "Emissions from fuel engines", emissions: this.wwt_KPI_GHG_fuel()},
-            {description: "Emissions from biogas (fuel used in digester)", emissions: this.wwt_KPI_GHG_biog_dig()},
-            {description: "Emissions from treatment", emissions: this.wwt_KPI_GHG_tre()},
-            {description: "Emissions from biogas", emissions: this.wwt_KPI_GHG_biog()},
-            {description: "Emissions from biogas flared", emissions: this.wwt_KPI_GHG_biog_flared()},
-            {description: "Biogas valorized emissions", emissions: this.wwt_KPI_GHG_biog_valorized()},
-            {description: "Biogas leaked emissions", emissions: this.wwt_KPI_GHG_biog_leaked()},
-            {description: "GHG from sludge management", emissions: this.wwt_KPI_GHG_slu()},
-            {description: "Emissions from sludge storage", emissions: this.wwt_KPI_GHG_sludge_storage()},
-            {description: "Emissions from sludge composting", emissions: this.wwt_KPI_GHG_sludge_composting()},
-            {description: "Emissions from sludge incineration", emissions: this.wwt_KPI_GHG_sludge_incineration()},
-            {description: "Emissions from sludge applied to land", emissions: this.wwt_KPI_GHG_sludge_land_application()},
-            {description: "Emissions from sludge used for landfilling", emissions: this.wwt_KPI_GHG_sludge_landfilling()},
-            {description: "Emissions from sludge stockpiled", emissions: this.wwt_KPI_GHG_sludge_stockpilling()},
-            {description: "Emissions from sludge transport", emissions: this.wwt_KPI_GHG_sludge_transport()},
-            {description: "Emissions from water reuse transport", emissions: this.wwt_KPI_GHG_reus_trck()},
-            {description: "Emissions from water discharged", emissions: this.wwt_KPI_GHG_disc()},
-        ]
-    }
-    water_quality_indicators(){
-        return [
-
-            {type: "COD load at the effluent of the WWTP", value: this.wwt_bod_effl, unit: "kg"},
-            {type: "Total Nitrogen load in the effluent", value: this.wwt_tn_effl, unit: "kg"},
-
-        ]
-    }
 }; //Industrial onsite WWTP with industrial off-site WWTP
 
 export class Industrial_wwtp_offsite extends Industrial_wwtp{
 
     static info_inputs(){
-        let inputs = Industrial_wwtp_offsite.info_inputs()
+        let inputs = Industrial_wwtp.info_inputs()
+        inputs["None"]["wwt_tn_effl_to_wb"] = {
+            question: "Effluent Total Nitrogen load leaving the WWTP to water body",
+                value: 0,
+                unit: "kg",
+                estimation_type: "option",
+                items: Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"],
+                estimation_based_on: "tn_infl",
+                estimation_factor: "N_effl",
+                description: "N_effl_table"
+        }  //kgN   TAULA 6.10c
+
         return inputs
     }
 
@@ -1337,6 +1293,14 @@ export class Industrial_wwtp_offsite extends Industrial_wwtp{
         this.vol_infl_wwtp = 0
         this.bod_infl_wwtp = 0
         this.tn_infl_wwtp = 0
+
+        this.tn_infl = function(){
+            return Number(this.tn_infl_wwtp) + Number(this.wwt_tn_infl)
+        }
+        this.bod_infl = function(){
+            return Number(this.bod_infl_wwtp) + Number(this.wwt_bod_infl)
+        }
+
     }
 
     /*
@@ -1368,8 +1332,8 @@ export class Industrial_wwtp_offsite extends Industrial_wwtp{
     water_quality_indicators(){
         return [
 
-            {type: "COD load at the effluent of the WWTP", value: this.wwt_bod_effl, unit: "kg"},
-            {type: "Total Nitrogen load in the effluent", value: this.wwt_tn_effl, unit: "kg"},
+            {type: "COD load at the effluent of the WWTP", value: this.wwt_bod_effl_to_wb, unit: "kg"},
+            {type: "Total Nitrogen load in the effluent", value: this.wwt_tn_effl_to_wb, unit: "kg"},
 
         ]
     }
@@ -1377,8 +1341,8 @@ export class Industrial_wwtp_offsite extends Industrial_wwtp{
     //emissions from treatment
     wwt_KPI_GHG_tre(){
         let co2   = 0;
-        let ch4   = (this.wwt_bod_infl+this.bod_infl_wwtp-this.wwt_bod_slud)*this.wwt_ch4_efac_tre*Cts.ct_ch4_eq.value;    //Eq. 6.4
-        let n2o   = (this.wwt_tn_infl+this.tn_infl_wwtp)*this.wwt_n2o_efac_tre*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;  //Eq. 6.11
+        let ch4   = (this.bod_infl()-this.wwt_bod_slud)*this.wwt_ch4_efac_tre*Cts.ct_ch4_eq.value;    //Eq. 6.4
+        let n2o   = (this.tn_infl())*this.wwt_n2o_efac_tre*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;  //Eq. 6.11
         let total = co2+ch4+n2o;
         return {total,co2,ch4,n2o};
     }
@@ -1392,21 +1356,27 @@ export class Domestic_wwtp extends WWTP{
 
             /*"wwt_serv_pop" :{question:"Serviced population", value: 0}*/
 
-            "wwt_vol_trea": {question: "Volume of water treated in the WWTP", value: 0, unit: "m3"},
+            "wwt_vol_trea": {question: "Volume of waste water discharged from the industry treated in the WWTP", value: 0, unit: "m3"},
             "wwt_vol_disc" :{question:"Volume of discharged effluent to water body", value: 0},
 
             //"wwt_tot_nit": {question: "Total nitrogen in untreated wastewater", value: 0, unit: "kgTN/m3"},  //kgTN/m3 | Total nitrogen in untreated wastewater
 
-            "wwt_bod_infl": {question: "Influent BOD load entering the WWTP", value: 0, unit: "kg", description_tooltip: "COD load entering the WWTP during the assessment period. It can be estimated by multiplying the average COD concentration in the influent by the volume entering the plant. If this is done daily and summed over the duration of the assessment period the value will be most accurate"}, //kgBOD   //No te estimacio
+            "wwt_bod_infl": {question: "Influent BOD load entering the WWTP from the industry", value: 0, unit: "kg", description_tooltip: "COD load entering the WWTP during the assessment period. It can be estimated by multiplying the average COD concentration in the influent by the volume entering the plant. If this is done daily and summed over the duration of the assessment period the value will be most accurate"}, //kgBOD   //No te estimacio
             "wwt_bod_effl_to_wb": {
                 question: "Effluent BOD load leaving the WWTP to water body",
                 value: 0,
                 unit: "kg",
                 description: "bod_effl_table",
                 description_tooltip: "BOD load at the effluent of the WWTP during the assessment period. It can be estimated by multiplying the average BOD concentration in the effluent by the effluent volume of the plant discharged to the water body. If this is done daily and summed over the duration of the assessment period the value will be most accurate",
+                items: Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"],
+                estimation_based_on: "bod_infl",
+                estimation_factor: "bod_effl",
+                estimation_type: "option",
+
             }, //kgBOD   Table 6.6B and 6.10C
 
-            "wwt_tn_infl": {question: "Total Nitrogen load in the influent", value: 0, unit: "kg"},  //kgN    Equacio 6.13
+
+            "wwt_tn_infl": {question: "Total Nitrogen load in the influent discharged from the industry", value: 0, unit: "kg"},  //kgN    Equacio 6.13
             //"wwt_P_infl": {question: "Influent P load", value: 0, unit: "kg"}, //kgP
 
             "wwt_tn_effl_to_wb": {
@@ -1415,7 +1385,7 @@ export class Domestic_wwtp extends WWTP{
                 unit: "kg",
                 estimation_type: "option",
                 items: Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"],
-                estimation_based_on: "wwt_tn_infl",
+                estimation_based_on: "tn_infl",
                 estimation_factor: "N_effl",
                 description: "N_effl_table"
             },  //kgN   TAULA 6.10c
@@ -1432,7 +1402,18 @@ export class Domestic_wwtp extends WWTP{
                 unit: "kg",
                 description_tooltip: "Amount of raw sludge removed from wastewater treatment as dry mass during the assessment period"
             },  //kg | raw sludge removed from wwtp as dry mass
-            "wwt_bod_slud": {question: "BOD removed as sludge", value: 0, unit: "kg", description_tooltip: "BOD (organic component) removed from wastewater (in the form of sludge) in aerobic treatment plant"},  //kg | BOD removed as sludge    //Taula 6.6A
+            "wwt_bod_slud": {
+                question: "BOD removed as sludge",
+                value: 0,
+                unit: "kg",
+                description_tooltip: "BOD (organic component) removed from wastewater (in the form of sludge) in aerobic treatment plant",
+                estimation_type: "option",
+                items: Tables["type_of_treatment_KREM"],
+                estimation_based_on: "wwt_mass_slu",
+                estimation_factor: "K_rem",
+                //description: "N_effl_table"
+
+            },  //kg | BOD removed as sludge    //Taula 6.6A
 
             //emission factors (treatment)
             "wwt_ch4_efac_tre": {
@@ -1442,7 +1423,7 @@ export class Domestic_wwtp extends WWTP{
                 estimation_type: "option",
                 items: Tables["type_of_treatment"],
                 estimation_based_on: null,
-                estimation_factor: "ch4_efac",
+                estimation_factor: "ch4_efac_bod",
                 description: "description",
                 description_tooltip: "Methane emission factor of selected biological wastewater aerobic treatment processes"
 
@@ -1466,7 +1447,7 @@ export class Domestic_wwtp extends WWTP{
                 estimation_type: "option",
                 items: Tables["type_of_water_body"],
                 estimation_based_on: null,
-                estimation_factor: "ch4_efac",
+                estimation_factor: "ch4_efac_bod",
                 description: "description"
             },  //kgCH4/kgBOD   Table 6.8
             "wwt_n2o_efac_dis": {
@@ -1491,11 +1472,24 @@ export class Domestic_wwtp extends WWTP{
         super();
         let _this = this
 
-        for(let items of Object.values(Industrial_wwtp.info_inputs())){
+        for(let items of Object.values(Domestic_wwtp.info_inputs())){
             for(let [clau, valor] of Object.entries(items)){
                 _this[clau] = valor.value
             }
         }
+
+        //Water received from local WWTP
+        this.vol_infl_wwtp = 0
+        this.bod_infl_wwtp = 0
+        this.tn_infl_wwtp = 0
+
+        this.tn_infl = function(){
+            return Number(this.tn_infl_wwtp) + Number(this.wwt_tn_infl)
+        }
+        this.bod_infl = function(){
+            return Number(this.bod_infl_wwtp) + Number(this.wwt_bod_infl)
+        }
+
     }
 
     /*
@@ -1558,11 +1552,12 @@ export class Domestic_wwtp extends WWTP{
         return {total,co2,ch4,n2o};
     }
 
+
     //emissions from treatment
     wwt_KPI_GHG_tre(){
         let co2   = 0;
-        let ch4   = (this.wwt_bod_infl-this.wwt_bod_slud)*this.wwt_ch4_efac_tre*Cts.ct_ch4_eq.value;    //Eq. 6.4
-        let n2o   = this.wwt_tn_infl*this.wwt_n2o_efac_tre*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;  //Eq. 6.11
+        let ch4   = (this.bod_infl()-this.wwt_bod_slud)*this.wwt_ch4_efac_tre*Cts.ct_ch4_eq.value;    //Eq. 6.4
+        let n2o   = this.tn_infl()*this.wwt_n2o_efac_tre*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;  //Eq. 6.11
         let total = co2+ch4+n2o;
         return {total,co2,ch4,n2o};
     }
@@ -1603,10 +1598,10 @@ let Tables={
 
     //ipcc 2019, table 6.3 (updated) EF (kgCH4/kgCOD)
     "type_of_water_body":[
-        {name:"Water body undefined",                                                                   ch4_efac:0, description:""     },
-        {name:"Discharge to aquatic environments (Tier 1)",                                             ch4_efac:0.028, description:"" },
-        {name:"Discharge to aquatic environments other than reservoirs, lakes, and estuaries (Tier 2)", ch4_efac:0.009, description:"" },
-        {name:"Discharge to reservoirs, lakes, and estuaries (Tier 2)",                                 ch4_efac:0.048, description:"" },
+        {name:"Water body undefined",                                                                   ch4_efac:0, ch4_efac_bod:0, description:""     },
+        {name:"Discharge to aquatic environments (Tier 1)",                                             ch4_efac:0.028, ch4_efac_bod:0.068, description:"" },
+        {name:"Discharge to aquatic environments other than reservoirs, lakes, and estuaries (Tier 2)", ch4_efac:0.009, ch4_efac_bod:0.021, description:"" },
+        {name:"Discharge to reservoirs, lakes, and estuaries (Tier 2)",                                 ch4_efac:0.048, ch4_efac_bod:0.114, description:"" },
         //{name:"Stagnant sewer or anaerobic water body",                                                 ch4_efac:0.3, description:""   },
         //{name:"Flowing sewer (open or closed)",                                                         ch4_efac:0, description:""     },
         //{name:"Soil infiltration",                                                                      ch4_efac:0, description:""     },
@@ -1620,16 +1615,16 @@ let Tables={
 
     //ipcc 2019, table 6.3 (updated) EF (kgCH4/kgCOD)           C
     "type_of_treatment":[
-        {name:"Type of treatment undefined",                                  ch4_efac:0,  description: ""   },
-        {name:"Centralised, aerobic, treatment plant",                        ch4_efac:0, description: ""},
-        {name:"Anaerobic Reactor - CH4 recovery not considered",              ch4_efac:0.2,  description: ""},
+        {name:"Type of treatment undefined",                                  ch4_efac:0,  ch4_efac_bod: 0, description: ""   },
+        {name:"Centralised, aerobic, treatment plant",                        ch4_efac:0, ch4_efac_bod:0.018, description: ""},
+        {name:"Anaerobic Reactor - CH4 recovery not considered",              ch4_efac:0.2, ch4_efac_bod:0.48, description: ""},
         //{name:"Anaerobic Reactor - CH4 recovery considered",                  ch4_efac:0.14,  description: ""},
-        {name:"Anaerobic shallow lagoon and facultative lagoons (<2m depth)", ch4_efac:0.05,  description: ""},
-        {name:"Anaerobic deep lagoon (>2m depth)",                            ch4_efac:0.2,  description: ""},
+        {name:"Anaerobic shallow lagoon and facultative lagoons (<2m depth)", ch4_efac:0.05,  ch4_efac_bod:0.12,description: ""},
+        {name:"Anaerobic deep lagoon (>2m depth)",                            ch4_efac:0.2,  ch4_efac_bod:0.48, description: ""},
         //{name:"Anaerobic Lagoon covered",                                     ch4_efac:0,     description: ""},
-        {name:"Wetlands - Surface flow",                                      ch4_efac:0.1,  description: ""},
-        {name:"Wetlands - Horizontal subsurface flow",                        ch4_efac:0.025,  description: ""},
-        {name:"Wetlands - Vertical subsurface flow",                          ch4_efac:0.0025, description: ""},
+        {name:"Wetlands - Surface flow",                                      ch4_efac:0.1,  ch4_efac_bod:0.24, description: ""},
+        {name:"Wetlands - Horizontal subsurface flow",                        ch4_efac:0.025,  ch4_efac_bod:0.06, description: ""},
+        {name:"Wetlands - Vertical subsurface flow",                          ch4_efac:0.0025, ch4_efac_bod:0.006, description: ""},
         //{name:"Activated Sludge - Well managed",                              ch4_efac:0,     description: ""},
         //{name:"Activated Sludge - Minor poorly aerated zones",                ch4_efac:0.06,  description: ""},
         //{name:"Activated Sludge - Some aerated zones",                        ch4_efac:0.12,  description: ""},
@@ -1687,15 +1682,6 @@ let Tables={
         {name:"Primary (mechanical treatment plants)",                                 bod_effl:0.60, bod_effl_table:"[60%]", N_effl:0.90, N_effl_table:"[90%]"},
         {name:"Primary + Secondary (biological treatment plants)",                     bod_effl:0.15, bod_effl_table:"[15%]", N_effl:0.60, N_effl_table:"[60%]"},
         {name:"Primary + Secondary + Tertiary (advanced biological treatment plants)", bod_effl:0.10, bod_effl_table:"[10%]", N_effl:0.20, N_effl_table:"[20%]"},
-    ],
-
-    "WW treatment organics removal fractions (onsite) (Table 6.6B and 6.10C)":[
-        {name:"Untreated systems",                                                                        bod_rmvd:0,     N_effl:1.00 },
-        {name:"Septic tank/septic system",                                                                bod_rmvd:0.625, N_effl:0.85 },
-        {name:"Septic tank/septic system + land dispersal field",                                         bod_rmvd:0.625, N_effl:0.32 },
-        {name:"Latrines – Dry climate, groundwater table lower than latrine, small family (3–5 persons)", bod_rmvd:0.1,   N_effl:0.88 },
-        {name:"Latrines – Dry climate, groundwater table lower than latrine, communal (many users)",      bod_rmvd:0.5,   N_effl:0.88 },
-        {name:"Latrines – Wet climate/flush water use, groundwater table higher than latrine",            bod_rmvd:0.7,   N_effl:0.88 },
     ],
 
     //Andreoli et al table 2.2
