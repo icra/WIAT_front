@@ -134,24 +134,6 @@ export class Direct_discharge{
     }
 
     /*
-      Functions for calling data from other components
-    */
-    //emissions with description
-    emissions_and_descriptions(){
-        return [
-            {description: "Emissions from water discharged", emissions: this.wwt_KPI_GHG_disc()},
-        ]
-    }
-    water_quality_indicators(){
-        return [
-
-            {type: "COD load at the effluent of the WWTP", value: this.wwt_bod_effl_to_wb, unit: "kg"},
-            {type: "Total Nitrogen load in the effluent", value: this.wwt_tn_effl_to_wb, unit: "kg"},
-
-        ]
-    }
-
-    /*
       GHG emissions (kgCO2eq)
     */
     //total GHG emissions
@@ -331,9 +313,6 @@ export class Direct_discharge{
         let total = 0;
         return {total,co2,ch4,n2o};
     }
-
-
-
 
 };  //Direct discharge
 
@@ -1161,18 +1140,6 @@ export class Industrial_wwtp extends WWTP{
         }
     }
 
-    /*
-      Functions for calling data from other components
-    */
-    //emissions with description
-    water_quality_indicators(){
-        return [
-
-            {type: "COD load at the effluent of the WWTP", value: this.wwt_bod_effl_to_wb, unit: "kg"},
-            {type: "Total Nitrogen load in the effluent", value: this.wwt_tn_effl_to_wb, unit: "kg"},
-
-        ]
-    }
 
     /*
       GHG emissions (kgCO2eq)
@@ -1347,18 +1314,6 @@ export class Industrial_wwtp_offsite extends Industrial_wwtp{
 
     }
 
-    /*
-      Functions for calling data from other components
-    */
-    //emissions with description
-    water_quality_indicators(){
-        return [
-
-            {type: "COD load at the effluent of the WWTP", value: this.wwt_bod_effl_to_wb, unit: "kg"},
-            {type: "Total Nitrogen load in the effluent", value: this.wwt_tn_effl_to_wb, unit: "kg"},
-
-        ]
-    }
 
     //emissions from treatment
     wwt_KPI_GHG_tre(){
@@ -1514,18 +1469,6 @@ export class Domestic_wwtp extends WWTP{
 
     }
 
-    /*
-      Functions for calling data from other components
-    */
-    //emissions with description
-    water_quality_indicators(){
-        return [
-
-            {type: "COD load at the effluent of the WWTP", value: this.wwt_bod_effl, unit: "kg"},
-            {type: "Total Nitrogen load in the effluent", value: this.wwt_tn_effl, unit: "kg"},
-
-        ]
-    }
 
     /*
       GHG emissions (kgCO2eq)

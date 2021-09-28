@@ -49,7 +49,7 @@ let _ = require('lodash');
 import PDFJSViewer from "@/components/PDFJSViewer";
 import pdfMake from 'pdfmake/build/pdfmake.js'
 import Vue from "vue";
-import {utils, industry_statistics} from "../utils"
+import {utils, industry_statistics, metrics} from "../utils"
 export default {
   name: "Make_report",
   components: {
@@ -62,7 +62,9 @@ export default {
       selected_industries: [],
       doc: null,
       layers: utils.format_layer_description(Vue.prototype.$layers_description),
-      generating_pdf: false
+      generating_pdf: false,
+      global_layers: utils.format_layer_description(Vue.prototype.$layers_description),
+
     }
   },
   watch: {
@@ -112,9 +114,14 @@ export default {
 
         dd.content.push("Assessment period: "+ assessment.assessment_period_start + " to "+ assessment.assessment_period_end + " ("+ utils.daysBetween(assessment.assessment_period_start, assessment.assessment_period_end) +" days)\n\n")
 
-        this.emissions_table(dd, industries)
+        let assessment_days = utils.daysBetween(assessment.assessment_period_start, assessment.assessment_period_end)
 
-        await this.layers_table(dd, industries)
+
+        this.emissions_table(dd, industries)
+        dd.content.push("\n\n")
+        await this.quality_quantity_indicators(dd, industries, assessment_days)
+
+        //await this.layers_table(dd, industries)
 
 
 
@@ -326,10 +333,57 @@ export default {
         }
       }
 
+      dd.content.push(emissions_table)
+
+    },
+
+    async quality_quantity_indicators(dd, industries, assessment_days) {
+
+      dd.content.push("Quality and quantity indicators\n\n")
+      let widths = ['*']
+      let body = [{}]
+      for (const industryAux of industries) {
+        widths.push('*')
+        let industry = industryAux.industry
+        body.push({
+          text: industry.name,
+          style: 'tableHeader'
+        })
+      }
+      widths.push('*')
+      body.push({
+        text: "Units",
+        style: 'tableHeader'
+      })
+
+      let tn = ["TN load discharged to the water body"]
+      let bod = ["BOD load discharged to the water body"]
+      let dilution_factor_row = ["Dilution factor"]
+
       for (const industryAux of industries) {
         let industry = industryAux.industry
-        industry_statistics.emissions_and_descriptions(industry)
+        tn.push(metrics.tn_effl(industry).toExponential(3))
+        bod.push(metrics.bod_effl(industry).toExponential(3))
+        let dilution_factor_value = await metrics.dilution_factor(this.global_layers, industry, assessment_days)
+        dilution_factor_row.push(dilution_factor_value.toExponential(3))
+
       }
+
+      bod.push("kg")
+      tn.push("kg")
+      dilution_factor_row.push("-")
+
+
+      let emissions_table = {
+        table: {
+          widths: widths,
+          body: [
+            body, bod, tn, dilution_factor_row
+          ]
+
+        }
+      }
+
 
       dd.content.push(emissions_table)
 

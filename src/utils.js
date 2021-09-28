@@ -62,7 +62,6 @@ let industry_statistics = {
             "wwt_KPI_GHG_disc": 0,
         }
 
-
         for (let key of Object.keys(sources)){
 
             if(industry.has_onsite_wwtp && industry.onsite_wwtp !== null){
@@ -83,7 +82,7 @@ let industry_statistics = {
 
 let metrics = {
 
-    async dilution_factor(global_layers, industry){
+    async dilution_factor(global_layers, industry, assessment_days){
 
         let flow_acc = global_layers["Flow accumulation"].layers.baseline.annual.layer
 
@@ -94,13 +93,14 @@ let metrics = {
 
         if(water_discharged == 0) return NaN
 
-        let flow_acc_value = await flow_acc.data_on_point(industry.location.lat, industry.location.lng)
+        let flow_acc_value = await flow_acc.data_on_point(industry.location.lat, industry.location.lng)*assessment_days/365 //flow accumulation during the assessment days
 
         let dilution_factor = water_discharged/(water_discharged + flow_acc_value)
         console.log(dilution_factor)
         return dilution_factor
 
     },
+
     recycled_water_factor(industry){
         if(industry.has_onsite_wwtp && industry.volume_withdrawn > 0) {
             let recycled_water_factor = industry.onsite_wwtp.wwt_vol_reused / industry.volume_withdrawn
@@ -142,6 +142,50 @@ let metrics = {
         }
 
     },
+
+    bod_effl(industry){
+        let load = 0
+        if(industry.has_onsite_wwtp) {
+            load += industry.onsite_wwtp.wwt_bod_effl_to_wb * 2.4
+        }
+        if(industry.has_direct_discharge) {
+            load += industry.direct_discharge.wwt_bod_effl_to_wb * 2.4
+        }
+        if(industry.has_offsite_wwtp){
+            if(industry.offsite_wwtp_type == "Domestic") load += industry.offsite_wwtp.wwt_bod_effl_to_wb
+            else load += industry.offsite_wwtp.wwt_bod_effl_to_wb * 2.4
+        }
+        return load
+    },
+
+    tn_effl(industry){
+        let load = 0
+        if(industry.has_onsite_wwtp) {
+            load += industry.onsite_wwtp.wwt_tn_effl_to_wb
+        }
+        if(industry.has_direct_discharge) {
+            load += industry.direct_discharge.wwt_tn_effl_to_wb
+        }
+        if(industry.has_offsite_wwtp){
+            if(industry.offsite_wwtp_type == "Domestic") load += industry.offsite_wwtp.wwt_tn_effl_to_wb
+            else load += industry.offsite_wwtp.wwt_tn_effl_to_wb
+        }
+        return load
+    }
+
+
+    /*
+  Functions for calling data from other components
+*/
+
+    /*water_quality_indicators(){
+        return [
+
+            {type: "COD load at the effluent of the WWTP", value: this.wwt_bod_effl_to_wb, unit: "kg"},
+            {type: "Total Nitrogen load in the effluent", value: this.wwt_tn_effl_to_wb, unit: "kg"},
+
+        ]
+    }*/
 }
 
 export {metrics, utils, industry_statistics}
