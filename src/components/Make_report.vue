@@ -16,6 +16,12 @@
           open-on-click
       ></v-treeview>
 
+      <v-switch
+          v-model="include_future"
+          :label="`Include 2030 BAU values in the report: ${include_future.toString()}`"
+          color="#1C195B"
+
+      ></v-switch>
       <br>
 
       <div>
@@ -64,6 +70,7 @@ export default {
       layers: utils.format_layer_description(Vue.prototype.$layers_description),
       generating_pdf: false,
       global_layers: utils.format_layer_description(Vue.prototype.$layers_description),
+      include_future: true,
 
     }
   },
@@ -87,13 +94,16 @@ export default {
             bold: true
           },
           subheader: {
-            fontSize: 15,
+            fontSize: 12,
             bold: true
           },
           tableHeader: {
             bold: true,
             fontSize: 12,
             color: 'black'
+          },
+          bold_text: {
+            bold: true
           }
         },
 
@@ -112,7 +122,15 @@ export default {
 
         let assessment = industries[0].assessment
 
-        dd.content.push("Assessment period: "+ assessment.assessment_period_start + " to "+ assessment.assessment_period_end + " ("+ utils.daysBetween(assessment.assessment_period_start, assessment.assessment_period_end) +" days)\n\n")
+        dd.content.push({
+          text: [
+            {
+              text:"Assessment period: ",
+              bold: true
+            },
+            assessment.assessment_period_start + " to "+ assessment.assessment_period_end + " ("+ utils.daysBetween(assessment.assessment_period_start, assessment.assessment_period_end) +" days)\n\n"
+        ]
+        })
 
         let assessment_days = utils.daysBetween(assessment.assessment_period_start, assessment.assessment_period_end)
 
@@ -120,8 +138,8 @@ export default {
         this.emissions_table(dd, industries)
         dd.content.push("\n\n")
         await this.quality_quantity_indicators(dd, industries, assessment_days)
-
-        //await this.layers_table(dd, industries)
+        dd.content.push("\n\n")
+        await this.layers_table(dd, industries)
 
 
 
@@ -157,7 +175,10 @@ export default {
       }
     }
 
-
+      dd.content.push({
+        text: "GHG emissions\n\n",
+        style: 'subheader'
+      })
     //for(let [layer_name, info] of Object.entries(_this.layers)){
     for(let [layer_name, info] of  selected_layers_formatted){
       let current_layer = [layer_name]
@@ -233,63 +254,83 @@ export default {
   },
   methods: {
     async layers_table(dd, industries){
-      for(const industryAux of industries) {
-        let industry = industryAux.industry
+
+      let selected_layers_formatted = this.selected_layers.map(function (layer) {
+        return [layer.name, layer.layer]
+      })
+
+      if (selected_layers_formatted.length > 0) { //Layer values on industry
+
         dd.content.push({
-          text: "Industry " + industry.name + "\n\n",
+          text: "Layers information\n\n",
           style: 'subheader'
         })
 
-        let lat = industry.location.lat
-        let lng = industry.location.lng
-
-        let selected_layers_formatted = this.selected_layers.map(function (layer) {
-          return [layer.name, layer.layer]
+        let body = [{text: 'Layer', style: 'tableHeader'}]
+        for(const industryAux of industries) {
+          let industry = industryAux.industry
+          body.push({text: industry.name, style: 'tableHeader'})
+        }
+        body.push({
+          text: "Units",
+          style: 'tableHeader'
         })
 
+        let layers_description = {
+          table: {
+            body: [body]
+          }
+        }
 
-        if (selected_layers_formatted.length > 0) { //Layer values on industry
-          dd.content.push("Layer information:\n\n")
-          let layers_description = {
-            table: {
-              widths: ['*', '*', '*'],
-              body: [
-                [{}, {text: 'Baseline', style: 'tableHeader'}, {text: 'Future', style: 'tableHeader'}],
-              ]
+        for (let [layer_name, info] of selected_layers_formatted) {
+          let current_layer = [layer_name]
+          let future_layer = [layer_name+ " (BAU 2030)"]
+
+
+          for(const industryAux of industries) {
+            let industry = industryAux.industry
+            let lat = industry.location.lat
+            let lng = industry.location.lng
+
+            //Baseline
+            let baseline_data = await info.layers.baseline.annual.layer["data_on_point"](lat, lng)
+            current_layer.push(baseline_data.toExponential(3))
+            //Future
+            if (info.future && this.include_future) {
+              let future_data = await info.layers.future.layer["data_on_point"](lat, lng)
+              future_layer.push(future_data.toExponential(3))
             }
           }
 
-          for (let [layer_name, info] of selected_layers_formatted) {
-            let current_layer = [layer_name]
+          current_layer.push(info.layers.baseline.annual.layer["unit"]())
+          layers_description.table.body.push(current_layer)
 
-            //Baseline
-            let baseline_data = await info.layers.baseline.annual.layer["get_label_on_coord"](lat, lng)
-            current_layer.push(baseline_data)
-            //Future
-            if (info.future) {
-              let future_data = await info.layers.future.layer["get_label_on_coord"](lat, lng)
-              current_layer.push(future_data)
-            } else current_layer.push('-')
+          if(info.future && this.include_future){
+            future_layer.push(info.layers.baseline.annual.layer["unit"]())
+            layers_description.table.body.push(future_layer)
 
-            layers_description.table.body.push(current_layer)
           }
-          dd.content.push(layers_description)
         }
+
+        dd.content.push(layers_description)
+
       }
+
     },
     emissions_table(dd, industries) {
-      dd.content.push("GHG emissions\n\n")
-      let widths = ['*']
+      dd.content.push({
+        text: "GHG emissions\n\n",
+        style: 'subheader'
+      })
+
       let body = [{}]
       for (const industryAux of industries) {
-        widths.push('*')
         let industry = industryAux.industry
         body.push({
           text: industry.name,
           style: 'tableHeader'
         })
       }
-      widths.push('*')
       body.push({
         text: "Units",
         style: 'tableHeader'
@@ -325,7 +366,6 @@ export default {
 
       let emissions_table = {
         table: {
-          widths: widths,
           body: [
             body, elec, fuel, tre, biog, slu, reus, disc
           ]
@@ -339,18 +379,19 @@ export default {
 
     async quality_quantity_indicators(dd, industries, assessment_days) {
 
-      dd.content.push("Quality and quantity indicators\n\n")
-      let widths = ['*']
+      dd.content.push({
+        text: "Quality and quantity indicators\n\n",
+        style: "subheader"
+      })
+
       let body = [{}]
       for (const industryAux of industries) {
-        widths.push('*')
         let industry = industryAux.industry
         body.push({
           text: industry.name,
           style: 'tableHeader'
         })
       }
-      widths.push('*')
       body.push({
         text: "Units",
         style: 'tableHeader'
@@ -359,6 +400,8 @@ export default {
       let tn = ["TN load discharged to the water body"]
       let bod = ["BOD load discharged to the water body"]
       let dilution_factor_row = ["Dilution factor"]
+      let recycled_factor = ["Recycled water factor"]
+      let dbo_in_river = ["BOD concentration in water body after discharging waste water"]
 
       for (const industryAux of industries) {
         let industry = industryAux.industry
@@ -366,19 +409,24 @@ export default {
         bod.push(metrics.bod_effl(industry).toExponential(3))
         let dilution_factor_value = await metrics.dilution_factor(this.global_layers, industry, assessment_days)
         dilution_factor_row.push(dilution_factor_value.toExponential(3))
+        recycled_factor.push(metrics.recycled_water_factor(industry).toExponential(3))
+
+        let dbo_value = await metrics.dbo_in_river(this.global_layers, industry, assessment_days)
+        dbo_in_river.push(dbo_value.toExponential(3))
 
       }
 
       bod.push("kg")
       tn.push("kg")
       dilution_factor_row.push("-")
+      recycled_factor.push("-")
+      dbo_in_river.push("kg/m3")
 
 
       let emissions_table = {
         table: {
-          widths: widths,
           body: [
-            body, bod, tn, dilution_factor_row
+            body, bod, tn, dilution_factor_row, recycled_factor, dbo_in_river
           ]
 
         }

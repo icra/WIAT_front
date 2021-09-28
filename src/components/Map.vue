@@ -690,6 +690,9 @@ export default {
           _this.html_legend += '<i style="opacity: 0.5; background:' + color + '"></i> ' + label + '<br>';
 
         }
+        obj["unit"] = function(){
+          return new_units
+        }
 
       }
       obj["delete"] = function(){
@@ -715,8 +718,6 @@ export default {
                 if(modified_string.match(/\d+/g) != null) modified_string = modified_string.replace(/\d+/g, digit => digit * unit_scale_factor);  //Multiply all numbers for the scale
 
               }
-
-
               return(modified_string)
             })
             .catch(function (error) {
@@ -735,7 +736,11 @@ export default {
       }
 
       obj["get_label_on_coord"] = async function(lat, lng){
-        return data_on_point(lat, lng)
+        return await data_on_point(lat, lng)
+      }
+
+      obj["data_on_point"] = async function(lat, lng){
+        return await data_on_point(lat, lng)
       }
       return obj
     },
@@ -773,6 +778,10 @@ export default {
         _this.place_markers(_this.$location_markers)
       }
 
+      obj["unit"] = function(){
+        return units
+      }
+
       async function data_on_point(lat, lng){
         return fetch("https://"+username+".carto.com:443/api/v2/sql?q=select "+label+" from "+dataset+" where ST_Intersects( the_geom, cdb_latlng("+lat+","+lng+"))")
             // we transform the response from the Fetch API into a JSON format
@@ -787,6 +796,10 @@ export default {
               // check if the request is returning an error
               console.log(error)
             });
+      }
+
+      obj["data_on_point"] = async function(lat, lng){
+        return await data_on_point(lat, lng)
       }
 
       async function label_on_point(lat, lng){
@@ -890,6 +903,10 @@ export default {
       obj["get_label_on_coord"] = async function(lat, lng){
         let str = await label_on_point(lat, lng)
         return str
+      }
+
+      obj["unit"] = function(){
+        return units
       }
       return obj
     },
@@ -1429,10 +1446,10 @@ export default {
         }
       `
       let water_gtd_colors = ['#ffff99', '#ffe600', '#ff9900', '#ff1900', '#990000', '#808080', '#4e4e4e' ]
-      let water_gtd_labels = ["Low (<0 cm/y)", "Low - Medium (0-2 cm/y)","Medium - High (2-4 cm/y)", "High (4-8 cm/y)","Extremely High (>8 cm/y)","Insignificant Trend","No Data"]
+      let water_gtd_labels = ["Low (<0 mm/year)", "Low - Medium (0-20 mm/year)","Medium - High (20-40 mm/year)", "High (40-80 mm/year)","Extremely High (>80 mm/y)","Insignificant Trend","No Data"]
 
       //this.layers["Groundwater table decline"].layers.baseline.annual.layer = this.define_carto_layer(baselineGroundwaterTableDeclineDataset, baselineGroundwaterTableDeclineStyle, "gtd_label", wri_client, "wri-rw", true, "cm/y", "mm/yr", 10)
-      this.layers["Groundwater table decline"].layers.baseline.annual.layer = this.define_carto_layer_v2(baselineGroundwaterTableDeclineDataset, baselineGroundwaterTableDeclineStyle, "gtd_raw", wri_client, "wri-rw", water_gtd_colors, water_gtd_labels, -9999, 1," cm/y")
+      this.layers["Groundwater table decline"].layers.baseline.annual.layer = this.define_carto_layer_v2(baselineGroundwaterTableDeclineDataset, baselineGroundwaterTableDeclineStyle, "gtd_raw", wri_client, "wri-rw", water_gtd_colors, water_gtd_labels, -9999, 10," mm/year")
 
       //Baseline riverine flood risk
       const baselineRiverineFloodRiskDataset = 'wat_055_aqueduct_riverine_flood_risk'
@@ -1696,7 +1713,7 @@ export default {
       `
 
       let water_supply_colors = ['#0000ff', '#4169e1', '#1e90ff', '#00bfff', '#87ceeb', '#b0e0e6', '#add8e6', '#b0c4de' ]
-      let water_supply_labels = [">10000 mm/yr", "3000-10000 mm/yr", "1000-3000 mm/yr","300-1000 mm/yr", "100-300 mm/yr", "30-100 mm/yr", "10-30 mm/yr", "< 10 mm/yr"]
+      let water_supply_labels = [">10000 mm/year", "3000-10000 mm/year", "1000-3000 mm/year","300-1000 mm/year", "100-300 mm/year", "30-100 mm/year", "10-30 mm/year", "< 10 mm/year"]
 
 
       //this.layers["Water supply"].layers.baseline.annual.layer = this.define_carto_layer(baselineWaterSupplyDataset, baselineWaterSupplyStyle, "bt2028tl", wri_client, "wri-rw", true, "cm", "mm/yr", 10)
@@ -1762,7 +1779,7 @@ export default {
       `
 
       let water_demand_colors = ['#8b4513', '#daa520', '#d2b48c', '#ffdead', '#fff8dc']
-      let water_demand_labels = [">300 mm/yr", "100-300 mm/yr", "30-100 mm/yr","10-30 mm/yr", "< 10 mm/yr"]
+      let water_demand_labels = [">300 mm/year", "100-300 mm/year", "30-100 mm/year","10-30 mm/year", "< 10 mm/year"]
 
       //this.layers["Water demand"].layers.baseline.annual.layer = this.define_carto_layer(baselineWaterDemandDataset, baselineWaterDemandStyle, "ut2028tl", wri_client, "wri-rw", true, "cm", "mm/yr", 10)
       this.layers["Water demand"].layers.baseline.annual.layer = this.define_carto_layer_v2(baselineWaterDemandDataset, baselineWaterDemandStyle, "ut2028tr", wri_client, "wri-rw", water_demand_colors, water_demand_labels, -9999, 1000, " mm/yr")

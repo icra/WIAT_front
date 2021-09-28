@@ -96,7 +96,6 @@ let metrics = {
         let flow_acc_value = await flow_acc.data_on_point(industry.location.lat, industry.location.lng)*assessment_days/365 //flow accumulation during the assessment days
 
         let dilution_factor = water_discharged/(water_discharged + flow_acc_value)
-        console.log(dilution_factor)
         return dilution_factor
 
     },
@@ -104,18 +103,19 @@ let metrics = {
     recycled_water_factor(industry){
         if(industry.has_onsite_wwtp && industry.volume_withdrawn > 0) {
             let recycled_water_factor = industry.onsite_wwtp.wwt_vol_reused / industry.volume_withdrawn
-            console.log(recycled_water_factor)
             return recycled_water_factor
         }
         return NaN
     },
 
-    async dbo_in_river(global_layers, industry){
+    async dbo_in_river(global_layers, industry, assessment_days, future = false){
         let pharmaceutical_pollution = global_layers["Surface Water Pharmaceutical Pollution"].layers.baseline.annual.layer
         let flow_acc = global_layers["Flow accumulation"].layers.baseline.annual.layer
 
-        let dbo_concentration = await pharmaceutical_pollution.data_on_point(industry.location.lat, industry.location.lng)*100
-        let flow_acc_value = await flow_acc.data_on_point(industry.location.lat, industry.location.lng)
+        let dbo_concentration = await pharmaceutical_pollution.data_on_point(industry.location.lat, industry.location.lng)*100*1e-9 // From dyplophenac ng/L to BOD kg/m3
+        let flow_acc_value = await flow_acc.data_on_point(industry.location.lat, industry.location.lng)*assessment_days/365
+
+
 
         let load = dbo_concentration*flow_acc_value - industry.volume_withdrawn*dbo_concentration
         let water_discharged = 0
@@ -137,7 +137,6 @@ let metrics = {
         let dbo = load/water_discharged
         if (discharge == 0) return NaN
         else{
-            console.log(dbo)
             return dbo
         }
 
