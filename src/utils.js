@@ -50,6 +50,36 @@ let utils = {
 
 }
 
+let industry_statistics = {
+    emissions_and_descriptions(industry){
+        let sources = {
+            "wwt_KPI_GHG_elec": 0,
+            "wwt_KPI_GHG_fuel": 0,
+            "wwt_KPI_GHG_tre": 0,
+            "wwt_KPI_GHG_biog": 0,
+            "wwt_KPI_GHG_slu": 0,
+            "wwt_KPI_GHG_reus_trck":0,
+            "wwt_KPI_GHG_disc": 0,
+        }
+
+
+        for (let key of Object.keys(sources)){
+
+            if(industry.has_onsite_wwtp && industry.onsite_wwtp !== null){
+                sources[key] += industry.onsite_wwtp[key]().total
+            }
+            if(industry.has_direct_discharge && industry.direct_discharge !== null){
+                sources[key] += industry.direct_discharge[key]().total
+            }
+            if(industry.has_offsite_wwtp && industry.offsite_wwtp !== null){
+                sources[key] += industry.offsite_wwtp[key]().total
+            }
+        }
+
+        return sources
+    }
+
+}
 
 let metrics = {
 
@@ -66,7 +96,7 @@ let metrics = {
 
         let flow_acc_value = await flow_acc.data_on_point(industry.location.lat, industry.location.lng)
 
-        let dilution_factor = flow_acc_value/water_discharged
+        let dilution_factor = water_discharged/(water_discharged + flow_acc_value)
         console.log(dilution_factor)
         return dilution_factor
 
@@ -114,5 +144,5 @@ let metrics = {
     },
 }
 
-export {metrics, utils}
+export {metrics, utils, industry_statistics}
 

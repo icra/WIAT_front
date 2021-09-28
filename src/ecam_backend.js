@@ -179,6 +179,162 @@ export class Direct_discharge{
         return {total,co2,ch4,n2o};
     }
 
+    //indirect emissions from electricity consumption
+    wwt_KPI_GHG_elec(){
+        let co2   = 0
+        let ch4   = 0
+        let n2o   = 0
+        let total = 0;
+        return {total,co2,ch4,n2o};
+    }
+
+    //emissions from fuel engines
+    wwt_KPI_GHG_fuel(){
+        let co2   = 0
+        let ch4   = 0
+        let n2o   = 0
+        let total = 0;
+        return {total,co2,ch4,n2o};
+    }
+
+    //emissions from biogas (fuel used in digester)
+    wwt_KPI_GHG_biog_dig(){
+        let co2   = 0
+        let ch4   = 0
+        let n2o   = 0
+        let total = 0;
+        return {total,co2,ch4,n2o};
+    }
+
+    //emissions from biogas
+    wwt_KPI_GHG_biog(){
+        let co2   = 0
+        let ch4   = 0
+        let n2o   = 0
+        let total = 0;
+        return {total,co2,ch4,n2o};
+    }
+
+    //emissions from biogas flared
+    wwt_KPI_GHG_biog_flared(){
+        let co2   = 0
+        let ch4   = 0
+        let n2o   = 0
+        let total = 0;
+        return {total,co2,ch4,n2o};
+    }
+
+    //biogas valorized emissions
+    wwt_KPI_GHG_biog_valorized(){
+        let co2   = 0
+        let ch4   = 0
+        let n2o   = 0
+        let total = 0;
+        return {total,co2,ch4,n2o};
+    }
+
+    //biogas leaked emissions
+    wwt_KPI_GHG_biog_leaked(){
+        let co2   = 0
+        let ch4   = 0
+        let n2o   = 0
+        let total = 0;
+        return {total,co2,ch4,n2o};
+    }
+
+    //ghg from sludge management
+    wwt_KPI_GHG_slu(){
+        let co2   = 0
+        let ch4   = 0
+        let n2o   = 0
+        let total = 0;
+        return {total,co2,ch4,n2o};
+    }
+
+    //emissions from sludge storage
+    wwt_KPI_GHG_sludge_storage(){
+        let co2   = 0
+        let ch4   = 0
+        let n2o   = 0
+        let total = 0;
+        return {total,co2,ch4,n2o};
+    }
+
+    //emissions from sludge composting
+    wwt_KPI_GHG_sludge_composting(){
+        let co2   = 0
+        let ch4   = 0
+        let n2o   = 0
+        let total = 0;
+        return {total,co2,ch4,n2o};
+    }
+
+    //emissions from sludge incineration
+    wwt_KPI_GHG_sludge_incineration(){
+        let co2   = 0
+        let ch4   = 0
+        let n2o   = 0
+        let total = 0;
+        return {total,co2,ch4,n2o};
+    }
+
+    //emissions from sludge applied to land
+    wwt_KPI_GHG_sludge_land_application(){
+        let co2   = 0
+        let ch4   = 0
+        let n2o   = 0
+        let total = 0;
+        return {total,co2,ch4,n2o};
+    }
+
+    //emissions from sludge used for landfilling
+    wwt_KPI_GHG_sludge_landfilling(){
+        let co2   = 0
+        let ch4   = 0
+        let n2o   = 0
+        let total = 0;
+        return {total,co2,ch4,n2o};
+    }
+
+    //emissions from sludge stockpiled
+    wwt_KPI_GHG_sludge_stockpilling(){
+        let co2   = 0
+        let ch4   = 0
+        let n2o   = 0
+        let total = 0;
+        return {total,co2,ch4,n2o};
+    }
+
+    //emissions from sludge transport
+    wwt_KPI_GHG_sludge_transport(){
+        let co2   = 0
+        let ch4   = 0
+        let n2o   = 0
+        let total = 0;
+        return {total,co2,ch4,n2o};
+    }
+
+    //emissions from water reuse transport
+    wwt_KPI_GHG_reus_trck(){
+        let co2   = 0
+        let ch4   = 0
+        let n2o   = 0
+        let total = 0;
+        return {total,co2,ch4,n2o};
+    }
+
+    //emissions from treatment
+    wwt_KPI_GHG_tre(){
+        let co2   = 0
+        let ch4   = 0
+        let n2o   = 0
+        let total = 0;
+        return {total,co2,ch4,n2o};
+    }
+
+
+
+
 };  //Direct discharge
 
 export class WWTP{
@@ -510,34 +666,6 @@ export class WWTP{
     }
 
     constructor(){
-    }
-
-    /*
-      Functions for calling data from other components
-    */
-
-    //emissions with description
-    emissions_and_descriptions(){
-        return [
-            {description: "Indirect emissions from electricity consumption", emissions: this.wwt_KPI_GHG_elec()},
-            {description: "Emissions from fuel engines", emissions: this.wwt_KPI_GHG_fuel()},
-            {description: "Emissions from biogas (fuel used in digester)", emissions: this.wwt_KPI_GHG_biog_dig()},
-            //{description: "Emissions from treatment", emissions: this.wwt_KPI_GHG_tre()},
-            {description: "Emissions from biogas", emissions: this.wwt_KPI_GHG_biog()},
-            {description: "Emissions from biogas flared", emissions: this.wwt_KPI_GHG_biog_flared()},
-            {description: "Biogas valorized emissions", emissions: this.wwt_KPI_GHG_biog_valorized()},
-            {description: "Biogas leaked emissions", emissions: this.wwt_KPI_GHG_biog_leaked()},
-            {description: "GHG from sludge management", emissions: this.wwt_KPI_GHG_slu()},
-            {description: "Emissions from sludge storage", emissions: this.wwt_KPI_GHG_sludge_storage()},
-            {description: "Emissions from sludge composting", emissions: this.wwt_KPI_GHG_sludge_composting()},
-            {description: "Emissions from sludge incineration", emissions: this.wwt_KPI_GHG_sludge_incineration()},
-            {description: "Emissions from sludge applied to land", emissions: this.wwt_KPI_GHG_sludge_land_application()},
-            {description: "Emissions from sludge used for landfilling", emissions: this.wwt_KPI_GHG_sludge_landfilling()},
-            {description: "Emissions from sludge stockpiled", emissions: this.wwt_KPI_GHG_sludge_stockpilling()},
-            {description: "Emissions from sludge transport", emissions: this.wwt_KPI_GHG_sludge_transport()},
-            {description: "Emissions from water reuse transport", emissions: this.wwt_KPI_GHG_reus_trck()},
-            //{description: "Emissions from water discharged", emissions: this.wwt_KPI_GHG_disc()},
-        ]
     }
 
     //indirect emissions from electricity consumption
@@ -1037,28 +1165,6 @@ export class Industrial_wwtp extends WWTP{
       Functions for calling data from other components
     */
     //emissions with description
-    emissions_and_descriptions(){
-        return [
-            {description: "Indirect emissions from electricity consumption", emissions: this.wwt_KPI_GHG_elec()},
-            {description: "Emissions from fuel engines", emissions: this.wwt_KPI_GHG_fuel()},
-            {description: "Emissions from biogas (fuel used in digester)", emissions: this.wwt_KPI_GHG_biog_dig()},
-            {description: "Emissions from treatment", emissions: this.wwt_KPI_GHG_tre()},
-            {description: "Emissions from biogas", emissions: this.wwt_KPI_GHG_biog()},
-            {description: "Emissions from biogas flared", emissions: this.wwt_KPI_GHG_biog_flared()},
-            {description: "Biogas valorized emissions", emissions: this.wwt_KPI_GHG_biog_valorized()},
-            {description: "Biogas leaked emissions", emissions: this.wwt_KPI_GHG_biog_leaked()},
-            {description: "GHG from sludge management", emissions: this.wwt_KPI_GHG_slu()},
-            {description: "Emissions from sludge storage", emissions: this.wwt_KPI_GHG_sludge_storage()},
-            {description: "Emissions from sludge composting", emissions: this.wwt_KPI_GHG_sludge_composting()},
-            {description: "Emissions from sludge incineration", emissions: this.wwt_KPI_GHG_sludge_incineration()},
-            {description: "Emissions from sludge applied to land", emissions: this.wwt_KPI_GHG_sludge_land_application()},
-            {description: "Emissions from sludge used for landfilling", emissions: this.wwt_KPI_GHG_sludge_landfilling()},
-            {description: "Emissions from sludge stockpiled", emissions: this.wwt_KPI_GHG_sludge_stockpilling()},
-            {description: "Emissions from sludge transport", emissions: this.wwt_KPI_GHG_sludge_transport()},
-            {description: "Emissions from water reuse transport", emissions: this.wwt_KPI_GHG_reus_trck()},
-            {description: "Emissions from water discharged", emissions: this.wwt_KPI_GHG_disc()},
-        ]
-    }
     water_quality_indicators(){
         return [
 
@@ -1136,40 +1242,6 @@ export class Industrial_wwtp_onsite extends Industrial_wwtp{
         }
     }
 
-    /*
-      Functions for calling data from other components
-    */
-    //emissions with description
-    /*emissions_and_descriptions(){
-        return [
-            {description: "Indirect emissions from electricity consumption", emissions: this.wwt_KPI_GHG_elec()},
-            {description: "Emissions from fuel engines", emissions: this.wwt_KPI_GHG_fuel()},
-            {description: "Emissions from biogas (fuel used in digester)", emissions: this.wwt_KPI_GHG_biog_dig()},
-            {description: "Emissions from treatment", emissions: this.wwt_KPI_GHG_tre()},
-            {description: "Emissions from biogas", emissions: this.wwt_KPI_GHG_biog()},
-            {description: "Emissions from biogas flared", emissions: this.wwt_KPI_GHG_biog_flared()},
-            {description: "Biogas valorized emissions", emissions: this.wwt_KPI_GHG_biog_valorized()},
-            {description: "Biogas leaked emissions", emissions: this.wwt_KPI_GHG_biog_leaked()},
-            {description: "GHG from sludge management", emissions: this.wwt_KPI_GHG_slu()},
-            {description: "Emissions from sludge storage", emissions: this.wwt_KPI_GHG_sludge_storage()},
-            {description: "Emissions from sludge composting", emissions: this.wwt_KPI_GHG_sludge_composting()},
-            {description: "Emissions from sludge incineration", emissions: this.wwt_KPI_GHG_sludge_incineration()},
-            {description: "Emissions from sludge applied to land", emissions: this.wwt_KPI_GHG_sludge_land_application()},
-            {description: "Emissions from sludge used for landfilling", emissions: this.wwt_KPI_GHG_sludge_landfilling()},
-            {description: "Emissions from sludge stockpiled", emissions: this.wwt_KPI_GHG_sludge_stockpilling()},
-            {description: "Emissions from sludge transport", emissions: this.wwt_KPI_GHG_sludge_transport()},
-            {description: "Emissions from water reuse transport", emissions: this.wwt_KPI_GHG_reus_trck()},
-            {description: "Emissions from water discharged", emissions: this.wwt_KPI_GHG_disc()},
-        ]
-    }
-    water_quality_indicators(){
-        return [
-
-            {type: "COD load at the effluent of the WWTP", value: this.wwt_bod_effl_to_wb, unit: "kg"},
-            {type: "Total Nitrogen load in the effluent", value: this.wwt_tn_effl_to_wb, unit: "kg"},
-
-        ]
-    }*/
 }; //Industrial onsite WWTP
 
 export class Industrial_wwtp_onsite_external_domestic extends Industrial_wwtp_onsite{  //Industrial onsite WWTP with domestic off-site WWTP
@@ -1279,28 +1351,6 @@ export class Industrial_wwtp_offsite extends Industrial_wwtp{
       Functions for calling data from other components
     */
     //emissions with description
-    emissions_and_descriptions(){
-        return [
-            {description: "Indirect emissions from electricity consumption", emissions: this.wwt_KPI_GHG_elec()},
-            {description: "Emissions from fuel engines", emissions: this.wwt_KPI_GHG_fuel()},
-            {description: "Emissions from biogas (fuel used in digester)", emissions: this.wwt_KPI_GHG_biog_dig()},
-            {description: "Emissions from treatment", emissions: this.wwt_KPI_GHG_tre()},
-            {description: "Emissions from biogas", emissions: this.wwt_KPI_GHG_biog()},
-            {description: "Emissions from biogas flared", emissions: this.wwt_KPI_GHG_biog_flared()},
-            {description: "Biogas valorized emissions", emissions: this.wwt_KPI_GHG_biog_valorized()},
-            {description: "Biogas leaked emissions", emissions: this.wwt_KPI_GHG_biog_leaked()},
-            {description: "GHG from sludge management", emissions: this.wwt_KPI_GHG_slu()},
-            {description: "Emissions from sludge storage", emissions: this.wwt_KPI_GHG_sludge_storage()},
-            {description: "Emissions from sludge composting", emissions: this.wwt_KPI_GHG_sludge_composting()},
-            {description: "Emissions from sludge incineration", emissions: this.wwt_KPI_GHG_sludge_incineration()},
-            {description: "Emissions from sludge applied to land", emissions: this.wwt_KPI_GHG_sludge_land_application()},
-            {description: "Emissions from sludge used for landfilling", emissions: this.wwt_KPI_GHG_sludge_landfilling()},
-            {description: "Emissions from sludge stockpiled", emissions: this.wwt_KPI_GHG_sludge_stockpilling()},
-            {description: "Emissions from sludge transport", emissions: this.wwt_KPI_GHG_sludge_transport()},
-            {description: "Emissions from water reuse transport", emissions: this.wwt_KPI_GHG_reus_trck()},
-            {description: "Emissions from water discharged", emissions: this.wwt_KPI_GHG_disc()},
-        ]
-    }
     water_quality_indicators(){
         return [
 
@@ -1468,28 +1518,6 @@ export class Domestic_wwtp extends WWTP{
       Functions for calling data from other components
     */
     //emissions with description
-    emissions_and_descriptions(){
-        return [
-            {description: "Indirect emissions from electricity consumption", emissions: this.wwt_KPI_GHG_elec()},
-            {description: "Emissions from fuel engines", emissions: this.wwt_KPI_GHG_fuel()},
-            {description: "Emissions from biogas (fuel used in digester)", emissions: this.wwt_KPI_GHG_biog_dig()},
-            {description: "Emissions from treatment", emissions: this.wwt_KPI_GHG_tre()},
-            {description: "Emissions from biogas", emissions: this.wwt_KPI_GHG_biog()},
-            {description: "Emissions from biogas flared", emissions: this.wwt_KPI_GHG_biog_flared()},
-            {description: "Biogas valorized emissions", emissions: this.wwt_KPI_GHG_biog_valorized()},
-            {description: "Biogas leaked emissions", emissions: this.wwt_KPI_GHG_biog_leaked()},
-            {description: "GHG from sludge management", emissions: this.wwt_KPI_GHG_slu()},
-            {description: "Emissions from sludge storage", emissions: this.wwt_KPI_GHG_sludge_storage()},
-            {description: "Emissions from sludge composting", emissions: this.wwt_KPI_GHG_sludge_composting()},
-            {description: "Emissions from sludge incineration", emissions: this.wwt_KPI_GHG_sludge_incineration()},
-            {description: "Emissions from sludge applied to land", emissions: this.wwt_KPI_GHG_sludge_land_application()},
-            {description: "Emissions from sludge used for landfilling", emissions: this.wwt_KPI_GHG_sludge_landfilling()},
-            {description: "Emissions from sludge stockpiled", emissions: this.wwt_KPI_GHG_sludge_stockpilling()},
-            {description: "Emissions from sludge transport", emissions: this.wwt_KPI_GHG_sludge_transport()},
-            {description: "Emissions from water reuse transport", emissions: this.wwt_KPI_GHG_reus_trck()},
-            {description: "Emissions from water discharged", emissions: this.wwt_KPI_GHG_disc()},
-        ]
-    }
     water_quality_indicators(){
         return [
 
