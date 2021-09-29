@@ -516,6 +516,10 @@ export default {
 },
   methods: {
 
+    pan_location(location){
+      this.mapDiv.panTo(location)
+    },
+
     async onMapClick(e) {
 
       let _this = this

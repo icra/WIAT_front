@@ -94,6 +94,13 @@
                     label="Off-site treatment wastewater plant type"
                     v-if="has_offsite_wwtp"
                 ></v-select>
+                <v-select
+                    v-model="industry_type"
+                    :items="industry_typologies"
+                    filled
+                    label="Industry type"
+                ></v-select>
+
               </v-form>
             </v-col>
 
@@ -164,7 +171,7 @@
 
                         <v-tooltip
                             bottom
-                            v-if="value.estimation_type === 'equation'">
+                            v-if="value.estimation_equation">
                           <template v-slot:activator="{ on, attrs }">
                             <v-btn
                                 v-bind="attrs"
@@ -268,7 +275,7 @@
 
                               <v-tooltip
                                   bottom
-                                  v-if="value.estimation_type === 'equation'">
+                                  v-if="value.estimation_equation">
                                 <template v-slot:activator="{ on, attrs }">
                                   <v-btn
                                       v-bind="attrs"
@@ -392,7 +399,7 @@
 
                         <v-tooltip
                             bottom
-                            v-if="value.estimation_type === 'equation'">
+                            v-if="value.estimation_equation">
                           <template v-slot:activator="{ on, attrs }">
                             <v-btn
                                 v-bind="attrs"
@@ -520,7 +527,7 @@
 
                         <v-tooltip
                             bottom
-                            v-if="value.estimation_type === 'equation'">
+                            v-if="value.estimation_equation">
                           <template v-slot:activator="{ on, attrs }">
                             <v-btn
                                 v-bind="attrs"
@@ -624,7 +631,7 @@
 
                               <v-tooltip
                                   bottom
-                                  v-if="value.estimation_type === 'equation'">
+                                  v-if="value.estimation_equation">
                                 <template v-slot:activator="{ on, attrs }">
                                   <v-btn
                                       v-bind="attrs"
@@ -746,7 +753,6 @@ export default {
       external_no_internal_image: require("../../public/water_flow/external_no_internal.jpg"),
       external_internal_image: require("../../public/water_flow/external_internal.jpg"),
 
-
       water_withdrawal_valid: true,
       water_withdrawn: defaultIndustry.volume_withdrawn,
       //water_withdrawn: 0,
@@ -760,8 +766,20 @@ export default {
       wwtp_aux_inputs: {},
       has_direct_discharge: defaultIndustry.has_direct_discharge,
 
-
       global_layers: utils.format_layer_description(Vue.prototype.$layers_description),
+
+      industry_type: defaultIndustry.industry_type,
+      industry_typologies: [
+        {text: "Undefined", value: null},
+        {text: "Others", value: null},
+        {text: "Alcohol refining", value: "alcohol"},
+        {text: "Beer and malt", value: "beer"},
+        {text: "Fish processing", value: "fish"},
+        {text: "Iron and steel manufacturing", value: "iron"},
+        {text: "Meat and poultry", value: "meat"},
+        {text: "Nitrogen fertiliser", value: "nitrogen"},
+        {text: "Plastics and resins", value: "plastics"},
+        {text: "Starch production", value: "starch"}]
 
     };
   },
@@ -781,6 +799,8 @@ export default {
         this.direct_discharge_inputs = this.industry.direct_discharge.get_inputs()
         this.wwtp_aux_inputs = {}
         for(let [clau, valor] of Object.entries(this.industry.direct_discharge)){
+          console.log(clau)
+          console.log(valor)
           this.$set(this.wwtp_aux_inputs, clau, valor);
         }
       }else if(step == 4){
@@ -862,23 +882,35 @@ export default {
       this.industry.has_offsite_wwtp = this.has_offsite_wwtp
       this.industry.offsite_wwtp_type = this.offsite_wwtp_type
       this.industry.has_direct_discharge = this.has_direct_discharge
+      this.industry.industry_type = this.industry_type
 
       //Local wwtp
 
-      if(this.has_offsite_wwtp){
-        if(this.offsite_wwtp_type === "Domestic"){
-          if(this.industry.onsite_wwtp === null || this.industry.onsite_wwtp.constructor.name !== "Industrial_wwtp_onsite_external_domestic") this.industry.onsite_wwtp = new Industrial_wwtp_onsite_external_domestic()
-        }else{  //Industrial
-          if(this.industry.onsite_wwtp === null || this.industry.onsite_wwtp.constructor.name !== "Industrial_wwtp_onsite_external_industrial") {
-            this.industry.onsite_wwtp = new Industrial_wwtp_onsite_external_industrial()
+      if(this.has_onsite_wwtp){
+        if(this.has_offsite_wwtp){
+          if(this.offsite_wwtp_type === "Domestic"){
+            if(this.industry.onsite_wwtp === null || this.industry.onsite_wwtp.constructor.name !== "Industrial_wwtp_onsite_external_domestic") this.industry.onsite_wwtp = new Industrial_wwtp_onsite_external_domestic()
+          }else{  //Industrial
+            if(this.industry.onsite_wwtp === null || this.industry.onsite_wwtp.constructor.name !== "Industrial_wwtp_onsite_external_industrial") {
+              this.industry.onsite_wwtp = new Industrial_wwtp_onsite_external_industrial()
+            }
+          }
+        }else{
+          if(this.industry.onsite_wwtp === null || this.industry.onsite_wwtp.constructor.name !== "Industrial_wwtp_onsite") {
+            this.industry.onsite_wwtp = new Industrial_wwtp_onsite()
           }
         }
-      }else{
-        if(this.industry.onsite_wwtp === null || this.industry.onsite_wwtp.constructor.name !== "Industrial_wwtp_onsite") this.industry.onsite_wwtp = new Industrial_wwtp_onsite()
+        this.industry.onsite_wwtp.industry_type = this.industry.industry_type
       }
 
       //Direct discharge
-      if(this.industry.direct_discharge === null) this.industry.direct_discharge = new Direct_discharge()
+      if(this.has_direct_discharge){
+        if(this.industry.direct_discharge === null) {
+          this.industry.direct_discharge = new Direct_discharge()
+        }
+        this.industry.direct_discharge.industry_type = this.industry.industry_type
+
+      }
 
       //Offsite wwtp
       if(this.has_offsite_wwtp){
@@ -886,8 +918,9 @@ export default {
           if(this.industry.offsite_wwtp === null || this.industry.offsite_wwtp.constructor.name !== "Industrial_wwtp_offsite") this.industry.offsite_wwtp = new Industrial_wwtp_offsite()
         }else {
           if(this.industry.offsite_wwtp === null || this.industry.offsite_wwtp.constructor.name !== "Domestic_wwtp") this.industry.offsite_wwtp = new Domestic_wwtp()
-
         }
+        this.industry.offsite_wwtp.industry_type = this.industry.industry_type
+
       }
 
       if(!this.has_onsite_wwtp){

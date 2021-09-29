@@ -2,7 +2,7 @@
   <v-app>
 
     <!-- Header -->
-    <v-app-bar
+    <!--<v-app-bar
         height="75px"
         width="100%"
         app
@@ -14,7 +14,7 @@
         <v-icon size="90">$icra_logo</v-icon>
         <v-icon size="90">$icra_logo</v-icon>
       </div>
-    </v-app-bar>
+    </v-app-bar>-->
 
       <!-- Main sidebar (first)-->
       <v-navigation-drawer
@@ -85,8 +85,6 @@
         <h1>Assessment list</h1>
         <!-- <div style = "overflow-y: auto; height: 75%; max-height: 75%; width: 100%"> -->
         <div style="flex: 2; overflow-y: auto; width: 100%; position: relative; height: 100%" >
-
-
 
           <v-expansion-panels focusable v-model="assessment_expansion_panel">
             <v-expansion-panel
@@ -352,9 +350,9 @@
             <v-btn @click="delete_industry" small outlined block>
               Delete
             </v-btn>
-            <v-btn block small outlined :to="{ name: 'statistics_industry', params: {assessment_id: selected_assessment, industry_id: selected_industry}}" @click="icon_selected = -1; selected_layer=null; secondMenu=false; rightMenu=false">
+            <!--<v-btn block small outlined :to="{ name: 'statistics_industry', params: {assessment_id: selected_assessment, industry_id: selected_industry}}" @click="icon_selected = -1; selected_layer=null; secondMenu=false; rightMenu=false">
               SHOW RESULTS
-            </v-btn>
+            </v-btn>-->
 
           </div>
         </div>
@@ -552,8 +550,15 @@ export default {
 
     }
   },
-
+  created() {
+    window.addEventListener('beforeunload', e => this.beforeunloadFn(e))
+  },
   methods: {
+    beforeunloadFn(){
+      event.preventDefault()
+      event.returnValue = ""
+    },
+
     /*assessmentTreeSelected(nodeAssessment){
 
       if(nodeAssessment.length > 0){ //Node selected
@@ -721,6 +726,13 @@ export default {
       this.selected_assessment = assessment_index
       this.selected_industry = industry_index
       this.assessment_expansion_panel = assessment_index
+
+      try {
+        this.$refs.reference.pan_location(this.created_assessments[assessment_index].industries[industry_index].location)
+      } catch (error) {}
+
+
+
     },
     edit_industry(){
       this.rightMenu = false
@@ -906,13 +918,12 @@ html::-webkit-scrollbar {
   height: 100%;
 }
 .content{
-  height: calc(100% - 75px);
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: #F2F4F3;
   position: absolute;
-  top: 75px;
 
 }
 .icon_hovered_pressed{

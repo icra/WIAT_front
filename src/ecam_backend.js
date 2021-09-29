@@ -70,6 +70,7 @@ export class Industry{
         this.volume_withdrawn = 0   //Amount of water withdrawn from the wb(m3)
         this.has_direct_discharge = false
         this.direct_discharge = null
+        this.industry_type = null
     }
 
 };
@@ -92,6 +93,9 @@ export class Direct_discharge{
                 question: "Total Nitrogen load directly discharged to water body",
                 value: 0,
                 unit: "kg",
+                estimation_type: "equation",
+                estimation_equation: true,
+
             },
 
             //emission factors (discharge)
@@ -125,7 +129,7 @@ export class Direct_discharge{
 
     constructor(){
         let _this = this
-
+        this.industry_type = null
         for(let items of Object.values(Direct_discharge.info_inputs())){
             for(let [clau, valor] of Object.entries(items)){
                 _this[clau] = valor.value
@@ -160,6 +164,7 @@ export class Direct_discharge{
         let total = co2+ch4+n2o;
         return {total,co2,ch4,n2o};
     }
+
 
     //indirect emissions from electricity consumption
     wwt_KPI_GHG_elec(){
@@ -333,28 +338,35 @@ export class WWTP{
                     value: 0,
                     unit: "Nm3",
                     estimation_type: "equation",
-                    description_tooltip: "Biogas produced during the assessment period by the wastewater treatment plant managed by the undertaking"
+                    description_tooltip: "Biogas produced during the assessment period by the wastewater treatment plant managed by the undertaking",
+                    estimation_equation: true,
+
                 }, //Nm3 | total biogas produced
                 "wwt_biog_fla": {
                     question: "% of biogas produced that is flared",
                     value: 98,
                     unit: "%",
-                    estimation_type: "equation"
+                    estimation_type: "equation",
+                    estimation_equation: true,
+
                 },
                 "wwt_biog_val": {
                     question: "Biogas valorised as heat and/or electricity (% volume)",
                     value: 0,
                     unit: "%",
                     estimation_type: "equation",
+                    estimation_equation: true,
                     description_tooltip: "Biogas valorized in the treatment plant to heat the digesters or the building and/or to run a Co-generator to generate heat and electricity"
                 }, //% of biogas produced that is used for heat
                 "wwt_biog_lkd": {
                     question: "Biogas leaked to the atmosphere (% volume)",
                     value: 2,
                     unit: "%",
-                    estimation_type: "equation"
+                    estimation_type: "equation",
+                    estimation_equation: true,
+
                 }, //% of biogas produced that is leaked
-                "wwt_biog_sold": {question: "Biogas sold (% volume)", value: 0, unit: "%", estimation_type: "equation"},
+                "wwt_biog_sold": {question: "Biogas sold (% volume)", value: 0, unit: "%", estimation_type: "equation",estimation_equation: true,},
                 "wwt_ch4_biog": {question: "Percentage of methane in the biogas (% volume)", value: 59, unit: "%"}, //% of CH4 in biogas (volume)
                 "wwt_dige_typ": {
                     question: "Fuel type (digester)",
@@ -641,10 +653,35 @@ export class WWTP{
             wwt_biog_sold(substage){
                 return 100-substage.wwt_biog_val-substage.wwt_biog_fla-substage.wwt_biog_lkd;
             },
+            wwt_tn_effl_to_wb(substage){
+                if(substage.industry_type === null){
+                    return 0
+                }else if(substage.industry_type === "alcohol"){
+                    return substage.wwt_vol_disc*2.4
+                }else if(substage.industry_type === "beer"){
+                    return substage.wwt_vol_disc*0.055
+                }else if(substage.industry_type === "fish"){
+                    return substage.wwt_vol_disc*0.60
+                }else if(substage.industry_type === "iron"){
+                    return substage.wwt_vol_disc*0.25
+                }else if(substage.industry_type === "meat"){
+                    return substage.wwt_vol_disc*0.19
+                }else if(substage.industry_type === "nitrogen"){
+                    return substage.wwt_vol_disc*0.5
+                }else if(substage.industry_type === "plastics"){
+                    return substage.wwt_vol_disc*0.25
+                }else if(substage.industry_type === "starch"){
+                    return substage.wwt_vol_disc*0.9
+                }
+
+
+            }
+
         }
     }
 
     constructor(){
+        this.industry_type = null
     }
 
     //indirect emissions from electricity consumption
@@ -1059,7 +1096,9 @@ export class Industrial_wwtp extends WWTP{
                 items: Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"],
                 estimation_based_on: "wwt_tn_infl",
                 estimation_factor: "N_effl",
-                description: "N_effl_table"
+                description: "N_effl_table",
+                estimation_equation: true,
+
             },  //kgN   TAULA 6.10c
 
 
@@ -1280,7 +1319,9 @@ export class Industrial_wwtp_offsite extends Industrial_wwtp{
                 items: Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"],
                 estimation_based_on: "tn_infl",
                 estimation_factor: "N_effl",
-                description: "N_effl_table"
+                description: "N_effl_table",
+                estimation_equation: true,
+
         }  //kgN   TAULA 6.10c
 
         return inputs
@@ -1364,7 +1405,9 @@ export class Domestic_wwtp extends WWTP{
                 items: Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"],
                 estimation_based_on: "tn_infl",
                 estimation_factor: "N_effl",
-                description: "N_effl_table"
+                description: "N_effl_table",
+                estimation_equation: true,
+
             },  //kgN   TAULA 6.10c
 
 
@@ -1388,7 +1431,6 @@ export class Domestic_wwtp extends WWTP{
                 items: Tables["type_of_treatment_KREM"],
                 estimation_based_on: "wwt_mass_slu",
                 estimation_factor: "K_rem",
-                //description: "N_effl_table"
 
             },  //kg | BOD removed as sludge    //Taula 6.6A
 
