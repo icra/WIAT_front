@@ -840,7 +840,7 @@ export default {
 
     tab_4_continue(){
       for (let [key, value] of Object.entries(this.wwtp_aux_inputs)){
-        if(Number(value) != NaN) this.industry.offsite_wwtp[key] = Number(value)
+        if(Number(value) != NaN && typeof this.industry.offsite_wwtp[key] !== "function") this.industry.offsite_wwtp[key] = Number(value)
       }
       this.stepper_model = 1
     },
@@ -848,7 +848,7 @@ export default {
 
     tab_3_continue(){
       for (let [key, value] of Object.entries(this.wwtp_aux_inputs)){
-        if(Number(value) != NaN) this.industry.direct_discharge[key] = Number(value)
+        if(Number(value) != NaN && typeof this.industry.direct_discharge[key] !== "function") this.industry.direct_discharge[key] = Number(value)
       }
 
       if(this.has_offsite_wwtp) {
@@ -859,7 +859,7 @@ export default {
 
     tab_2_continue(){
       for (let [key, value] of Object.entries(this.wwtp_aux_inputs)){
-        if(Number(value) != NaN) this.industry.onsite_wwtp[key] = Number(value)
+        if(Number(value) != NaN && typeof this.industry.onsite_wwtp[key] !== "function") this.industry.onsite_wwtp[key] = Number(value)
       }
 
       if(this.has_offsite_wwtp){

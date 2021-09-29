@@ -1345,11 +1345,14 @@ export class Industrial_wwtp_offsite extends Industrial_wwtp{
         this.vol_infl_wwtp = 0
         this.bod_infl_wwtp = 0
         this.tn_infl_wwtp = 0
+        //this.tn_infl =  new this.a
 
-        this.tn_infl = function(){
+        this.tn_infl = function() {
             return Number(this.tn_infl_wwtp) + Number(this.wwt_tn_infl)
         }
+
         this.bod_infl = function(){
+            console.log('aaa')
             return Number(this.bod_infl_wwtp) + Number(this.wwt_bod_infl)
         }
 
@@ -1358,6 +1361,8 @@ export class Industrial_wwtp_offsite extends Industrial_wwtp{
 
     //emissions from treatment
     wwt_KPI_GHG_tre(){
+
+        console.log(this)
         let co2   = 0;
         let ch4   = (this.bod_infl()-this.wwt_bod_slud)*this.wwt_ch4_efac_tre*Cts.ct_ch4_eq.value;    //Eq. 6.4
         let n2o   = (this.tn_infl())*this.wwt_n2o_efac_tre*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;  //Eq. 6.11
