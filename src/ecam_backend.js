@@ -87,15 +87,14 @@ export class Direct_discharge{
                 question: "COD load directly discharged to water body",
                 value: 0,
                 unit: "kg",
+
             },
 
             "wwt_tn_effl_to_wb": {
                 question: "Total Nitrogen load directly discharged to water body",
                 value: 0,
                 unit: "kg",
-                estimation_type: "equation",
-                estimation_equation: true,
-
+                estimation_equation: true
             },
 
             //emission factors (discharge)
@@ -653,29 +652,54 @@ export class WWTP{
             wwt_biog_sold(substage){
                 return 100-substage.wwt_biog_val-substage.wwt_biog_fla-substage.wwt_biog_lkd;
             },
-            wwt_tn_effl_to_wb(substage){
+            wwt_tn_infl(substage){
+
+                let key = "wwt_vol_trea"
+
                 if(substage.industry_type === null){
                     return 0
                 }else if(substage.industry_type === "alcohol"){
-                    return substage.wwt_vol_disc*2.4
+                    return substage[key]*2.4
                 }else if(substage.industry_type === "beer"){
-                    return substage.wwt_vol_disc*0.055
+                    return substage[key]*0.055
                 }else if(substage.industry_type === "fish"){
-                    return substage.wwt_vol_disc*0.60
+                    return substage[key]*0.60
                 }else if(substage.industry_type === "iron"){
-                    return substage.wwt_vol_disc*0.25
+                    return substage[key]*0.25
                 }else if(substage.industry_type === "meat"){
-                    return substage.wwt_vol_disc*0.19
+                    return substage[key]*0.19
                 }else if(substage.industry_type === "nitrogen"){
-                    return substage.wwt_vol_disc*0.5
+                    return substage[key]*0.5
                 }else if(substage.industry_type === "plastics"){
-                    return substage.wwt_vol_disc*0.25
+                    return substage[key]*0.25
                 }else if(substage.industry_type === "starch"){
-                    return substage.wwt_vol_disc*0.9
+                    return substage[key]*0.9
                 }
+            },
+            wwt_tn_effl_to_wb(substage){
 
+                let key = "wwt_vol_disc"  //Direct discharge"
+                if(substage.industry_type === null){
+                    return 0
+                }else if(substage.industry_type === "alcohol"){
+                    return substage[key]*2.4
+                }else if(substage.industry_type === "beer"){
+                    return substage[key]*0.055
+                }else if(substage.industry_type === "fish"){
+                    return substage[key]*0.60
+                }else if(substage.industry_type === "iron"){
+                    return substage[key]*0.25
+                }else if(substage.industry_type === "meat"){
+                    return substage[key]*0.19
+                }else if(substage.industry_type === "nitrogen"){
+                    return substage[key]*0.5
+                }else if(substage.industry_type === "plastics"){
+                    return substage[key]*0.25
+                }else if(substage.industry_type === "starch"){
+                    return substage[key]*0.9
+                }
+            },
 
-            }
 
         }
     }
@@ -1082,10 +1106,14 @@ export class Industrial_wwtp extends WWTP{
                 value: 0,
                 unit: "kg",
                 description_tooltip: "COD load at the effluent of the WWTP during the assessment period. It can be estimated by multiplying the average COD concentration in the effluent by the effluent volume of the plant discharged to the water body. If this is done daily and summed over the duration of the assessment period the value will be most accurate",
+                items: Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"],
+                estimation_based_on: "wwt_bod_infl",
+                estimation_factor: "bod_effl",
+                estimation_type: "option",
                 //depends_on: "wwt_has_local_wwt_plant"
             }, //kgCOD   Table 6.6B and 6.10C
 
-            "wwt_tn_infl": {question: "Total Nitrogen load in the influent", value: 0, unit: "kg"},  //kgN    Equacio 6.13
+            "wwt_tn_infl": {question: "Total Nitrogen load in the influent", value: 0, unit: "kg", estimation_equation: true},  //kgN    Equacio 6.13
             //"wwt_P_infl": {question: "Influent P load", value: 0, unit: "kg"}, //kgP
 
             "wwt_tn_effl_to_wb": {
@@ -1097,7 +1125,6 @@ export class Industrial_wwtp extends WWTP{
                 estimation_based_on: "wwt_tn_infl",
                 estimation_factor: "N_effl",
                 description: "N_effl_table",
-                estimation_equation: true,
 
             },  //kgN   TAULA 6.10c
 
@@ -1113,7 +1140,16 @@ export class Industrial_wwtp extends WWTP{
                 unit: "kg",
                 description_tooltip: "Amount of raw sludge removed from wastewater treatment as dry mass during the assessment period"
             },  //kg | raw sludge removed from wwtp as dry mass
-            "wwt_bod_slud": {question: "COD removed as sludge", value: 0, unit: "kg", description_tooltip: "COD (organic component) removed from wastewater (in the form of sludge) in aerobic treatment plant"},  //kg | COD removed as sludge    //Taula 6.6A
+            "wwt_bod_slud": {
+                question: "COD removed as sludge",
+                value: 0,
+                unit: "kg",
+                description_tooltip: "COD (organic component) removed from wastewater (in the form of sludge) in aerobic treatment plant",
+                estimation_type: "option",
+                items: Tables["type_of_treatment_KREM"],
+                estimation_based_on: "wwt_mass_slu",
+                estimation_factor: "K_rem",
+            },  //kg | COD removed as sludge    //Taula 6.6A
 
             //emission factors (treatment)
             "wwt_ch4_efac_tre": {
@@ -1320,9 +1356,21 @@ export class Industrial_wwtp_offsite extends Industrial_wwtp{
                 estimation_based_on: "tn_infl",
                 estimation_factor: "N_effl",
                 description: "N_effl_table",
-                estimation_equation: true,
 
         }  //kgN   TAULA 6.10c
+
+        inputs["None"]["wwt_bod_effl_to_wb"] = {
+            question: "Effluent COD load leaving the WWTP to water body",
+                value: 0,
+                unit: "kg",
+                description: "bod_effl_table",
+                description_tooltip: "COD load at the effluent of the WWTP during the assessment period. It can be estimated by multiplying the average COD concentration in the effluent by the effluent volume of the plant discharged to the water body. If this is done daily and summed over the duration of the assessment period the value will be most accurate",
+                items: Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"],
+                estimation_based_on: "bod_infl",
+                estimation_factor: "bod_effl",
+                estimation_type: "option",
+
+        }
 
         return inputs
     }
@@ -1352,7 +1400,6 @@ export class Industrial_wwtp_offsite extends Industrial_wwtp{
         }
 
         this.bod_infl = function(){
-            console.log('aaa')
             return Number(this.bod_infl_wwtp) + Number(this.wwt_bod_infl)
         }
 
@@ -1399,7 +1446,7 @@ export class Domestic_wwtp extends WWTP{
             }, //kgBOD   Table 6.6B and 6.10C
 
 
-            "wwt_tn_infl": {question: "Total Nitrogen load in the influent discharged from the industry", value: 0, unit: "kg"},  //kgN    Equacio 6.13
+            "wwt_tn_infl": {question: "Total Nitrogen load in the influent discharged from the industry", value: 0, unit: "kg",estimation_equation: true},  //kgN    Equacio 6.13
             //"wwt_P_infl": {question: "Influent P load", value: 0, unit: "kg"}, //kgP
 
             "wwt_tn_effl_to_wb": {
@@ -1411,7 +1458,6 @@ export class Domestic_wwtp extends WWTP{
                 estimation_based_on: "tn_infl",
                 estimation_factor: "N_effl",
                 description: "N_effl_table",
-                estimation_equation: true,
 
             },  //kgN   TAULA 6.10c
 
