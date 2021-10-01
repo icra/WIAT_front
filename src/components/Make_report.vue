@@ -111,7 +111,7 @@ export default {
     },
     units_model: async function () {
       this.bod_to_cod = 1
-      if(this.units_model === true) this.bod_to_cod = 1/2.4
+      if(this.units_model === "cod") this.bod_to_cod = 1/2.4
       if (this.selected_industries.length > 0) await this.generate_pdf()
     },
     period_model: async function () {
