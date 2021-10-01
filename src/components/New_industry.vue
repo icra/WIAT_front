@@ -721,7 +721,10 @@ import {
   Industry,
   Industrial_wwtp_onsite,
   Industrial_wwtp_onsite_external_domestic,
-  Industrial_wwtp_onsite_external_industrial, Direct_discharge, Industrial_wwtp_offsite, Domestic_wwtp
+  Industrial_wwtp_onsite_external_industrial,
+  Direct_discharge,
+  Industrial_wwtp_offsite,
+  Domestic_wwtp
 } from "../ecam_backend";
 import Vue from 'vue'
 import {utils, metrics} from "../utils"
@@ -799,8 +802,7 @@ export default {
         this.direct_discharge_inputs = this.industry.direct_discharge.get_inputs()
         this.wwtp_aux_inputs = {}
         for(let [clau, valor] of Object.entries(this.industry.direct_discharge)){
-          console.log(clau)
-          console.log(valor)
+
           this.$set(this.wwtp_aux_inputs, clau, valor);
         }
       }else if(step == 4){
@@ -840,7 +842,7 @@ export default {
 
     tab_4_continue(){
       for (let [key, value] of Object.entries(this.wwtp_aux_inputs)){
-        if(Number(value) != NaN) this.industry.offsite_wwtp[key] = Number(value)
+        if(Number(value) != NaN && typeof this.industry.offsite_wwtp[key] !== "function") this.industry.offsite_wwtp[key] = Number(value)
       }
       this.stepper_model = 1
     },
@@ -848,7 +850,7 @@ export default {
 
     tab_3_continue(){
       for (let [key, value] of Object.entries(this.wwtp_aux_inputs)){
-        if(Number(value) != NaN) this.industry.direct_discharge[key] = Number(value)
+        if(Number(value) != NaN && typeof this.industry.direct_discharge[key] !== "function") this.industry.direct_discharge[key] = Number(value)
       }
 
       if(this.has_offsite_wwtp) {
@@ -859,7 +861,7 @@ export default {
 
     tab_2_continue(){
       for (let [key, value] of Object.entries(this.wwtp_aux_inputs)){
-        if(Number(value) != NaN) this.industry.onsite_wwtp[key] = Number(value)
+        if(Number(value) != NaN && typeof this.industry.onsite_wwtp[key] !== "function") this.industry.onsite_wwtp[key] = Number(value)
       }
 
       if(this.has_offsite_wwtp){
@@ -920,7 +922,6 @@ export default {
           if(this.industry.offsite_wwtp === null || this.industry.offsite_wwtp.constructor.name !== "Domestic_wwtp") this.industry.offsite_wwtp = new Domestic_wwtp()
         }
         this.industry.offsite_wwtp.industry_type = this.industry.industry_type
-
       }
 
       if(!this.has_onsite_wwtp){

@@ -10,7 +10,7 @@
         style="left: 0px"
     >
       <div class="header">
-        <v-icon size="90">$icra_logo</v-icon>
+        <v-icon size="90">$wbcsd_logo</v-icon>
         <v-icon size="90">$icra_logo</v-icon>
         <v-icon size="90">$icra_logo</v-icon>
       </div>
@@ -62,8 +62,20 @@
                     <v-list-item-content></v-list-item-content>
                   </v-list-item>
                 </v-hover>
-
               </v-list-item-group>
+
+
+              <v-hover v-slot:default="{ hover }">
+                <div :class="hover ? 'icon_hovered_pressed' : ''" style="height: 75px; width: 100%; margin-top: 40px; ">
+                  <a href="https://www.wbcsd.org/" target="_blank" style="position: absolute; width: 100%">
+                    <div style="display: inline-block; position: relative; left: 50%; top: 50%; transform: translate(-50%, 25%);">
+                      <v-icon size="50"  color = "#F2F4F3">$wbcsd_logo</v-icon>
+                    </div>
+                  </a>
+                </div>
+              </v-hover>
+
+
             </div>
           </v-list>
         </div>

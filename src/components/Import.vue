@@ -117,7 +117,16 @@
 </template>
 
 <script>
-import {Assessment, Industry } from "../ecam_backend";
+import {
+  Assessment,
+  Industry,
+  Industrial_wwtp_onsite,
+  Industrial_wwtp_onsite_external_domestic,
+  Industrial_wwtp_onsite_external_industrial,
+  Direct_discharge,
+  Industrial_wwtp_offsite,
+  Domestic_wwtp
+} from "../ecam_backend";
 
 export default {
   name: "import_assessments",
@@ -136,6 +145,60 @@ export default {
     }
   },
   methods: {
+
+    copy_wwtp(wwtp, type, industry_type){
+
+      const classes = {
+        Industrial_wwtp_onsite,
+        Industrial_wwtp_onsite_external_domestic,
+        Industrial_wwtp_onsite_external_industrial,
+        Direct_discharge,
+        Industrial_wwtp_offsite,
+        Domestic_wwtp
+      };
+
+      let new_wwtp = new classes[type];
+      for (let key of Object.keys(new_wwtp)){
+        if(typeof wwtp[key] !== "function") new_wwtp[key] = wwtp[key]
+      }
+      new_wwtp.industry_type = industry_type
+      return new_wwtp
+    },
+
+    copyIndustry(industry){
+      let new_industry = new Industry()
+      new_industry.name = industry.name
+      new_industry.location = industry.location
+      new_industry.has_onsite_wwtp = industry.has_onsite_wwtp
+      new_industry.has_offsite_wwtp = industry.has_offsite_wwtp
+      new_industry.offsite_wwtp_type = industry.offsite_wwtp_type
+      new_industry.volume_withdrawn = industry.volume_withdrawn
+      new_industry.has_direct_discharge = industry.has_direct_discharge
+      new_industry.industry_type = industry.industry_type
+
+
+      if(new_industry.has_onsite_wwtp)
+        if(new_industry.has_offsite_wwtp){
+          if(new_industry.offsite_wwtp_type === "Domestic") new_industry.onsite_wwtp = this.copy_wwtp(industry.onsite_wwtp, "Industrial_wwtp_onsite_external_domestic", new_industry.industry_type)
+          else new_industry.onsite_wwtp = this.copy_wwtp(industry.onsite_wwtp, "Industrial_wwtp_onsite_external_industrial", new_industry.industry_type) //Industrial
+        } else new_industry.onsite_wwtp = this.copy_wwtp(industry.onsite_wwtp, "Industrial_wwtp_onsite", new_industry.industry_type)
+      else new_industry.onsite_wwtp = null
+
+
+
+      if(new_industry.has_offsite_wwtp){
+        if(new_industry.offsite_wwtp_type === "Industrial") new_industry.offsite_wwtp_type = this.copy_wwtp(industry.offsite_wwtp, "Industrial_wwtp_offsite", new_industry.industry_type)
+        else new_industry.offsite_wwtp_type = this.copy_wwtp(industry.offsite_wwtp, "Domestic_wwtp",new_industry.industry_type)
+      }
+      else new_industry.offsite_wwtp = null
+
+
+      if(new_industry.has_direct_discharge) new_industry.direct_discharge = this.copy_wwtp(industry.direct_discharge, "Direct_discharge", new_industry.industry_type)
+      else new_industry.direct_discharge = null
+
+      return new_industry
+
+    },
     download_json(){
       let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.created_assessments));
       let downloadAnchorNode = document.createElement('a');
@@ -181,10 +244,7 @@ export default {
           let industry_to_delete = new_assessment.industries.findIndex(e => e.name === industry.name)
           if (industry_to_delete > -1) new_assessment.industries.splice(industry_to_delete,1);
 
-          let new_industry = new Industry()
-          for(let [key, value] of Object.entries(industry)){
-            new_industry[key] = value
-          }
+          let new_industry = this.copyIndustry(industry)
           new_assessment.industries.push(new_industry)
 
         })
@@ -209,10 +269,7 @@ export default {
             let industry_to_delete = current_assessment.industries.findIndex(e => e.name === industry.name)
             if (industry_to_delete > -1) current_assessment.industries.splice(industry_to_delete,1);
 
-            let new_industry = new Industry()
-            for(let [key, value] of Object.entries(industry)){
-              new_industry[key] = value
-            }
+            let new_industry = this.copyIndustry(industry)
             current_assessment.industries.push(new_industry)
           })
         }else{
@@ -228,10 +285,7 @@ export default {
             let industry_to_delete = new_assessment.industries.findIndex(e => e.name === industry.name)
             if (industry_to_delete > -1) new_assessment.industries.splice(industry_to_delete,1);
 
-            let new_industry = new Industry()
-            for(let [key, value] of Object.entries(industry)){
-              new_industry[key] = value
-            }
+            let new_industry = this.copyIndustry(industry)
             new_assessment.industries.push(new_industry)
 
           })

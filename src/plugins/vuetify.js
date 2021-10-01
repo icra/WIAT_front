@@ -4,6 +4,7 @@ import Vuetify from 'vuetify/lib/framework';
 
 //Icons
 import icraLogo from '@/components/Logos/icraLogo'
+import wbcsdLogo from '@/components/Logos/wbcsd'
 
 
 Vue.use(Vuetify);
@@ -12,8 +13,10 @@ export default new Vuetify({
     icons: {
         values: {
             icra_logo: {
-                component: icraLogo, // you can use string here if component is registered globally
-
+                component: icraLogo,
+            },
+            wbcsd_logo: {
+                component: wbcsdLogo,
             },
         },
     },
