@@ -162,7 +162,7 @@
       <!-- Main content -->
     <div style="position: absolute; height: 100%; width: 100%">
       <div class="content" :class="manageContentClass">
-        <router-view :selected_layers="selected_layers" :selected_assessment="assessment_expansion_panel" :selected_layer="selected_layer" @createIndustry="createNewIndustry" @editIndustry="open_edit_industry_tab" @selectLayer="toggleLayerSelection" @closeRightMenu="closeRightMenu" @closeLayer="applyLayer(selected_layer)" ref="reference"></router-view>
+        <router-view :selected_assessment="assessment_expansion_panel" :selected_layer="selected_layer" @createIndustry="createNewIndustry" @editIndustry="open_edit_industry_tab" @selectLayer="toggleLayerSelection" @closeRightMenu="closeRightMenu" @closeLayer="applyLayer(selected_layer)" ref="reference"></router-view>
       </div>
     </div>
 
@@ -437,11 +437,9 @@
                       :items="layer_tree"
                       dense
                       hoverable
-                      selectable
                       activatable
                       selection-type="leaf"
                       return-object
-                      v-model="selected_layers"
                       open-on-click
                       color="#1C195B"
                       selected-color="#1C195B"
@@ -542,7 +540,6 @@ export default {
       selected_layer: null,  //Layer displayed in the map
       layers_description: this.$layers_description,
       search_layer_model: "",
-      selected_layers: [], //layers included in the report
       start_date_model_assessment: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
       start_date_modal: false,
       end_date_model_assessment: new Date(new Date().setFullYear((new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).getFullYear() + 1)).toISOString().substr(0, 10),
@@ -592,7 +589,6 @@ export default {
       }
 
       return id
-
     },
 
     left_side_menu_icon_selected(index){
