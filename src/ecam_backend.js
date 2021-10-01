@@ -653,9 +653,7 @@ export class WWTP{
                 return 100-substage.wwt_biog_val-substage.wwt_biog_fla-substage.wwt_biog_lkd;
             },
             wwt_tn_infl(substage){
-
                 let key = "wwt_vol_trea"
-
                 if(substage.industry_type === null){
                     return 0
                 }else if(substage.industry_type === "alcohol"){
@@ -674,7 +672,55 @@ export class WWTP{
                     return substage[key]*0.25
                 }else if(substage.industry_type === "starch"){
                     return substage[key]*0.9
-                }
+                }/*else if(substage.industry_type === "food"){  //noves categories
+                    return substage[key]*
+                }else if(substage.industry_type === "beverages"){  //noves categories
+                    return substage[key]*
+                }else if(substage.industry_type === "tobacco"){  //noves categories
+                    return substage[key]*
+                }else if(substage.industry_type === "textiles"){  //noves categories
+                    return substage[key]*
+                }else if(substage.industry_type === "wearing"){  //noves categories
+                    return substage[key]*
+                }else if(substage.industry_type === "leather"){  //noves categories
+                    return substage[key]*
+                }else if(substage.industry_type === "wood"){  //noves categories
+                    return substage[key]*
+                }else if(substage.industry_type === "paper"){  //noves categories
+                    return substage[key]*
+                }else if(substage.industry_type === "printing"){  //noves categories
+                    return substage[key]*
+                }else if(substage.industry_type === "coke"){  //noves categories
+                    return substage[key]*
+                }else if(substage.industry_type === "chemicals"){  //noves categories
+                    return substage[key]*
+                }else if(substage.industry_type === "pharmaceutical"){  //noves categories
+                    return substage[key]*
+                }else if(substage.industry_type === "rubber"){  //noves categories
+                    return substage[key]*
+                }else if(substage.industry_type === "mineral"){  //noves categories
+                    return substage[key]*
+                }else if(substage.industry_type === "metals"){  //noves categories
+                    return substage[key]*
+                }else if(substage.industry_type === "fabricated_metals"){  //noves categories
+                    return substage[key]*
+                }else if(substage.industry_type === "computer"){  //noves categories
+                    return substage[key]*
+                }else if(substage.industry_type === "electrical"){  //noves categories
+                    return substage[key]*
+                }else if(substage.industry_type === "machinery"){  //noves categories
+                    return substage[key]*
+                }else if(substage.industry_type === "vehicles"){  //noves categories
+                    return substage[key]*
+                }else if(substage.industry_type === "transport"){  //noves categories
+                    return substage[key]*
+                }else if(substage.industry_type === "furniture"){  //noves categories
+                    return substage[key]*
+                }else if(substage.industry_type === "other_manufacturing"){  //noves categories
+                    return substage[key]*
+                }else if(substage.industry_type === "repair"){  //noves categories
+                    return substage[key]*
+                }*/
             },
             wwt_tn_effl_to_wb(substage){
 
@@ -1714,10 +1760,10 @@ let Tables={
     ],
 
     "WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)":[
-        {name:"Untreated systems",                                                     bod_effl:1,  bod_effl_table:"[100%]",    N_effl:1.00,   N_effl_table:"[100%]"},
-        {name:"Primary (mechanical treatment plants)",                                 bod_effl:0.60, bod_effl_table:"[60%]", N_effl:0.90, N_effl_table:"[90%]"},
-        {name:"Primary + Secondary (biological treatment plants)",                     bod_effl:0.15, bod_effl_table:"[15%]", N_effl:0.60, N_effl_table:"[60%]"},
-        {name:"Primary + Secondary + Tertiary (advanced biological treatment plants)", bod_effl:0.10, bod_effl_table:"[10%]", N_effl:0.20, N_effl_table:"[20%]"},
+        {name:"Untreated systems",                                                     bod_effl:1,  bod_effl_table:"[100%]",    N_effl:1.00,   N_effl_table:"[100%]", diclo_effl:1,  diclo_effl_table:"[100%]", cadmium_effl:1,  cadmium_effl_table:"[100%]",hexaclorobenzene_effl:1,  hexaclorobenzene_effl_table:"[100%]",mercury_effl:1,  mercury_effl_table:"[100%]",plomo_effl:1,  plomo_effl_table:"[100%]",niquel_effl:1,  niquel_effl_table:"[100%]",chloro_effl:1,  chloro_effl_table:"[100%]", hexaclorobutadie_effl:1,  hexaclorobutadie_effl_table:"[100%]", nonilfenols_efll:1,  nonilfenols_effl_table:"[100%]", tetracloroetile_effl:1,  tetracloroetile_effl_table:"[100%]",tricloroetile_effl:1, tricloroetile_effl_table:"[100%]",},
+        {name:"Primary (mechanical treatment plants)",                                 bod_effl:0.60, bod_effl_table:"[60%]", N_effl:0.90, N_effl_table:"[90%]", diclo_effl:0.7875,  diclo_effl_table:"[78.75%]", cadmium_effl:0.785,  cadmium_effl_table:"[78.5%]", hexaclorobenzene_effl:1,  hexaclorobenzene_effl_table:"[100%]",mercury_effl:0.64,  mercury_effl_table:"[64%]",plomo_effl:0.585,  plomo_effl_table:"[58.5%]",niquel_effl:0.83,  niquel_effl_table:"[83%]",chloro_effl:0.9,  chloro_effl_table:"[90%]", hexaclorobutadie_effl:0.95,  hexaclorobutadie_effl_table:"[95%]", nonilfenols_efll:0.57,  nonilfenols_effl_table:"[57%]", tetracloroetile_effl:0.765,  tetracloroetile_effl_table:"[76.5%]",tricloroetile_effl:0.9, tricloroetile_effl_table:"[90%]"},
+        {name:"Primary + Secondary (biological treatment plants)",                     bod_effl:0.15, bod_effl_table:"[15%]", N_effl:0.60, N_effl_table:"[60%]", diclo_effl:0.3268125,  diclo_effl_table:"[32.68%]", cadmium_effl:0.42785,  cadmium_effl_table:"[42.785%]", hexaclorobenzene_effl:1,  hexaclorobenzene_effl_table:"[100%]",mercury_effl:0.53312,  mercury_effl_table:"[53.312%]",plomo_effl:0.2720835,  plomo_effl_table:"[27.20835%]",niquel_effl:0.41417,  niquel_effl_table:"[41.417%]",chloro_effl:0.54,  chloro_effl_table:"[54%]", hexaclorobutadie_effl:0.19,  hexaclorobutadie_effl_table:"[19%]", nonilfenols_effl:0.1197,  nonilfenols_effl_table:"[11.97%]", tetracloroetile_effl:0.153,  tetracloroetile_effl_table:"[15.3%]",tricloroetile_effl:0.222, tricloroetile_effl_table:"[22.2%]"},
+        {name:"Primary + Secondary + Tertiary (advanced biological treatment plants)", bod_effl:0.10, bod_effl_table:"[10%]", N_effl:0.20, N_effl_table:"[20%]", diclo_effl:0.0653625,  diclo_effl_table:"[65.36%]", cadmium_effl:0.15829525,  cadmium_effl_table:"[15.83%]", hexaclorobenzene_effl:0.4275,  hexaclorobenzene_effl_table:"[42.75%]",mercury_effl:0.53312,  mercury_effl_table:"[53.312%]",plomo_effl:0.087746929,  plomo_effl_table:"[8.77%]",niquel_effl:0.256437,  niquel_effl_table:"[25.64%]",chloro_effl:0.54,  chloro_effl_table:"[54%]", hexaclorobutadie_effl:0.19,  hexaclorobutadie_effl_table:"[19%]", nonilfenols_efll:0.005985,  nonilfenols_effl_table:"[0.59%]", tetracloroetile_effl:0.00918,  tetracloroetile_effl_table:"[0.918%]",tricloroetile_effl:0.01332, tricloroetile_effl_table:"[1.33%]"},
     ],
 
     //Andreoli et al table 2.2

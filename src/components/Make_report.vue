@@ -2,19 +2,43 @@
   <div class="outer">
     <h1>Report</h1>
     <div v-if="is_there_any_industry_created">
-      <p>Select the industries to include in the report.</p>
-      <v-treeview
-          :items="assessments_and_industries_tree"
-          dense
-          hoverable
-          selectable
-          selection-type="leaf"
-          return-object
-          v-model="selected_industries"
-          color="#1C195B"
-          selected-color="#1C195B"
-          open-on-click
-      ></v-treeview>
+      <br>
+      <v-row>
+        <v-col>
+          <p>Select the industries to include in the report.</p>
+          <v-treeview
+              :items="assessments_and_industries_tree"
+              dense
+              hoverable
+              selectable
+              selection-type="leaf"
+              return-object
+              v-model="selected_industries"
+              color="#1C195B"
+              selected-color="#1C195B"
+              open-on-click
+          ></v-treeview>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col>
+          <p>Select the layers to include in the report.</p>
+          <v-treeview
+              :items="layer_tree"
+              dense
+              hoverable
+              selectable
+              selection-type="leaf"
+              return-object
+              v-model="selected_layers"
+              open-on-click
+              color="#1C195B"
+              selected-color="#1C195B"
+          >
+          </v-treeview>
+        </v-col>
+
+      </v-row>
 
       <v-row>
         <v-col cols="3">
@@ -84,13 +108,12 @@ export default {
   components: {
     PDFJSViewer
   },
-  props: ["selected_layers"],
   data() {
     return {
       created_assessments: this.$assessments,  //Created assessments
       selected_industries: [],
       doc: null,
-      layers: utils.format_layer_description(Vue.prototype.$layers_description),
+      layers: Vue.prototype.$layers_description,
       generating_pdf: false,
       global_layers: utils.format_layer_description(Vue.prototype.$layers_description),
       include_future: true,
@@ -100,9 +123,16 @@ export default {
       bod_cod: [{text: "BOD", value: "bod"},{text: "COD", value: "cod"}],
       period_model: "assessment",
       daily_annual_assessment: [{text: "Daily", value: "daily"},{text: "Annual", value: "annual"}, {text: "Assessment period", value: "assessment"}],
+      selected_layers: [], //layers included in the report
+
     }
   },
   watch: {
+
+    selected_layers: async function () {
+      if (this.selected_industries.length > 0) await this.generate_pdf()
+    },
+
     selected_industries: async function () {
       await this.generate_pdf()
     },
@@ -121,6 +151,21 @@ export default {
 
   },
   methods: {
+    add_identifier: function (category, id){
+      let _this = this
+      category.id = id
+      id++
+
+      if(category.hasOwnProperty("children")){
+        category.children.forEach(subcategory => {
+          id = _this.add_identifier(subcategory, id)
+        })
+
+      }
+
+      return id
+    },
+
     async layers_table(dd, industries, assessment_days){
 
       let selected_layers_formatted = this.selected_layers.map(function (layer) {
@@ -582,6 +627,17 @@ export default {
 
   },
   computed: {
+    layer_tree: function () {
+      let _this = this
+      let id = 1
+      console.log(this.layers)
+      this.layers.forEach(category => {
+        id = _this.add_identifier(category, id)  //id has the new id to add
+      })
+
+      return this.layers
+    },
+
 
     is_there_any_industry_created: function () {
 

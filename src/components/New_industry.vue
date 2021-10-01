@@ -169,23 +169,13 @@
 
                       </span>
 
-                        <v-tooltip
-                            bottom
-                            v-if="value.estimation_equation">
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-btn
-                                v-bind="attrs"
-                                v-on="on"
-                                outlined
-                                x-small
-                                @click="wwtp_aux_inputs[key] = parseFloat(estimations[key](wwtp_aux_inputs))"
-                            >
-                              Estimation: {{parseFloat(estimations[key](wwtp_aux_inputs)).toFixed(2)}}{{value.unit}} <!-- Botó amb estimació -->
-                            </v-btn>
-                          </template>
-
-                          <span style="white-space: pre;" v-html="estimations[key]"></span>
-                        </v-tooltip>
+                        <v-btn v-if="value.estimation_equation"
+                          outlined
+                          x-small
+                          @click="wwtp_aux_inputs[key] = parseFloat(estimations[key](wwtp_aux_inputs))"
+                          >
+                          Estimation: {{parseFloat(estimations[key](wwtp_aux_inputs)).toFixed(2)}}{{value.unit}} <!-- Botó amb estimació -->
+                        </v-btn>
 
                       </div>
                       <div v-if="value.estimation_type === 'option'" style="width: 100%">
@@ -273,23 +263,13 @@
 
                       </span>
 
-                              <v-tooltip
-                                  bottom
-                                  v-if="value.estimation_equation">
-                                <template v-slot:activator="{ on, attrs }">
-                                  <v-btn
-                                      v-bind="attrs"
-                                      v-on="on"
-                                      outlined
-                                      x-small
-                                      @click="wwtp_aux_inputs[key] = parseFloat(estimations[key](wwtp_aux_inputs))"
-                                  >
-                                    Estimation: {{parseFloat(estimations[key](wwtp_aux_inputs)).toFixed(2)}}{{value.unit}} <!-- Botó amb estimació -->
-                                  </v-btn>
-                                </template>
-
-                                <span style="white-space: pre;" v-html="estimations[key]"></span>
-                              </v-tooltip>
+                              <v-btn v-if="value.estimation_equation"
+                                     outlined
+                                     x-small
+                                     @click="wwtp_aux_inputs[key] = parseFloat(estimations[key](wwtp_aux_inputs))"
+                              >
+                                Estimation: {{parseFloat(estimations[key](wwtp_aux_inputs)).toFixed(2)}}{{value.unit}} <!-- Botó amb estimació -->
+                              </v-btn>
 
                             </div>
                             <div v-if="value.estimation_type === 'option'" style="width: 100%">
@@ -397,23 +377,13 @@
 
                       </span>
 
-                        <v-tooltip
-                            bottom
-                            v-if="value.estimation_equation">
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-btn
-                                v-bind="attrs"
-                                v-on="on"
-                                outlined
-                                x-small
-                                @click="wwtp_aux_inputs[key] = parseFloat(estimations[key](wwtp_aux_inputs))"
-                            >
-                              Estimation: {{parseFloat(estimations[key](wwtp_aux_inputs)).toFixed(2)}}{{value.unit}} <!-- Botó amb estimació -->
-                            </v-btn>
-                          </template>
-
-                          <span style="white-space: pre;" v-html="estimations[key]"></span>
-                        </v-tooltip>
+                        <v-btn v-if="value.estimation_equation"
+                               outlined
+                               x-small
+                               @click="wwtp_aux_inputs[key] = parseFloat(estimations[key](wwtp_aux_inputs))"
+                        >
+                          Estimation: {{parseFloat(estimations[key](wwtp_aux_inputs)).toFixed(2)}}{{value.unit}} <!-- Botó amb estimació -->
+                        </v-btn>
 
                       </div>
                       <div v-if="value.estimation_type === 'option'" style="width: 100%">
@@ -525,23 +495,13 @@
 
                       </span>
 
-                        <v-tooltip
-                            bottom
-                            v-if="value.estimation_equation">
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-btn
-                                v-bind="attrs"
-                                v-on="on"
-                                outlined
-                                x-small
-                                @click="wwtp_aux_inputs[key] = parseFloat(estimations[key](wwtp_aux_inputs))"
-                            >
-                              Estimation: {{parseFloat(estimations[key](wwtp_aux_inputs)).toFixed(2)}}{{value.unit}} <!-- Botó amb estimació -->
-                            </v-btn>
-                          </template>
-
-                          <span style="white-space: pre;" v-html="estimations[key]"></span>
-                        </v-tooltip>
+                        <v-btn v-if="value.estimation_equation"
+                               outlined
+                               x-small
+                               @click="wwtp_aux_inputs[key] = parseFloat(estimations[key](wwtp_aux_inputs))"
+                        >
+                          Estimation: {{parseFloat(estimations[key](wwtp_aux_inputs)).toFixed(2)}}{{value.unit}} <!-- Botó amb estimació -->
+                        </v-btn>
 
                       </div>
                       <div v-if="value.estimation_type === 'option'" style="width: 100%">
@@ -629,23 +589,13 @@
 
                       </span>
 
-                              <v-tooltip
-                                  bottom
-                                  v-if="value.estimation_equation">
-                                <template v-slot:activator="{ on, attrs }">
-                                  <v-btn
-                                      v-bind="attrs"
-                                      v-on="on"
-                                      outlined
-                                      x-small
-                                      @click="wwtp_aux_inputs[key] = parseFloat(estimations[key](wwtp_aux_inputs))"
-                                  >
-                                    Estimation: {{parseFloat(estimations[key](wwtp_aux_inputs)).toFixed(2)}}{{value.unit}} <!-- Botó amb estimació -->
-                                  </v-btn>
-                                </template>
-
-                                <span style="white-space: pre;" v-html="estimations[key]"></span>
-                              </v-tooltip>
+                              <v-btn v-if="value.estimation_equation"
+                                     outlined
+                                     x-small
+                                     @click="wwtp_aux_inputs[key] = parseFloat(estimations[key](wwtp_aux_inputs))"
+                              >
+                                Estimation: {{parseFloat(estimations[key](wwtp_aux_inputs)).toFixed(2)}}{{value.unit}} <!-- Botó amb estimació -->
+                              </v-btn>
 
                             </div>
                             <div v-if="value.estimation_type === 'option'" style="width: 100%">
@@ -782,7 +732,36 @@ export default {
         {text: "Meat and poultry", value: "meat"},
         {text: "Nitrogen fertiliser", value: "nitrogen"},
         {text: "Plastics and resins", value: "plastics"},
-        {text: "Starch production", value: "starch"}]
+        {text: "Starch production", value: "starch"}],
+      industry_typologies_2: [
+        {text: "Undefined", value: null},
+        {text: "Others", value: null},
+        {text: "Manufacture of food products", value: "food"},
+        {text: "Manufacture of beverages", value: "beverages"},
+        {text: "Manufacture of tobacco products", value: "tobacco"},
+        {text: "Manufacture of textiles", value: "textiles"},
+        {text: "Manufacture of wearing apparel", value: "wearing"},
+        {text: "Manufacture of leather and related products", value: "leather"},
+        {text: "Manufacture of wood and of products of wood and cork, except furniture; manufacture of articles of straw and plaiting materials", value: "wood"},
+        {text: "Manufacture of paper and paper products", value: "paper"},
+        {text: "Printing and reproduction of recorded media", value: "printing"},
+        {text: "Manufacture of coke and refined petroleum products", value: "coke"},
+        {text: "Manufacture of chemicals and chemical products", value: "chemicals"},
+        {text: "Manufacture of basic pharmaceutical products and pharmaceutical preparations", value: "pharmaceutical"},
+        {text: "Manufacture of rubber and plastic products", value: "rubber"},
+        {text: "Manufacture of other non-metallic mineral products", value: "mineral"},
+        {text: "Manufacture of basic metals", value: "metals"},
+        {text: "Manufacture of fabricated metal products, except machinery and equipment", value: "fabricated_metals"},
+        {text: "Manufacture of computer, electronic and optical products", value: "computer"},
+        {text: "Manufacture of electrical equipment", value: "electrical"},
+        {text: "Manufacture of machinery and equipment n.e.c.", value: "machinery"},
+        {text: "Manufacture of motor vehicles, trailers and semi-trailers", value: "vehicles"},
+        {text: "Manufacture of other transport equipment", value: "transport"},
+        {text: "Manufacture of furniture", value: "furniture"},
+        {text: "Other manufacturing", value: "other_manufacturing"},
+        {text: "Repair and installation of machinery and equipment", value: "repair"}
+      ]
+
 
     };
   },

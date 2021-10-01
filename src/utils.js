@@ -95,7 +95,11 @@ let metrics = {
 
         let flow_acc_value = await flow_acc.data_on_point(industry.location.lat, industry.location.lng)*assessment_days/365 //flow accumulation during the assessment days
 
-        let dilution_factor = water_discharged/(water_discharged + flow_acc_value)
+        //let dilution_factor = water_discharged/(water_discharged + flow_acc_value)
+        let dilution_factor = (water_discharged + flow_acc_value)/water_discharged
+
+        if(water_discharged === 0) return NaN
+
         return dilution_factor
 
     },
