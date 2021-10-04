@@ -50,7 +50,7 @@
         <v-stepper-content step="1">
 
           <v-row>
-            <v-col cols="8">
+            <v-col cols="12">
               <v-img
                   :src="water_withdrawal_image"
                   height="450"
@@ -58,62 +58,265 @@
               ></v-img>
 
             </v-col>
-            <v-col cols="4">
-              <v-form
-                  v-model="water_withdrawal_valid"
-              >
-                <v-text-field
-                    v-model="water_withdrawn"
-                    label="Amount of water withdrawn from the water body"
-                    suffix="m3"
-                    type="number"
-                    :rules="[water_withdrawn_rule]"
-                ></v-text-field>
-                <v-select
-                    v-model="has_onsite_wwtp"
-                    :items="yes_no"
-                    filled
-                    label="Has the industry an on-site treatment wastewater plant?"
-                ></v-select>
-                <v-select
-                    v-model="has_direct_discharge"
-                    :items="yes_no"
-                    filled
-                    label="Does the industry directly discharge wastewater into the water body?"
-                ></v-select>
-                <v-select
-                    v-model="has_offsite_wwtp"
-                    :items="yes_no"
-                    filled
-                    label="Has the industry an off-site treatment wastewater plant?"
-                ></v-select>
-                <v-select
-                    v-model="offsite_wwtp_type"
-                    :items="industrial_domestic"
-                    filled
-                    label="Off-site treatment wastewater plant type"
-                    v-if="has_offsite_wwtp"
-                ></v-select>
-                <v-select
-                    v-model="industry_type"
-                    :items="industry_typologies"
-                    filled
-                    label="Industry type"
-                ></v-select>
 
-              </v-form>
+
+          </v-row>
+          <v-row style="background-color: #F2F4F3" align="center">
+            <v-col cols="8" >
+              <div style="width: 100%;">
+                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                      <span>
+                        Amount of water withdrawn from the water body every day
+                      </span>
+
+                </div>
+              </div>
+            </v-col>
+            <v-col cols="4">
+              <div>
+                <div>
+                  <v-text-field
+                      v-model="water_withdrawn"
+                      suffix="m3/day"
+                      type="number"
+                  ></v-text-field>
+
+                </div>
+              </div>
+
             </v-col>
 
           </v-row>
+          <v-row style="background-color: #F2F4F3" align="center">
+            <v-col cols="8" >
+              <div style="width: 100%;">
+                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                      <span>
+                        Amount of water used in the industry every day
+                      </span>
+
+                </div>
+              </div>
+            </v-col>
+            <v-col cols="4">
+              <div>
+                <div>
+                  <v-text-field
+                      v-model="volume_used"
+                      suffix="m3/day"
+                      type="number"
+                  ></v-text-field>
+
+                </div>
+              </div>
+
+            </v-col>
+
+          </v-row>
+          <v-row style="background-color: #F2F4F3" align="center">
+            <v-col cols="8" >
+              <div style="width: 100%;">
+                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                      <span>
+                        Has the industry an on-site treatment wastewater plant?
+                      </span>
+
+                </div>
+              </div>
+            </v-col>
+            <v-col cols="4">
+              <div>
+                <v-select
+                    v-model="has_onsite_wwtp"
+                    :items="yes_no"
+                    item-text="text"
+                    item-value="value"
+                    label="Select"
+                ></v-select>
+              </div>
+
+            </v-col>
+
+          </v-row>
+          <v-row style="background-color: #F2F4F3" align="center">
+            <v-col cols="8" >
+              <div style="width: 100%;">
+                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                      <span>
+                        Does the industry directly discharge wastewater into the water body?
+                      </span>
+
+                </div>
+              </div>
+            </v-col>
+            <v-col cols="4">
+              <div>
+                <v-select
+                    v-model="has_direct_discharge"
+                    :items="yes_no"
+                    item-text="text"
+                    item-value="value"
+                    label="Select"
+                ></v-select>
+              </div>
+
+            </v-col>
+
+          </v-row>
+          <v-row style="background-color: #F2F4F3" align="center">
+            <v-col cols="8" >
+              <div style="width: 100%;">
+                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                      <span>
+                        Has the industry an off-site treatment wastewater plant?
+                      </span>
+
+                </div>
+              </div>
+            </v-col>
+            <v-col cols="4">
+              <div>
+                <v-select
+                    v-model="has_offsite_wwtp"
+                    :items="yes_no"
+                    item-text="text"
+                    item-value="value"
+                    label="Select"
+                ></v-select>
+              </div>
+
+            </v-col>
+
+          </v-row>
+          <v-row style="background-color: #F2F4F3" align="center" v-if="has_offsite_wwtp">
+            <v-col cols="8" >
+              <div style="width: 100%;">
+                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                      <span>
+                        Off-site treatment wastewater plant type
+                      </span>
+
+                </div>
+              </div>
+            </v-col>
+            <v-col cols="4">
+              <div>
+                <v-select
+                    v-model="offsite_wwtp_type"
+                    :items="industrial_domestic"
+                    label="Select"
+                ></v-select>
+              </div>
+
+            </v-col>
+
+          </v-row>
+          <v-row style="background-color: #F2F4F3" align="center">
+            <v-col cols="8" >
+              <div style="width: 100%;">
+                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                      <span>
+                        Industry type
+                      </span>
+
+                </div>
+              </div>
+            </v-col>
+            <v-col cols="4">
+              <div>
+                <v-select
+                    v-model="industry_type"
+                    :items="industry_typologies"
+                    item-text="text"
+                    item-value="value"
+                    label="Select"
+                ></v-select>
+              </div>
+
+            </v-col>
+
+          </v-row>
+          <v-row style="background-color: #F2F4F3" align="center">
+            <v-col cols="8" >
+              <div style="width: 100%;">
+                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                      <span>
+                        COD concentration of the industry effluent
+                      </span>
+
+
+
+                  <v-btn v-if="ind_bod_effl !== null"
+                         outlined
+                         x-small
+                         @click="ind_bod_effl_concentration = parseFloat(ind_bod_effl)"
+                  >
+                    Estimation: {{parseFloat(ind_bod_effl).toExponential(2)}} g/m3
+                  </v-btn>
+
+                </div>
+              </div>
+            </v-col>
+            <v-col cols="4">
+              <div>
+                <div>
+                  <v-text-field
+                      v-model="ind_bod_effl_concentration"
+                      suffix="g/m3"
+                      type="number"
+                  ></v-text-field>
+
+                </div>
+              </div>
+
+            </v-col>
+
+          </v-row>
+          <v-row style="background-color: #F2F4F3" align="center">
+            <v-col cols="8" >
+              <div style="width: 100%;">
+                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                      <span>
+                        Total Nitrogen concentration of the industry effluent
+                      </span>
+
+
+
+                  <v-btn v-if="ind_tn_effl !== null"
+                         outlined
+                         x-small
+                         @click="ind_tn_effl_concentration = parseFloat(ind_tn_effl)"
+                  >
+                    Estimation: {{parseFloat(ind_tn_effl).toExponential(2)}} g/m3
+                  </v-btn>
+
+                </div>
+              </div>
+            </v-col>
+            <v-col cols="4">
+              <div>
+                <div>
+                  <v-text-field
+                      v-model="ind_tn_effl_concentration"
+                      suffix="g/m3"
+                      type="number"
+                  ></v-text-field>
+
+                </div>
+              </div>
+
+            </v-col>
+
+          </v-row>
+
           <br>
           <v-btn
               color="primary"
               @click="tab_1_continue"
-              :disabled="!water_withdrawal_valid"
           >
             SAVE AND CONTINUE
           </v-btn>
-        </v-stepper-content>
+        </v-stepper-content>  <!-- Industry -->
 
         <v-stepper-content step="2">
           <v-row>
@@ -169,12 +372,12 @@
 
                       </span>
 
-                        <v-btn v-if="value.estimation_equation"
+                        <v-btn v-if="value.estimation_equation && industrial_wwtp_onsite_estimations[key](wwtp_aux_inputs) !== null"
                           outlined
                           x-small
-                          @click="wwtp_aux_inputs[key] = parseFloat(estimations[key](wwtp_aux_inputs))"
+                          @click="wwtp_aux_inputs[key] = parseFloat(industrial_wwtp_onsite_estimations[key](wwtp_aux_inputs))"
                           >
-                          Estimation: {{parseFloat(estimations[key](wwtp_aux_inputs)).toFixed(2)}}{{value.unit}} <!-- Botó amb estimació -->
+                          Estimation: {{parseFloat(industrial_wwtp_onsite_estimations[key](wwtp_aux_inputs)).toExponential(2)}}{{value.unit}} <!-- Botó amb estimació -->
                         </v-btn>
 
                       </div>
@@ -263,12 +466,12 @@
 
                       </span>
 
-                              <v-btn v-if="value.estimation_equation"
+                              <v-btn v-if="value.estimation_equation && industrial_wwtp_onsite_estimations[key](wwtp_aux_inputs) !== null"
                                      outlined
                                      x-small
-                                     @click="wwtp_aux_inputs[key] = parseFloat(estimations[key](wwtp_aux_inputs))"
+                                     @click="wwtp_aux_inputs[key] = parseFloat(industrial_wwtp_onsite_estimations[key](wwtp_aux_inputs))"
                               >
-                                Estimation: {{parseFloat(estimations[key](wwtp_aux_inputs)).toFixed(2)}}{{value.unit}} <!-- Botó amb estimació -->
+                                Estimation: {{parseFloat(industrial_wwtp_onsite_estimations[key](wwtp_aux_inputs)).toExponential(2)}}{{value.unit}} <!-- Botó amb estimació -->
                               </v-btn>
 
                             </div>
@@ -327,7 +530,7 @@
             SAVE AND CONTINUE
           </v-btn>
 
-        </v-stepper-content>
+        </v-stepper-content>  <!-- Onsite WWTP -->
 
         <v-stepper-content step="3">
 
@@ -377,12 +580,12 @@
 
                       </span>
 
-                        <v-btn v-if="value.estimation_equation"
+                        <v-btn v-if="value.estimation_equation && direct_discharge_estimations[key](wwtp_aux_inputs) !== null"
                                outlined
                                x-small
-                               @click="wwtp_aux_inputs[key] = parseFloat(estimations[key](wwtp_aux_inputs))"
+                               @click="wwtp_aux_inputs[key] = parseFloat(direct_discharge_estimations[key](wwtp_aux_inputs))"
                         >
-                          Estimation: {{parseFloat(estimations[key](wwtp_aux_inputs)).toFixed(2)}}{{value.unit}} <!-- Botó amb estimació -->
+                          Estimation: {{parseFloat(direct_discharge_estimations[key](wwtp_aux_inputs)).toExponential(2)}}{{value.unit}} <!-- Botó amb estimació -->
                         </v-btn>
 
                       </div>
@@ -439,7 +642,7 @@
             SAVE AND CONTINUE
           </v-btn>
 
-        </v-stepper-content>
+        </v-stepper-content>  <!-- Direct discharge -->
 
         <v-stepper-content step="4">
           <v-row>
@@ -495,12 +698,12 @@
 
                       </span>
 
-                        <v-btn v-if="value.estimation_equation"
+                        <v-btn v-if="value.estimation_equation && wwtp_offsite_estimations[key](wwtp_aux_inputs) !== null"
                                outlined
                                x-small
-                               @click="wwtp_aux_inputs[key] = parseFloat(estimations[key](wwtp_aux_inputs))"
+                               @click="wwtp_aux_inputs[key] = parseFloat(wwtp_offsite_estimations[key](wwtp_aux_inputs))"
                         >
-                          Estimation: {{parseFloat(estimations[key](wwtp_aux_inputs)).toFixed(2)}}{{value.unit}} <!-- Botó amb estimació -->
+                          Estimation: {{parseFloat(wwtp_offsite_estimations[key](wwtp_aux_inputs)).toExponential(2)}}{{value.unit}} <!-- Botó amb estimació -->
                         </v-btn>
 
                       </div>
@@ -589,12 +792,12 @@
 
                       </span>
 
-                              <v-btn v-if="value.estimation_equation"
+                              <v-btn v-if="value.estimation_equation && wwtp_offsite_estimations[key](wwtp_aux_inputs) !== null"
                                      outlined
                                      x-small
-                                     @click="wwtp_aux_inputs[key] = parseFloat(estimations[key](wwtp_aux_inputs))"
+                                     @click="wwtp_aux_inputs[key] = parseFloat(wwtp_offsite_estimations[key](wwtp_aux_inputs))"
                               >
-                                Estimation: {{parseFloat(estimations[key](wwtp_aux_inputs)).toFixed(2)}}{{value.unit}} <!-- Botó amb estimació -->
+                                Estimation: {{parseFloat(wwtp_offsite_estimations[key](wwtp_aux_inputs)).toExponential(2)}}{{value.unit}} <!-- Botó amb estimació -->
                               </v-btn>
 
                             </div>
@@ -653,7 +856,7 @@
             SAVE AND CONTINUE
           </v-btn>
 
-        </v-stepper-content>
+        </v-stepper-content>  <!-- offsite wwtp -->
 
       </v-stepper-items>
     </v-stepper>
@@ -674,7 +877,7 @@ import {
   Industrial_wwtp_onsite_external_industrial,
   Direct_discharge,
   Industrial_wwtp_offsite,
-  Domestic_wwtp
+  Domestic_wwtp,
 } from "../ecam_backend";
 import Vue from 'vue'
 import {utils, metrics} from "../utils"
@@ -698,6 +901,11 @@ export default {
       direct_discharge_inputs: {},
       offsite_inputs: {},
       estimations: Industrial_wwtp_onsite.get_estimations(),
+      industrial_wwtp_onsite_estimations: Industrial_wwtp_onsite.get_estimations(),
+      direct_discharge_estimations: Direct_discharge.get_estimations(),
+
+      wwtp_offsite_estimations: null,
+
       stepper_model: 1,
       water_withdrawal_image: require("@/../public/water_flow/water_withdrawal.jpg"),
       onsite_no_external_image: require("../../public/water_flow/onsite_no_external.jpg"),
@@ -708,7 +916,6 @@ export default {
 
       water_withdrawal_valid: true,
       water_withdrawn: defaultIndustry.volume_withdrawn,
-      //water_withdrawn: 0,
 
       has_onsite_wwtp: defaultIndustry.has_onsite_wwtp,
       yes_no: [{text: "Yes", value: true},{text: "No", value: false}],
@@ -718,11 +925,15 @@ export default {
       industrial_domestic: ["Domestic", "Industrial"],
       wwtp_aux_inputs: {},
       has_direct_discharge: defaultIndustry.has_direct_discharge,
+      ind_tn_effl_concentration: defaultIndustry.ind_tn_effl_concentration,
+      ind_bod_effl_concentration: defaultIndustry.ind_bod_effl_concentration,
+      volume_used: defaultIndustry.volume_used,
+
 
       global_layers: utils.format_layer_description(Vue.prototype.$layers_description),
-
+      cod_to_bod: 2.4,
       industry_type: defaultIndustry.industry_type,
-      industry_typologies: [
+      industry_typologies_2: [
         {text: "Undefined", value: null},
         {text: "Others", value: null},
         {text: "Alcohol refining", value: "alcohol"},
@@ -733,7 +944,7 @@ export default {
         {text: "Nitrogen fertiliser", value: "nitrogen"},
         {text: "Plastics and resins", value: "plastics"},
         {text: "Starch production", value: "starch"}],
-      industry_typologies_2: [
+      industry_typologies: [
         {text: "Undefined", value: null},
         {text: "Others", value: null},
         {text: "Manufacture of food products", value: "food"},
@@ -760,16 +971,13 @@ export default {
         {text: "Manufacture of furniture", value: "furniture"},
         {text: "Other manufacturing", value: "other_manufacturing"},
         {text: "Repair and installation of machinery and equipment", value: "repair"}
-      ]
-
-
+      ],
     };
   },
   created() {
     if (this.industry === undefined) this.$router.push('/')
   },
   watch: {
-
     stepper_model(step){
       if(step == 2 ){
         this.onsite_inputs = this.industry.onsite_wwtp.get_inputs()
@@ -845,8 +1053,11 @@ export default {
 
       if(this.has_offsite_wwtp){
         this.industry.offsite_wwtp.vol_infl_wwtp = this.industry.onsite_wwtp.wwt_vol_treated_external
-        this.industry.offsite_wwtp.bod_infl_wwtp = this.industry.onsite_wwtp.wwt_cod_effl_treated_external
-        this.industry.offsite_wwtp.tn_infl_wwtp = this.industry.onsite_wwtp.wwt_tn_effl_treated_external
+        this.industry.offsite_wwtp.tn_infl_wwtp = this.industry.onsite_wwtp.wwt_tn_effl_to_wb
+
+        if(this.industry.offsite_wwtp_type === "Domestic") this.industry.offsite_wwtp.bod_infl_wwtp = this.industry.onsite_wwtp.wwt_bod_effl_to_wb*this.cod_to_bod
+        else this.industry.offsite_wwtp.bod_infl_wwtp = this.industry.onsite_wwtp.wwt_bod_effl_to_wb
+
       }
 
       if(this.has_direct_discharge) {
@@ -864,6 +1075,11 @@ export default {
       this.industry.offsite_wwtp_type = this.offsite_wwtp_type
       this.industry.has_direct_discharge = this.has_direct_discharge
       this.industry.industry_type = this.industry_type
+      this.industry.tn_effl_concentration = this.ind_tn_effl_concentration
+      this.industry.bod_effl_concentration = this.ind_bod_effl_concentration
+      this.industry.volume_used = this.volume_used
+
+
 
       //Local wwtp
 
@@ -882,6 +1098,8 @@ export default {
           }
         }
         this.industry.onsite_wwtp.industry_type = this.industry.industry_type
+        this.industry.onsite_wwtp.wwt_bod_infl = this.industry.bod_effl_concentration
+        this.industry.onsite_wwtp.wwt_tn_infl = this.industry.tn_effl_concentration
       }
 
       //Direct discharge
@@ -890,6 +1108,9 @@ export default {
           this.industry.direct_discharge = new Direct_discharge()
         }
         this.industry.direct_discharge.industry_type = this.industry.industry_type
+        this.industry.direct_discharge.wwt_bod_effl_to_wb = this.industry.bod_effl_concentration
+        this.industry.direct_discharge.wwt_tn_effl_to_wb = this.industry.tn_effl_concentration
+
 
       }
 
@@ -897,10 +1118,18 @@ export default {
       if(this.has_offsite_wwtp){
         if(this.offsite_wwtp_type == "Industrial"){
           if(this.industry.offsite_wwtp === null || this.industry.offsite_wwtp.constructor.name !== "Industrial_wwtp_offsite") this.industry.offsite_wwtp = new Industrial_wwtp_offsite()
+
+          this.wwtp_offsite_estimations = Industrial_wwtp_offsite.get_estimations()
+          this.industry.offsite_wwtp.wwt_bod_infl = this.industry.bod_effl_concentration
         }else {
           if(this.industry.offsite_wwtp === null || this.industry.offsite_wwtp.constructor.name !== "Domestic_wwtp") this.industry.offsite_wwtp = new Domestic_wwtp()
+          this.wwtp_offsite_estimations = Domestic_wwtp.get_estimations()
+          this.industry.offsite_wwtp.wwt_bod_infl = this.industry.bod_effl_concentration*this.cod_to_bod
+
         }
         this.industry.offsite_wwtp.industry_type = this.industry.industry_type
+        this.industry.offsite_wwtp.wwt_tn_infl = this.industry.tn_effl_concentration
+
       }
 
       if(!this.has_onsite_wwtp){
@@ -936,6 +1165,111 @@ export default {
       if(this.water_needed === this.amount_insitu + this.amount_offsite) return true
       else return ("Amount of water entering the industry must be the same as the amount leaving")
     }*/
+  },
+  computed: {
+    ind_bod_effl(){
+      if(this.industry_type === "food"){  //noves categories
+        return 336.2591324200910*1e-6
+      }else if(this.industry_type === "beverages"){  //noves categories
+        return 231.09062980030700*1e-6
+      }else if(this.industry_type === "tobacco"){  //noves categories
+        return  null
+      }else if(this.industry_type === "textiles"){  //noves categories
+        return 410.09920634920627*1e-6
+      }else if(this.industry_type === "wearing"){  //noves categories
+        return 40*1e-6
+      }else if(this.industry_type === "leather"){  //noves categories
+        return null
+      }else if(this.industry_type === "wood"){  //noves categories
+        return 33.333333333333336*1e-6
+      }else if(this.industry_type === "paper"){  //noves categories
+        return 366.27272727272725*1e-6
+      }else if(this.industry_type === "printing"){  //noves categories
+        return 750*1e-6
+      }else if(this.industry_type === "coke"){  //noves categories
+        return 300*1e-6
+      }else if(this.industry_type === "chemicals"){  //noves categories
+        return 598.8096590909091*1e-6
+      }else if(this.industry_type === "pharmaceutical"){  //noves categories
+        return 559.8717948717948*1e-6
+      }else if(this.industry_type === "rubber"){  //noves categories
+        return 603.1034482758621*1e-6
+      }else if(this.industry_type === "mineral"){  //noves categories
+        return 59.03846153846154*1e-6
+      }else if(this.industry_type === "metals"){  //noves categories
+        return 586.5384615384615*1e-6
+      }else if(this.industry_type === "fabricated_metals"){  //noves categories
+        return 641.4117647058823*1e-6
+      }else if(this.industry_type === "computer"){  //noves categories
+        return 33.333333333333336*1e-6
+      }else if(this.industry_type === "electrical"){  //noves categories
+        return 86.66666666666667*1e-6
+      }else if(this.industry_type === "machinery"){  //noves categories
+        return 328.75*1e-6
+      }else if(this.industry_type === "vehicles"){  //noves categories
+        return 563.1578947368421*1e-6
+      }else if(this.industry_type === "transport"){  //noves categories
+        return null
+      }else if(this.industry_type === "furniture"){  //noves categories
+        return 35*1e-6
+      }else if(this.industry_type === "other_manufacturing"){  //noves categories
+        return 35*1e-6
+      }else if(this.industry_type === "repair"){  //noves categories
+        return 40*1e-6
+      }else return null
+    },
+    ind_tn_effl(){
+      if(this.industry_type === "food"){  //noves categories
+        return 2.4867513640738284*1e-6
+      }else if(this.industry_type === "beverages"){  //noves categories
+        return  null
+      }else if(this.industry_type === "tobacco"){  //noves categories
+        return  null
+      }else if(this.industry_type === "textiles"){  //noves categories
+        return  null
+      }else if(this.industry_type === "wearing"){  //noves categories
+        return  null
+      }else if(this.industry_type === "leather"){  //noves categories
+        return null
+      }else if(this.industry_type === "wood"){  //noves categories
+        return  null
+      }else if(this.industry_type === "paper"){  //noves categories
+        return  null
+      }else if(this.industry_type === "printing"){  //noves categories
+        return 0
+      }else if(this.industry_type === "coke"){  //noves categories
+        return  null
+      }else if(this.industry_type === "chemicals"){  //noves categories
+        return  null
+      }else if(this.industry_type === "pharmaceutical"){  //noves categories
+        return  null
+      }else if(this.industry_type === "rubber"){  //noves categories
+        return  null
+      }else if(this.industry_type === "mineral"){  //noves categories
+        return 6.25
+      }else if(this.industry_type === "metals"){  //noves categories
+        return  null
+      }else if(this.industry_type === "fabricated_metals"){  //noves categories
+        return 0
+      }else if(this.industry_type === "computer"){  //noves categories
+        return  null
+      }else if(this.industry_type === "electrical"){  //noves categories
+        return  null
+      }else if(this.industry_type === "machinery"){  //noves categories
+        return  null
+      }else if(this.industry_type === "vehicles"){  //noves categories
+        return  null
+      }else if(this.industry_type === "transport"){  //noves categories
+        return null
+      }else if(this.industry_type === "furniture"){  //noves categories
+        return  null
+      }else if(this.industry_type === "other_manufacturing"){  //noves categories
+        return  null
+      }else if(this.industry_type === "repair"){  //noves categories
+        return  null
+      }else return null
+    },
+
   }
 
 

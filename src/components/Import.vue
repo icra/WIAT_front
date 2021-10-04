@@ -175,7 +175,9 @@ export default {
       new_industry.volume_withdrawn = industry.volume_withdrawn
       new_industry.has_direct_discharge = industry.has_direct_discharge
       new_industry.industry_type = industry.industry_type
-
+      new_industry.tn_effl_concentration = industry.tn_effl_concentration
+      new_industry.bod_effl_concentration = industry.bod_effl_concentration
+      new_industry.vol_used = industry.vol_used
 
       if(new_industry.has_onsite_wwtp)
         if(new_industry.has_offsite_wwtp){
@@ -183,8 +185,6 @@ export default {
           else new_industry.onsite_wwtp = this.copy_wwtp(industry.onsite_wwtp, "Industrial_wwtp_onsite_external_industrial", new_industry.industry_type) //Industrial
         } else new_industry.onsite_wwtp = this.copy_wwtp(industry.onsite_wwtp, "Industrial_wwtp_onsite", new_industry.industry_type)
       else new_industry.onsite_wwtp = null
-
-
 
       if(new_industry.has_offsite_wwtp){
         if(new_industry.offsite_wwtp_type === "Industrial") new_industry.offsite_wwtp_type = this.copy_wwtp(industry.offsite_wwtp, "Industrial_wwtp_offsite", new_industry.industry_type)

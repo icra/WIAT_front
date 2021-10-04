@@ -233,8 +233,8 @@ export default {
     emissions_table(dd, industries, assessment_days) {
 
       let days_factor = 1
-      if(this.period_model === "annual") days_factor = 365/assessment_days
-      else if(this.period_model === "daily") days_factor = 1/assessment_days
+      if(this.period_model === "annual") days_factor = 365
+      else if(this.period_model === "assessment") days_factor = assessment_days
 
       dd.content.push({
         text: "GHG emissions\n\n",
@@ -324,8 +324,8 @@ export default {
     async quality_quantity_indicators(dd, industries, assessment_days) {
 
       let days_factor = 1
-      if(this.period_model === "annual") days_factor = 365/assessment_days
-      else if(this.period_model === "daily") days_factor = 1/assessment_days
+      if(this.period_model === "annual") days_factor = 365
+      else if(this.period_model === "assessment") days_factor = assessment_days
 
 
       dd.content.push({

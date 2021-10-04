@@ -67,10 +67,14 @@ export class Industry{
         this.has_offsite_wwtp = false
         this.offsite_wwtp = null
         this.offsite_wwtp_type = "Domestic" //Domestic or Industrial
-        this.volume_withdrawn = 0   //Amount of water withdrawn from the wb(m3)
+        this.volume_withdrawn = 0   //Amount of water withdrawn from the wb per day(m3/day)
         this.has_direct_discharge = false
         this.direct_discharge = null
         this.industry_type = null
+        this.ind_tn_effl_concentration = 0
+        this.ind_bod_effl_concentration = 0
+        this.volume_used = 0
+
     }
 
 };
@@ -81,21 +85,7 @@ export class Direct_discharge{
         let inputs = {}
         inputs["None"] = {
 
-            "wwt_vol_disc" :{question:"Volume of discharged waste water to water body", value: 0},
-
-            "wwt_bod_effl_to_wb": {
-                question: "COD load directly discharged to water body",
-                value: 0,
-                unit: "kg",
-
-            },
-
-            "wwt_tn_effl_to_wb": {
-                question: "Total Nitrogen load directly discharged to water body",
-                value: 0,
-                unit: "kg",
-                estimation_equation: true
-            },
+            "wwt_vol_disc" :{question:"Volume of discharged waste water to water body every day", value: 0, unit: "m3/day"},
 
             //emission factors (discharge)
             "wwt_ch4_efac_dis": {
@@ -126,9 +116,26 @@ export class Direct_discharge{
         return Direct_discharge.info_inputs()
     }
 
+    static get_estimations(){
+        return {
+            wwt_bod_effl_to_wb(substage){
+                return substage.wwt_bod_infl
+            },
+
+            wwt_tn_effl_to_wb(substage){
+                return substage.wwt_tn_infl
+            },
+
+        }
+    }
+
     constructor(){
         let _this = this
         this.industry_type = null
+        this.wwt_tn_effl_to_wb = 0
+        this.wwt_bod_effl_to_wb = 0
+
+
         for(let items of Object.values(Direct_discharge.info_inputs())){
             for(let [clau, valor] of Object.entries(items)){
                 _this[clau] = valor.value
@@ -630,126 +637,6 @@ export class WWTP{
         return WWTP.info_inputs()
     }
 
-    static get_estimations(){
-        return {
-            wwt_biog_pro(substage){ //estimation for biogas produced
-                let wwt_mass_slu    = substage.wwt_mass_slu;  //kg  | mass of combined sludge to digestion
-                let VS_to_digestion = wwt_mass_slu    * 0.80; //kg  | VS to digestion: 80% of sludge mass
-                let VS_destroyed    = VS_to_digestion * 0.60; //kg  | VS destroyed: 60% of VS
-                let biogas_volume   = VS_destroyed    * 0.80; //Nm3 | biogas produced (volume)
-                return biogas_volume;
-            },
-            //wwt
-            wwt_biog_fla(substage){
-                return 100-substage.wwt_biog_val-substage.wwt_biog_lkd-substage.wwt_biog_sold;
-            },
-            wwt_biog_val(substage){
-                return 100-substage.wwt_biog_fla-substage.wwt_biog_lkd-substage.wwt_biog_sold;
-            },
-            wwt_biog_lkd(substage){
-                return 100-substage.wwt_biog_val-substage.wwt_biog_fla-substage.wwt_biog_sold;
-            },
-            wwt_biog_sold(substage){
-                return 100-substage.wwt_biog_val-substage.wwt_biog_fla-substage.wwt_biog_lkd;
-            },
-            wwt_tn_infl(substage){
-                let key = "wwt_vol_trea"
-                if(substage.industry_type === null){
-                    return 0
-                }else if(substage.industry_type === "alcohol"){
-                    return substage[key]*2.4
-                }else if(substage.industry_type === "beer"){
-                    return substage[key]*0.055
-                }else if(substage.industry_type === "fish"){
-                    return substage[key]*0.60
-                }else if(substage.industry_type === "iron"){
-                    return substage[key]*0.25
-                }else if(substage.industry_type === "meat"){
-                    return substage[key]*0.19
-                }else if(substage.industry_type === "nitrogen"){
-                    return substage[key]*0.5
-                }else if(substage.industry_type === "plastics"){
-                    return substage[key]*0.25
-                }else if(substage.industry_type === "starch"){
-                    return substage[key]*0.9
-                }/*else if(substage.industry_type === "food"){  //noves categories
-                    return substage[key]*
-                }else if(substage.industry_type === "beverages"){  //noves categories
-                    return substage[key]*
-                }else if(substage.industry_type === "tobacco"){  //noves categories
-                    return substage[key]*
-                }else if(substage.industry_type === "textiles"){  //noves categories
-                    return substage[key]*
-                }else if(substage.industry_type === "wearing"){  //noves categories
-                    return substage[key]*
-                }else if(substage.industry_type === "leather"){  //noves categories
-                    return substage[key]*
-                }else if(substage.industry_type === "wood"){  //noves categories
-                    return substage[key]*
-                }else if(substage.industry_type === "paper"){  //noves categories
-                    return substage[key]*
-                }else if(substage.industry_type === "printing"){  //noves categories
-                    return substage[key]*
-                }else if(substage.industry_type === "coke"){  //noves categories
-                    return substage[key]*
-                }else if(substage.industry_type === "chemicals"){  //noves categories
-                    return substage[key]*
-                }else if(substage.industry_type === "pharmaceutical"){  //noves categories
-                    return substage[key]*
-                }else if(substage.industry_type === "rubber"){  //noves categories
-                    return substage[key]*
-                }else if(substage.industry_type === "mineral"){  //noves categories
-                    return substage[key]*
-                }else if(substage.industry_type === "metals"){  //noves categories
-                    return substage[key]*
-                }else if(substage.industry_type === "fabricated_metals"){  //noves categories
-                    return substage[key]*
-                }else if(substage.industry_type === "computer"){  //noves categories
-                    return substage[key]*
-                }else if(substage.industry_type === "electrical"){  //noves categories
-                    return substage[key]*
-                }else if(substage.industry_type === "machinery"){  //noves categories
-                    return substage[key]*
-                }else if(substage.industry_type === "vehicles"){  //noves categories
-                    return substage[key]*
-                }else if(substage.industry_type === "transport"){  //noves categories
-                    return substage[key]*
-                }else if(substage.industry_type === "furniture"){  //noves categories
-                    return substage[key]*
-                }else if(substage.industry_type === "other_manufacturing"){  //noves categories
-                    return substage[key]*
-                }else if(substage.industry_type === "repair"){  //noves categories
-                    return substage[key]*
-                }*/
-            },
-            wwt_tn_effl_to_wb(substage){
-
-                let key = "wwt_vol_disc"  //Direct discharge"
-                if(substage.industry_type === null){
-                    return 0
-                }else if(substage.industry_type === "alcohol"){
-                    return substage[key]*2.4
-                }else if(substage.industry_type === "beer"){
-                    return substage[key]*0.055
-                }else if(substage.industry_type === "fish"){
-                    return substage[key]*0.60
-                }else if(substage.industry_type === "iron"){
-                    return substage[key]*0.25
-                }else if(substage.industry_type === "meat"){
-                    return substage[key]*0.19
-                }else if(substage.industry_type === "nitrogen"){
-                    return substage[key]*0.5
-                }else if(substage.industry_type === "plastics"){
-                    return substage[key]*0.25
-                }else if(substage.industry_type === "starch"){
-                    return substage[key]*0.9
-                }
-            },
-
-
-        }
-    }
-
     constructor(){
         this.industry_type = null
     }
@@ -1060,7 +947,7 @@ export class WWTP{
         emissions.n2o[0] = sludge_mass*rates.n2o[0];
         emissions.co2[0] = sludge_mass*rates.co2[0];
 
-        //year 1 to 3
+        //year 1 to 3eel
         for(let i=1;i<3;i++){
             emissions.ch4[i] = sludge_mass*rates.ch4[1];
             emissions.n2o[i] = sludge_mass*rates.n2o[1];
@@ -1141,37 +1028,29 @@ export class Industrial_wwtp extends WWTP{
 
             /*"wwt_serv_pop" :{question:"Serviced population", value: 0}*/
 
-            "wwt_vol_trea": {question: "Volume of water treated in the WWTP", value: 0, unit: "m3"},
-            "wwt_vol_disc" :{question:"Volume of discharged effluent to water body", value: 0},
+            "wwt_treatment_type" :{question:"Type of wastewater treatment", value: 0, type: "option", items: Tables["WW treatment type"]}, //Option | type of treatment (see Tables)
+
+
+            "wwt_vol_trea": {question: "Volume of water treated in the WWTP every day", value: 0, unit: "m3/day"},
+            "wwt_vol_disc" :{question:"Volume of water discharged to water body every day", value: 0, unit: "m3/day"},
 
             //"wwt_tot_nit": {question: "Total nitrogen in untreated wastewater", value: 0, unit: "kgTN/m3"},  //kgTN/m3 | Total nitrogen in untreated wastewater
 
-            "wwt_bod_infl": {question: "Influent COD load entering the WWTP", value: 0, unit: "kg", description_tooltip: "COD load entering the WWTP during the assessment period. It can be estimated by multiplying the average COD concentration in the influent by the volume entering the plant. If this is done daily and summed over the duration of the assessment period the value will be most accurate"}, //kgCOD   //No te estimacio
             "wwt_bod_effl_to_wb": {
-                question: "Effluent COD load leaving the WWTP to water body",
+                question: "Effluent COD concentration leaving the WWTP",
                 value: 0,
-                unit: "kg",
-                description_tooltip: "COD load at the effluent of the WWTP during the assessment period. It can be estimated by multiplying the average COD concentration in the effluent by the effluent volume of the plant discharged to the water body. If this is done daily and summed over the duration of the assessment period the value will be most accurate",
-                items: Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"],
-                estimation_based_on: "wwt_bod_infl",
-                estimation_factor: "bod_effl",
-                estimation_type: "option",
+                unit: "g/m3",
+                estimation_equation: true
                 //depends_on: "wwt_has_local_wwt_plant"
             }, //kgCOD   Table 6.6B and 6.10C
 
-            "wwt_tn_infl": {question: "Total Nitrogen load in the influent", value: 0, unit: "kg", estimation_equation: true},  //kgN    Equacio 6.13
             //"wwt_P_infl": {question: "Influent P load", value: 0, unit: "kg"}, //kgP
 
             "wwt_tn_effl_to_wb": {
-                question: "Effluent Total Nitrogen load leaving the WWTP to water body",
+                question: "Effluent Total Nitrogen concentration leaving the WWTP",
                 value: 0,
-                unit: "kg",
-                estimation_type: "option",
-                items: Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"],
-                estimation_based_on: "wwt_tn_infl",
-                estimation_factor: "N_effl",
-                description: "N_effl_table",
-
+                unit: "g/m3",
+                estimation_equation: true
             },  //kgN   TAULA 6.10c
 
 
@@ -1181,15 +1060,15 @@ export class Industrial_wwtp extends WWTP{
 
             //SLUDGE MANAGEMENT
             "wwt_mass_slu": {
-                question: "Sludge removed from wastewater treatment (dry weight)",
+                question: "Sludge removed from wastewater treatment (dry weight) every day",
                 value: 0,
-                unit: "kg",
-                description_tooltip: "Amount of raw sludge removed from wastewater treatment as dry mass during the assessment period"
+                unit: "kg/day",
+                description_tooltip: "Amount of raw sludge removed from wastewater treatment as dry mass every day"
             },  //kg | raw sludge removed from wwtp as dry mass
             "wwt_bod_slud": {
-                question: "COD removed as sludge",
+                question: "COD removed as sludge every day",
                 value: 0,
-                unit: "kg",
+                unit: "kg/day",
                 description_tooltip: "COD (organic component) removed from wastewater (in the form of sludge) in aerobic treatment plant",
                 estimation_type: "option",
                 items: Tables["type_of_treatment_KREM"],
@@ -1254,6 +1133,9 @@ export class Industrial_wwtp extends WWTP{
         super();
         let _this = this
 
+        this.wwt_bod_infl = 0
+        this.wwt_tn_infl = 0
+
         for(let items of Object.values(Industrial_wwtp.info_inputs())){
             for(let [clau, valor] of Object.entries(items)){
                 _this[clau] = valor.value
@@ -1261,6 +1143,141 @@ export class Industrial_wwtp extends WWTP{
         }
     }
 
+    //Estimations
+    static get_estimations(){
+        return {
+            wwt_biog_pro(substage){ //estimation for biogas produced
+                let wwt_mass_slu    = substage.wwt_mass_slu;  //kg  | mass of combined sludge to digestion
+                let VS_to_digestion = wwt_mass_slu    * 0.80; //kg  | VS to digestion: 80% of sludge mass
+                let VS_destroyed    = VS_to_digestion * 0.60; //kg  | VS destroyed: 60% of VS
+                let biogas_volume   = VS_destroyed    * 0.80; //Nm3 | biogas produced (volume)
+                return biogas_volume;
+            },
+            //wwt
+            wwt_biog_fla(substage){
+                return 100-substage.wwt_biog_val-substage.wwt_biog_lkd-substage.wwt_biog_sold;
+            },
+            wwt_biog_val(substage){
+                return 100-substage.wwt_biog_fla-substage.wwt_biog_lkd-substage.wwt_biog_sold;
+            },
+            wwt_biog_lkd(substage){
+                return 100-substage.wwt_biog_val-substage.wwt_biog_fla-substage.wwt_biog_sold;
+            },
+            wwt_biog_sold(substage){
+                return 100-substage.wwt_biog_val-substage.wwt_biog_fla-substage.wwt_biog_lkd;
+            },
+            wwt_bod_infl(substage){
+                if(substage.industry_type === "food"){  //noves categories
+                    return 336.2591324200910*1e-6
+                }else if(substage.industry_type === "beverages"){  //noves categories
+                    return 231.09062980030700*1e-6
+                }else if(substage.industry_type === "tobacco"){  //noves categories
+                    return  null
+                }else if(substage.industry_type === "textiles"){  //noves categories
+                    return 410.09920634920627*1e-6
+                }else if(substage.industry_type === "wearing"){  //noves categories
+                    return 40*1e-6
+                }else if(substage.industry_type === "leather"){  //noves categories
+                    return null
+                }else if(substage.industry_type === "wood"){  //noves categories
+                    return 33.333333333333336*1e-6
+                }else if(substage.industry_type === "paper"){  //noves categories
+                    return 366.27272727272725*1e-6
+                }else if(substage.industry_type === "printing"){  //noves categories
+                    return 750*1e-6
+                }else if(substage.industry_type === "coke"){  //noves categories
+                    return 300*1e-6
+                }else if(substage.industry_type === "chemicals"){  //noves categories
+                    return 598.8096590909091*1e-6
+                }else if(substage.industry_type === "pharmaceutical"){  //noves categories
+                    return 559.8717948717948*1e-6
+                }else if(substage.industry_type === "rubber"){  //noves categories
+                    return 603.1034482758621*1e-6
+                }else if(substage.industry_type === "mineral"){  //noves categories
+                    return 59.03846153846154*1e-6
+                }else if(substage.industry_type === "metals"){  //noves categories
+                    return 586.5384615384615*1e-6
+                }else if(substage.industry_type === "fabricated_metals"){  //noves categories
+                    return 641.4117647058823*1e-6
+                }else if(substage.industry_type === "computer"){  //noves categories
+                    return 33.333333333333336*1e-6
+                }else if(substage.industry_type === "electrical"){  //noves categories
+                    return 86.66666666666667*1e-6
+                }else if(substage.industry_type === "machinery"){  //noves categories
+                    return 328.75*1e-6
+                }else if(substage.industry_type === "vehicles"){  //noves categories
+                    return 563.1578947368421*1e-6
+                }else if(substage.industry_type === "transport"){  //noves categories
+                    return null
+                }else if(substage.industry_type === "furniture"){  //noves categories
+                    return 35*1e-6
+                }else if(substage.industry_type === "other_manufacturing"){  //noves categories
+                    return 35*1e-6
+                }else if(substage.industry_type === "repair"){  //noves categories
+                    return 40*1e-6
+                }
+            },
+            wwt_bod_effl_to_wb(substage){
+                return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type].bod_effl*substage.wwt_bod_infl
+            },
+
+            wwt_tn_infl(substage){
+                if(substage.industry_type === "food"){  //noves categories
+                    return 2.4867513640738284*1e-6
+                }else if(substage.industry_type === "beverages"){  //noves categories
+                    return  null
+                }else if(substage.industry_type === "tobacco"){  //noves categories
+                    return  null
+                }else if(substage.industry_type === "textiles"){  //noves categories
+                    return  null
+                }else if(substage.industry_type === "wearing"){  //noves categories
+                    return  null
+                }else if(substage.industry_type === "leather"){  //noves categories
+                    return null
+                }else if(substage.industry_type === "wood"){  //noves categories
+                    return  null
+                }else if(substage.industry_type === "paper"){  //noves categories
+                    return  null
+                }else if(substage.industry_type === "printing"){  //noves categories
+                    return 0
+                }else if(substage.industry_type === "coke"){  //noves categories
+                    return  null
+                }else if(substage.industry_type === "chemicals"){  //noves categories
+                    return  null
+                }else if(substage.industry_type === "pharmaceutical"){  //noves categories
+                    return  null
+                }else if(substage.industry_type === "rubber"){  //noves categories
+                    return  null
+                }else if(substage.industry_type === "mineral"){  //noves categories
+                    return 6.25
+                }else if(substage.industry_type === "metals"){  //noves categories
+                    return  null
+                }else if(substage.industry_type === "fabricated_metals"){  //noves categories
+                    return 0
+                }else if(substage.industry_type === "computer"){  //noves categories
+                    return  null
+                }else if(substage.industry_type === "electrical"){  //noves categories
+                    return  null
+                }else if(substage.industry_type === "machinery"){  //noves categories
+                    return  null
+                }else if(substage.industry_type === "vehicles"){  //noves categories
+                    return  null
+                }else if(substage.industry_type === "transport"){  //noves categories
+                    return null
+                }else if(substage.industry_type === "furniture"){  //noves categories
+                    return  null
+                }else if(substage.industry_type === "other_manufacturing"){  //noves categories
+                    return  null
+                }else if(substage.industry_type === "repair"){  //noves categories
+                    return  null
+                }
+            },
+            wwt_tn_effl_to_wb(substage){
+                return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type].N_effl*substage.wwt_tn_infl
+            },
+
+        }
+    }
 
     /*
       GHG emissions (kgCO2eq)
@@ -1290,8 +1307,8 @@ export class Industrial_wwtp extends WWTP{
     //emissions from treatment
     wwt_KPI_GHG_tre(){
         let co2   = 0;
-        let ch4   = (this.wwt_bod_infl-this.wwt_bod_slud)*this.wwt_ch4_efac_tre*Cts.ct_ch4_eq.value;    //Eq. 6.4
-        let n2o   = this.wwt_tn_infl*this.wwt_n2o_efac_tre*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;  //Eq. 6.11
+        let ch4   = (this.wwt_bod_infl*this.wwt_vol_trea-this.wwt_bod_slud)*this.wwt_ch4_efac_tre*Cts.ct_ch4_eq.value;    //Eq. 6.4
+        let n2o   = this.wwt_tn_infl*this.wwt_vol_trea*this.wwt_n2o_efac_tre*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;  //Eq. 6.11
         let total = co2+ch4+n2o;
         return {total,co2,ch4,n2o};
     }
@@ -1299,8 +1316,8 @@ export class Industrial_wwtp extends WWTP{
     //emissions from water discharged
     wwt_KPI_GHG_disc(){
         let co2   = 0;
-        let ch4   = this.wwt_bod_effl_to_wb*this.wwt_ch4_efac_dis*Cts.ct_ch4_eq.value;    //Equacio 6.2
-        let n2o   = this.wwt_tn_effl_to_wb *this.wwt_n2o_efac_dis*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;    //Equacio 6.12
+        let ch4   = this.wwt_bod_effl_to_wb*this.wwt_vol_disc*this.wwt_ch4_efac_dis*Cts.ct_ch4_eq.value;    //Equacio 6.2
+        let n2o   = this.wwt_tn_effl_to_wb *this.wwt_vol_disc*this.wwt_n2o_efac_dis*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;    //Equacio 6.12
         let total = co2+ch4+n2o;
         return {total,co2,ch4,n2o};
     }
@@ -1311,7 +1328,7 @@ export class Industrial_wwtp_onsite extends Industrial_wwtp{
 
     static info_inputs(){
         let inputs = Industrial_wwtp.info_inputs()
-        inputs["None"]["wwt_vol_reused"] = {question: "Volume of water reuse/recycled on the WWTP", value: 0, unit: "m3"}
+        inputs["None"]["wwt_vol_reused"] = {question: "Volume of water reused/recycled on the WWTP every day", value: 0, unit: "m3/day"}
         return inputs
     }
 
@@ -1336,9 +1353,9 @@ export class Industrial_wwtp_onsite_external_domestic extends Industrial_wwtp_on
 
     static info_inputs(){
         let inputs = Industrial_wwtp_onsite.info_inputs()
-        inputs["None"]["wwt_vol_treated_external"] = {question: "Volume of water from the WWTP treated in an off-site WWTP", value: 0, unit: "m3"}
-        inputs["None"]["wwt_cod_effl_treated_external"] = {question: "Effluent BOD load leaving the WWTP to external WWTP ", value: 0, unit: "kg"}
-        inputs["None"]["wwt_tn_effl_treated_external"] = {question: "Effluent Total Nitrogen load leaving the WWTP to external WWTP ", value: 0, unit: "kg"}
+        inputs["None"]["wwt_vol_treated_external"] = {question: "Volume of water from the WWTP treated in an off-site WWTP every day", value: 0, unit: "m3/day"}
+        //inputs["None"]["wwt_cod_effl_treated_external"] = {question: "Effluent BOD load leaving the WWTP to external WWTP ", value: 0, unit: "kg"}
+        //inputs["None"]["wwt_tn_effl_treated_external"] = {question: "Effluent Total Nitrogen load leaving the WWTP to external WWTP ", value: 0, unit: "kg"}
         return inputs
     }
 
@@ -1365,9 +1382,9 @@ export class Industrial_wwtp_onsite_external_industrial extends Industrial_wwtp_
 
     static info_inputs(){
         let inputs = Industrial_wwtp_onsite.info_inputs()
-        inputs["None"]["wwt_vol_treated_external"] = {question: "Volume of water from the WWTP treated in an off-site WWTP", value: 0, unit: "m3"}
-        inputs["None"]["wwt_cod_effl_treated_external"] = {question: "Effluent COD load leaving the WWTP to external WWTP ", value: 0, unit: "kg"}
-        inputs["None"]["wwt_tn_effl_treated_external"] = {question: "Effluent Total Nitrogen load leaving the WWTP to external WWTP ", value: 0, unit: "kg"}
+        inputs["None"]["wwt_vol_treated_external"] = {question: "Volume of water from the WWTP treated in an off-site WWTP every day", value: 0, unit: "m3/day"}
+        //inputs["None"]["wwt_cod_effl_treated_external"] = {question: "Effluent COD load leaving the WWTP to external WWTP ", value: 0, unit: "kg"}
+        //inputs["None"]["wwt_tn_effl_treated_external"] = {question: "Effluent Total Nitrogen load leaving the WWTP to external WWTP ", value: 0, unit: "kg"}
         return inputs
     }
 
@@ -1393,31 +1410,6 @@ export class Industrial_wwtp_offsite extends Industrial_wwtp{
 
     static info_inputs(){
         let inputs = Industrial_wwtp.info_inputs()
-        inputs["None"]["wwt_tn_effl_to_wb"] = {
-            question: "Effluent Total Nitrogen load leaving the WWTP to water body",
-                value: 0,
-                unit: "kg",
-                estimation_type: "option",
-                items: Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"],
-                estimation_based_on: "tn_infl",
-                estimation_factor: "N_effl",
-                description: "N_effl_table",
-
-        }  //kgN   TAULA 6.10c
-
-        inputs["None"]["wwt_bod_effl_to_wb"] = {
-            question: "Effluent COD load leaving the WWTP to water body",
-                value: 0,
-                unit: "kg",
-                description: "bod_effl_table",
-                description_tooltip: "COD load at the effluent of the WWTP during the assessment period. It can be estimated by multiplying the average COD concentration in the effluent by the effluent volume of the plant discharged to the water body. If this is done daily and summed over the duration of the assessment period the value will be most accurate",
-                items: Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"],
-                estimation_based_on: "bod_infl",
-                estimation_factor: "bod_effl",
-                estimation_type: "option",
-
-        }
-
         return inputs
     }
 
@@ -1439,23 +1431,83 @@ export class Industrial_wwtp_offsite extends Industrial_wwtp{
         this.vol_infl_wwtp = 0
         this.bod_infl_wwtp = 0
         this.tn_infl_wwtp = 0
-        //this.tn_infl =  new this.a
-
-        this.tn_infl = function() {
-            return Number(this.tn_infl_wwtp) + Number(this.wwt_tn_infl)
-        }
-
-        this.bod_infl = function(){
-            return Number(this.bod_infl_wwtp) + Number(this.wwt_bod_infl)
-        }
 
     }
 
+    static get_estimations(){
+        return {
+            wwt_biog_pro(substage){ //estimation for biogas produced
+                let wwt_mass_slu    = substage.wwt_mass_slu;  //kg  | mass of combined sludge to digestion
+                let VS_to_digestion = wwt_mass_slu    * 0.80; //kg  | VS to digestion: 80% of sludge mass
+                let VS_destroyed    = VS_to_digestion * 0.60; //kg  | VS destroyed: 60% of VS
+                let biogas_volume   = VS_destroyed    * 0.80; //Nm3 | biogas produced (volume)
+                return biogas_volume;
+            },
+            //wwt
+            wwt_biog_fla(substage){
+                return 100-substage.wwt_biog_val-substage.wwt_biog_lkd-substage.wwt_biog_sold;
+            },
+            wwt_biog_val(substage){
+                return 100-substage.wwt_biog_fla-substage.wwt_biog_lkd-substage.wwt_biog_sold;
+            },
+            wwt_biog_lkd(substage){
+                return 100-substage.wwt_biog_val-substage.wwt_biog_fla-substage.wwt_biog_sold;
+            },
+            wwt_biog_sold(substage){
+                return 100-substage.wwt_biog_val-substage.wwt_biog_fla-substage.wwt_biog_lkd;
+            },
+            wwt_bod_effl_to_wb(substage){
+                let vol_treated_from_wwtp = Number(substage.vol_infl_wwtp)
+                let bod_from_wwtp = Number(substage.bod_infl_wwtp)
+                let vol_treated_from_ind = Number(substage.wwt_vol_trea)
+                let bod_from_ind = Number(substage.wwt_bod_infl)
+                let concentration_effluent = (vol_treated_from_wwtp*bod_from_wwtp + vol_treated_from_ind*bod_from_ind) / (vol_treated_from_wwtp+vol_treated_from_ind)
+
+                if(isNaN(concentration_effluent)) {
+                    return null
+                }
+                else return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type].bod_effl*concentration_effluent
+            },
+
+            wwt_tn_effl_to_wb(substage){
+
+                let vol_treated_from_wwtp = Number(substage.vol_infl_wwtp)
+                let tn_from_wwtp = Number(substage.tn_infl_wwtp)
+                let vol_treated_from_ind = Number(substage.wwt_vol_trea)
+                let tn_from_ind = Number(substage.wwt_tn_infl)
+
+                let concentration_effluent = (vol_treated_from_wwtp*tn_from_wwtp + vol_treated_from_ind*tn_from_ind) / (vol_treated_from_wwtp+vol_treated_from_ind)
+
+                if(isNaN(concentration_effluent)) {
+                    return null
+                }
+                return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type].N_effl*concentration_effluent
+            },
+
+        }
+    }
+
+
+    bod_infl(){
+        let vol_treated_from_wwtp = Number(this.vol_infl_wwtp)
+        let bod_from_wwtp = Number(this.bod_infl_wwtp)
+        let vol_treated_from_ind = Number(this.wwt_vol_trea)
+        let bod_from_ind = Number(this.wwt_bod_infl)
+        return vol_treated_from_wwtp*bod_from_wwtp + vol_treated_from_ind*bod_from_ind
+
+    }
+
+    tn_infl(){
+        let vol_treated_from_wwtp = Number(this.vol_infl_wwtp)
+        let tn_from_wwtp = Number(this.tn_infl_wwtp)
+        let vol_treated_from_ind = Number(this.wwt_vol_trea)
+        let tn_from_ind = Number(this.wwt_tn_infl)
+        return vol_treated_from_wwtp*tn_from_wwtp + vol_treated_from_ind*tn_from_ind
+    }
 
     //emissions from treatment
     wwt_KPI_GHG_tre(){
 
-        console.log(this)
         let co2   = 0;
         let ch4   = (this.bod_infl()-this.wwt_bod_slud)*this.wwt_ch4_efac_tre*Cts.ct_ch4_eq.value;    //Eq. 6.4
         let n2o   = (this.tn_infl())*this.wwt_n2o_efac_tre*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;  //Eq. 6.11
@@ -1472,38 +1524,27 @@ export class Domestic_wwtp extends WWTP{
 
             /*"wwt_serv_pop" :{question:"Serviced population", value: 0}*/
 
-            "wwt_vol_trea": {question: "Volume of waste water discharged from the industry treated in the WWTP", value: 0, unit: "m3"},
-            "wwt_vol_disc" :{question:"Volume of discharged effluent to water body", value: 0},
+            "wwt_treatment_type" :{question:"Type of wastewater treatment", value: 0, type: "option", items: Tables["WW treatment type"]}, //Option | type of treatment (see Tables)
+
+            "wwt_vol_trea": {question: "Volume of waste water discharged from the industry treated in the WWTP every day", value: 0, unit: "m3/day"},
+            "wwt_vol_disc" :{question:"Volume of discharged effluent to water body every day", value: 0, unit: "m3/day"},
 
             //"wwt_tot_nit": {question: "Total nitrogen in untreated wastewater", value: 0, unit: "kgTN/m3"},  //kgTN/m3 | Total nitrogen in untreated wastewater
 
-            "wwt_bod_infl": {question: "Influent BOD load entering the WWTP from the industry", value: 0, unit: "kg", description_tooltip: "COD load entering the WWTP during the assessment period. It can be estimated by multiplying the average COD concentration in the influent by the volume entering the plant. If this is done daily and summed over the duration of the assessment period the value will be most accurate"}, //kgBOD   //No te estimacio
             "wwt_bod_effl_to_wb": {
-                question: "Effluent BOD load leaving the WWTP to water body",
+                question: "Effluent BOD concentration leaving the WWTP to water body",
                 value: 0,
-                unit: "kg",
-                description: "bod_effl_table",
-                description_tooltip: "BOD load at the effluent of the WWTP during the assessment period. It can be estimated by multiplying the average BOD concentration in the effluent by the effluent volume of the plant discharged to the water body. If this is done daily and summed over the duration of the assessment period the value will be most accurate",
-                items: Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"],
-                estimation_based_on: "bod_infl",
-                estimation_factor: "bod_effl",
-                estimation_type: "option",
-
+                unit: "g/m3",
+                estimation_equation: true
             }, //kgBOD   Table 6.6B and 6.10C
 
-
-            "wwt_tn_infl": {question: "Total Nitrogen load in the influent discharged from the industry", value: 0, unit: "kg",estimation_equation: true},  //kgN    Equacio 6.13
             //"wwt_P_infl": {question: "Influent P load", value: 0, unit: "kg"}, //kgP
 
             "wwt_tn_effl_to_wb": {
-                question: "Effluent Total Nitrogen load leaving the WWTP to water body",
+                question: "Effluent Total Nitrogen concentration leaving the WWTP to water body",
                 value: 0,
-                unit: "kg",
-                estimation_type: "option",
-                items: Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"],
-                estimation_based_on: "tn_infl",
-                estimation_factor: "N_effl",
-                description: "N_effl_table",
+                unit: "g/m3",
+                estimation_equation: true
 
             },  //kgN   TAULA 6.10c
 
@@ -1520,14 +1561,14 @@ export class Domestic_wwtp extends WWTP{
                 description_tooltip: "Amount of raw sludge removed from wastewater treatment as dry mass during the assessment period"
             },  //kg | raw sludge removed from wwtp as dry mass
             "wwt_bod_slud": {
-                question: "BOD removed as sludge",
+                question: "BOD removed as sludge every day",
                 value: 0,
-                unit: "kg",
+                unit: "kg/day",
                 description_tooltip: "BOD (organic component) removed from wastewater (in the form of sludge) in aerobic treatment plant",
                 estimation_type: "option",
                 items: Tables["type_of_treatment_KREM"],
                 estimation_based_on: "wwt_mass_slu",
-                estimation_factor: "K_rem",
+                estimation_factor: "K_rem_bod",
 
             },  //kg | BOD removed as sludge    //Taula 6.6A
 
@@ -1598,14 +1639,60 @@ export class Domestic_wwtp extends WWTP{
         this.vol_infl_wwtp = 0
         this.bod_infl_wwtp = 0
         this.tn_infl_wwtp = 0
+        this.wwt_bod_infl = 0
+        this.wwt_tn_infl = 0
 
-        this.tn_infl = function(){
-            return Number(this.tn_infl_wwtp) + Number(this.wwt_tn_infl)
-        }
-        this.bod_infl = function(){
-            return Number(this.bod_infl_wwtp) + Number(this.wwt_bod_infl)
-        }
 
+    }
+
+    static get_estimations(){
+        return {
+            wwt_biog_pro(substage){ //estimation for biogas produced
+                let wwt_mass_slu    = substage.wwt_mass_slu;  //kg  | mass of combined sludge to digestion
+                let VS_to_digestion = wwt_mass_slu    * 0.80; //kg  | VS to digestion: 80% of sludge mass
+                let VS_destroyed    = VS_to_digestion * 0.60; //kg  | VS destroyed: 60% of VS
+                let biogas_volume   = VS_destroyed    * 0.80; //Nm3 | biogas produced (volume)
+                return biogas_volume;
+            },
+            //wwt
+            wwt_biog_fla(substage){
+                return 100-substage.wwt_biog_val-substage.wwt_biog_lkd-substage.wwt_biog_sold;
+            },
+            wwt_biog_val(substage){
+                return 100-substage.wwt_biog_fla-substage.wwt_biog_lkd-substage.wwt_biog_sold;
+            },
+            wwt_biog_lkd(substage){
+                return 100-substage.wwt_biog_val-substage.wwt_biog_fla-substage.wwt_biog_sold;
+            },
+            wwt_biog_sold(substage){
+                return 100-substage.wwt_biog_val-substage.wwt_biog_fla-substage.wwt_biog_lkd;
+            },
+            wwt_bod_effl_to_wb(substage){
+                let vol_treated_from_wwtp = Number(substage.vol_infl_wwtp)
+                let bod_from_wwtp = Number(substage.bod_infl_wwtp)
+                let vol_treated_from_ind = Number(substage.wwt_vol_trea)
+                let bod_from_ind = Number(substage.wwt_bod_infl)
+                let concentration_effluent = (vol_treated_from_wwtp*bod_from_wwtp + vol_treated_from_ind*bod_from_ind) / (vol_treated_from_wwtp+vol_treated_from_ind)
+                if(isNaN(concentration_effluent)) {
+                    return null
+                }
+                else return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type].bod_effl*concentration_effluent
+            },
+            wwt_tn_effl_to_wb(substage){
+
+                let vol_treated_from_wwtp = Number(substage.vol_infl_wwtp)
+                let tn_from_wwtp = Number(substage.tn_infl_wwtp)
+                let vol_treated_from_ind = Number(substage.wwt_vol_trea)
+                let tn_from_ind = Number(substage.wwt_tn_infl)
+
+                let concentration_effluent = (vol_treated_from_wwtp*tn_from_wwtp + vol_treated_from_ind*tn_from_ind) / (vol_treated_from_wwtp+vol_treated_from_ind)
+                if(isNaN(concentration_effluent)) {
+                    return null
+                }
+                return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type].N_effl*concentration_effluent
+            },
+
+        }
     }
 
 
@@ -1634,6 +1721,23 @@ export class Domestic_wwtp extends WWTP{
         return {total,co2,ch4,n2o};
     }
 
+    bod_infl(){
+        let vol_treated_from_wwtp = Number(this.vol_infl_wwtp)
+        let bod_from_wwtp = Number(this.bod_infl_wwtp)
+        let vol_treated_from_ind = Number(this.wwt_vol_trea)
+        let bod_from_ind = Number(this.wwt_bod_infl)
+        return vol_treated_from_wwtp*bod_from_wwtp + vol_treated_from_ind*bod_from_ind
+
+    }
+
+    tn_infl(){
+        let vol_treated_from_wwtp = Number(this.vol_infl_wwtp)
+        let tn_from_wwtp = Number(this.tn_infl_wwtp)
+        let vol_treated_from_ind = Number(this.wwt_vol_trea)
+        let tn_from_ind = Number(this.wwt_tn_infl)
+        return vol_treated_from_wwtp*tn_from_wwtp + vol_treated_from_ind*tn_from_ind
+    }
+
 
     //emissions from treatment
     wwt_KPI_GHG_tre(){
@@ -1647,8 +1751,8 @@ export class Domestic_wwtp extends WWTP{
     //emissions from water discharged
     wwt_KPI_GHG_disc(){
         let co2   = 0;
-        let ch4   = this.wwt_bod_effl_to_wb*this.wwt_ch4_efac_dis*Cts.ct_ch4_eq.value;    //Equacio 6.2
-        let n2o   = this.wwt_tn_effl_to_wb *this.wwt_n2o_efac_dis*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;    //Equacio 6.12
+        let ch4   = this.wwt_bod_effl_to_wb*this.wwt_vol_disc*this.wwt_ch4_efac_dis*Cts.ct_ch4_eq.value;    //Equacio 6.2
+        let n2o   = this.wwt_tn_effl_to_wb *this.wwt_vol_disc*this.wwt_n2o_efac_dis*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;    //Equacio 6.12
         let total = co2+ch4+n2o;
         return {total,co2,ch4,n2o};
     }
@@ -1753,10 +1857,10 @@ let Tables={
     ],
 
     "type_of_treatment_KREM":[
-        {name:"Mechanical treatment plants (primary sedimentation sludge)",                                                                                 K_rem:0.50},
-        {name:"Aerobic treatment plants with primary treatment (mixed primary and secondary sludge, untreated or treated aerobically)",                     K_rem:0.80},
-        {name:"Aerobic treatment plants with primary treatment and anaerobic sludge digestion (mixed primary and secondary sludge, treated anaerobically)", K_rem:1.00},
-        {name:"Aerobic wastewater treatment plants without separate primary treatment",                                                                     K_rem:1.16},
+        {name:"Mechanical treatment plants (primary sedimentation sludge)",                                                                                 K_rem:0.20833, K_rem_bod:0.50},
+        {name:"Aerobic treatment plants with primary treatment (mixed primary and secondary sludge, untreated or treated aerobically)",                     K_rem:0.33333, K_rem_bod:0.80},
+        {name:"Aerobic treatment plants with primary treatment and anaerobic sludge digestion (mixed primary and secondary sludge, treated anaerobically)", K_rem:0.41666, K_rem_bod:1},
+        {name:"Aerobic wastewater treatment plants without separate primary treatment",                                                                     K_rem:0.48333, K_rem_bod:1.16},
     ],
 
     "WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)":[
@@ -1765,6 +1869,14 @@ let Tables={
         {name:"Primary + Secondary (biological treatment plants)",                     bod_effl:0.15, bod_effl_table:"[15%]", N_effl:0.60, N_effl_table:"[60%]", diclo_effl:0.3268125,  diclo_effl_table:"[32.68%]", cadmium_effl:0.42785,  cadmium_effl_table:"[42.785%]", hexaclorobenzene_effl:1,  hexaclorobenzene_effl_table:"[100%]",mercury_effl:0.53312,  mercury_effl_table:"[53.312%]",plomo_effl:0.2720835,  plomo_effl_table:"[27.20835%]",niquel_effl:0.41417,  niquel_effl_table:"[41.417%]",chloro_effl:0.54,  chloro_effl_table:"[54%]", hexaclorobutadie_effl:0.19,  hexaclorobutadie_effl_table:"[19%]", nonilfenols_effl:0.1197,  nonilfenols_effl_table:"[11.97%]", tetracloroetile_effl:0.153,  tetracloroetile_effl_table:"[15.3%]",tricloroetile_effl:0.222, tricloroetile_effl_table:"[22.2%]"},
         {name:"Primary + Secondary + Tertiary (advanced biological treatment plants)", bod_effl:0.10, bod_effl_table:"[10%]", N_effl:0.20, N_effl_table:"[20%]", diclo_effl:0.0653625,  diclo_effl_table:"[65.36%]", cadmium_effl:0.15829525,  cadmium_effl_table:"[15.83%]", hexaclorobenzene_effl:0.4275,  hexaclorobenzene_effl_table:"[42.75%]",mercury_effl:0.53312,  mercury_effl_table:"[53.312%]",plomo_effl:0.087746929,  plomo_effl_table:"[8.77%]",niquel_effl:0.256437,  niquel_effl_table:"[25.64%]",chloro_effl:0.54,  chloro_effl_table:"[54%]", hexaclorobutadie_effl:0.19,  hexaclorobutadie_effl_table:"[19%]", nonilfenols_efll:0.005985,  nonilfenols_effl_table:"[0.59%]", tetracloroetile_effl:0.00918,  tetracloroetile_effl_table:"[0.918%]",tricloroetile_effl:0.01332, tricloroetile_effl_table:"[1.33%]"},
     ],
+
+    "WW treatment type":[
+        {text:"Untreated systems",                                                     value: 0,},
+        {text:"Primary (mechanical treatment plants)",                                 value: 1,},
+        {text:"Primary + Secondary (biological treatment plants)",                     value: 2,},
+        {text:"Primary + Secondary + Tertiary (advanced biological treatment plants)", value: 3,},
+    ],
+
 
     //Andreoli et al table 2.2
     "Sludge characteristics in each stage of the treatment process":[

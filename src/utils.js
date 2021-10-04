@@ -86,14 +86,14 @@ let metrics = {
 
         let flow_acc = global_layers["Flow accumulation"].layers.baseline.annual.layer
 
-        let water_discharged = 0
-        if(industry.has_onsite_wwtp) water_discharged += industry.onsite_wwtp.wwt_vol_disc
-        if(industry.has_direct_discharge) water_discharged += industry.direct_discharge.wwt_vol_disc
-        if(industry.has_offsite_wwtp) water_discharged += industry.offsite_wwtp.wwt_vol_disc
+        let water_discharged = 0    // m3/day
+        if(industry.has_onsite_wwtp) water_discharged += industry.onsite_wwtp.wwt_vol_disc  //m3/day
+        if(industry.has_direct_discharge) water_discharged += industry.direct_discharge.wwt_vol_disc //m3/day
+        if(industry.has_offsite_wwtp) water_discharged += industry.offsite_wwtp.wwt_vol_disc //m3/day
 
         if(water_discharged == 0) return NaN
 
-        let flow_acc_value = await flow_acc.data_on_point(industry.location.lat, industry.location.lng)*assessment_days/365 //flow accumulation during the assessment days
+        let flow_acc_value = await flow_acc.data_on_point(industry.location.lat, industry.location.lng)/365 //flow accumulation (m3/day)
 
         //let dilution_factor = water_discharged/(water_discharged + flow_acc_value)
         let dilution_factor = (water_discharged + flow_acc_value)/water_discharged
@@ -106,7 +106,7 @@ let metrics = {
 
     recycled_water_factor(industry){
         if(industry.has_onsite_wwtp && industry.volume_withdrawn > 0) {
-            let recycled_water_factor = industry.onsite_wwtp.wwt_vol_reused / industry.volume_withdrawn
+            let recycled_water_factor = industry.onsite_wwtp.wwt_vol_reused / industry.volume_used
             return recycled_water_factor
         }
         return NaN
@@ -116,28 +116,27 @@ let metrics = {
         let pharmaceutical_pollution = global_layers["Surface Water Pharmaceutical Pollution"].layers.baseline.annual.layer
         let flow_acc = global_layers["Flow accumulation"].layers.baseline.annual.layer
 
-        let dbo_concentration = await pharmaceutical_pollution.data_on_point(industry.location.lat, industry.location.lng)*100*1e-9 // From dyplophenac ng/L to BOD kg/m3
-        let flow_acc_value = await flow_acc.data_on_point(industry.location.lat, industry.location.lng)*assessment_days/365
-
+        let dbo_concentration = await pharmaceutical_pollution.data_on_point(industry.location.lat, industry.location.lng)*100*1e-6 // From dyplophenac ng/L to BOD g/m3
+        let flow_acc_value = await flow_acc.data_on_point(industry.location.lat, industry.location.lng)/365 //m3/day
 
 
         let load = dbo_concentration*flow_acc_value - industry.volume_withdrawn*dbo_concentration
-        let water_discharged = 0
+        let water_discharged = 0    //m3/day
 
         if(industry.has_onsite_wwtp) {
-            load += industry.onsite_wwtp.wwt_bod_effl_to_wb * 2.4
-            water_discharged += industry.onsite_wwtp.wwt_vol_disc
+            load += industry.onsite_wwtp.wwt_bod_effl_to_wb * 2.4 * industry.onsite_wwtp.wwt_vol_disc // g/day
+            water_discharged += industry.onsite_wwtp.wwt_vol_disc  // m3/day
         }
         if(industry.has_direct_discharge) {
-            load += industry.direct_discharge.wwt_bod_effl_to_wb * 2.4
-            water_discharged += industry.direct_discharge.wwt_vol_disc
+            load += industry.direct_discharge.wwt_bod_effl_to_wb * 2.4 * industry.direct_discharge.wwt_vol_disc  // g/day
+            water_discharged += industry.direct_discharge.wwt_vol_disc  // m3/day
         }
         if(industry.has_offsite_wwtp){
-            water_discharged += industry.offsite_wwtp.wwt_vol_disc
-            if(industry.offsite_wwtp_type == "Domestic") load += industry.offsite_wwtp.wwt_bod_effl_to_wb
-            else load += industry.offsite_wwtp.wwt_bod_effl_to_wb * 2.4
+            water_discharged += industry.offsite_wwtp.wwt_vol_disc  // m3/day
+            if(industry.offsite_wwtp_type == "Domestic") load += industry.offsite_wwtp.wwt_bod_effl_to_wb * industry.offsite_wwtp.wwt_vol_disc  // g/day
+            else load += industry.offsite_wwtp.wwt_bod_effl_to_wb * 2.4 * industry.offsite_wwtp.wwt_vol_disc  // g/day
         }
-        let discharge = flow_acc_value - industry.volume_withdrawn + water_discharged
+        let discharge = flow_acc_value - industry.volume_used + water_discharged
         let dbo = load/water_discharged
         if (discharge == 0) return NaN
         else{
@@ -149,31 +148,30 @@ let metrics = {
     bod_effl(industry){
         let load = 0
         if(industry.has_onsite_wwtp) {
-            load += industry.onsite_wwtp.wwt_bod_effl_to_wb * 2.4
+            load += industry.onsite_wwtp.wwt_bod_effl_to_wb * 2.4 * industry.onsite_wwtp.wwt_vol_disc // g/day
         }
         if(industry.has_direct_discharge) {
-            load += industry.direct_discharge.wwt_bod_effl_to_wb * 2.4
+            load += industry.direct_discharge.wwt_bod_effl_to_wb * 2.4 * industry.direct_discharge.wwt_vol_disc  // g/day
         }
         if(industry.has_offsite_wwtp){
-            if(industry.offsite_wwtp_type == "Domestic") load += industry.offsite_wwtp.wwt_bod_effl_to_wb
-            else load += industry.offsite_wwtp.wwt_bod_effl_to_wb * 2.4
+            if(industry.offsite_wwtp_type == "Domestic") load += industry.offsite_wwtp.wwt_bod_effl_to_wb * industry.offsite_wwtp.wwt_vol_disc  // g/day
+            else load += industry.offsite_wwtp.wwt_bod_effl_to_wb * 2.4 * industry.offsite_wwtp.wwt_vol_disc  // g/day
         }
-        return load
+        return load  //g/day
     },
 
     tn_effl(industry){
         let load = 0
         if(industry.has_onsite_wwtp) {
-            load += industry.onsite_wwtp.wwt_tn_effl_to_wb
+            load += industry.onsite_wwtp.wwt_tn_effl_to_wb * industry.onsite_wwtp.wwt_vol_disc // g/day
         }
         if(industry.has_direct_discharge) {
-            load += industry.direct_discharge.wwt_tn_effl_to_wb
+            load += industry.direct_discharge.wwt_tn_effl_to_wb  *  industry.direct_discharge.wwt_vol_disc  // g/day
         }
         if(industry.has_offsite_wwtp){
-            if(industry.offsite_wwtp_type == "Domestic") load += industry.offsite_wwtp.wwt_tn_effl_to_wb
-            else load += industry.offsite_wwtp.wwt_tn_effl_to_wb
+            load += industry.offsite_wwtp.wwt_tn_effl_to_wb * industry.offsite_wwtp.wwt_vol_disc  // g/day
         }
-        return load
+        return load //g/day
     }
 
 

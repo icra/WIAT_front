@@ -959,7 +959,6 @@ export default {
       return axios
           .get(call)
           .then(response => {
-
             return response.data.test[0]["0"]
           })
 
