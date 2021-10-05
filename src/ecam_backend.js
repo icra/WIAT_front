@@ -147,6 +147,18 @@ export class Direct_discharge{
         this.industry_type = null
         this.wwt_tn_effl_to_wb = 0
         this.wwt_bod_effl_to_wb = 0
+        this.wwt_diclo_effl_to_wb = 0 //1,2-Dichloroethane
+        this.wwt_cadmium_effl_to_wb = 0 //Cadmium
+        this.wwt_hexaclorobenzene_effl_to_wb = 0 //Hexachlorobenzene
+        this.wwt_mercury_effl_to_wb = 0 //mercury
+        this.wwt_plomo_effl_to_wb = 0 //lead
+        this.wwt_niquel_effl_to_wb = 0 //nickel
+        this.wwt_chloro_effl_to_wb = 0 //chloroalkanes
+        this.wwt_hexaclorobutadie_effl_to_wb = 0 //Hexachlorobutadiene
+        this.wwt_nonilfenols_effl_to_wb = 0 //Nonylphenols
+        this.wwt_tetracloroetile_effl_to_wb = 0 //tetrachloroethene
+        this.wwt_tricloroetile_effl_to_wb = 0 //Trichloroethylene
+
 
 
         for(let items of Object.values(Direct_discharge.info_inputs())){
@@ -1050,7 +1062,7 @@ export class Industrial_wwtp extends WWTP{
             //"wwt_tot_nit": {question: "Total nitrogen in untreated wastewater", value: 0, unit: "kgTN/m3"},  //kgTN/m3 | Total nitrogen in untreated wastewater
 
             "wwt_bod_effl_to_wb": {
-                question: "Effluent COD concentration leaving the WWTP",
+                question: "Effluent COD concentration of the WWTP",
                 value: 0,
                 unit: "g/m3",
                 estimation_equation: true
@@ -1060,11 +1072,89 @@ export class Industrial_wwtp extends WWTP{
             //"wwt_P_infl": {question: "Influent P load", value: 0, unit: "kg"}, //kgP
 
             "wwt_tn_effl_to_wb": {
-                question: "Effluent Total Nitrogen concentration leaving the WWTP",
+                question: "Effluent Total Nitrogen concentration of the WWTP",
                 value: 0,
                 unit: "g/m3",
                 estimation_equation: true
             },  //kgN   TAULA 6.10c
+
+            //Priority pollutants
+            "wwt_diclo_effl_to_wb": {
+                question: "Effluent 1,2-Dichloroethane concentration of the WWTP",
+                value: 0,
+                unit: "g/m3",
+                estimation_equation: true
+            },
+
+            "wwt_cadmium_effl_to_wb": {
+                question: "Effluent cadmium concentration of the WWTP",
+                value: 0,
+                unit: "g/m3",
+                estimation_equation: true
+            },
+
+            "wwt_hexaclorobenzene_effl_to_wb": {
+                question: "Effluent hexachlorobenzene concentration of the WWTP",
+                value: 0,
+                unit: "g/m3",
+                estimation_equation: true
+            },
+
+            "wwt_mercury_effl_to_wb": {
+                question: "Effluent mercury concentration of the WWTP",
+                value: 0,
+                unit: "g/m3",
+                estimation_equation: true
+            },
+
+            "wwt_plomo_effl_to_wb": {
+                question: "Effluent lead concentration of the WWTP",
+                value: 0,
+                unit: "g/m3",
+                estimation_equation: true
+            },
+
+            "wwt_niquel_effl_to_wb": {
+                question: "Effluent nickel concentration of the WWTP",
+                value: 0,
+                unit: "g/m3",
+                estimation_equation: true
+            },
+
+            "wwt_chloro_effl_to_wb": {
+                question: "Effluent chloroalkanes concentration of the WWTP",
+                value: 0,
+                unit: "g/m3",
+                estimation_equation: true
+            },
+
+            "wwt_hexaclorobutadie_effl_to_wb": {
+                question: "Effluent hexachlorobutadiene concentration of the WWTP",
+                value: 0,
+                unit: "g/m3",
+                estimation_equation: true
+            },
+
+            "wwt_nonilfenols_effl_to_wb": {
+                question: "Effluent nonylphenols concentration of the WWTP",
+                value: 0,
+                unit: "g/m3",
+                estimation_equation: true
+            },
+
+            "wwt_tetracloroetile_effl_to_wb": {
+                question: "Effluent tetrachloroethene concentration of the WWTP",
+                value: 0,
+                unit: "g/m3",
+                estimation_equation: true
+            },
+
+            "wwt_tricloroetile_effl_to_wb": {
+                question: "Effluent trichloroethylene concentration of the WWTP",
+                value: 0,
+                unit: "g/m3",
+                estimation_equation: true
+            },
 
 
             //energy
@@ -1148,6 +1238,17 @@ export class Industrial_wwtp extends WWTP{
 
         this.wwt_bod_infl = 0
         this.wwt_tn_infl = 0
+        this.wwt_diclo_infl = 0 //1,2-Dichloroethane
+        this.wwt_cadmium_infl = 0 //Cadmium
+        this.wwt_hexaclorobenzene_infl = 0 //Hexachlorobenzene
+        this.wwt_mercury_infl = 0 //mercury
+        this.wwt_plomo_infl = 0 //lead
+        this.wwt_niquel_infl = 0 //nickel
+        this.wwt_chloro_infl = 0 //chloroalkanes
+        this.wwt_hexaclorobutadie_infl = 0 //Hexachlorobutadiene
+        this.wwt_nonilfenols_infl = 0 //Nonylphenols
+        this.wwt_tetracloroetile_infl = 0 //tetrachloroethene
+        this.wwt_tricloroetile_infl = 0 //Trichloroethylene
 
         for(let items of Object.values(Industrial_wwtp.info_inputs())){
             for(let [clau, valor] of Object.entries(items)){
@@ -1179,116 +1280,46 @@ export class Industrial_wwtp extends WWTP{
             wwt_biog_sold(substage){
                 return 100-substage.wwt_biog_val-substage.wwt_biog_fla-substage.wwt_biog_lkd;
             },
-            wwt_bod_infl(substage){
-                if(substage.industry_type === "food"){  //noves categories
-                    return 336.2591324200910*1e-6
-                }else if(substage.industry_type === "beverages"){  //noves categories
-                    return 231.09062980030700*1e-6
-                }else if(substage.industry_type === "tobacco"){  //noves categories
-                    return  null
-                }else if(substage.industry_type === "textiles"){  //noves categories
-                    return 410.09920634920627*1e-6
-                }else if(substage.industry_type === "wearing"){  //noves categories
-                    return 40*1e-6
-                }else if(substage.industry_type === "leather"){  //noves categories
-                    return null
-                }else if(substage.industry_type === "wood"){  //noves categories
-                    return 33.333333333333336*1e-6
-                }else if(substage.industry_type === "paper"){  //noves categories
-                    return 366.27272727272725*1e-6
-                }else if(substage.industry_type === "printing"){  //noves categories
-                    return 750*1e-6
-                }else if(substage.industry_type === "coke"){  //noves categories
-                    return 300*1e-6
-                }else if(substage.industry_type === "chemicals"){  //noves categories
-                    return 598.8096590909091*1e-6
-                }else if(substage.industry_type === "pharmaceutical"){  //noves categories
-                    return 559.8717948717948*1e-6
-                }else if(substage.industry_type === "rubber"){  //noves categories
-                    return 603.1034482758621*1e-6
-                }else if(substage.industry_type === "mineral"){  //noves categories
-                    return 59.03846153846154*1e-6
-                }else if(substage.industry_type === "metals"){  //noves categories
-                    return 586.5384615384615*1e-6
-                }else if(substage.industry_type === "fabricated_metals"){  //noves categories
-                    return 641.4117647058823*1e-6
-                }else if(substage.industry_type === "computer"){  //noves categories
-                    return 33.333333333333336*1e-6
-                }else if(substage.industry_type === "electrical"){  //noves categories
-                    return 86.66666666666667*1e-6
-                }else if(substage.industry_type === "machinery"){  //noves categories
-                    return 328.75*1e-6
-                }else if(substage.industry_type === "vehicles"){  //noves categories
-                    return 563.1578947368421*1e-6
-                }else if(substage.industry_type === "transport"){  //noves categories
-                    return null
-                }else if(substage.industry_type === "furniture"){  //noves categories
-                    return 35*1e-6
-                }else if(substage.industry_type === "other_manufacturing"){  //noves categories
-                    return 35*1e-6
-                }else if(substage.industry_type === "repair"){  //noves categories
-                    return 40*1e-6
-                }
-            },
             wwt_bod_effl_to_wb(substage){
                 return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type].bod_effl*substage.wwt_bod_infl
-            },
-
-            wwt_tn_infl(substage){
-                if(substage.industry_type === "food"){  //noves categories
-                    return 2.4867513640738284*1e-6
-                }else if(substage.industry_type === "beverages"){  //noves categories
-                    return  null
-                }else if(substage.industry_type === "tobacco"){  //noves categories
-                    return  null
-                }else if(substage.industry_type === "textiles"){  //noves categories
-                    return  null
-                }else if(substage.industry_type === "wearing"){  //noves categories
-                    return  null
-                }else if(substage.industry_type === "leather"){  //noves categories
-                    return null
-                }else if(substage.industry_type === "wood"){  //noves categories
-                    return  null
-                }else if(substage.industry_type === "paper"){  //noves categories
-                    return  null
-                }else if(substage.industry_type === "printing"){  //noves categories
-                    return 0
-                }else if(substage.industry_type === "coke"){  //noves categories
-                    return  null
-                }else if(substage.industry_type === "chemicals"){  //noves categories
-                    return  null
-                }else if(substage.industry_type === "pharmaceutical"){  //noves categories
-                    return  null
-                }else if(substage.industry_type === "rubber"){  //noves categories
-                    return  null
-                }else if(substage.industry_type === "mineral"){  //noves categories
-                    return 6.25
-                }else if(substage.industry_type === "metals"){  //noves categories
-                    return  null
-                }else if(substage.industry_type === "fabricated_metals"){  //noves categories
-                    return 0
-                }else if(substage.industry_type === "computer"){  //noves categories
-                    return  null
-                }else if(substage.industry_type === "electrical"){  //noves categories
-                    return  null
-                }else if(substage.industry_type === "machinery"){  //noves categories
-                    return  null
-                }else if(substage.industry_type === "vehicles"){  //noves categories
-                    return  null
-                }else if(substage.industry_type === "transport"){  //noves categories
-                    return null
-                }else if(substage.industry_type === "furniture"){  //noves categories
-                    return  null
-                }else if(substage.industry_type === "other_manufacturing"){  //noves categories
-                    return  null
-                }else if(substage.industry_type === "repair"){  //noves categories
-                    return  null
-                }
             },
             wwt_tn_effl_to_wb(substage){
                 return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type].N_effl*substage.wwt_tn_infl
             },
-
+            //Priority pollutants
+            wwt_diclo_effl_to_wb(substage) {
+                return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type].diclo_effl*substage.wwt_diclo_infl
+            },
+            wwt_cadmium_effl_to_wb(substage) {
+                return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type].cadmium_effl*substage.wwt_cadmium_infl
+            },
+            wwt_hexaclorobenzene_effl_to_wb(substage) {
+                return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type].hexaclorobenzene_effl*substage.wwt_hexaclorobenzene_infl
+            },
+            wwt_mercury_effl_to_wb(substage) {
+                return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type].mercury_effl*substage.wwt_mercury_infl
+            },
+            wwt_plomo_effl_to_wb(substage) {
+                return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type].plomo_effl*substage.wwt_plomo_infl
+            },
+            wwt_niquel_effl_to_wb(substage) {
+                return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type].niquel_effl*substage.wwt_niquel_infl
+            },
+            wwt_chloro_effl_to_wb(substage) {
+                return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type].chloro_effl*substage.wwt_chloro_infl
+            },
+            wwt_hexaclorobutadie_effl_to_wb(substage) {
+                return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type].hexaclorobutadie_effl*substage.wwt_hexaclorobutadie_infl
+            },
+            wwt_nonilfenols_effl_to_wb(substage) {
+                return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type].nonilfenols_effl*substage.wwt_nonilfenols_infl
+            },
+            wwt_tetracloroetile_effl_to_wb(substage) {
+                return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type].tetracloroetile_effl*substage.wwt_tetracloroetile_infl
+            },
+            wwt_tricloroetile_effl_to_wb(substage) {
+                return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type].tricloroetile_effl*substage.wwt_tricloroetile_infl
+            },
         }
     }
 
@@ -1444,6 +1475,17 @@ export class Industrial_wwtp_offsite extends Industrial_wwtp{
         this.vol_infl_wwtp = 0
         this.bod_infl_wwtp = 0
         this.tn_infl_wwtp = 0
+        this.diclo_infl_wwtp = 0 //1,2-Dichloroethane
+        this.cadmium_infl_wwtp = 0 //Cadmium
+        this.hexaclorobenzene_infl_wwtp = 0 //Hexachlorobenzene
+        this.mercury_infl_wwtp = 0 //mercury
+        this.plomo_infl_wwtp = 0 //lead
+        this.niquel_infl_wwtp = 0 //nickel
+        this.chloro_infl_wwtp = 0 //chloroalkanes
+        this.hexaclorobutadie_infl_wwtp = 0 //Hexachlorobutadiene
+        this.nonilfenols_infl_wwtp = 0 //Nonylphenols
+        this.tetracloroetile_infl_wwtp = 0 //tetrachloroethene
+        this.tricloroetile_infl_wwtp = 0 //Trichloroethylene
 
     }
 
@@ -1469,61 +1511,97 @@ export class Industrial_wwtp_offsite extends Industrial_wwtp{
             wwt_biog_sold(substage){
                 return 100-substage.wwt_biog_val-substage.wwt_biog_fla-substage.wwt_biog_lkd;
             },
-            wwt_bod_effl_to_wb(substage){
+            wwt_concentration_effl_to_wb(substage, influent_wwtp, influent_industry, table_effluent){
                 let vol_treated_from_wwtp = Number(substage.vol_infl_wwtp)
-                let bod_from_wwtp = Number(substage.bod_infl_wwtp)
+                let concentration_from_wwtp = Number(substage[influent_wwtp])
                 let vol_treated_from_ind = Number(substage.wwt_vol_trea)
-                let bod_from_ind = Number(substage.wwt_bod_infl)
-                let concentration_effluent = (vol_treated_from_wwtp*bod_from_wwtp + vol_treated_from_ind*bod_from_ind) / (vol_treated_from_wwtp+vol_treated_from_ind)
+                let concentration_from_ind = Number(substage[influent_industry])
+                let concentration_effluent = (vol_treated_from_wwtp*concentration_from_wwtp + vol_treated_from_ind*concentration_from_ind) / (vol_treated_from_wwtp+vol_treated_from_ind)
 
                 if(isNaN(concentration_effluent)) {
                     return null
                 }
-                else return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type].bod_effl*concentration_effluent
+                else return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type][table_effluent]*concentration_effluent
+            },
+            wwt_bod_effl_to_wb(substage){
+                return this.wwt_concentration_effl_to_wb(substage, "bod_infl_wwtp", "wwt_bod_infl", "bod_effl")
             },
 
             wwt_tn_effl_to_wb(substage){
-
-                let vol_treated_from_wwtp = Number(substage.vol_infl_wwtp)
-                let tn_from_wwtp = Number(substage.tn_infl_wwtp)
-                let vol_treated_from_ind = Number(substage.wwt_vol_trea)
-                let tn_from_ind = Number(substage.wwt_tn_infl)
-
-                let concentration_effluent = (vol_treated_from_wwtp*tn_from_wwtp + vol_treated_from_ind*tn_from_ind) / (vol_treated_from_wwtp+vol_treated_from_ind)
-
-                if(isNaN(concentration_effluent)) {
-                    return null
-                }
-                return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type].N_effl*concentration_effluent
+                return this.wwt_concentration_effl_to_wb(substage, "tn_infl_wwtp", "wwt_tn_infl", "N_effl")
             },
+
+
+            wwt_diclo_effl_to_wb(substage){
+                return this.wwt_concentration_effl_to_wb(substage, "diclo_infl_wwtp", "wwt_diclo_infl", "diclo_effl")
+            },
+
+            wwt_cadmium_effl_to_wb(substage){
+                return this.wwt_concentration_effl_to_wb(substage, "cadmium_infl_wwtp", "wwt_cadmium_infl", "cadmium_effl")
+            },
+
+            wwt_hexaclorobenzene_effl_to_wb(substage){
+                return this.wwt_concentration_effl_to_wb(substage, "hexaclorobenzene_infl_wwtp", "wwt_hexaclorobenzene_infl", "hexaclorobenzene_effl")
+            },
+
+            wwt_mercury_effl_to_wb(substage){
+                return this.wwt_concentration_effl_to_wb(substage, "mercury_infl_wwtp", "wwt_mercury_infl", "mercury_effl")
+            },
+
+            wwt_plomo_effl_to_wb(substage){
+                return this.wwt_concentration_effl_to_wb(substage, "plomo_infl_wwtp", "wwt_plomo_infl", "plomo_effl")
+            },
+
+            wwt_niquel_effl_to_wb(substage){
+                return this.wwt_concentration_effl_to_wb(substage, "niquel_infl_wwtp", "wwt_niquel_infl", "niquel_effl")
+            },
+
+            wwt_chloro_effl_to_wb(substage){
+                return this.wwt_concentration_effl_to_wb(substage, "chloro_infl_wwtp", "wwt_chloro_infl", "chloro_effl")
+            },
+
+            wwt_hexaclorobutadie_effl_to_wb(substage){
+                return this.wwt_concentration_effl_to_wb(substage, "hexaclorobutadie_infl_wwtp", "wwt_hexaclorobutadie_infl", "hexaclorobutadie_effl")
+            },
+
+            wwt_nonilfenols_effl_to_wb(substage){
+                return this.wwt_concentration_effl_to_wb(substage, "nonilfenols_infl_wwtp", "wwt_nonilfenols_infl", "nonilfenols_effl")
+            },
+
+            wwt_tetracloroetile_effl_to_wb(substage){
+                return this.wwt_concentration_effl_to_wb(substage, "tetracloroetile_infl_wwtp", "wwt_tetracloroetile_infl", "tetracloroetile_effl")
+            },
+
+            wwt_tricloroetile_effl_to_wb(substage){
+                return this.wwt_concentration_effl_to_wb(substage, "tricloroetile_infl_wwtp", "wwt_tricloroetile_infl", "tricloroetile_effl")
+            },
+
 
         }
     }
 
 
-    bod_infl(){
+    get_load_influent(influent_wwtp, influent_industry){
         let vol_treated_from_wwtp = Number(this.vol_infl_wwtp)
-        let bod_from_wwtp = Number(this.bod_infl_wwtp)
+        let concentration_from_wwtp = Number(this[influent_wwtp])
         let vol_treated_from_ind = Number(this.wwt_vol_trea)
-        let bod_from_ind = Number(this.wwt_bod_infl)
-        return vol_treated_from_wwtp*bod_from_wwtp + vol_treated_from_ind*bod_from_ind
-
+        let concentration_from_ind = Number(this[influent_industry])
+        return vol_treated_from_wwtp*concentration_from_wwtp + vol_treated_from_ind*concentration_from_ind
     }
 
-    tn_infl(){
-        let vol_treated_from_wwtp = Number(this.vol_infl_wwtp)
-        let tn_from_wwtp = Number(this.tn_infl_wwtp)
-        let vol_treated_from_ind = Number(this.wwt_vol_trea)
-        let tn_from_ind = Number(this.wwt_tn_infl)
-        return vol_treated_from_wwtp*tn_from_wwtp + vol_treated_from_ind*tn_from_ind
+    bod_load_infl(){
+        return this.get_load_influent("bod_infl_wwtp", "wwt_bod_infl")
+    }
+    tn_load_infl(){
+        return this.get_load_influent("tn_infl_wwtp", "wwt_tn_infl")
     }
 
     //emissions from treatment
     wwt_KPI_GHG_tre(){
 
         let co2   = 0;
-        let ch4   = (this.bod_infl()-this.wwt_bod_slud)*this.wwt_ch4_efac_tre*Cts.ct_ch4_eq.value;    //Eq. 6.4
-        let n2o   = (this.tn_infl())*this.wwt_n2o_efac_tre*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;  //Eq. 6.11
+        let ch4   = (this.bod_load_infl()-this.wwt_bod_slud)*this.wwt_ch4_efac_tre*Cts.ct_ch4_eq.value;    //Eq. 6.4
+        let n2o   = (this.tn_load_infl())*this.wwt_n2o_efac_tre*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;  //Eq. 6.11
         let total = co2+ch4+n2o;
         return {total,co2,ch4,n2o};
     }
@@ -1560,6 +1638,84 @@ export class Domestic_wwtp extends WWTP{
                 estimation_equation: true
 
             },  //kgN   TAULA 6.10c
+            //Priority pollutants
+            "wwt_diclo_effl_to_wb": {
+                question: "Effluent 1,2-Dichloroethane concentration of the WWTP",
+                value: 0,
+                unit: "g/m3",
+                estimation_equation: true
+            },
+
+            "wwt_cadmium_effl_to_wb": {
+                question: "Effluent cadmium concentration of the WWTP",
+                value: 0,
+                unit: "g/m3",
+                estimation_equation: true
+            },
+
+            "wwt_hexaclorobenzene_effl_to_wb": {
+                question: "Effluent hexachlorobenzene concentration of the WWTP",
+                value: 0,
+                unit: "g/m3",
+                estimation_equation: true
+            },
+
+            "wwt_mercury_effl_to_wb": {
+                question: "Effluent mercury concentration of the WWTP",
+                value: 0,
+                unit: "g/m3",
+                estimation_equation: true
+            },
+
+            "wwt_plomo_effl_to_wb": {
+                question: "Effluent lead concentration of the WWTP",
+                value: 0,
+                unit: "g/m3",
+                estimation_equation: true
+            },
+
+            "wwt_niquel_effl_to_wb": {
+                question: "Effluent nickel concentration of the WWTP",
+                value: 0,
+                unit: "g/m3",
+                estimation_equation: true
+            },
+
+            "wwt_chloro_effl_to_wb": {
+                question: "Effluent chloroalkanes concentration of the WWTP",
+                value: 0,
+                unit: "g/m3",
+                estimation_equation: true
+            },
+
+            "wwt_hexaclorobutadie_effl_to_wb": {
+                question: "Effluent hexachlorobutadiene concentration of the WWTP",
+                value: 0,
+                unit: "g/m3",
+                estimation_equation: true
+            },
+
+            "wwt_nonilfenols_effl_to_wb": {
+                question: "Effluent nonylphenols concentration of the WWTP",
+                value: 0,
+                unit: "g/m3",
+                estimation_equation: true
+            },
+
+            "wwt_tetracloroetile_effl_to_wb": {
+                question: "Effluent tetrachloroethene concentration of the WWTP",
+                value: 0,
+                unit: "g/m3",
+                estimation_equation: true
+            },
+
+            "wwt_tricloroetile_effl_to_wb": {
+                question: "Effluent trichloroethylene concentration of the WWTP",
+                value: 0,
+                unit: "g/m3",
+                estimation_equation: true
+            },
+
 
 
             //energy
@@ -1652,8 +1808,32 @@ export class Domestic_wwtp extends WWTP{
         this.vol_infl_wwtp = 0
         this.bod_infl_wwtp = 0
         this.tn_infl_wwtp = 0
+        this.diclo_infl_wwtp = 0 //1,2-Dichloroethane
+        this.cadmium_infl_wwtp = 0 //Cadmium
+        this.hexaclorobenzene_infl_wwtp = 0 //Hexachlorobenzene
+        this.mercury_infl_wwtp = 0 //mercury
+        this.plomo_infl_wwtp = 0 //lead
+        this.niquel_infl_wwtp = 0 //nickel
+        this.chloro_infl_wwtp = 0 //chloroalkanes
+        this.hexaclorobutadie_infl_wwtp = 0 //Hexachlorobutadiene
+        this.nonilfenols_infl_wwtp = 0 //Nonylphenols
+        this.tetracloroetile_infl_wwtp = 0 //tetrachloroethene
+        this.tricloroetile_infl_wwtp = 0 //Trichloroethylene
+
+        //Water received from industry
         this.wwt_bod_infl = 0
         this.wwt_tn_infl = 0
+        this.wwt_diclo_infl = 0 //1,2-Dichloroethane
+        this.wwt_cadmium_infl = 0 //Cadmium
+        this.wwt_hexaclorobenzene_infl = 0 //Hexachlorobenzene
+        this.wwt_mercury_infl = 0 //mercury
+        this.wwt_plomo_infl = 0 //lead
+        this.wwt_niquel_infl = 0 //nickel
+        this.wwt_chloro_infl = 0 //chloroalkanes
+        this.wwt_hexaclorobutadie_infl = 0 //Hexachlorobutadiene
+        this.wwt_nonilfenols_infl = 0 //Nonylphenols
+        this.wwt_tetracloroetile_infl = 0 //tetrachloroethene
+        this.wwt_tricloroetile_infl = 0 //Trichloroethylene
 
 
     }
@@ -1680,34 +1860,72 @@ export class Domestic_wwtp extends WWTP{
             wwt_biog_sold(substage){
                 return 100-substage.wwt_biog_val-substage.wwt_biog_fla-substage.wwt_biog_lkd;
             },
+            wwt_concentration_effl_to_wb(substage, influent_wwtp, influent_industry, table_effluent){
+                let vol_treated_from_wwtp = Number(substage.vol_infl_wwtp)
+                let concentration_from_wwtp = Number(substage[influent_wwtp])
+                let vol_treated_from_ind = Number(substage.wwt_vol_trea)
+                let concentration_from_ind = Number(substage[influent_industry])
+                let concentration_effluent = (vol_treated_from_wwtp*concentration_from_wwtp + vol_treated_from_ind*concentration_from_ind) / (vol_treated_from_wwtp+vol_treated_from_ind)
+
+                if(isNaN(concentration_effluent)) {
+                    return null
+                }
+                else return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type][table_effluent]*concentration_effluent
+            },
             wwt_bod_effl_to_wb(substage){
-                let vol_treated_from_wwtp = Number(substage.vol_infl_wwtp)
-                let bod_from_wwtp = Number(substage.bod_infl_wwtp)
-                let vol_treated_from_ind = Number(substage.wwt_vol_trea)
-                let bod_from_ind = Number(substage.wwt_bod_infl)
-                let concentration_effluent = (vol_treated_from_wwtp*bod_from_wwtp + vol_treated_from_ind*bod_from_ind) / (vol_treated_from_wwtp+vol_treated_from_ind)
-                if(isNaN(concentration_effluent)) {
-                    return null
-                }
-                else return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type].bod_effl*concentration_effluent
+                return this.wwt_concentration_effl_to_wb(substage, "bod_infl_wwtp", "wwt_bod_infl", "bod_effl")
             },
+
             wwt_tn_effl_to_wb(substage){
-
-                let vol_treated_from_wwtp = Number(substage.vol_infl_wwtp)
-                let tn_from_wwtp = Number(substage.tn_infl_wwtp)
-                let vol_treated_from_ind = Number(substage.wwt_vol_trea)
-                let tn_from_ind = Number(substage.wwt_tn_infl)
-
-                let concentration_effluent = (vol_treated_from_wwtp*tn_from_wwtp + vol_treated_from_ind*tn_from_ind) / (vol_treated_from_wwtp+vol_treated_from_ind)
-                if(isNaN(concentration_effluent)) {
-                    return null
-                }
-                return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type].N_effl*concentration_effluent
+                return this.wwt_concentration_effl_to_wb(substage, "tn_infl_wwtp", "wwt_tn_infl", "N_effl")
             },
 
+
+            wwt_diclo_effl_to_wb(substage){
+                return this.wwt_concentration_effl_to_wb(substage, "diclo_infl_wwtp", "wwt_diclo_infl", "diclo_effl")
+            },
+
+            wwt_cadmium_effl_to_wb(substage){
+                return this.wwt_concentration_effl_to_wb(substage, "cadmium_infl_wwtp", "wwt_cadmium_infl", "cadmium_effl")
+            },
+
+            wwt_hexaclorobenzene_effl_to_wb(substage){
+                return this.wwt_concentration_effl_to_wb(substage, "hexaclorobenzene_infl_wwtp", "wwt_hexaclorobenzene_infl", "hexaclorobenzene_effl")
+            },
+
+            wwt_mercury_effl_to_wb(substage){
+                return this.wwt_concentration_effl_to_wb(substage, "mercury_infl_wwtp", "wwt_mercury_infl", "mercury_effl")
+            },
+
+            wwt_plomo_effl_to_wb(substage){
+                return this.wwt_concentration_effl_to_wb(substage, "plomo_infl_wwtp", "wwt_plomo_infl", "plomo_effl")
+            },
+
+            wwt_niquel_effl_to_wb(substage){
+                return this.wwt_concentration_effl_to_wb(substage, "niquel_infl_wwtp", "wwt_niquel_infl", "niquel_effl")
+            },
+
+            wwt_chloro_effl_to_wb(substage){
+                return this.wwt_concentration_effl_to_wb(substage, "chloro_infl_wwtp", "wwt_chloro_infl", "chloro_effl")
+            },
+
+            wwt_hexaclorobutadie_effl_to_wb(substage){
+                return this.wwt_concentration_effl_to_wb(substage, "hexaclorobutadie_infl_wwtp", "wwt_hexaclorobutadie_infl", "hexaclorobutadie_effl")
+            },
+
+            wwt_nonilfenols_effl_to_wb(substage){
+                return this.wwt_concentration_effl_to_wb(substage, "nonilfenols_infl_wwtp", "wwt_nonilfenols_infl", "nonilfenols_effl")
+            },
+
+            wwt_tetracloroetile_effl_to_wb(substage){
+                return this.wwt_concentration_effl_to_wb(substage, "tetracloroetile_infl_wwtp", "wwt_tetracloroetile_infl", "tetracloroetile_effl")
+            },
+
+            wwt_tricloroetile_effl_to_wb(substage){
+                return this.wwt_concentration_effl_to_wb(substage, "tricloroetile_infl_wwtp", "wwt_tricloroetile_infl", "tricloroetile_effl")
+            },
         }
     }
-
 
     /*
       GHG emissions (kgCO2eq)
@@ -1734,29 +1952,27 @@ export class Domestic_wwtp extends WWTP{
         return {total,co2,ch4,n2o};
     }
 
-    bod_infl(){
+    get_load_influent(influent_wwtp, influent_industry){
         let vol_treated_from_wwtp = Number(this.vol_infl_wwtp)
-        let bod_from_wwtp = Number(this.bod_infl_wwtp)
+        let concentration_from_wwtp = Number(this[influent_wwtp])
         let vol_treated_from_ind = Number(this.wwt_vol_trea)
-        let bod_from_ind = Number(this.wwt_bod_infl)
-        return vol_treated_from_wwtp*bod_from_wwtp + vol_treated_from_ind*bod_from_ind
-
+        let concentration_from_ind = Number(this[influent_industry])
+        return vol_treated_from_wwtp*concentration_from_wwtp + vol_treated_from_ind*concentration_from_ind
     }
 
-    tn_infl(){
-        let vol_treated_from_wwtp = Number(this.vol_infl_wwtp)
-        let tn_from_wwtp = Number(this.tn_infl_wwtp)
-        let vol_treated_from_ind = Number(this.wwt_vol_trea)
-        let tn_from_ind = Number(this.wwt_tn_infl)
-        return vol_treated_from_wwtp*tn_from_wwtp + vol_treated_from_ind*tn_from_ind
+    bod_load_infl(){
+        return this.get_load_influent("bod_infl_wwtp", "wwt_bod_infl")
+    }
+    tn_load_infl(){
+        return this.get_load_influent("tn_infl_wwtp", "wwt_tn_infl")
     }
 
 
     //emissions from treatment
     wwt_KPI_GHG_tre(){
         let co2   = 0;
-        let ch4   = (this.bod_infl()-this.wwt_bod_slud)*this.wwt_ch4_efac_tre*Cts.ct_ch4_eq.value;    //Eq. 6.4
-        let n2o   = this.tn_infl()*this.wwt_n2o_efac_tre*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;  //Eq. 6.11
+        let ch4   = (this.bod_load_infl()-this.wwt_bod_slud)*this.wwt_ch4_efac_tre*Cts.ct_ch4_eq.value;    //Eq. 6.4
+        let n2o   = this.tn_load_infl()*this.wwt_n2o_efac_tre*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;  //Eq. 6.11
         let total = co2+ch4+n2o;
         return {total,co2,ch4,n2o};
     }
@@ -1832,26 +2048,6 @@ let Tables={
         //{name:"Trickling Filter",                                             ch4_efac:0.036, description: ""},
     ],
 
-    /*
-    "Type of onsite treatment":[
-        {name:"Type of treatment undefined",                      ch4_efac:0.00,   bod_rmvd_as_sludge_estm:0.0,},
-        {name:"Anaerobic Digester",                               ch4_efac:0.48,   bod_rmvd_as_sludge_estm:0.10,},
-        {name:"Imhoff Tanks",                                     ch4_efac:0.48,   bod_rmvd_as_sludge_estm:0.10,},
-        {name:"Anaerobic Reactors - CH4 recovery not considered", ch4_efac:0.48,   bod_rmvd_as_sludge_estm:0.10,},
-        {name:"Anaerobic Reactors - CH4 recovery considered",     ch4_efac:0.14,   bod_rmvd_as_sludge_estm:0.10,},
-        {name:"Stabilization Ponds (<2m depth)",                  ch4_efac:0.12,   bod_rmvd_as_sludge_estm:0.30,},
-        {name:"Stabilization Ponds (>2m depth)",                  ch4_efac:0.48,   bod_rmvd_as_sludge_estm:0.10,},
-        {name:"Sludge Drying Beds",                               ch4_efac:0.00,   bod_rmvd_as_sludge_estm:0.0,},
-        {name:"Wetlands - surface flow",                          ch4_efac:0.24,   bod_rmvd_as_sludge_estm:0.30,},
-        {name:"Wetlands - Horizontal subsurface flow",            ch4_efac:0.06,   bod_rmvd_as_sludge_estm:0.65,},
-        {name:"Wetlands - Vertical subsurface flow",              ch4_efac:0.006,  bod_rmvd_as_sludge_estm:0.65,},
-        {name:"Composting",                                       ch4_efac:0.0013, bod_rmvd_as_sludge_estm:0.0,},
-        {name:"Activated Sludge (well managed)",                  ch4_efac:0.0000, bod_rmvd_as_sludge_estm:0.65,},
-        {name:"Activated Sludge - minor poorly aerated zones",    ch4_efac:0.06,   bod_rmvd_as_sludge_estm:0.65,},
-        {name:"Activated Sludge - Some aerated zones",            ch4_efac:0.12,   bod_rmvd_as_sludge_estm:0.65,},
-        {name:"Activated Sludge - Not well managed",              ch4_efac:0.18,   bod_rmvd_as_sludge_estm:0.65,},
-        {name:"Trickling Filter",                                 ch4_efac:0.036,  bod_rmvd_as_sludge_estm:0.65,},
-    ],*/
 
     "N2O EF plants (Table 6.8A)":[
         {name:"Type of treatment undefined",           n2o_efac:0, description:""     },
@@ -1891,38 +2087,6 @@ let Tables={
     ],
 
 
-    //Andreoli et al table 2.2
-    "Sludge characteristics in each stage of the treatment process":[
-        {name:"Type of treatment undefined",                                     gSS_inh_day:0},
-        {name:"Primary treatment (conventional)",                                gSS_inh_day:(35+45)/2},
-        {name:"Primary treatment (septic tanks)",                                gSS_inh_day:(20+30)/2},
-        {name:"Facultative pond",                                                gSS_inh_day:(20+25)/2},
-        {name:"Anaerobic pond – facultative pond (anaerobic pond)",              gSS_inh_day:(20+45)/2},
-        {name:"Anaerobic pond – facultative pond (facultative pond)",            gSS_inh_day:( 6+10)/2},
-        {name:"Anaerobic pond – facultative pond (total)",                       gSS_inh_day:(26+55)/2},
-        {name:"Facultative aerated lagoon",                                      gSS_inh_day:( 8+13)/2},
-        {name:"Complete-mix aerat.lagoon – sedim. pond",                         gSS_inh_day:(11+13)/2},
-        {name:"Septic tank+anaerobic filter (septic tank)",                      gSS_inh_day:(20+30)/2},
-        {name:"Septic tank+anaerobic filter (anaerobic filter)",                 gSS_inh_day:( 7+9 )/2},
-        {name:"Septic tank+anaerobic filter (total)",                            gSS_inh_day:(27+39)/2},
-        {name:"Conventional activated sludge (primary sludge)",                  gSS_inh_day:(35+45)/2},
-        {name:"Conventional activated sludge (secondary sludge)",                gSS_inh_day:(25+35)/2},
-        {name:"Conventional activated sludge (mixed sludge)",                    gSS_inh_day:(60+80)/2},
-        {name:"Activated sludge extended aeration",                              gSS_inh_day:(40+45)/2},
-        {name:"High rate trickling filter (primary sludge)",                     gSS_inh_day:(35+45)/2},
-        {name:"High rate trickling filter (secondary sludge)",                   gSS_inh_day:(20+30)/2},
-        {name:"High rate trickling filter (mixed sludge)",                       gSS_inh_day:(55+75)/2},
-        {name:"Submerged aerated biofilter (primary sludge)",                    gSS_inh_day:(35+45)/2},
-        {name:"Submerged aerated biofilter (secondary sludge)",                  gSS_inh_day:(25+35)/2},
-        {name:"Submerged aerated biofilter (mixed sludge)",                      gSS_inh_day:(60+80)/2},
-        {name:"UASB Reactor",                                                    gSS_inh_day:(12+18)/2},
-        {name:"UASB+activated sludge (anaerobic sludge (UASB))",                 gSS_inh_day:(12+18)/2},
-        {name:"UASB+activated sludge (aerobic sludge (activated sludge))",       gSS_inh_day:( 8+14)/2},
-        {name:"UASB+activated sludge (mixed sludge)",                            gSS_inh_day:(20+32)/2},
-        {name:"UASB+aerobic biofilm reactor (anaerobic sludge (UASB))",          gSS_inh_day:(12+18)/2},
-        {name:"UASB+aerobic biofilm reactor (aerobic sludge (aerobic reactor))", gSS_inh_day:( 6+12)/2},
-        {name:"UASB+aerobic biofilm reactor (mixed sludge)",                     gSS_inh_day:(18+30)/2},
-    ],
 
     "Type of sludge disposed":[
         {name:"Type of sludge disposed", f_ch4:0,  N_cont:0, TVS:0, description:"" },
@@ -1930,16 +2094,6 @@ let Tables={
         {name:"Digested",                f_ch4:6,  N_cont:4, TVS:51, description:""},
     ],
 
-    //for land application and landfilling
-    "Type of faecal sludge":[
-        {name:"Type of faecal sludge undefined", N_content:0.00, TVS:0,  total_solids:0.00},
-        {name:"Untreated faecal sludge",         N_content:0.24, TVS:70, total_solids:0.04},
-        {name:"Treated faecal sludge",           N_content:3.00, TVS:40, total_solids:0.22},
-        {name:"Pit humus",                       N_content:4.00, TVS:65, total_solids:0.07},
-        {name:"Dehydrated faeces",               N_content:3.00, TVS:70, total_solids:0.27},
-        {name:"Compost",                         N_content:3.00, TVS:80, total_solids:0.08},
-        {name:"Septic tank sludge",              N_content:0.03, TVS:60, total_solids:0.02},
-    ],
 
     "Type of landfill":[
         {name:"Landfill",                     MCF:1, description: ""},
@@ -1954,20 +2108,6 @@ let Tables={
         {name:"Coarse-Textured (<30% clay)", f_la:0.005, description: ""},
     ],
 
-    "Type of containment":[
-        {name:"Containment undefined",                                          ch4_efac:0,      ch4_efac_flooding:0,     BOD_conc_FS:0,    fs_density:0   },
-        {name:"No containment (open defecation)",                               ch4_efac:0.027,  ch4_efac_flooding:0.027, BOD_conc_FS:67.8, fs_density:1400},
-        {name:"Pit latrine without flush water (lined or unlined) – household", ch4_efac:0.06,   ch4_efac_flooding:0.42,  BOD_conc_FS:67.8, fs_density:1400},
-        {name:"Pit latrine without flush water (lined or unlined) – communal",  ch4_efac:0.3,    ch4_efac_flooding:0.42,  BOD_conc_FS:67.8, fs_density:1400},
-        {name:"Pit latrine with flush water use (lined or unlined)",            ch4_efac:0.42,   ch4_efac_flooding:0.42,  BOD_conc_FS:67.8, fs_density:1400},
-        {name:"Septic tank (with or without dispersal field)",                  ch4_efac:0.3,    ch4_efac_flooding:0.42,  BOD_conc_FS:1.35, fs_density:1100},
-        {name:"Fully lined tank without flush water use – not water tight",     ch4_efac:0.3,    ch4_efac_flooding:0.42,  BOD_conc_FS:67.8, fs_density:1400},
-        {name:"Fully lined tank without flush water use – water tight",         ch4_efac:0.42,   ch4_efac_flooding:0.42,  BOD_conc_FS:67.8, fs_density:1400},
-        {name:"Fully lined tank with flush water use - water tight or untight", ch4_efac:0.42,   ch4_efac_flooding:0.42,  BOD_conc_FS:67.8, fs_density:1400},
-        {name:"Urine Diverting Dry Toilet (UDDT)",                              ch4_efac:0.0,    ch4_efac_flooding:0.42,  BOD_conc_FS:67.8, fs_density:1400},
-        {name:"Composting Toilet",                                              ch4_efac:0.0013, ch4_efac_flooding:0.42,  BOD_conc_FS:67.8, fs_density:1400},
-        {name:"Imhoff tank",                                                    ch4_efac:0.48,   ch4_efac_flooding:0.42,  BOD_conc_FS:67.8, fs_density:1400},
-    ],
 
     "Yes/No":[
         {text:"No", value: 0},

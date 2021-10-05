@@ -1336,8 +1336,6 @@ export default {
       tetracloroetile_effl: defaultIndustry.tetracloroetile_effl, //tetrachloroethene
       tricloroetile_effl: defaultIndustry.tricloroetile_effl, //Trichloroethylene
 
-
-
       global_layers: utils.format_layer_description(Vue.prototype.$layers_description),
       cod_to_bod: 2.4,
       industry_type: defaultIndustry.industry_type,
@@ -1459,9 +1457,21 @@ export default {
         if(Number(value) != NaN && typeof this.industry.onsite_wwtp[key] !== "function") this.industry.onsite_wwtp[key] = Number(value)
       }
 
+
       if(this.has_offsite_wwtp){
         this.industry.offsite_wwtp.vol_infl_wwtp = this.industry.onsite_wwtp.wwt_vol_treated_external
         this.industry.offsite_wwtp.tn_infl_wwtp = this.industry.onsite_wwtp.wwt_tn_effl_to_wb
+        this.industry.offsite_wwtp.diclo_infl_wwtp = this.industry.onsite_wwtp.wwt_diclo_effl_to_wb //1,2-Dichloroethane
+        this.industry.offsite_wwtp.cadmium_infl_wwtp = this.industry.onsite_wwtp.wwt_cadmium_effl_to_wb //Cadmium
+        this.industry.offsite_wwtp.hexaclorobenzene_infl_wwtp = this.industry.onsite_wwtp.wwt_hexaclorobenzene_effl_to_wb //Hexachlorobenzene
+        this.industry.offsite_wwtp.mercury_infl_wwtp = this.industry.onsite_wwtp.wwt_mercury_effl_to_wb //mercury
+        this.industry.offsite_wwtp.plomo_infl_wwtp = this.industry.onsite_wwtp.wwt_plomo_effl_to_wb //lead
+        this.industry.offsite_wwtp.niquel_infl_wwtp = this.industry.onsite_wwtp.wwt_niquel_effl_to_wb //nickel
+        this.industry.offsite_wwtp.chloro_infl_wwtp = this.industry.onsite_wwtp.wwt_chloro_effl_to_wb //chloroalkanes
+        this.industry.offsite_wwtp.hexaclorobutadie_infl_wwtp = this.industry.onsite_wwtp.wwt_hexaclorobutadie_effl_to_wb //Hexachlorobutadiene
+        this.industry.offsite_wwtp.nonilfenols_infl_wwtp = this.industry.onsite_wwtp.wwt_nonilfenols_effl_to_wb //Nonylphenols
+        this.industry.offsite_wwtp.tetracloroetile_infl_wwtp = this.industry.onsite_wwtp.wwt_tetracloroetile_effl_to_wb //tetrachloroethene
+        this.industry.offsite_wwtp.tricloroetile_infl_wwtp = this.industry.onsite_wwtp.wwt_tricloroetile_effl_to_wb //Trichloroethylene
 
         if(this.industry.offsite_wwtp_type === "Domestic") this.industry.offsite_wwtp.bod_infl_wwtp = this.industry.onsite_wwtp.wwt_bod_effl_to_wb*this.cod_to_bod
         else this.industry.offsite_wwtp.bod_infl_wwtp = this.industry.onsite_wwtp.wwt_bod_effl_to_wb
@@ -1486,7 +1496,17 @@ export default {
       this.industry.tn_effl_concentration = this.ind_tn_effl_concentration
       this.industry.bod_effl_concentration = this.ind_bod_effl_concentration
       this.industry.volume_used = this.volume_used
-
+      this.industry.diclo_effl = this.diclo_effl //1,2-Dichloroethane
+      this.industry.cadmium_effl = this.cadmium_effl //Cadmium
+      this.industry.hexaclorobenzene_effl = this.hexaclorobenzene_effl //Hexachlorobenzene
+      this.industry.mercury_effl = this.mercury_effl //mercury
+      this.industry.plomo_effl = this.plomo_effl //lead
+      this.industry.niquel_effl = this.niquel_effl //nickel
+      this.industry.chloro_effl = this.chloro_effl //chloroalkanes
+      this.industry.hexaclorobutadie_effl = this.hexaclorobutadie_effl //Hexachlorobutadiene
+      this.industry.nonilfenols_effl = this.nonilfenols_effl //Nonylphenols
+      this.industry.tetracloroetile_effl = this.tetracloroetile_effl //tetrachloroethene
+      this.industry.tricloroetile_effl = this.tricloroetile_effl //Trichloroethylene
 
 
       //Local wwtp
@@ -1508,6 +1528,18 @@ export default {
         this.industry.onsite_wwtp.industry_type = this.industry.industry_type
         this.industry.onsite_wwtp.wwt_bod_infl = this.industry.bod_effl_concentration
         this.industry.onsite_wwtp.wwt_tn_infl = this.industry.tn_effl_concentration
+        this.industry.onsite_wwtp.wwt_diclo_infl = this.industry.diclo_effl //1,2-Dichloroethane
+        this.industry.onsite_wwtp.wwt_cadmium_infl = this.industry.cadmium_effl //Cadmium
+        this.industry.onsite_wwtp.wwt_hexaclorobenzene_infl = this.industry.hexaclorobenzene_effl //Hexachlorobenzene
+        this.industry.onsite_wwtp.wwt_mercury_infl = this.industry.mercury_effl //mercury
+        this.industry.onsite_wwtp.wwt_plomo_infl = this.industry.plomo_effl //lead
+        this.industry.onsite_wwtp.wwt_niquel_infl = this.industry.niquel_effl //nickel
+        this.industry.onsite_wwtp.wwt_chloro_infl = this.industry.chloro_effl //chloroalkanes
+        this.industry.onsite_wwtp.wwt_hexaclorobutadie_infl = this.industry.hexaclorobutadie_effl //Hexachlorobutadiene
+        this.industry.onsite_wwtp.wwt_nonilfenols_infl = this.industry.nonilfenols_effl //Nonylphenols
+        this.industry.onsite_wwtp.wwt_tetracloroetile_infl = this.industry.tetracloroetile_effl //tetrachloroethene
+        this.industry.onsite_wwtp.wwt_tricloroetile_infl = this.industry.tricloroetile_effl //Trichloroethylene
+
       }
 
       //Direct discharge
@@ -1518,7 +1550,17 @@ export default {
         this.industry.direct_discharge.industry_type = this.industry.industry_type
         this.industry.direct_discharge.wwt_bod_effl_to_wb = this.industry.bod_effl_concentration
         this.industry.direct_discharge.wwt_tn_effl_to_wb = this.industry.tn_effl_concentration
-
+        this.industry.direct_discharge.wwt_diclo_effl_to_wb = this.industry.diclo_effl //1,2-Dichloroethane
+        this.industry.direct_discharge.wwt_cadmium_effl_to_wb = this.industry.cadmium_effl //Cadmium
+        this.industry.direct_discharge.wwt_hexaclorobenzene_effl_to_wb = this.industry.hexaclorobenzene_effl //Hexachlorobenzene
+        this.industry.direct_discharge.wwt_mercury_effl_to_wb = this.industry.mercury_effl //mercury
+        this.industry.direct_discharge.wwt_plomo_effl_to_wb = this.industry.plomo_effl //lead
+        this.industry.direct_discharge.wwt_niquel_effl_to_wb = this.industry.niquel_effl //nickel
+        this.industry.direct_discharge.wwt_chloro_effl_to_wb = this.industry.chloro_effl //chloroalkanes
+        this.industry.direct_discharge.wwt_hexaclorobutadie_effl_to_wb = this.industry.hexaclorobutadie_effl //Hexachlorobutadiene
+        this.industry.direct_discharge.wwt_nonilfenols_effl_to_wb = this.industry.nonilfenols_effl //Nonylphenols
+        this.industry.direct_discharge.wwt_tetracloroetile_effl_to_wb = this.industry.tetracloroetile_effl //tetrachloroethene
+        this.industry.direct_discharge.wwt_tricloroetile_effl_to_wb = this.industry.tricloroetile_effl //Trichloroethylene
 
       }
 
@@ -1537,6 +1579,17 @@ export default {
         }
         this.industry.offsite_wwtp.industry_type = this.industry.industry_type
         this.industry.offsite_wwtp.wwt_tn_infl = this.industry.tn_effl_concentration
+        this.industry.offsite_wwtp.wwt_diclo_infl = this.industry.diclo_effl //1,2-Dichloroethane
+        this.industry.offsite_wwtp.wwt_cadmium_infl = this.industry.cadmium_effl //Cadmium
+        this.industry.offsite_wwtp.wwt_hexaclorobenzene_infl = this.industry.hexaclorobenzene_effl //Hexachlorobenzene
+        this.industry.offsite_wwtp.wwt_mercury_infl = this.industry.mercury_effl //mercury
+        this.industry.offsite_wwtp.wwt_plomo_infl = this.industry.plomo_effl //lead
+        this.industry.offsite_wwtp.wwt_niquel_infl = this.industry.niquel_effl //nickel
+        this.industry.offsite_wwtp.wwt_chloro_infl = this.industry.chloro_effl //chloroalkanes
+        this.industry.offsite_wwtp.wwt_hexaclorobutadie_infl = this.industry.hexaclorobutadie_effl //Hexachlorobutadiene
+        this.industry.offsite_wwtp.wwt_nonilfenols_infl = this.industry.nonilfenols_effl //Nonylphenols
+        this.industry.offsite_wwtp.wwt_tetracloroetile_infl = this.industry.tetracloroetile_effl //tetrachloroethene
+        this.industry.offsite_wwtp.wwt_tricloroetile_infl = this.industry.tricloroetile_effl //Trichloroethylene
 
       }
 
