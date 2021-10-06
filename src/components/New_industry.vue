@@ -53,7 +53,7 @@
             <v-col cols="12">
               <v-img
                   :src="water_withdrawal_image"
-                  height="450"
+                  width="100%"
                   class="grey darken-4"
               ></v-img>
 
@@ -282,7 +282,7 @@
 
 
 
-                  <v-btn v-if="ind_tn_effl !== null"
+                  <v-btn v-if="ind_tn_effl != null"
                          outlined
                          x-small
                          @click="ind_tn_effl_concentration = parseFloat(ind_tn_effl)"
@@ -717,13 +717,13 @@
             <v-col cols="12">
               <v-img
                   :src="onsite_external_image"
-                  height="600"
+                  width="100%"
                   class="grey darken-4"
                   v-if="industry.has_offsite_wwtp"
               ></v-img>
               <v-img
                   :src="onsite_no_external_image"
-                  height="600"
+                  width="100%"
                   class="grey darken-4"
                   v-else
               ></v-img>
@@ -932,7 +932,7 @@
             <v-col cols="12">
               <v-img
                   :src="direct_discharge_image"
-                  height="600"
+                  width="100%"
                   class="grey darken-4"
               ></v-img>
 
@@ -1043,13 +1043,13 @@
             <v-col cols="12">
               <v-img
                   :src="external_internal_image"
-                  height="600"
+                  width="100%"
                   class="grey darken-4"
                   v-if="industry.has_onsite_wwtp"
               ></v-img>
               <v-img
                   :src="external_no_internal_image"
-                  height="600"
+                  width="100%"
                   class="grey darken-4"
                   v-else
               ></v-img>
@@ -1297,8 +1297,7 @@ export default {
       estimations: Industrial_wwtp_onsite.get_estimations(),
       industrial_wwtp_onsite_estimations: Industrial_wwtp_onsite.get_estimations(),
       direct_discharge_estimations: Direct_discharge.get_estimations(),
-
-      wwtp_offsite_estimations: null,
+      wwtp_offsite_estimations: Domestic_wwtp.get_estimations(),
 
       stepper_model: 1,
       water_withdrawal_image: require("@/../public/water_flow/water_withdrawal.jpg"),
@@ -1319,8 +1318,8 @@ export default {
       industrial_domestic: ["Domestic", "Industrial"],
       wwtp_aux_inputs: {},
       has_direct_discharge: defaultIndustry.has_direct_discharge,
-      ind_tn_effl_concentration: defaultIndustry.ind_tn_effl_concentration,
-      ind_bod_effl_concentration: defaultIndustry.ind_bod_effl_concentration,
+      ind_tn_effl_concentration: defaultIndustry.tn_effl_concentration,
+      ind_bod_effl_concentration: defaultIndustry.bod_effl_concentration,
       volume_used: defaultIndustry.volume_used,
 
       //Priority pollutants
@@ -1384,6 +1383,14 @@ export default {
     if (this.industry === undefined) this.$router.push('/')
   },
   watch: {
+
+    offsite_wwtp_type(type){
+      if(type == "Industrial"){
+        this.wwtp_offsite_estimations = Industrial_wwtp_offsite.get_estimations()
+      }else {
+        this.wwtp_offsite_estimations = Domestic_wwtp.get_estimations()
+      }
+    },
     stepper_model(step){
       if(step == 2 ){
         this.onsite_inputs = this.industry.onsite_wwtp.get_inputs()
@@ -1568,14 +1575,10 @@ export default {
       if(this.has_offsite_wwtp){
         if(this.offsite_wwtp_type == "Industrial"){
           if(this.industry.offsite_wwtp === null || this.industry.offsite_wwtp.constructor.name !== "Industrial_wwtp_offsite") this.industry.offsite_wwtp = new Industrial_wwtp_offsite()
-
-          this.wwtp_offsite_estimations = Industrial_wwtp_offsite.get_estimations()
           this.industry.offsite_wwtp.wwt_bod_infl = this.industry.bod_effl_concentration
         }else {
           if(this.industry.offsite_wwtp === null || this.industry.offsite_wwtp.constructor.name !== "Domestic_wwtp") this.industry.offsite_wwtp = new Domestic_wwtp()
-          this.wwtp_offsite_estimations = Domestic_wwtp.get_estimations()
           this.industry.offsite_wwtp.wwt_bod_infl = this.industry.bod_effl_concentration*this.cod_to_bod
-
         }
         this.industry.offsite_wwtp.industry_type = this.industry.industry_type
         this.industry.offsite_wwtp.wwt_tn_infl = this.industry.tn_effl_concentration
@@ -1627,6 +1630,7 @@ export default {
       else return ("Amount of water entering the industry must be the same as the amount leaving")
     }*/
   },
+
   computed: {
     ind_bod_effl(){
       if(this.industry_type === "food"){  //noves categories

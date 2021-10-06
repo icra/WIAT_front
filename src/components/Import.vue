@@ -179,6 +179,19 @@ export default {
       new_industry.bod_effl_concentration = industry.bod_effl_concentration
       new_industry.vol_used = industry.vol_used
 
+      new_industry.diclo_effl= industry.diclo_effl //1,2-Dichloroethane
+      new_industry.cadmium_effl= industry.cadmium_effl //Cadmium
+      new_industry.hexaclorobenzene_effl= industry.hexaclorobenzene_effl //Hexachlorobenzene
+      new_industry.mercury_effl= industry.mercury_effl //mercury
+      new_industry.plomo_effl= industry.plomo_effl //lead
+      new_industry.niquel_effl= industry.niquel_effl //nickel
+      new_industry.chloro_effl= industry.chloro_effl //chloroalkanes
+      new_industry.hexaclorobutadie_effl= industry.hexaclorobutadie_effl //Hexachlorobutadiene
+      new_industry.nonilfenols_effl= industry.nonilfenols_effl //Nonylphenols
+      new_industry.tetracloroetile_effl= industry.tetracloroetile_effl //tetrachloroethene
+      new_industry.tricloroetile_effl= industry.tricloroetile_effl //Trichloroethylene
+
+
       if(new_industry.has_onsite_wwtp)
         if(new_industry.has_offsite_wwtp){
           if(new_industry.offsite_wwtp_type === "Domestic") new_industry.onsite_wwtp = this.copy_wwtp(industry.onsite_wwtp, "Industrial_wwtp_onsite_external_domestic", new_industry.industry_type)

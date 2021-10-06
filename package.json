@@ -23,6 +23,7 @@
     "lodash": "^4.17.21",
     "pdfmake": "^0.2.2",
     "vue": "^2.6.11",
+    "vue-async-computed": "^3.9.0",
     "vue-chartjs": "^3.5.1",
     "vue-router": "^3.2.0",
     "vuetify": "^2.4.0"

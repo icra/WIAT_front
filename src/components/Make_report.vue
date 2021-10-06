@@ -72,6 +72,7 @@
       <br>
 
       <div>
+
         <v-progress-linear
             indeterminate
             rounded
@@ -82,14 +83,56 @@
         ></v-progress-linear>
 
         <PDFJSViewer class="center" v-show="selected_industries.length>0 && !generating_pdf" ref="make_pdf"/>
+
       </div>
+
+      <!--
+      <template>
+        <v-tabs v-model="tab">
+          <v-tab
+              v-for="assessment_name in assessment_names"
+              :key="assessment_name"
+          >
+            {{assessment_name}}
+          </v-tab>
+
+        </v-tabs>
+        <v-tabs-items v-model="tab">
+          <v-tab-item
+              v-for="assessment_name in assessment_names"
+              :key="assessment_name"
+          >
+            <br>
+            <v-card flat style="background-color: #0AA44A; margin-left: 10px">
+              <b> Global Warming Potential: </b>
+              <v-data-table
+                  :headers="emissions_table.header"
+                  :items="emissions_table.emissions"
+                  class="elevation-1"
+              ></v-data-table>
+
+              <b> Layers information: </b>
+              {{layers_table}}
+              <v-data-table
+                  :headers="layers_table"
+                  :items="layers_table.value"
+                  class="elevation-1"
+              ></v-data-table>
+
+
+            </v-card>
+          </v-tab-item>
+        </v-tabs-items>
+      </template>
+-->
     </div>
     <div v-else>
       <p>Please, create an industry first to make a PDF report.</p>
     </div>
 
 
-    <canvas v-show="false" id="chart" width="300" height="150"> </canvas>
+    <!-- <canvas v-show="false" id="chart" width="300" height="150"> </canvas> -->
+
 
 
     <br>
@@ -103,6 +146,8 @@ import PDFJSViewer from "@/components/PDFJSViewer";
 import pdfMake from 'pdfmake/build/pdfmake.js'
 import Vue from "vue";
 import {utils, industry_statistics, metrics} from "../utils"
+import AsyncComputed from 'vue-async-computed'
+
 export default {
   name: "Make_report",
   components: {
@@ -121,9 +166,10 @@ export default {
       units_model: "bod",
       bod_to_cod: 1,
       bod_cod: [{text: "BOD", value: "bod"},{text: "COD", value: "cod"}],
-      period_model: "assessment",
+      period_model: "daily",
       daily_annual_assessment: [{text: "Daily", value: "daily"},{text: "Annual", value: "annual"}, {text: "Assessment period", value: "assessment"}],
       selected_layers: [], //layers included in the report
+      tab: 0,
 
     }
   },
@@ -151,6 +197,7 @@ export default {
 
   },
   methods: {
+
     add_identifier: function (category, id){
       let _this = this
       category.id = id
@@ -166,7 +213,7 @@ export default {
       return id
     },
 
-    async layers_table(dd, industries, assessment_days){
+    async layers_table_pdf(dd, industries, assessment_days){
 
       let selected_layers_formatted = this.selected_layers.map(function (layer) {
         return [layer.name, layer.layer]
@@ -230,14 +277,14 @@ export default {
       }
 
     },
-    emissions_table(dd, industries, assessment_days) {
+    emissions_table_pdf(dd, industries, assessment_days) {
 
       let days_factor = 1
       if(this.period_model === "annual") days_factor = 365
       else if(this.period_model === "assessment") days_factor = assessment_days
 
       dd.content.push({
-        text: "GHG emissions\n\n",
+        text: "Global Warming Potential\n\n",
         style: 'subheader'
       })
 
@@ -261,45 +308,64 @@ export default {
       let slu = ["Emissions from sludge management"]
       let reus = ["Emissions from water reuse transport"]
       let disc = ["Emissions from water discharged"]
+      let total_emissions = ["Total emissions"]
+
 
       for (const industryAux of industries) {
+        let total = 0
         let industry = industryAux.industry
         let emissions = industry_statistics.emissions_and_descriptions(industry)
         if(Number.isFinite(emissions["wwt_KPI_GHG_elec"])){
-          elec.push((days_factor*emissions["wwt_KPI_GHG_elec"]).toExponential(3))
+          let value = days_factor*emissions["wwt_KPI_GHG_elec"]
+          elec.push(value.toExponential(3))
+          total += value
         }else{
           elec.push("-")
         }
         if(Number.isFinite(emissions["wwt_KPI_GHG_fuel"])){
-          fuel.push((emissions["wwt_KPI_GHG_fuel"]*days_factor).toExponential(3))
+          let value = days_factor*emissions["wwt_KPI_GHG_fuel"]
+          fuel.push((value).toExponential(3))
+          total += value
         }else{
           fuel.push("-")
         }
         if(Number.isFinite(emissions["wwt_KPI_GHG_tre"])){
-          tre.push((days_factor*emissions["wwt_KPI_GHG_tre"]).toExponential(3))
+          let value = days_factor*emissions["wwt_KPI_GHG_tre"]
+          tre.push((value).toExponential(3))
+          total += value
         }else{
           tre.push("-")
         }
         if(Number.isFinite(emissions["wwt_KPI_GHG_biog"])){
-          biog.push((days_factor*emissions["wwt_KPI_GHG_biog"]).toExponential(3))
+          let value = days_factor*emissions["wwt_KPI_GHG_biog"]
+          biog.push((value).toExponential(3))
+          total += value
         }else{
           biog.push("-")
         }
         if(Number.isFinite(emissions["wwt_KPI_GHG_slu"])){
-          slu.push((days_factor*emissions["wwt_KPI_GHG_slu"]).toExponential(3))
+          let value = days_factor*emissions["wwt_KPI_GHG_slu"]
+          slu.push((value).toExponential(3))
+          total += value
         }else{
           slu.push("-")
         }
         if(Number.isFinite(emissions["wwt_KPI_GHG_reus_trck"])){
-          reus.push((days_factor*emissions["wwt_KPI_GHG_reus_trck"]).toExponential(3))
+          let value = days_factor*emissions["wwt_KPI_GHG_reus_trck"]
+          reus.push((value).toExponential(3))
+          total += value
         }else{
           reus.push("-")
         }
         if(Number.isFinite(emissions["wwt_KPI_GHG_disc"])){
-          disc.push((days_factor*emissions["wwt_KPI_GHG_disc"]).toExponential(3))
+          let value = days_factor*emissions["wwt_KPI_GHG_disc"]
+          disc.push((value).toExponential(3))
+          total += value
         }else{
           disc.push("-")
         }
+
+        total_emissions.push(total.toExponential(3))
       }
 
       elec.push("kgCO2eq")
@@ -309,11 +375,12 @@ export default {
       slu.push("kgCO2eq")
       reus.push("kgCO2eq")
       disc.push("kgCO2eq")
+      total_emissions.push("kgCO2eq")
 
       let emissions_table = {
         table: {
           body: [
-            body, elec, fuel, tre, biog, slu, reus, disc
+            body, elec, fuel, tre, biog, slu, reus, disc, total_emissions
           ]
         }
       }
@@ -351,6 +418,19 @@ export default {
       let dilution_factor_row = ["Dilution factor"]
       let recycled_factor = ["Recycled water factor"]
       let dbo_in_river = [""]
+      let dichloroethane = ["1,2-Dichloroethane load discharged to the water body"]
+      let cadmium = ["Cadmium load discharged to the water body"]
+      let hexachlorobenzene = ["Hexachlorobenzene load discharged to the water body"]
+      let mercury = ["Mercury load discharged to the water body"]
+      let lead = ["Lead load discharged to the water body"]
+      let nickel = ["Nickel load discharged to the water body"]
+      let chloroalkanes = ["Chloroalkanes load discharged to the water body"]
+      let hexaclorobutadie = ["Hexachlorobutadiene load discharged to the water body"]
+      let nonylphenols = ["Nonylphenols load discharged to the water body"]
+      let tetrachloroethene = ["Tetrachloroethene load discharged to the water body"]
+      let trichloroethylene = ["Trichloroethylene load discharged to the water body"]
+
+
       if(this.units_model === "bod") {
         bod = ["BOD load discharged to the water body"]
         dbo_in_river = ["BOD concentration in water body after discharging waste water"]
@@ -382,39 +462,115 @@ export default {
           recycled_factor.push("-")
         }
 
-
         if(Number.isFinite(metrics.bod_effl(industry))){
-          bod.push((days_factor*metrics.bod_effl(industry)).toExponential(3)*this.bod_to_cod)
+          bod.push((days_factor*metrics.bod_effl(industry)*this.bod_to_cod).toExponential(3))
         }else{
           bod.push("-")
         }
 
         let dbo_value = await metrics.dbo_in_river(this.global_layers, industry, assessment_days)
 
-        if(Number.isFinite(dbo_value)){
+
+        if(Number.isFinite(metrics.dichloroethane_effl(industry))){
+          dichloroethane.push((days_factor*metrics.dichloroethane_effl(industry)).toExponential(3))
+        }else{
+          dichloroethane.push("-")
+        }
+
+        if(Number.isFinite(metrics.cadmium_effl(industry))){
+          cadmium.push((days_factor*metrics.cadmium_effl(industry)).toExponential(3))
+        }else{
+          cadmium.push("-")
+        }
+
+        if(Number.isFinite(metrics.hexaclorobenzene_effl(industry))){
+          hexachlorobenzene.push((days_factor*metrics.hexaclorobenzene_effl(industry)).toExponential(3))
+        }else{
+          hexachlorobenzene.push("-")
+        }
+
+        if(Number.isFinite(metrics.mercury_effl(industry))){
+          mercury.push((days_factor*metrics.mercury_effl(industry)).toExponential(3))
+        }else{
+          mercury.push("-")
+        }
+
+        if(Number.isFinite(metrics.lead_effl(industry))){
+          lead.push((days_factor*metrics.lead_effl(industry)).toExponential(3))
+        }else{
+          lead.push("-")
+        }
+        if(Number.isFinite(metrics.nickel_effl(industry))){
+          nickel.push((days_factor*metrics.nickel_effl(industry)).toExponential(3))
+        }else{
+          nickel.push("-")
+        }
+        if(Number.isFinite(metrics.chloroalkanes_effl(industry))){
+          chloroalkanes.push((days_factor*metrics.chloroalkanes_effl(industry)).toExponential(3))
+        }else{
+          chloroalkanes.push("-")
+        }
+        if(Number.isFinite(metrics.hexaclorobutadie_effl(industry))){
+          hexaclorobutadie.push((days_factor*metrics.hexaclorobutadie_effl(industry)).toExponential(3))
+        }else{
+          hexaclorobutadie.push("-")
+        }
+        if(Number.isFinite(metrics.nonylphenols_effl(industry))){
+          nonylphenols.push((days_factor*metrics.nonylphenols_effl(industry)).toExponential(3))
+        }else{
+          nonylphenols.push("-")
+        }
+        if(Number.isFinite(metrics.tetrachloroethene_effl(industry))){
+          tetrachloroethene.push((days_factor*metrics.tetrachloroethene_effl(industry)).toExponential(3))
+        }else{
+          tetrachloroethene.push("-")
+        }
+        if(Number.isFinite(metrics.tricloroetile_effl(industry))){
+          trichloroethylene.push((days_factor*metrics.tricloroetile_effl(industry)).toExponential(3))
+        }else{
+          trichloroethylene.push("-")
+        }
+
+
+
+
+
+
+
+        /*if(Number.isFinite(dbo_value)){
           dbo_in_river.push(dbo_value.toExponential(3)*this.bod_to_cod)
         }else{
           dbo_in_river.push("-")
-        }
+        }*/
 
       }
 
-      bod.push("kg")
-      tn.push("kg")
+      bod.push("g")
+      tn.push("g")
       dilution_factor_row.push("-")
       recycled_factor.push("-")
-      dbo_in_river.push("kg/m3")
+      dbo_in_river.push("g/m3")
+      dichloroethane.push("g")
+      cadmium.push("g")
+      hexachlorobenzene.push("g")
+      mercury.push("g")
+      lead.push("g")
+      nickel.push("g")
+      chloroalkanes.push("g")
+      hexaclorobutadie.push("g")
+      nonylphenols.push("g")
+      tetrachloroethene.push("g")
+      trichloroethylene.push("g")
 
 
       let emissions_table = {
         table: {
           body: [
-            body, bod, tn, dilution_factor_row, recycled_factor, dbo_in_river
+            body, bod, tn, dichloroethane, cadmium, hexachlorobenzene, mercury, lead, nickel, chloroalkanes, hexaclorobutadie, nonylphenols, tetrachloroethene, trichloroethylene, dilution_factor_row, recycled_factor
           ]
 
         }
       }
-
 
       dd.content.push(emissions_table)
 
@@ -478,11 +634,11 @@ export default {
         let assessment_days = utils.daysBetween(assessment.assessment_period_start, assessment.assessment_period_end)
 
 
-        this.emissions_table(dd, industries, assessment_days)
+        this.emissions_table_pdf(dd, industries, assessment_days)
         dd.content.push("\n\n")
         await this.quality_quantity_indicators(dd, industries, assessment_days)
         dd.content.push("\n\n")
-        await this.layers_table(dd, industries, assessment_days)
+        await this.layers_table_pdf(dd, industries, assessment_days)
 
 
 
@@ -626,7 +782,187 @@ export default {
     }
 
   },
+
+  asyncComputed: {
+    async layers_table(){
+
+      let selected_layers_formatted = this.selected_layers.map(function (layer) {
+        return [layer.name, layer.layer]
+      })
+
+      const groupedByAssessments = _.groupBy(this.selected_industries, function(n) {
+        return n.assessment.name;
+      });
+
+      let _this = this
+
+      if(_this.tab !== undefined && _this.tab !== null){
+
+        let assessment = Object.values(groupedByAssessments)[_this.tab][0].assessment
+        let assessment_days = utils.daysBetween(assessment.assessment_period_start, assessment.assessment_period_end)
+
+        let days_factor = 1
+        if(this.period_model === "annual") days_factor = 365
+        else if(this.period_model === "assessment") days_factor = assessment_days
+
+        let layer_table = {
+          header: [{text: "Layer", value: "layer", sortable: false}],
+          value: []
+        }
+
+        for (let [layer_name, info] of selected_layers_formatted) {
+          let current_layer = {layer: layer_name}
+          let future_layer = [layer_name + " (BAU 2030)"]
+          for (const industryAux of Object.values(groupedByAssessments)[_this.tab]) {
+            let industry = industryAux.industry
+            let lat = industry.location.lat
+            let lng = industry.location.lng
+
+            layer_table.header.push({text: industry.name, value: industry.name})
+
+            //Baseline
+            let baseline_data = await info.layers.baseline.annual.layer["data_on_point"](lat, lng)
+            current_layer[industry.name] = baseline_data.toExponential(3)
+          }
+          layer_table.value.push(current_layer)
+          console.log(layer_table)
+        }
+        return layer_table
+      }
+      else return {header: [], value: []}
+
+
+    },
+
+  },
   computed: {
+    emissions_table() {
+
+      let _this = this
+
+      const groupedByAssessments = _.groupBy(this.selected_industries, function(n) {
+        return n.assessment.name;
+      });
+
+      if(_this.tab !== undefined && _this.tab !== null){
+
+        let assessment = Object.values(groupedByAssessments)[_this.tab][0].assessment
+        let assessment_days = utils.daysBetween(assessment.assessment_period_start, assessment.assessment_period_end)
+
+        let days_factor = 1
+        if(this.period_model === "annual") days_factor = 365
+        else if(this.period_model === "assessment") days_factor = assessment_days
+
+        let emission_table = {
+          header: [{text: "", value: "value", sortable: false}],
+          emissions: []
+        }
+
+        let elec = {value: "Indirect emissions from electricity consumption", unit: "kgCO2eq"}
+        let fuel = {value: "Emissions from fuel engines", unit: "kgCO2eq"}
+        let tre = {value: "Emissions from treatment", unit: "kgCO2eq"}
+        let biog = {value: "Emissions from biogas", unit: "kgCO2eq"}
+        let slu = {value: "Emissions from sludge management", unit: "kgCO2eq"}
+        let reus = {value: "Emissions from water reuse transport", unit: "kgCO2eq"}
+        let disc = {value: "Emissions from water discharged", unit: "kgCO2eq"}
+        let total = {value: "Total emissions", unit: "kgCO2eq"}
+
+
+        for (const industryAux of Object.values(groupedByAssessments)[_this.tab]) {
+          let industry = industryAux.industry
+          let total_emission = 0
+          emission_table.header.push({
+            text: industry.name, value: industry.name,
+          })
+          let emissions = industry_statistics.emissions_and_descriptions(industry)
+          if(Number.isFinite(emissions["wwt_KPI_GHG_elec"])){
+            let value = (days_factor*emissions["wwt_KPI_GHG_elec"])
+            elec[industry.name] = value.toExponential(3)
+            total_emission += value
+          }else{
+            elec[industry.name] = ("-")
+          }
+          if(Number.isFinite(emissions["wwt_KPI_GHG_fuel"])){
+            let value = emissions["wwt_KPI_GHG_fuel"]*days_factor
+            fuel[industry.name] = value.toExponential(3)
+            total_emission += value
+
+          }else{
+            fuel[industry.name] = ("-")
+          }
+          if(Number.isFinite(emissions["wwt_KPI_GHG_tre"])){
+            let value = days_factor*emissions["wwt_KPI_GHG_tre"]
+            tre[industry.name] = value.toExponential(3)
+            total_emission += value
+
+          }else{
+            tre[industry.name] = ("-")
+          }
+          if(Number.isFinite(emissions["wwt_KPI_GHG_biog"])){
+            let value = days_factor*emissions["wwt_KPI_GHG_biog"]
+            biog[industry.name] = value.toExponential(3)
+            total_emission += value
+          }else{
+            biog[industry.name] = ("-")
+          }
+          if(Number.isFinite(emissions["wwt_KPI_GHG_slu"])){
+            let value = days_factor*emissions["wwt_KPI_GHG_slu"]
+            slu[industry.name] = value.toExponential(3)
+            total_emission += value
+
+          }else{
+            slu[industry.name] = ("-")
+          }
+          if(Number.isFinite(emissions["wwt_KPI_GHG_reus_trck"])){
+            let value = days_factor*emissions["wwt_KPI_GHG_reus_trck"]
+            reus[industry.name] = value.toExponential(3)
+            total_emission += value
+          }else{
+            reus[industry.name] = ("-")
+          }
+          if(Number.isFinite(emissions["wwt_KPI_GHG_disc"])){
+            let value = days_factor*emissions["wwt_KPI_GHG_disc"]
+            disc[industry.name] = value.toExponential(3)
+            total_emission += value
+          }else{
+            disc[industry.name] = ("-")
+          }
+
+          total[industry.name] = total_emission.toExponential(3)
+
+        }
+
+
+        emission_table.header.push({text: "Unit", value: "unit", sortable: false,})
+
+
+        emission_table.emissions.push(elec)
+        emission_table.emissions.push(fuel)
+        emission_table.emissions.push(tre)
+        emission_table.emissions.push(biog)
+        emission_table.emissions.push(slu)
+        emission_table.emissions.push(reus)
+        emission_table.emissions.push(disc)
+        emission_table.emissions.push(total)
+
+
+        return emission_table
+      }
+      else return {header: [], emissions: []}
+
+
+
+
+
+    },
+
+    assessment_names: function() {
+      const groupedByAssessments = _.groupBy(this.selected_industries, function(n) {
+        return n.assessment.name;
+      });
+      return Object.entries(groupedByAssessments).map(assessment => assessment[0])
+    },
+
     layer_tree: function () {
       let _this = this
       let id = 1

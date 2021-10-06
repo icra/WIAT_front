@@ -71,8 +71,8 @@ export class Industry{
         this.has_direct_discharge = false
         this.direct_discharge = null
         this.industry_type = null
-        this.ind_tn_effl_concentration = 0
-        this.ind_bod_effl_concentration = 0
+        this.bod_effl_concentration = 0
+        this.tn_effl_concentration = 0
         this.volume_used = 0
 
         //Priority pollutants

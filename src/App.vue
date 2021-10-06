@@ -460,6 +460,20 @@
                       @update:active="layerTreeSelected"
                   >
                     <template v-slot:append="{ item }">
+                      <v-tooltip bottom v-if="item.layer && item.layer.info" max-width="700px">
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-icon
+                              color='#1C195B'
+                              style="padding-right: 10px"
+                              v-bind="attrs"
+                              v-on="on"
+                          >
+                            mdi-information-outline
+                          </v-icon>
+                        </template>
+                        <span>{{item.layer.info}}</span>
+                      </v-tooltip>
+
                       <v-icon v-if="selected_layer === item.name && item.layer" color='#1C195B'>
                         mdi-layers-remove
                       </v-icon>
@@ -563,6 +577,9 @@ export default {
     window.addEventListener('beforeunload', e => this.beforeunloadFn(e))
   },
   methods: {
+    prova(item){
+      console.log(item)
+    },
     beforeunloadFn(){
       event.preventDefault()
       event.returnValue = ""

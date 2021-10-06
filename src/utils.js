@@ -80,6 +80,20 @@ let industry_statistics = {
 
 }
 
+function effl_load(industry, effl){
+    let load = 0
+    if(industry.has_onsite_wwtp) {
+        load += industry.onsite_wwtp[effl] * industry.onsite_wwtp.wwt_vol_disc // g/day
+    }
+    if(industry.has_direct_discharge) {
+        load += industry.direct_discharge[effl]  *  industry.direct_discharge.wwt_vol_disc  // g/day
+    }
+    if(industry.has_offsite_wwtp){
+        load += industry.offsite_wwtp[effl] * industry.offsite_wwtp.wwt_vol_disc  // g/day
+    }
+    return load //g/day
+}
+
 let metrics = {
 
     async dilution_factor(global_layers, industry, assessment_days){
@@ -161,32 +175,42 @@ let metrics = {
     },
 
     tn_effl(industry){
-        let load = 0
-        if(industry.has_onsite_wwtp) {
-            load += industry.onsite_wwtp.wwt_tn_effl_to_wb * industry.onsite_wwtp.wwt_vol_disc // g/day
-        }
-        if(industry.has_direct_discharge) {
-            load += industry.direct_discharge.wwt_tn_effl_to_wb  *  industry.direct_discharge.wwt_vol_disc  // g/day
-        }
-        if(industry.has_offsite_wwtp){
-            load += industry.offsite_wwtp.wwt_tn_effl_to_wb * industry.offsite_wwtp.wwt_vol_disc  // g/day
-        }
-        return load //g/day
-    }
+        return effl_load(industry, "wwt_tn_effl_to_wb")
+    },
+    dichloroethane_effl(industry){
+        return effl_load(industry, "wwt_diclo_effl_to_wb")
+    },
+    cadmium_effl(industry){
+        return effl_load(industry, "wwt_cadmium_effl_to_wb")
+    },
+    hexaclorobenzene_effl(industry){
+        return effl_load(industry, "wwt_hexaclorobenzene_effl_to_wb")
+    },
+    mercury_effl(industry){
+        return effl_load(industry, "wwt_mercury_effl_to_wb")
+    },
+    lead_effl(industry){
+        return effl_load(industry, "wwt_plomo_effl_to_wb")
+    },
+    nickel_effl(industry){
+        return effl_load(industry, "wwt_niquel_effl_to_wb")
+    },
+    chloroalkanes_effl(industry){
+        return effl_load(industry, "wwt_chloro_effl_to_wb")
+    },
+    hexaclorobutadie_effl(industry){
+        return effl_load(industry, "wwt_hexaclorobutadie_effl_to_wb")
+    },
+    nonylphenols_effl(industry){
+        return effl_load(industry, "wwt_nonilfenols_effl_to_wb")
+    },
+    tetrachloroethene_effl(industry){
+        return effl_load(industry, "wwt_tetracloroetile_effl_to_wb")
+    },
+    tricloroetile_effl(industry){
+        return effl_load(industry, "wwt_tricloroetile_effl_to_wb")
+    },
 
-
-    /*
-  Functions for calling data from other components
-*/
-
-    /*water_quality_indicators(){
-        return [
-
-            {type: "COD load at the effluent of the WWTP", value: this.wwt_bod_effl_to_wb, unit: "kg"},
-            {type: "Total Nitrogen load in the effluent", value: this.wwt_tn_effl_to_wb, unit: "kg"},
-
-        ]
-    }*/
 }
 
 export {metrics, utils, industry_statistics}
