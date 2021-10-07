@@ -1,10 +1,77 @@
 <template>
   <div class="outer">
     <h1>Report</h1>
-    <div v-if="is_there_any_industry_created">
+    <div v-if="is_there_any_industry_created" style="height: 100%">
       <br>
       <v-row>
-        <v-col>
+        <v-col cols="9">
+          <v-tabs v-model="tab">
+            <v-tab
+                v-for="assessment_name in assessment_names"
+                :key="assessment_name"
+            >
+              {{assessment_name}}
+            </v-tab>
+          </v-tabs>
+        </v-col>
+      </v-row>
+      <v-row style="height: 85%" class = "border_report">
+        <v-col v-if="selected_industries.length === 0" cols="9" style="height: 100%">
+          Please, select at least an industry to make the report
+
+        </v-col>
+
+        <v-col v-else cols="9" style="height: 100%">
+          <template class="report" >
+
+            <div style="width: 100%; height: 90%">
+              <v-tabs-items v-model="tab">
+                <v-tab-item
+                    v-for="assessment_name in assessment_names"
+                    :key="assessment_name"
+                >
+                  <br>
+                  <v-card flat style="margin-left: 10px;">
+                    <div class = table_descriptor>
+                      <b > Global Warming Potential: </b>
+                    </div>
+                    <v-data-table
+                        :headers="emissions_table.header"
+                        :items="emissions_table.emissions"
+                        class="elevation-1"
+                    ></v-data-table>
+
+                    <div class = table_descriptor>
+                      <b> Quality and quantity indicators: </b>
+                    </div>
+                    <v-data-table
+                        :headers="pollutants_table.header"
+                        :items="pollutants_table.value"
+                        class="elevation-1"
+                    ></v-data-table>
+
+                    <div v-if="selected_layers.length > 0">
+                      <div class = table_descriptor>
+                        <b > Layers information: </b>
+                      </div>
+                      <v-data-table
+                          :headers="layers_table.header"
+                          :items="layers_table.value"
+                          class="elevation-1"
+                      ></v-data-table>
+                    </div>
+
+                  </v-card>
+                </v-tab-item>
+              </v-tabs-items>
+            </div>
+
+
+
+          </template>
+
+        </v-col>
+        <v-col class="menu">
           <p>Select the industries to include in the report.</p>
           <v-treeview
               :items="assessments_and_industries_tree"
@@ -18,10 +85,6 @@
               selected-color="#1C195B"
               open-on-click
           ></v-treeview>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col>
           <p>Select the layers to include in the report.</p>
           <v-treeview
               :items="layer_tree"
@@ -36,41 +99,38 @@
               selected-color="#1C195B"
           >
           </v-treeview>
-        </v-col>
-
-      </v-row>
-
-      <v-row>
-        <v-col cols="3">
           <v-select
               v-model="include_future"
               :items="yes_no"
               filled
               label="Include 2030 BAU values in the report"
           ></v-select>
-        </v-col>
-        <v-col cols="3">
           <v-select
               v-model="units_model"
               :items="bod_cod"
               filled
               label="Select units"
           ></v-select>
-        </v-col>
-        <v-col cols="3">
           <v-select
               v-model="period_model"
               :items="daily_annual_assessment"
               filled
               label="Time period to express the results"
           ></v-select>
+          <v-row>
+            <v-col>
+              <v-btn block @click="button_generate_pdf_clicked">
+                GENERATE PDF
+              </v-btn>
+            </v-col>
+          </v-row>
+
         </v-col>
-
-
       </v-row>
 
       <br>
 
+      <!--
       <div>
 
         <v-progress-linear
@@ -84,47 +144,10 @@
 
         <PDFJSViewer class="center" v-show="selected_industries.length>0 && !generating_pdf" ref="make_pdf"/>
 
-      </div>
-
-      <!--
-      <template>
-        <v-tabs v-model="tab">
-          <v-tab
-              v-for="assessment_name in assessment_names"
-              :key="assessment_name"
-          >
-            {{assessment_name}}
-          </v-tab>
-
-        </v-tabs>
-        <v-tabs-items v-model="tab">
-          <v-tab-item
-              v-for="assessment_name in assessment_names"
-              :key="assessment_name"
-          >
-            <br>
-            <v-card flat style="background-color: #0AA44A; margin-left: 10px">
-              <b> Global Warming Potential: </b>
-              <v-data-table
-                  :headers="emissions_table.header"
-                  :items="emissions_table.emissions"
-                  class="elevation-1"
-              ></v-data-table>
-
-              <b> Layers information: </b>
-              {{layers_table}}
-              <v-data-table
-                  :headers="layers_table"
-                  :items="layers_table.value"
-                  class="elevation-1"
-              ></v-data-table>
+      </div>-->
 
 
-            </v-card>
-          </v-tab-item>
-        </v-tabs-items>
-      </template>
--->
+
     </div>
     <div v-else>
       <p>Please, create an industry first to make a PDF report.</p>
@@ -146,7 +169,7 @@ import PDFJSViewer from "@/components/PDFJSViewer";
 import pdfMake from 'pdfmake/build/pdfmake.js'
 import Vue from "vue";
 import {utils, industry_statistics, metrics} from "../utils"
-import AsyncComputed from 'vue-async-computed'
+
 
 export default {
   name: "Make_report",
@@ -170,33 +193,286 @@ export default {
       daily_annual_assessment: [{text: "Daily", value: "daily"},{text: "Annual", value: "annual"}, {text: "Assessment period", value: "assessment"}],
       selected_layers: [], //layers included in the report
       tab: 0,
+      layers_table: {header: [], value: []},
+      pollutants_table: {header: [], value: []}
+
 
     }
   },
   watch: {
 
     selected_layers: async function () {
-      if (this.selected_industries.length > 0) await this.generate_pdf()
+      this.layers_table = await this.generate_layers_table()
+      this.pollutants_table = await this.generate_pollutants_table()
+
     },
 
     selected_industries: async function () {
-      await this.generate_pdf()
+      this.layers_table = await this.generate_layers_table()
+      this.pollutants_table = await this.generate_pollutants_table()
+
     },
     include_future: async function () {
-      if (this.selected_industries.length > 0) await this.generate_pdf()
+      this.layers_table = await this.generate_layers_table()
+      this.pollutants_table = await this.generate_pollutants_table()
+
     },
     units_model: async function () {
+      this.layers_table = await this.generate_layers_table()
+      this.pollutants_table = await this.generate_pollutants_table()
+
       this.bod_to_cod = 1
       if(this.units_model === "cod") this.bod_to_cod = 1/2.4
-      if (this.selected_industries.length > 0) await this.generate_pdf()
     },
     period_model: async function () {
-      if (this.selected_industries.length > 0) await this.generate_pdf()
+      this.layers_table = await this.generate_layers_table()
+      this.pollutants_table = await this.generate_pollutants_table()
+
     },
 
 
   },
   methods: {
+
+    async button_generate_pdf_clicked(){
+      if (this.selected_industries.length > 0) await this.generate_pdf()
+    },
+    async generate_pollutants_table() {
+
+      let _this = this
+
+      const groupedByAssessments = _.groupBy(this.selected_industries, function(n) {
+        return n.assessment.name;
+      });
+
+      if(_this.tab !== undefined && _this.tab !== null){
+
+        let assessment = Object.values(groupedByAssessments)[_this.tab][0].assessment
+        let assessment_days = utils.daysBetween(assessment.assessment_period_start, assessment.assessment_period_end)
+
+        let days_factor = 1
+        if(this.period_model === "annual") days_factor = 365
+        else if(this.period_model === "assessment") days_factor = assessment_days
+
+        let pollutants_table = {
+          header: [{text: "Pollutant", value: "value", sortable: false}],
+          value: []
+        }
+
+
+        let tn = {value: "TN load discharged to the water body", unit: "g"}
+        let dilution_factor_row = {value: "Dilution factor", unit: "-"}
+        let recycled_factor = {value: "Recycled water factor", unit: "-"}
+        let dichloroethane = {value: "1,2-Dichloroethane load discharged to the water body", unit: "g"}
+        let cadmium = {value: "Cadmium load discharged to the water body", unit: "g"}
+        let hexachlorobenzene = {value: "Hexachlorobenzene load discharged to the water body", unit: "g"}
+        let mercury = {value: "Mercury load discharged to the water body", unit: "g"}
+        let lead = {value: "Lead load discharged to the water body", unit: "g"}
+        let nickel = {value: "Nickel load discharged to the water body", unit: "g"}
+        let chloroalkanes = {value: "Chloroalkanes load discharged to the water body", unit: "g"}
+        let hexaclorobutadie = {value: "Hexachlorobutadiene load discharged to the water body", unit: "g"}
+        let nonylphenols = {value: "Nonylphenols load discharged to the water body", unit: "g"}
+        let tetrachloroethene = {value: "Tetrachloroethene load discharged to the water body", unit: "g"}
+        let trichloroethylene = {value: "Trichloroethylene load discharged to the water body", unit: "g"}
+        let bod = {value: "", unit: "g"}
+        if(this.units_model === "bod") {
+          bod.value = "BOD load discharged to the water body"
+        }
+        else {
+          bod.value = "COD load discharged to the water body"
+        }
+
+
+        for (const industryAux of Object.values(groupedByAssessments)[_this.tab]) {
+          let industry = industryAux.industry
+          pollutants_table.header.push({
+            text: industry.name, value: industry.name,
+          })
+
+          if(Number.isFinite(metrics.tn_effl(industry))){
+            tn[industry.name] = ((days_factor*metrics.tn_effl(industry)).toExponential(3))
+          }else{
+            tn[industry.name] = ("-")
+          }
+
+          let dilution_factor_value = await metrics.dilution_factor(this.global_layers, industry, assessment_days)
+          if(Number.isFinite(dilution_factor_value)){
+            dilution_factor_row[industry.name] = (dilution_factor_value.toExponential(3))
+          }else{
+            dilution_factor_row[industry.name] = ("-")
+          }
+
+          if(Number.isFinite(metrics.recycled_water_factor(industry))){
+            recycled_factor[industry.name] = (metrics.recycled_water_factor(industry).toExponential(3))
+          }else{
+            recycled_factor[industry.name] = ("-")
+          }
+
+          if(Number.isFinite(metrics.bod_effl(industry))){
+            bod[industry.name] = ((days_factor*metrics.bod_effl(industry)*this.bod_to_cod).toExponential(3))
+          }else{
+            bod[industry.name] = ("-")
+          }
+
+          let dbo_value = await metrics.dbo_in_river(this.global_layers, industry, assessment_days)
+
+
+          if(Number.isFinite(metrics.dichloroethane_effl(industry))){
+            dichloroethane[industry.name] = ((days_factor*metrics.dichloroethane_effl(industry)).toExponential(3))
+          }else{
+            dichloroethane[industry.name] = ("-")
+          }
+
+          if(Number.isFinite(metrics.cadmium_effl(industry))){
+            cadmium[industry.name] = ((days_factor*metrics.cadmium_effl(industry)).toExponential(3))
+          }else{
+            cadmium[industry.name] = ("-")
+          }
+
+          if(Number.isFinite(metrics.hexaclorobenzene_effl(industry))){
+            hexachlorobenzene[industry.name] = ((days_factor*metrics.hexaclorobenzene_effl(industry)).toExponential(3))
+          }else{
+            hexachlorobenzene[industry.name] = ("-")
+          }
+
+          if(Number.isFinite(metrics.mercury_effl(industry))){
+            mercury[industry.name] = ((days_factor*metrics.mercury_effl(industry)).toExponential(3))
+          }else{
+            mercury[industry.name] = ("-")
+          }
+
+          if(Number.isFinite(metrics.lead_effl(industry))){
+            lead[industry.name] = ((days_factor*metrics.lead_effl(industry)).toExponential(3))
+          }else{
+            lead[industry.name] = ("-")
+          }
+          if(Number.isFinite(metrics.nickel_effl(industry))){
+            nickel[industry.name] = ((days_factor*metrics.nickel_effl(industry)).toExponential(3))
+          }else{
+            nickel[industry.name] = ("-")
+          }
+          if(Number.isFinite(metrics.chloroalkanes_effl(industry))){
+            chloroalkanes[industry.name] = ((days_factor*metrics.chloroalkanes_effl(industry)).toExponential(3))
+          }else{
+            chloroalkanes[industry.name] = ("-")
+          }
+          if(Number.isFinite(metrics.hexaclorobutadie_effl(industry))){
+            hexaclorobutadie[industry.name] = ((days_factor*metrics.hexaclorobutadie_effl(industry)).toExponential(3))
+          }else{
+            hexaclorobutadie[industry.name] = ("-")
+          }
+          if(Number.isFinite(metrics.nonylphenols_effl(industry))){
+            nonylphenols[industry.name] = ((days_factor*metrics.nonylphenols_effl(industry)).toExponential(3))
+          }else{
+            nonylphenols[industry.name] = ("-")
+          }
+          if(Number.isFinite(metrics.tetrachloroethene_effl(industry))){
+            tetrachloroethene[industry.name] = ((days_factor*metrics.tetrachloroethene_effl(industry)).toExponential(3))
+          }else{
+            tetrachloroethene[industry.name] = ("-")
+          }
+          if(Number.isFinite(metrics.tricloroetile_effl(industry))){
+            trichloroethylene[industry.name] = ((days_factor*metrics.tricloroetile_effl(industry)).toExponential(3))
+          }else{
+            trichloroethylene[industry.name] = ("-")
+          }
+
+        }
+
+        pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
+
+        pollutants_table.value.push(bod)
+        pollutants_table.value.push(tn)
+        pollutants_table.value.push(dichloroethane)
+        pollutants_table.value.push(cadmium)
+        pollutants_table.value.push(hexachlorobenzene)
+        pollutants_table.value.push(mercury)
+        pollutants_table.value.push(lead)
+        pollutants_table.value.push(nickel)
+        pollutants_table.value.push(chloroalkanes)
+        pollutants_table.value.push(hexaclorobutadie)
+        pollutants_table.value.push(nonylphenols)
+        pollutants_table.value.push(tetrachloroethene)
+        pollutants_table.value.push(trichloroethylene)
+        pollutants_table.value.push(dilution_factor_row)
+        pollutants_table.value.push(recycled_factor)
+
+
+        return pollutants_table
+      }
+      else return {header: [], emissions: []}
+
+    },
+
+    async generate_layers_table(){
+
+      let selected_layers_formatted = this.selected_layers.map(function (layer) {
+        return [layer.name, layer.layer]
+      })
+
+      const groupedByAssessments = _.groupBy(this.selected_industries, function(n) {
+        return n.assessment.name;
+      });
+
+      let _this = this
+
+      if(_this.tab !== undefined && _this.tab !== null && Object.values(groupedByAssessments)[_this.tab] != undefined){
+
+        let assessment = Object.values(groupedByAssessments)[_this.tab][0].assessment
+        let assessment_days = utils.daysBetween(assessment.assessment_period_start, assessment.assessment_period_end)
+
+        let days_factor = 1
+        if(this.period_model === "annual") days_factor = 365
+        else if(this.period_model === "assessment") days_factor = assessment_days
+
+        let layer_table = {
+          header: [{text: "Layer", value: "layer", sortable: false}],
+          value: []
+        }
+
+        for (const industryAux of Object.values(groupedByAssessments)[_this.tab]) {
+          let industry = industryAux.industry
+          layer_table.header.push({text: industry.name, value: industry.name})
+        }
+        layer_table.header.push({text: "Unit", value: "unit"})
+
+        for (let [layer_name, info] of selected_layers_formatted) {
+          let current_layer = {layer: layer_name}
+          let future_layer = {layer: layer_name + " (BAU 2030)"}
+          for (const industryAux of Object.values(groupedByAssessments)[_this.tab]) {
+            let industry = industryAux.industry
+            let lat = industry.location.lat
+            let lng = industry.location.lng
+
+            //Baseline
+            let baseline_data = await info.layers.baseline.annual.layer["data_on_point"](lat, lng)
+            current_layer[industry.name] = baseline_data.toExponential(3)
+
+            if (info.future && this.include_future) {
+              let future_data = await info.layers.future.layer["data_on_point"](lat, lng)
+              future_layer[industry.name] = future_data.toExponential(3)
+            }
+
+          }
+          current_layer["unit"] = (info.layers.baseline.annual.layer["unit"]())
+          layer_table.value.push(current_layer)
+
+          if(info.future && this.include_future){
+            future_layer["unit"] = (info.layers.future.layer["unit"]())
+            layer_table.value.push(future_layer)
+
+            //layers_description.table.body.push(future_layer)
+
+          }
+
+          //layer_table.value.push(current_layer)
+        }
+        return layer_table
+      }
+      else return {header: [], value: []}
+
+
+    },
 
     add_identifier: function (category, id){
       let _this = this
@@ -534,9 +810,6 @@ export default {
 
 
 
-
-
-
         /*if(Number.isFinite(dbo_value)){
           dbo_in_river.push(dbo_value.toExponential(3)*this.bod_to_cod)
         }else{
@@ -746,8 +1019,9 @@ export default {
 
       }
 
-      this.$refs.make_pdf.make_pdf(pdfMake.createPdf(dd))
+      //this.$refs.make_pdf.make_pdf(pdfMake.createPdf(dd))
       this.generating_pdf = false
+      pdfMake.createPdf(dd).download();
 
     },
 
@@ -783,59 +1057,8 @@ export default {
 
   },
 
-  asyncComputed: {
-    async layers_table(){
-
-      let selected_layers_formatted = this.selected_layers.map(function (layer) {
-        return [layer.name, layer.layer]
-      })
-
-      const groupedByAssessments = _.groupBy(this.selected_industries, function(n) {
-        return n.assessment.name;
-      });
-
-      let _this = this
-
-      if(_this.tab !== undefined && _this.tab !== null){
-
-        let assessment = Object.values(groupedByAssessments)[_this.tab][0].assessment
-        let assessment_days = utils.daysBetween(assessment.assessment_period_start, assessment.assessment_period_end)
-
-        let days_factor = 1
-        if(this.period_model === "annual") days_factor = 365
-        else if(this.period_model === "assessment") days_factor = assessment_days
-
-        let layer_table = {
-          header: [{text: "Layer", value: "layer", sortable: false}],
-          value: []
-        }
-
-        for (let [layer_name, info] of selected_layers_formatted) {
-          let current_layer = {layer: layer_name}
-          let future_layer = [layer_name + " (BAU 2030)"]
-          for (const industryAux of Object.values(groupedByAssessments)[_this.tab]) {
-            let industry = industryAux.industry
-            let lat = industry.location.lat
-            let lng = industry.location.lng
-
-            layer_table.header.push({text: industry.name, value: industry.name})
-
-            //Baseline
-            let baseline_data = await info.layers.baseline.annual.layer["data_on_point"](lat, lng)
-            current_layer[industry.name] = baseline_data.toExponential(3)
-          }
-          layer_table.value.push(current_layer)
-          console.log(layer_table)
-        }
-        return layer_table
-      }
-      else return {header: [], value: []}
-
-
-    },
-
-  },
   computed: {
+
     emissions_table() {
 
       let _this = this
@@ -966,7 +1189,6 @@ export default {
     layer_tree: function () {
       let _this = this
       let id = 1
-      console.log(this.layers)
       this.layers.forEach(category => {
         id = _this.add_identifier(category, id)  //id has the new id to add
       })
@@ -1016,9 +1238,48 @@ export default {
 </script>
 
 <style scoped>
+
+.outer{
+  overflow: hidden;
+}
+
 .center {
   margin: auto;
-
   padding: 10px;
 }
+
+.table_descriptor{
+  margin-bottom: 10px;
+  margin-top: 10px;
+}
+
+.report {
+  height: 100%;
+  margin-bottom: 50px;
+}
+.v-tabs-items {
+  padding: 20px;
+  overflow-y:scroll !important;
+  height: 100%;
+}
+
+.border_report{
+  border-style: solid;
+  border-color: #1C195B;
+}
+
+.menu{
+  border-left: 3px solid #1C195B;
+  overflow-y:scroll !important;
+  height: 100%;
+}
+
+.v-tab.v-tab--active{
+  background-color: #1C195B;
+  color: #F2F4F3
+}
+
+
+
+
 </style>

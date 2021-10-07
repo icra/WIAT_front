@@ -1634,51 +1634,51 @@ export default {
   computed: {
     ind_bod_effl(){
       if(this.industry_type === "food"){  //noves categories
-        return 336.2591324200910
+        return 336.2591324200910/2.4
       }else if(this.industry_type === "beverages"){  //noves categories
-        return 231.09062980030700
+        return 231.09062980030700/2.4
       }else if(this.industry_type === "textiles"){  //noves categories
-        return 410.09920634920627
+        return 410.09920634920627/2.4
       }else if(this.industry_type === "wearing"){  //noves categories
-        return 40
+        return 40/2.4
       }else if(this.industry_type === "leather"){  //noves categories
         return null
       }else if(this.industry_type === "wood"){  //noves categories
-        return 33.333333333333336
+        return 33.333333333333336/2.4
       }else if(this.industry_type === "paper"){  //noves categories
-        return 366.27272727272725
+        return 366.27272727272725/2.4
       }else if(this.industry_type === "printing"){  //noves categories
-        return 750
+        return 750/2.4
       }else if(this.industry_type === "coke"){  //noves categories
-        return 300
+        return 300/2.4
       }else if(this.industry_type === "chemicals"){  //noves categories
-        return 598.8096590909091
+        return 598.8096590909091/2.4
       }else if(this.industry_type === "pharmaceutical"){  //noves categories
-        return 559.8717948717948
+        return 559.8717948717948/2.4
       }else if(this.industry_type === "rubber"){  //noves categories
-        return 603.1034482758621
+        return 603.1034482758621/2.4
       }else if(this.industry_type === "mineral"){  //noves categories
-        return 59.03846153846154
+        return 59.03846153846154/2.4
       }else if(this.industry_type === "metals"){  //noves categories
-        return 586.5384615384615
+        return 586.5384615384615/2.4
       }else if(this.industry_type === "fabricated_metals"){  //noves categories
-        return 641.4117647058823
+        return 641.4117647058823/2.4
       }else if(this.industry_type === "computer"){  //noves categories
-        return 33.333333333333336
+        return 33.333333333333336/2.4
       }else if(this.industry_type === "electrical"){  //noves categories
-        return 86.66666666666667
+        return 86.66666666666667/2.4
       }else if(this.industry_type === "machinery"){  //noves categories
-        return 328.75
+        return 328.75/2.4
       }else if(this.industry_type === "vehicles"){  //noves categories
-        return 563.1578947368421
+        return 563.1578947368421/2.4
       }else if(this.industry_type === "transport"){  //noves categories
         return null
       }else if(this.industry_type === "furniture"){  //noves categories
-        return 35
+        return 35/2.4
       }else if(this.industry_type === "other_manufacturing"){  //noves categories
-        return 35
+        return 35/2.4
       }else if(this.industry_type === "repair"){  //noves categories
-        return 40
+        return 40/2.4
       }else return null
     },
     ind_tn_effl(){

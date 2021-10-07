@@ -2,7 +2,8 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import vuetify from './plugins/vuetify'
-import AsyncComputed from 'vue-async-computed'
+
+
 Vue.config.productionTip = false
 
 import "@/assets/global.css"
@@ -433,7 +434,6 @@ Vue.prototype.$layers_description = [
   },
 ]
 
-//Vue.use(AsyncComputed)
 
 new Vue({
   router,
