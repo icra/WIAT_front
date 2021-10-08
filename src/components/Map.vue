@@ -12,7 +12,7 @@
       <div v-if="selected_layer !== null">
         <div class="box legend">
           <div>
-            <b>{{ selected_layer }}</b> <v-icon style="float: right;" @click="delete_layer(selected_layer, baseline_future_model, annual_monthly_model, months_model); $emit('closeLayer')">mdi-layers-remove</v-icon>
+            <b>{{ selected_layer }}</b> <v-icon style="float: right;" @click="$emit('closeLayer')">mdi-layers-remove</v-icon>
           </div>
           <div v-html="html_legend"></div>
 
@@ -740,11 +740,23 @@ export default {
       }
 
       obj["get_label_on_coord"] = async function(lat, lng){
-        return await data_on_point(lat, lng)
+        let value =  await data_on_point(lat, lng)
+        if(value == undefined) return "No data"
+        else return value
       }
 
       obj["data_on_point"] = async function(lat, lng){
         return await data_on_point(lat, lng)
+      }
+
+      obj["data_for_report"] = async function(lat, lng){
+        let value =  await data_on_point(lat, lng)
+        if(value == undefined) return "No data"
+        else return value
+      }
+
+      obj["unit"] = function(){
+        return "-"
       }
       return obj
     },
@@ -793,8 +805,9 @@ export default {
               return resp.json()
             }).then((response) => {
               // we get the data from the request response
-              if(response.rows[0] === undefined) return undefined
-              return response.rows[0][label]*unit_scale_factor
+              if(response.rows[0] == undefined) return noData
+              else if (response.rows[0] == noData) return noData
+              else return response.rows[0][label]*unit_scale_factor
             })
             .catch(function (error) {
               // check if the request is returning an error
@@ -804,6 +817,17 @@ export default {
 
       obj["data_on_point"] = async function(lat, lng){
         return await data_on_point(lat, lng)
+      }
+
+      obj["data_for_report"] = async function(lat, lng){
+        let data = await data_on_point(lat, lng)
+        if(data !== undefined){
+          if(data !== noData) {
+            if (units !== "%") return data.toExponential(3)
+            else return +data.toFixed(3).toString()
+          }
+          else return "No data"
+        }else return "No data"
       }
 
       async function label_on_point(lat, lng){
@@ -874,6 +898,25 @@ export default {
         return await data_on_point(lat, lng)
       }
 
+      obj["data_for_report"] = async function(lat, lng){
+        let value = await data_on_point(lat, lng)
+        let value_string = ""
+        let value_number = Number.parseFloat(value)
+        if(value_number === NaN) value_string = value
+        else {
+          if (value_number < 0) value_string = "No data"
+
+          else {
+            if(units !== "%") {
+              value_string = value_number.toExponential(3)
+            } else {
+              value_string = +value_number.toFixed(3).toString()
+            }
+          }
+
+        }
+        return value_string
+      }
       async function data_on_point(lat, lng){
         let value = await _this.get_raster_data(lat, lng, geotiff_file_data)*scale
         return value
@@ -959,7 +1002,10 @@ export default {
       return axios
           .get(call)
           .then(response => {
-            return response.data.test[0]["0"]
+            if(response) {
+              if(response.data.test[0]["0"]) return response.data.test[0]["0"]
+              else return -9999999999
+            }else return -999999999
           })
 
     },
@@ -1861,7 +1907,10 @@ export default {
         }
       `
       //this.layers["Coastal Pharmaceutical Pollution"].layers.baseline.annual.layer = this.define_carto_layer(coastal_pollution_dataset, coastal_pollution_style, "dn", own_client, "jsalo")
-      this.layers["Coastal Pharmaceutical Pollution"].layers.baseline.annual.layer = this.define_carto_layer_v2(coastal_pollution_dataset, coastal_pollution_style, "dn", own_client, "jsalo", water_demand_colors, water_demand_labels, -9999, 1000, " mm/yr")
+      let color_legend_coastal_Pharmaceutical_Pollution = [' #02b5fd', '#34d10e', '#f8ee04', '#fe0000', ' #000000' ]
+      let label_legend_coastal_Pharmaceutical_Pollution = ["<10 g/km*year", "10-50 g/km*year", "50-1000 g/km*year", "1000-100000 g/km*year",">100000 g/km*year"]
+
+      this.layers["Coastal Pharmaceutical Pollution"].layers.baseline.annual.layer = this.define_carto_layer_v2(coastal_pollution_dataset, coastal_pollution_style, "dn", own_client, "jsalo", color_legend_coastal_Pharmaceutical_Pollution, label_legend_coastal_Pharmaceutical_Pollution, -10000000, 1, " g/km*year")
 
 
     },

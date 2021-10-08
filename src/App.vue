@@ -454,9 +454,9 @@
                       return-object
                       open-on-click
                       color="#1C195B"
-                      selected-color="#1C195B"
                       clear-icon="mdi-close-circle-outline"
                       :search="search_layer_model"
+                      :active.sync = "actived_layers"
                       @update:active="layerTreeSelected"
                   >
                     <template v-slot:append="{ item }">
@@ -569,7 +569,8 @@ export default {
       start_date_model_assessment: (new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).toISOString().substr(0, 10),
       start_date_modal: false,
       end_date_model_assessment: new Date(new Date().setFullYear((new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).getFullYear() + 1)).toISOString().substr(0, 10),
-      end_date_modal: false
+      end_date_modal: false,
+      actived_layers: []
 
     }
   },
@@ -599,7 +600,6 @@ export default {
     },*/
 
     layerTreeSelected(nodeLayer){
-
       if(nodeLayer.length > 0) this.applyLayer(nodeLayer[0].name)
       else this.applyLayer(this.selected_layer)
 
@@ -624,10 +624,17 @@ export default {
       this.icon_selected = index;
       if (this.icon_selected !== 0 && this.right_sidebar_content === 6) this.rightMenu=false  //Close layer selection menu if map is not active
     },
+
     applyLayer(key){  //Selected layer to apply
-      if (this.selected_layer === key) this.selected_layer = null
-      else this.selected_layer = key
+      if (this.selected_layer === key){
+        this.actived_layers.splice(0,this.actived_layers.length)
+        this.selected_layer = null
+      }
+      else {
+        this.selected_layer = key
+      }
     },
+
     update_markers(){
       let _this = this
       this.$location_markers.splice(0,this.$location_markers.length)
