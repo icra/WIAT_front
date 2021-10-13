@@ -73,6 +73,8 @@ export class Industry{
         this.industry_type = null
         this.bod_effl_concentration = 0
         this.tn_effl_concentration = 0
+        this.tp_effl_concentration = 0
+
         this.volume_used = 0
 
         //Priority pollutants
@@ -131,13 +133,16 @@ export class Direct_discharge{
 
     static get_estimations(){
         return {
-            wwt_bod_effl_to_wb(substage){
+            /*wwt_bod_effl_to_wb(substage){
                 return substage.wwt_bod_infl
             },
 
             wwt_tn_effl_to_wb(substage){
                 return substage.wwt_tn_infl
             },
+            wwt_tp_effl_to_wb(substage){
+                return substage.wwt_tp_infl
+            },*/
 
         }
     }
@@ -146,6 +151,7 @@ export class Direct_discharge{
         let _this = this
         this.industry_type = null
         this.wwt_tn_effl_to_wb = 0
+        this.wwt_tp_effl_to_wb = 0
         this.wwt_bod_effl_to_wb = 0
         this.wwt_diclo_effl_to_wb = 0 //1,2-Dichloroethane
         this.wwt_cadmium_effl_to_wb = 0 //Cadmium
@@ -1078,6 +1084,14 @@ export class Industrial_wwtp extends WWTP{
                 estimation_equation: true
             },  //kgN   TAULA 6.10c
 
+            "wwt_tp_effl_to_wb": {
+                question: "Effluent Total Phosphorus concentration of the WWTP",
+                value: 0,
+                unit: "g/m3",
+                estimation_equation: true
+            },  //kgN   TAULA 6.10c
+
+
             //Priority pollutants
             "wwt_diclo_effl_to_wb": {
                 question: "Effluent 1,2-Dichloroethane concentration of the WWTP",
@@ -1238,6 +1252,7 @@ export class Industrial_wwtp extends WWTP{
 
         this.wwt_bod_infl = 0
         this.wwt_tn_infl = 0
+        this.wwt_tp_infl = 0
         this.wwt_diclo_infl = 0 //1,2-Dichloroethane
         this.wwt_cadmium_infl = 0 //Cadmium
         this.wwt_hexaclorobenzene_infl = 0 //Hexachlorobenzene
@@ -1285,6 +1300,9 @@ export class Industrial_wwtp extends WWTP{
             },
             wwt_tn_effl_to_wb(substage){
                 return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type].N_effl*substage.wwt_tn_infl
+            },
+            wwt_tp_effl_to_wb(substage){
+                return null
             },
             //Priority pollutants
             wwt_diclo_effl_to_wb(substage) {
@@ -1475,6 +1493,7 @@ export class Industrial_wwtp_offsite extends Industrial_wwtp{
         this.vol_infl_wwtp = 0
         this.bod_infl_wwtp = 0
         this.tn_infl_wwtp = 0
+        this.tp_infl_wwtp = 0
         this.diclo_infl_wwtp = 0 //1,2-Dichloroethane
         this.cadmium_infl_wwtp = 0 //Cadmium
         this.hexaclorobenzene_infl_wwtp = 0 //Hexachlorobenzene
@@ -1530,8 +1549,9 @@ export class Industrial_wwtp_offsite extends Industrial_wwtp{
             wwt_tn_effl_to_wb(substage){
                 return this.wwt_concentration_effl_to_wb(substage, "tn_infl_wwtp", "wwt_tn_infl", "N_effl")
             },
-
-
+            wwt_tp_effl_to_wb(substage){
+                return null
+            },
             wwt_diclo_effl_to_wb(substage){
                 return this.wwt_concentration_effl_to_wb(substage, "diclo_infl_wwtp", "wwt_diclo_infl", "diclo_effl")
             },
@@ -1638,6 +1658,14 @@ export class Domestic_wwtp extends WWTP{
                 estimation_equation: true
 
             },  //kgN   TAULA 6.10c
+
+            "wwt_tp_effl_to_wb": {
+                question: "Effluent Total Phosphorus concentration leaving the WWTP to water body",
+                value: 0,
+                unit: "g/m3",
+                estimation_equation: true
+
+            },
             //Priority pollutants
             "wwt_diclo_effl_to_wb": {
                 question: "Effluent 1,2-Dichloroethane concentration of the WWTP",
@@ -1808,6 +1836,7 @@ export class Domestic_wwtp extends WWTP{
         this.vol_infl_wwtp = 0
         this.bod_infl_wwtp = 0
         this.tn_infl_wwtp = 0
+        this.tp_infl_wwtp = 0
         this.diclo_infl_wwtp = 0 //1,2-Dichloroethane
         this.cadmium_infl_wwtp = 0 //Cadmium
         this.hexaclorobenzene_infl_wwtp = 0 //Hexachlorobenzene
@@ -1823,6 +1852,7 @@ export class Domestic_wwtp extends WWTP{
         //Water received from industry
         this.wwt_bod_infl = 0
         this.wwt_tn_infl = 0
+        this.wwt_tp_infl = 0
         this.wwt_diclo_infl = 0 //1,2-Dichloroethane
         this.wwt_cadmium_infl = 0 //Cadmium
         this.wwt_hexaclorobenzene_infl = 0 //Hexachlorobenzene
@@ -1879,7 +1909,9 @@ export class Domestic_wwtp extends WWTP{
             wwt_tn_effl_to_wb(substage){
                 return this.wwt_concentration_effl_to_wb(substage, "tn_infl_wwtp", "wwt_tn_infl", "N_effl")
             },
-
+            wwt_tp_effl_to_wb(substage){
+                return null
+            },
 
             wwt_diclo_effl_to_wb(substage){
                 return this.wwt_concentration_effl_to_wb(substage, "diclo_infl_wwtp", "wwt_diclo_infl", "diclo_effl")

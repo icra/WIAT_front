@@ -308,6 +308,43 @@
             </v-col>
 
           </v-row>
+          <v-row style="background-color: #F2F4F3" align="center">
+            <v-col cols="8" >
+              <div style="width: 100%;">
+                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                      <span>
+                        Total Phosphorus concentration in the industry effluent
+                      </span>
+
+
+
+                  <v-btn v-if="ind_tp_effl != null"
+                         outlined
+                         x-small
+                         @click="ind_tp_effl_concentration = parseFloat(ind_tp_effl)"
+                  >
+                    Estimation: {{parseFloat(ind_tp_effl).toExponential(2)}} g/m3
+                  </v-btn>
+
+                </div>
+              </div>
+            </v-col>
+            <v-col cols="4">
+              <div>
+                <div>
+                  <v-text-field
+                      v-model="ind_tp_effl_concentration"
+                      suffix="g/m3"
+                      type="number"
+                  ></v-text-field>
+
+                </div>
+              </div>
+
+            </v-col>
+
+          </v-row>
+
           <!-- Priority pollutants -->
           <v-row style="background-color: #F2F4F3" align="center">
             <v-col cols="8" >
@@ -712,7 +749,7 @@
           </v-btn>
         </v-stepper-content>  <!-- Industry -->
 
-        <v-stepper-content step="2">
+        <v-stepper-content step="2" >
           <v-row>
             <v-col cols="12">
               <v-img
@@ -926,7 +963,7 @@
 
         </v-stepper-content>  <!-- Onsite WWTP -->
 
-        <v-stepper-content step="3">
+        <v-stepper-content step="3" >
 
           <v-row>
             <v-col cols="12">
@@ -1038,7 +1075,7 @@
 
         </v-stepper-content>  <!-- Direct discharge -->
 
-        <v-stepper-content step="4">
+        <v-stepper-content step="4" >
           <v-row>
             <v-col cols="12">
               <v-img
@@ -1319,6 +1356,7 @@ export default {
       wwtp_aux_inputs: {},
       has_direct_discharge: defaultIndustry.has_direct_discharge,
       ind_tn_effl_concentration: defaultIndustry.tn_effl_concentration,
+      ind_tp_effl_concentration: defaultIndustry.tp_effl_concentration,
       ind_bod_effl_concentration: defaultIndustry.bod_effl_concentration,
       volume_used: defaultIndustry.volume_used,
 
@@ -1439,8 +1477,33 @@ export default {
     },
   },
   methods: {
+    //this.industry.onsite_wwtp = new Industrial_wwtp_onsite_external_domestic(
+    copy_wwtp(old_wwtp,  new_wwtp){
+
+      if(old_wwtp != null){
+        for (let key of Object.keys(new_wwtp)){
+          if(typeof new_wwtp[key] !== "function" && old_wwtp.hasOwnProperty(key)) new_wwtp[key] = old_wwtp[key]
+        }
+        if(old_wwtp.constructor.name == "Domestic" && new_wwtp.constructor.name == "Industrial_wwtp_offsite"){
+          new_wwtp.bod_infl_wwtp = new_wwtp.bod_infl_wwtp/this.cod_to_bod
+          new_wwtp.wwt_bod_effl_to_wb = new_wwtp.wwt_bod_effl_to_wb/this.cod_to_bod
+          new_wwtp.wwt_bod_infl = new_wwtp.wwt_bod_infl/this.cod_to_bod
+        }else if(old_wwtp.constructor.name == "Industrial_wwtp_offsite" && new_wwtp.constructor.name == "Domestic"){
+          new_wwtp.bod_infl_wwtp = new_wwtp.bod_infl_wwtp*this.cod_to_bod
+          new_wwtp.wwt_bod_effl_to_wb = new_wwtp.wwt_bod_effl_to_wb*this.cod_to_bod
+          new_wwtp.wwt_bod_infl = new_wwtp.wwt_bod_infl*this.cod_to_bod
+        }
+      }
+
+      return new_wwtp
+    },
 
     tab_4_continue(){
+      document.getElementsByClassName('outer').forEach(div => {
+        div.scrollTo(0, 0)
+      })
+
+
       for (let [key, value] of Object.entries(this.wwtp_aux_inputs)){
         if(Number(value) != NaN && typeof this.industry.offsite_wwtp[key] !== "function") this.industry.offsite_wwtp[key] = Number(value)
       }
@@ -1449,6 +1512,9 @@ export default {
 
 
     tab_3_continue(){
+      document.getElementsByClassName('outer').forEach(div => {
+        div.scrollTo(0, 0)
+      })
       for (let [key, value] of Object.entries(this.wwtp_aux_inputs)){
         if(Number(value) != NaN && typeof this.industry.direct_discharge[key] !== "function") this.industry.direct_discharge[key] = Number(value)
       }
@@ -1460,14 +1526,17 @@ export default {
     },
 
     tab_2_continue(){
+      document.getElementsByClassName('outer').forEach(div => {
+        div.scrollTo(0, 0)
+      })
       for (let [key, value] of Object.entries(this.wwtp_aux_inputs)){
         if(Number(value) != NaN && typeof this.industry.onsite_wwtp[key] !== "function") this.industry.onsite_wwtp[key] = Number(value)
       }
 
-
       if(this.has_offsite_wwtp){
         this.industry.offsite_wwtp.vol_infl_wwtp = this.industry.onsite_wwtp.wwt_vol_treated_external
         this.industry.offsite_wwtp.tn_infl_wwtp = this.industry.onsite_wwtp.wwt_tn_effl_to_wb
+        this.industry.offsite_wwtp.tp_infl_wwtp = this.industry.onsite_wwtp.wwt_tp_effl_to_wb
         this.industry.offsite_wwtp.diclo_infl_wwtp = this.industry.onsite_wwtp.wwt_diclo_effl_to_wb //1,2-Dichloroethane
         this.industry.offsite_wwtp.cadmium_infl_wwtp = this.industry.onsite_wwtp.wwt_cadmium_effl_to_wb //Cadmium
         this.industry.offsite_wwtp.hexaclorobenzene_infl_wwtp = this.industry.onsite_wwtp.wwt_hexaclorobenzene_effl_to_wb //Hexachlorobenzene
@@ -1493,7 +1562,10 @@ export default {
     },
 
     tab_1_continue(){
-
+      document.getElementsByClassName('outer').forEach(div => {
+        console.log(div)
+        div.scrollTo(0, 0)
+      })
       this.industry.volume_withdrawn = this.water_withdrawn
       this.industry.has_onsite_wwtp = this.has_onsite_wwtp
       this.industry.has_offsite_wwtp = this.has_offsite_wwtp
@@ -1501,6 +1573,7 @@ export default {
       this.industry.has_direct_discharge = this.has_direct_discharge
       this.industry.industry_type = this.industry_type
       this.industry.tn_effl_concentration = this.ind_tn_effl_concentration
+      this.industry.tp_effl_concentration = this.ind_tp_effl_concentration
       this.industry.bod_effl_concentration = this.ind_bod_effl_concentration
       this.industry.volume_used = this.volume_used
       this.industry.diclo_effl = this.diclo_effl //1,2-Dichloroethane
@@ -1521,20 +1594,24 @@ export default {
       if(this.has_onsite_wwtp){
         if(this.has_offsite_wwtp){
           if(this.offsite_wwtp_type === "Domestic"){
-            if(this.industry.onsite_wwtp === null || this.industry.onsite_wwtp.constructor.name !== "Industrial_wwtp_onsite_external_domestic") this.industry.onsite_wwtp = new Industrial_wwtp_onsite_external_domestic()
-          }else{  //Industrial
+            //if(this.industry.onsite_wwtp === null || this.industry.onsite_wwtp.constructor.name !== "Industrial_wwtp_onsite_external_domestic") this.industry.onsite_wwtp = new Industrial_wwtp_onsite_external_domestic()
+            if(this.industry.onsite_wwtp === null || this.industry.onsite_wwtp.constructor.name !== "Industrial_wwtp_onsite_external_domestic") this.industry.onsite_wwtp = this.copy_wwtp(this.industry.onsite_wwtp,  new Industrial_wwtp_onsite_external_domestic())
+
+
+            }else{  //Industrial
             if(this.industry.onsite_wwtp === null || this.industry.onsite_wwtp.constructor.name !== "Industrial_wwtp_onsite_external_industrial") {
-              this.industry.onsite_wwtp = new Industrial_wwtp_onsite_external_industrial()
+              this.industry.onsite_wwtp = this.copy_wwtp(this.industry.onsite_wwtp,  new Industrial_wwtp_onsite_external_industrial())
             }
           }
         }else{
           if(this.industry.onsite_wwtp === null || this.industry.onsite_wwtp.constructor.name !== "Industrial_wwtp_onsite") {
-            this.industry.onsite_wwtp = new Industrial_wwtp_onsite()
+            this.industry.onsite_wwtp = this.copy_wwtp(this.industry.onsite_wwtp,  new Industrial_wwtp_onsite())
           }
         }
         this.industry.onsite_wwtp.industry_type = this.industry.industry_type
         this.industry.onsite_wwtp.wwt_bod_infl = this.industry.bod_effl_concentration
         this.industry.onsite_wwtp.wwt_tn_infl = this.industry.tn_effl_concentration
+        this.industry.onsite_wwtp.wwt_tp_infl = this.industry.tp_effl_concentration
         this.industry.onsite_wwtp.wwt_diclo_infl = this.industry.diclo_effl //1,2-Dichloroethane
         this.industry.onsite_wwtp.wwt_cadmium_infl = this.industry.cadmium_effl //Cadmium
         this.industry.onsite_wwtp.wwt_hexaclorobenzene_infl = this.industry.hexaclorobenzene_effl //Hexachlorobenzene
@@ -1552,11 +1629,12 @@ export default {
       //Direct discharge
       if(this.has_direct_discharge){
         if(this.industry.direct_discharge === null) {
-          this.industry.direct_discharge = new Direct_discharge()
+          this.industry.direct_discharge = this.copy_wwtp(this.industry.direct_discharge,  new Direct_discharge())
         }
         this.industry.direct_discharge.industry_type = this.industry.industry_type
         this.industry.direct_discharge.wwt_bod_effl_to_wb = this.industry.bod_effl_concentration
         this.industry.direct_discharge.wwt_tn_effl_to_wb = this.industry.tn_effl_concentration
+        this.industry.direct_discharge.wwt_tp_effl_to_wb = this.industry.tp_effl_concentration
         this.industry.direct_discharge.wwt_diclo_effl_to_wb = this.industry.diclo_effl //1,2-Dichloroethane
         this.industry.direct_discharge.wwt_cadmium_effl_to_wb = this.industry.cadmium_effl //Cadmium
         this.industry.direct_discharge.wwt_hexaclorobenzene_effl_to_wb = this.industry.hexaclorobenzene_effl //Hexachlorobenzene
@@ -1574,14 +1652,19 @@ export default {
       //Offsite wwtp
       if(this.has_offsite_wwtp){
         if(this.offsite_wwtp_type == "Industrial"){
-          if(this.industry.offsite_wwtp === null || this.industry.offsite_wwtp.constructor.name !== "Industrial_wwtp_offsite") this.industry.offsite_wwtp = new Industrial_wwtp_offsite()
+          if(this.industry.offsite_wwtp === null || this.industry.offsite_wwtp.constructor.name !== "Industrial_wwtp_offsite") {
+            this.industry.offsite_wwtp = this.copy_wwtp(this.industry.offsite_wwtp,  new Industrial_wwtp_offsite())
+          }
           this.industry.offsite_wwtp.wwt_bod_infl = this.industry.bod_effl_concentration
         }else {
-          if(this.industry.offsite_wwtp === null || this.industry.offsite_wwtp.constructor.name !== "Domestic_wwtp") this.industry.offsite_wwtp = new Domestic_wwtp()
+          if(this.industry.offsite_wwtp === null || this.industry.offsite_wwtp.constructor.name !== "Domestic_wwtp") {
+            this.industry.offsite_wwtp = this.copy_wwtp(this.industry.offsite_wwtp,  new Domestic_wwtp())
+          }
           this.industry.offsite_wwtp.wwt_bod_infl = this.industry.bod_effl_concentration*this.cod_to_bod
         }
         this.industry.offsite_wwtp.industry_type = this.industry.industry_type
         this.industry.offsite_wwtp.wwt_tn_infl = this.industry.tn_effl_concentration
+        this.industry.offsite_wwtp.wwt_tp_infl = this.industry.tp_effl_concentration
         this.industry.offsite_wwtp.wwt_diclo_infl = this.industry.diclo_effl //1,2-Dichloroethane
         this.industry.offsite_wwtp.wwt_cadmium_infl = this.industry.cadmium_effl //Cadmium
         this.industry.offsite_wwtp.wwt_hexaclorobenzene_infl = this.industry.hexaclorobenzene_effl //Hexachlorobenzene
@@ -1594,6 +1677,23 @@ export default {
         this.industry.offsite_wwtp.wwt_tetracloroetile_infl = this.industry.tetracloroetile_effl //tetrachloroethene
         this.industry.offsite_wwtp.wwt_tricloroetile_infl = this.industry.tricloroetile_effl //Trichloroethylene
 
+        if(!this.has_onsite_wwtp){
+          this.industry.offsite_wwtp.vol_infl_wwtp = 0
+          this.industry.offsite_wwtp.bod_infl_wwtp = 0
+          this.industry.offsite_wwtp.tn_infl_wwtp = 0
+          this.industry.offsite_wwtp.tp_infl_wwtp = 0
+          this.industry.offsite_wwtp.diclo_infl_wwtp = 0 //1,2-Dichloroethane
+          this.industry.offsite_wwtp.cadmium_infl_wwtp = 0 //Cadmium
+          this.industry.offsite_wwtp.hexaclorobenzene_infl_wwtp = 0 //Hexachlorobenzene
+          this.industry.offsite_wwtp.mercury_infl_wwtp = 0 //mercury
+          this.industry.offsite_wwtp.plomo_infl_wwtp = 0 //lead
+          this.industry.offsite_wwtp.niquel_infl_wwtp = 0 //nickel
+          this.industry.offsite_wwtp.chloro_infl_wwtp = 0 //chloroalkanes
+          this.industry.offsite_wwtp.hexaclorobutadie_infl_wwtp = 0 //Hexachlorobutadiene
+          this.industry.offsite_wwtp.nonilfenols_infl_wwtp = 0 //Nonylphenols
+          this.industry.offsite_wwtp.tetracloroetile_infl_wwtp = 0 //tetrachloroethene
+          this.industry.offsite_wwtp.tricloroetile_infl_wwtp = 0 //Trichloroethylene
+        }
       }
 
       if(!this.has_onsite_wwtp){
@@ -1730,6 +1830,56 @@ export default {
         return  null
       }else return null
     },
+    ind_tp_effl(){
+      if(this.industry_type === "food"){  //noves categories
+        return 26.10771604938271
+      }else if(this.industry_type === "beverages"){  //noves categories
+        return  20.452873563218382
+      }else if(this.industry_type === "textiles"){  //noves categories
+        return  32.58536585365854
+      }else if(this.industry_type === "wearing"){  //noves categories
+        return  10
+      }else if(this.industry_type === "leather"){  //noves categories
+        return null
+      }else if(this.industry_type === "wood"){  //noves categories
+        return  10
+      }else if(this.industry_type === "paper"){  //noves categories
+        return  27.528301886792452
+      }else if(this.industry_type === "printing"){  //noves categories
+        return 40.19230769230769
+      }else if(this.industry_type === "coke"){  //noves categories
+        return  30
+      }else if(this.industry_type === "chemicals"){  //noves categories
+        return  39.810956790123456
+      }else if(this.industry_type === "pharmaceutical"){  //noves categories
+        return  35.96774193548387
+      }else if(this.industry_type === "rubber"){  //noves categories
+        return  35.0032786885246
+      }else if(this.industry_type === "mineral"){  //noves categories
+        return 11.279069767441861
+      }else if(this.industry_type === "metals"){  //noves categories
+        return  10
+      }else if(this.industry_type === "fabricated_metals"){  //noves categories
+        return 40.870535714285715
+      }else if(this.industry_type === "computer"){  //noves categories
+        return  10
+      }else if(this.industry_type === "electrical"){  //noves categories
+        return  25.714285714285715
+      }else if(this.industry_type === "machinery"){  //noves categories
+        return  32.857142857142854
+      }else if(this.industry_type === "vehicles"){  //noves categories
+        return  39.25
+      }else if(this.industry_type === "transport"){  //noves categories
+        return null
+      }else if(this.industry_type === "furniture"){  //noves categories
+        return  10
+      }else if(this.industry_type === "other_manufacturing"){  //noves categories
+        return  38.75
+      }else if(this.industry_type === "repair"){  //noves categories
+        return  10
+      }else return null
+    },
+
     ind_diclo_effl(){
       if(this.industry_type === "food"){  //noves categories
         return null

@@ -266,6 +266,8 @@ export default {
 
 
         let tn = {value: "TN load discharged to the water body", unit: "g"}
+        let tp = {value: "TP load discharged to the water body", unit: "g"}
+
         let dilution_factor_row = {value: "Dilution factor", unit: "-"}
         let recycled_factor = {value: "Recycled water factor", unit: "-"}
         let dichloroethane = {value: "1,2-Dichloroethane load discharged to the water body", unit: "g"}
@@ -298,6 +300,12 @@ export default {
             tn[industry.name] = ((days_factor*metrics.tn_effl(industry)).toExponential(3))
           }else{
             tn[industry.name] = ("-")
+          }
+
+          if(Number.isFinite(metrics.tp_effl(industry))){
+            tp[industry.name] = ((days_factor*metrics.tp_effl(industry)).toExponential(3))
+          }else{
+            tp[industry.name] = ("-")
           }
 
           let dilution_factor_value = await metrics.dilution_factor(this.global_layers, industry, assessment_days)
@@ -388,6 +396,8 @@ export default {
 
         pollutants_table.value.push(bod)
         pollutants_table.value.push(tn)
+        pollutants_table.value.push(tp)
+
         pollutants_table.value.push(dichloroethane)
         pollutants_table.value.push(cadmium)
         pollutants_table.value.push(hexachlorobenzene)
@@ -695,6 +705,8 @@ export default {
       })
 
       let tn = ["TN load discharged to the water body"]
+      let tp = ["TP load discharged to the water body"]
+
       let bod = [""]
       let dilution_factor_row = ["Dilution factor"]
       let recycled_factor = ["Recycled water factor"]
@@ -729,7 +741,11 @@ export default {
         }else{
           tn.push("-")
         }
-
+        if(Number.isFinite(metrics.tp_effl(industry))){
+          tp.push((days_factor*metrics.tp_effl(industry)).toExponential(3))
+        }else{
+          tp.push("-")
+        }
         let dilution_factor_value = await metrics.dilution_factor(this.global_layers, industry, assessment_days)
         if(Number.isFinite(dilution_factor_value)){
           dilution_factor_row.push(dilution_factor_value.toExponential(3))
@@ -825,6 +841,8 @@ export default {
 
       bod.push("g")
       tn.push("g")
+      tp.push("g")
+
       dilution_factor_row.push("-")
       recycled_factor.push("-")
       dbo_in_river.push("g/m3")
@@ -844,7 +862,7 @@ export default {
       let emissions_table = {
         table: {
           body: [
-            body, bod, tn, dichloroethane, cadmium, hexachlorobenzene, mercury, lead, nickel, chloroalkanes, hexaclorobutadie, nonylphenols, tetrachloroethene, trichloroethylene, dilution_factor_row, recycled_factor
+            body, bod, tn, tp, dichloroethane, cadmium, hexachlorobenzene, mercury, lead, nickel, chloroalkanes, hexaclorobutadie, nonylphenols, tetrachloroethene, trichloroethylene, dilution_factor_row, recycled_factor
           ]
 
         }
