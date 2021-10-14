@@ -176,6 +176,7 @@ export default {
       new_industry.has_direct_discharge = industry.has_direct_discharge
       new_industry.industry_type = industry.industry_type
       new_industry.tn_effl_concentration = industry.tn_effl_concentration
+      new_industry.tp_effl_concentration = industry.tp_effl_concentration
       new_industry.bod_effl_concentration = industry.bod_effl_concentration
       new_industry.vol_used = industry.vol_used
 

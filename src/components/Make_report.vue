@@ -2,154 +2,164 @@
   <div class="outer">
     <h1>Report</h1>
     <div v-if="is_there_any_industry_created" style="height: 100%">
-      <br>
-      <v-row>
-        <v-col cols="9">
-          <v-tabs v-model="tab">
-            <v-tab
-                v-for="assessment_name in assessment_names"
-                :key="assessment_name"
-            >
-              {{assessment_name}}
-            </v-tab>
-          </v-tabs>
-        </v-col>
-      </v-row>
-      <v-row style="height: 85%" class = "border_report">
-        <v-col v-if="selected_industries.length === 0" cols="9" style="height: 100%">
-          Please, select at least an industry to make the report
+      <div style="height: 100%; padding-top: 10px">
+        <v-row>
+          <v-col cols="9">
+            <v-tabs v-model="tab">
+              <v-tab
+                  v-for="assessment_name in assessment_names"
+                  :key="assessment_name"
+              >
+                {{assessment_name}}
+              </v-tab>
+            </v-tabs>
+          </v-col>
+        </v-row>
+        <v-row style="height: 85%" class = "border_report">
+          <v-col v-if="selected_industries.length === 0" cols="9" style="height: 100%">
+            Please, select at least an industry to make the report
 
-        </v-col>
+          </v-col>
 
-        <v-col v-else cols="9" style="height: 100%">
-          <template class="report" >
+          <v-col v-else cols="9" style="height: 100%">
+            <template class="report" >
 
-            <div style="width: 100%; height: 90%">
-              <v-tabs-items v-model="tab">
-                <v-tab-item
-                    v-for="assessment_name in assessment_names"
-                    :key="assessment_name"
-                >
-                  <br>
-                  <v-card flat style="margin-left: 10px;">
-                    <div class = table_descriptor>
-                      <b > Global Warming Potential: </b>
-                    </div>
-                    <v-data-table
-                        :headers="emissions_table.header"
-                        :items="emissions_table.emissions"
-                        class="elevation-1"
-                    ></v-data-table>
-
-                    <div class = table_descriptor>
-                      <b> Quality and quantity indicators: </b>
-                    </div>
-                    <v-data-table
-                        :headers="pollutants_table.header"
-                        :items="pollutants_table.value"
-                        class="elevation-1"
-                    ></v-data-table>
-
-                    <div v-if="selected_layers.length > 0">
+              <div style="width: 100%; height: 100%">
+                <v-tabs-items v-model="tab">
+                  <v-tab-item
+                      v-for="assessment_name in assessment_names"
+                      :key="assessment_name"
+                  >
+                    <br>
+                    <v-card flat style="margin-left: 10px;">
                       <div class = table_descriptor>
-                        <b > Layers information: </b>
+                        <b > Global Warming Potential: </b>
                       </div>
                       <v-data-table
-                          :headers="layers_table.header"
-                          :items="layers_table.value"
+                          :headers="emissions_table.header"
+                          :items="emissions_table.emissions"
                           class="elevation-1"
                       ></v-data-table>
-                    </div>
 
-                  </v-card>
-                </v-tab-item>
-              </v-tabs-items>
-            </div>
+                      <div class = table_descriptor>
+                        <b> Quality and quantity indicators: </b>
+                      </div>
+                      <v-data-table
+                          :headers="pollutants_table.header"
+                          :items="pollutants_table.value"
+                          class="elevation-1"
+                      ></v-data-table>
+
+                      <div v-if="selected_layers.length > 0">
+                        <div class = table_descriptor>
+                          <b > Layers information: </b>
+                        </div>
+                        <v-data-table
+                            :headers="layers_table.header"
+                            :items="layers_table.value"
+                            class="elevation-1"
+                        ></v-data-table>
+                      </div>
+
+                    </v-card>
+                  </v-tab-item>
+                </v-tabs-items>
+              </div>
 
 
 
-          </template>
+            </template>
 
-        </v-col>
-        <v-col class="menu">
-          <p>Select the industries to include in the report.</p>
-          <v-treeview
-              :items="assessments_and_industries_tree"
-              dense
-              hoverable
-              selectable
-              selection-type="leaf"
-              return-object
-              v-model="selected_industries"
-              color="#1C195B"
-              selected-color="#1C195B"
-              open-on-click
-          ></v-treeview>
-          <p>Select the layers to include in the report.</p>
-          <v-treeview
-              :items="layer_tree"
-              dense
-              hoverable
-              selectable
-              selection-type="leaf"
-              return-object
-              v-model="selected_layers"
-              open-on-click
-              color="#1C195B"
-              selected-color="#1C195B"
-          >
-          </v-treeview>
-          <v-select
-              v-model="include_future"
-              :items="yes_no"
-              filled
-              label="Include 2030 BAU values in the report"
-          ></v-select>
-          <v-select
-              v-model="units_model"
-              :items="bod_cod"
-              filled
-              label="Select units"
-          ></v-select>
-          <v-select
-              v-model="period_model"
-              :items="daily_annual_assessment"
-              filled
-              label="Time period to express the results"
-          ></v-select>
-          <v-row>
-            <v-col>
-              <v-btn block @click="button_generate_pdf_clicked">
-                GENERATE PDF
-              </v-btn>
-            </v-col>
-          </v-row>
+          </v-col>
+          <v-col class="menu">
+            <p>Select the industries to include in the report.</p>
+            <v-treeview
+                :items="assessments_and_industries_tree"
+                dense
+                hoverable
+                selectable
+                selection-type="leaf"
+                return-object
+                v-model="selected_industries"
+                color="#1C195B"
+                selected-color="#1C195B"
+                open-on-click
+            ></v-treeview>
+            <p>Select the layers to include in the report.</p>
+            <v-treeview
+                :items="layer_tree"
+                dense
+                hoverable
+                selectable
+                selection-type="leaf"
+                return-object
+                v-model="selected_layers"
+                open-on-click
+                color="#1C195B"
+                selected-color="#1C195B"
+            >
+            </v-treeview>
+            <v-select
+                v-model="include_future"
+                :items="yes_no"
+                filled
+                label="Include 2030 BAU values in the report"
+            ></v-select>
+            <v-select
+                v-model="units_model"
+                :items="bod_cod"
+                filled
+                label="Select units"
+            ></v-select>
+            <v-select
+                v-model="period_model"
+                :items="daily_annual_assessment"
+                filled
+                label="Time period to express the results"
+            ></v-select>
+            <v-row>
+              <v-col>
+                <v-btn block @click="button_generate_pdf_clicked">
+                  GENERATE PDF
+                </v-btn>
+                <v-progress-linear
+                    indeterminate
+                    rounded
+                    height="6"
+                    v-show="generating_pdf"
+                    color="#1C195B"
 
-        </v-col>
-      </v-row>
+                ></v-progress-linear>
+              </v-col>
+            </v-row>
+
+          </v-col>
+        </v-row>
+
+      </div>
 
       <br>
+
+      <div>
+
+        <!--<PDFJSViewer class="center" v-show="selected_industries.length>0 && !generating_pdf" ref="make_pdf"/> -->
+
+      </div>
 
 
 
     </div>
     <div v-else>
       <p>Please, create an industry first to make a PDF report.</p>
-      <div style="background-color: red; width: 300px; height: 300px">
-
-      </div>
-
     </div>
 
 
-    {{pieChart_base64()}}
+    <!-- <canvas v-show="false" id="chart" width="300" height="150"> </canvas> -->
+
 
 
     <br>
-    <canvas v-show="true" id="chart" width="300" height="300" > </canvas>
   </div>
-
-
 </template>
 
 <script>
@@ -225,7 +235,12 @@ export default {
   methods: {
 
     async button_generate_pdf_clicked(){
-      if (this.selected_industries.length > 0) await this.generate_pdf()
+      if (this.selected_industries.length > 0) {
+        this.generating_pdf = true
+        await this.generate_pdf()
+        this.generating_pdf = false
+
+      }
     },
     async generate_pollutants_table() {
 
@@ -235,7 +250,7 @@ export default {
         return n.assessment.name;
       });
 
-      if(_this.tab !== undefined && _this.tab !== null){
+      if(_this.tab !== undefined && _this.tab !== null && Object.values(groupedByAssessments)[_this.tab] != undefined){
 
         let assessment = Object.values(groupedByAssessments)[_this.tab][0].assessment
         let assessment_days = utils.daysBetween(assessment.assessment_period_start, assessment.assessment_period_end)
@@ -251,6 +266,8 @@ export default {
 
 
         let tn = {value: "TN load discharged to the water body", unit: "g"}
+        let tp = {value: "TP load discharged to the water body", unit: "g"}
+
         let dilution_factor_row = {value: "Dilution factor", unit: "-"}
         let recycled_factor = {value: "Recycled water factor", unit: "-"}
         let dichloroethane = {value: "1,2-Dichloroethane load discharged to the water body", unit: "g"}
@@ -283,6 +300,12 @@ export default {
             tn[industry.name] = ((days_factor*metrics.tn_effl(industry)).toExponential(3))
           }else{
             tn[industry.name] = ("-")
+          }
+
+          if(Number.isFinite(metrics.tp_effl(industry))){
+            tp[industry.name] = ((days_factor*metrics.tp_effl(industry)).toExponential(3))
+          }else{
+            tp[industry.name] = ("-")
           }
 
           let dilution_factor_value = await metrics.dilution_factor(this.global_layers, industry, assessment_days)
@@ -373,6 +396,8 @@ export default {
 
         pollutants_table.value.push(bod)
         pollutants_table.value.push(tn)
+        pollutants_table.value.push(tp)
+
         pollutants_table.value.push(dichloroethane)
         pollutants_table.value.push(cadmium)
         pollutants_table.value.push(hexachlorobenzene)
@@ -435,12 +460,12 @@ export default {
             let lng = industry.location.lng
 
             //Baseline
-            let baseline_data = await info.layers.baseline.annual.layer["data_on_point"](lat, lng)
-            current_layer[industry.name] = baseline_data.toExponential(3)
+            let baseline_data = await info.layers.baseline.annual.layer["data_for_report"](lat, lng)
+            current_layer[industry.name] = baseline_data
 
             if (info.future && this.include_future) {
-              let future_data = await info.layers.future.layer["data_on_point"](lat, lng)
-              future_layer[industry.name] = future_data.toExponential(3)
+              let future_data = await info.layers.future.layer["data_for_report"](lat, lng)
+              future_layer[industry.name] = future_data
             }
 
           }
@@ -519,12 +544,12 @@ export default {
             let lng = industry.location.lng
 
             //Baseline
-            let baseline_data = await info.layers.baseline.annual.layer["data_on_point"](lat, lng)
-            current_layer.push(baseline_data.toExponential(3))
+            let baseline_data = await info.layers.baseline.annual.layer["data_for_report"](lat, lng)
+            current_layer.push(baseline_data)
             //Future
             if (info.future && this.include_future) {
-              let future_data = await info.layers.future.layer["data_on_point"](lat, lng)
-              future_layer.push(future_data.toExponential(3))
+              let future_data = await info.layers.future.layer["data_for_report"](lat, lng)
+              future_layer.push(future_data)
             }
           }
 
@@ -680,6 +705,8 @@ export default {
       })
 
       let tn = ["TN load discharged to the water body"]
+      let tp = ["TP load discharged to the water body"]
+
       let bod = [""]
       let dilution_factor_row = ["Dilution factor"]
       let recycled_factor = ["Recycled water factor"]
@@ -714,7 +741,11 @@ export default {
         }else{
           tn.push("-")
         }
-
+        if(Number.isFinite(metrics.tp_effl(industry))){
+          tp.push((days_factor*metrics.tp_effl(industry)).toExponential(3))
+        }else{
+          tp.push("-")
+        }
         let dilution_factor_value = await metrics.dilution_factor(this.global_layers, industry, assessment_days)
         if(Number.isFinite(dilution_factor_value)){
           dilution_factor_row.push(dilution_factor_value.toExponential(3))
@@ -810,6 +841,8 @@ export default {
 
       bod.push("g")
       tn.push("g")
+      tp.push("g")
+
       dilution_factor_row.push("-")
       recycled_factor.push("-")
       dbo_in_river.push("g/m3")
@@ -829,7 +862,7 @@ export default {
       let emissions_table = {
         table: {
           body: [
-            body, bod, tn, dichloroethane, cadmium, hexachlorobenzene, mercury, lead, nickel, chloroalkanes, hexaclorobutadie, nonylphenols, tetrachloroethene, trichloroethylene, dilution_factor_row, recycled_factor
+            body, bod, tn, tp, dichloroethane, cadmium, hexachlorobenzene, mercury, lead, nickel, chloroalkanes, hexaclorobutadie, nonylphenols, tetrachloroethene, trichloroethylene, dilution_factor_row, recycled_factor
           ]
 
         }
@@ -1015,56 +1048,32 @@ export default {
 
     },
 
-    pieChart_base64() {
+    pieChart_base64(industry) {
+      let labels_for_pie = []
+      let dataset_for_pie = [{
+        borderWidth: 1,
+        data: [],
+        backgroundColor: []
+      }]
 
-      console.log('aaaa')
-      const data = {
-        labels: [
-          'Eating',
-          'Drinking',
-          'Sleeping',
-          'Designing',
-          'Coding',
-          'Cycling',
-          'Running'
-        ],
-        datasets: [{
-          label: 'My First Dataset',
-          data: [65, 59, 90, 81, 56, 55, 40],
-          fill: true,
-          backgroundColor: 'rgba(255, 99, 132, 0.2)',
-          borderColor: 'rgb(255, 99, 132)',
-          pointBackgroundColor: 'rgb(255, 99, 132)',
-          pointBorderColor: '#fff',
-          pointHoverBackgroundColor: '#fff',
-          pointHoverBorderColor: 'rgb(255, 99, 132)'
-        }, {
-          label: 'My Second Dataset',
-          data: [28, 48, 40, 19, 96, 27, 100],
-          fill: true,
-          backgroundColor: 'rgba(54, 162, 235, 0.2)',
-          borderColor: 'rgb(54, 162, 235)',
-          pointBackgroundColor: 'rgb(54, 162, 235)',
-          pointBorderColor: '#fff',
-          pointHoverBackgroundColor: '#fff',
-          pointHoverBorderColor: 'rgb(54, 162, 235)'
-        }]
+      industry.emissions_and_descriptions().forEach(func => {
+        labels_for_pie.push(func.description)
+        dataset_for_pie[0].data.push(func.emissions.total)
+        dataset_for_pie[0].backgroundColor.push(utils.getRandomColor())
+      })
+
+      let options = {
+        animation: false
       };
-
-      const config = {
-        type: 'radar',
-        data: data,
-        options: {
-          elements: {
-            line: {
-              borderWidth: 3
-            }
-          },
-          animation: false
+      let content = {
+        type: 'pie',
+        data: {
+          datasets: dataset_for_pie,
+          labels: labels_for_pie,
         },
+        options: options
       };
-
-      let pieChart = new Chart(document.getElementById('chart').getContext('2d'), config);
+      let pieChart = new Chart(document.getElementById('chart').getContext('2d'), content);
       return pieChart.toBase64Image()
 
     }
@@ -1081,7 +1090,7 @@ export default {
         return n.assessment.name;
       });
 
-      if(_this.tab !== undefined && _this.tab !== null){
+      if(_this.tab !== undefined && _this.tab !== null && Object.values(groupedByAssessments)[_this.tab] != undefined){
 
         let assessment = Object.values(groupedByAssessments)[_this.tab][0].assessment
         let assessment_days = utils.daysBetween(assessment.assessment_period_start, assessment.assessment_period_end)
@@ -1286,6 +1295,8 @@ export default {
   border-left: 3px solid #1C195B;
   overflow-y:scroll !important;
   height: 100%;
+  padding-top: 30px;
+  padding-bottom: 30px;
 }
 
 .v-tab.v-tab--active{

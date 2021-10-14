@@ -83,6 +83,8 @@ let industry_statistics = {
 function effl_load(industry, effl){
     let load = 0
     if(industry.has_onsite_wwtp) {
+        console.log(effl, '--', industry.onsite_wwtp[effl])
+
         load += industry.onsite_wwtp[effl] * industry.onsite_wwtp.wwt_vol_disc // g/day
     }
     if(industry.has_direct_discharge) {
@@ -176,6 +178,9 @@ let metrics = {
 
     tn_effl(industry){
         return effl_load(industry, "wwt_tn_effl_to_wb")
+    },
+    tp_effl(industry){
+        return effl_load(industry, "wwt_tp_effl_to_wb")
     },
     dichloroethane_effl(industry){
         return effl_load(industry, "wwt_diclo_effl_to_wb")
