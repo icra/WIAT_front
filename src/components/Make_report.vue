@@ -130,36 +130,26 @@
 
       <br>
 
-      <!--
-      <div>
-
-        <v-progress-linear
-            indeterminate
-            rounded
-            height="6"
-            v-show="generating_pdf"
-            color="#1C195B"
-
-        ></v-progress-linear>
-
-        <PDFJSViewer class="center" v-show="selected_industries.length>0 && !generating_pdf" ref="make_pdf"/>
-
-      </div>-->
-
 
 
     </div>
     <div v-else>
       <p>Please, create an industry first to make a PDF report.</p>
+      <div style="background-color: red; width: 300px; height: 300px">
+
+      </div>
+
     </div>
 
 
-    <!-- <canvas v-show="false" id="chart" width="300" height="150"> </canvas> -->
-
+    {{pieChart_base64()}}
 
 
     <br>
+    <canvas v-show="true" id="chart" width="300" height="300" > </canvas>
   </div>
+
+
 </template>
 
 <script>
@@ -1025,32 +1015,56 @@ export default {
 
     },
 
-    pieChart_base64(industry) {
-      let labels_for_pie = []
-      let dataset_for_pie = [{
-        borderWidth: 1,
-        data: [],
-        backgroundColor: []
-      }]
+    pieChart_base64() {
 
-      industry.emissions_and_descriptions().forEach(func => {
-        labels_for_pie.push(func.description)
-        dataset_for_pie[0].data.push(func.emissions.total)
-        dataset_for_pie[0].backgroundColor.push(utils.getRandomColor())
-      })
-
-      let options = {
-        animation: false
+      console.log('aaaa')
+      const data = {
+        labels: [
+          'Eating',
+          'Drinking',
+          'Sleeping',
+          'Designing',
+          'Coding',
+          'Cycling',
+          'Running'
+        ],
+        datasets: [{
+          label: 'My First Dataset',
+          data: [65, 59, 90, 81, 56, 55, 40],
+          fill: true,
+          backgroundColor: 'rgba(255, 99, 132, 0.2)',
+          borderColor: 'rgb(255, 99, 132)',
+          pointBackgroundColor: 'rgb(255, 99, 132)',
+          pointBorderColor: '#fff',
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: 'rgb(255, 99, 132)'
+        }, {
+          label: 'My Second Dataset',
+          data: [28, 48, 40, 19, 96, 27, 100],
+          fill: true,
+          backgroundColor: 'rgba(54, 162, 235, 0.2)',
+          borderColor: 'rgb(54, 162, 235)',
+          pointBackgroundColor: 'rgb(54, 162, 235)',
+          pointBorderColor: '#fff',
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: 'rgb(54, 162, 235)'
+        }]
       };
-      let content = {
-        type: 'pie',
-        data: {
-          datasets: dataset_for_pie,
-          labels: labels_for_pie,
+
+      const config = {
+        type: 'radar',
+        data: data,
+        options: {
+          elements: {
+            line: {
+              borderWidth: 3
+            }
+          },
+          animation: false
         },
-        options: options
       };
-      let pieChart = new Chart(document.getElementById('chart').getContext('2d'), content);
+
+      let pieChart = new Chart(document.getElementById('chart').getContext('2d'), config);
       return pieChart.toBase64Image()
 
     }

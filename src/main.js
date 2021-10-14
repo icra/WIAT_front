@@ -125,6 +125,26 @@ Vue.prototype.$layers_description = [
               future: true,
             },
           },
+          {
+            name: "Streamflow",
+            layer: {
+              layers: {
+                baseline: {
+                  annual: {
+                    layer: null
+                  },
+                  monthly: []
+                },
+                future: {
+                  layer: null
+                },
+              },
+              monthly: false,
+              future: true,
+              info: "Streamflow is the volume of water flowing in one point, it considers the extraction of water for irrigation, livestock, domestic uses, manufacturing process and thermal power."
+            },
+          },
+
         ]
       },
       {
