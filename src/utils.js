@@ -50,7 +50,26 @@ let utils = {
 
 }
 
-let industry_statistics = {
+
+
+function effl_load(industry, effl){
+    let load = 0
+    if(industry.has_onsite_wwtp) {
+        console.log(effl, '--', industry.onsite_wwtp[effl])
+
+        load += industry.onsite_wwtp[effl] * industry.onsite_wwtp.wwt_vol_disc // g/day
+    }
+    if(industry.has_direct_discharge) {
+        load += industry.direct_discharge[effl]  *  industry.direct_discharge.wwt_vol_disc  // g/day
+    }
+    if(industry.has_offsite_wwtp){
+        load += industry.offsite_wwtp[effl] * industry.offsite_wwtp.wwt_vol_disc  // g/day
+    }
+    return load //g/day
+}
+
+let metrics = {
+
     emissions_and_descriptions(industry){
         let sources = {
             "wwt_KPI_GHG_elec": 0,
@@ -76,29 +95,14 @@ let industry_statistics = {
         }
 
         return sources
-    }
+    },
 
-}
+    global_warming_potential(industry){
+        return Object.values(this.emissions_and_descriptions(industry)).reduce((a, b) => a + b, 0)
+    },
 
-function effl_load(industry, effl){
-    let load = 0
-    if(industry.has_onsite_wwtp) {
-        console.log(effl, '--', industry.onsite_wwtp[effl])
 
-        load += industry.onsite_wwtp[effl] * industry.onsite_wwtp.wwt_vol_disc // g/day
-    }
-    if(industry.has_direct_discharge) {
-        load += industry.direct_discharge[effl]  *  industry.direct_discharge.wwt_vol_disc  // g/day
-    }
-    if(industry.has_offsite_wwtp){
-        load += industry.offsite_wwtp[effl] * industry.offsite_wwtp.wwt_vol_disc  // g/day
-    }
-    return load //g/day
-}
-
-let metrics = {
-
-    async dilution_factor(global_layers, industry, assessment_days){
+    async dilution_factor(global_layers, industry){
 
         let flow_acc = global_layers["Flow accumulation"].layers.baseline.annual.layer
 
@@ -113,8 +117,6 @@ let metrics = {
 
         //let dilution_factor = water_discharged/(water_discharged + flow_acc_value)
         let dilution_factor = (water_discharged + flow_acc_value)/water_discharged
-
-        if(water_discharged === 0) return NaN
 
         return dilution_factor
 
@@ -218,5 +220,5 @@ let metrics = {
 
 }
 
-export {metrics, utils, industry_statistics}
+export {metrics, utils}
 
