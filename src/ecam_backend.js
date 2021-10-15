@@ -1,10 +1,11 @@
-/*
-  Draft for WIAT backend
-*/
+
 
 /*
   UTILS
 */
+import {utils} from "./utils"
+import Countries from "./countries"
+
 //sum array of numbers
 Array.prototype.sum=function(){return this.reduce((p,c)=>(p+c),0)};
 
@@ -149,7 +150,6 @@ export class Direct_discharge{
 
     constructor(){
         let _this = this
-        this.industry_type = null
         this.wwt_tn_effl_to_wb = 0
         this.wwt_tp_effl_to_wb = 0
         this.wwt_bod_effl_to_wb = 0
@@ -668,10 +668,6 @@ export class WWTP{
         return WWTP.info_inputs()
     }
 
-    constructor(){
-        this.industry_type = null
-    }
-
     //indirect emissions from electricity consumption
     wwt_KPI_GHG_elec(){
         let co2 = this.wwt_nrg_cons*this.wwt_conv_kwh;
@@ -1173,7 +1169,7 @@ export class Industrial_wwtp extends WWTP{
 
             //energy
             "wwt_nrg_cons": {question: "Energy consumed from the grid", value: 0, unit: "kWh", description_tooltip: "Total energy consumed during the assessment period by all wastewater treatment plants managed by the undertaking"},  //kWh | energy consumed from the grid
-            "wwt_conv_kwh": {question: "Emission factor for grid electricity", value: 0, unit: "kgCO2eq/kWh", description_tooltip: "Emission factor for grid electricity (indirect emissions)"},  //kgCO2eq/kWh | conversion factor
+            "wwt_conv_kwh": {question: "Emission factor for grid electricity", estimation_equation: true, value: 0, unit: "kgCO2eq/kWh", description_tooltip: "Emission factor for grid electricity (indirect emissions)"},  //kgCO2eq/kWh | conversion factor
 
             //SLUDGE MANAGEMENT
             "wwt_mass_slu": {
@@ -1249,7 +1245,7 @@ export class Industrial_wwtp extends WWTP{
     constructor(){
         super();
         let _this = this
-
+        this.location = null
         this.wwt_bod_infl = 0
         this.wwt_tn_infl = 0
         this.wwt_tp_infl = 0
@@ -1338,6 +1334,14 @@ export class Industrial_wwtp extends WWTP{
             wwt_tricloroetile_effl_to_wb(substage) {
                 return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type].tricloroetile_effl*substage.wwt_tricloroetile_infl
             },
+            wwt_conv_kwh(substage) {
+                let location = substage.location
+                let lat = location.lat
+                let lng = location.lng
+                let code = utils.get_country_code_from_coordinates(lat, lng)
+                if(code == null) return null
+                return Countries[code].conv_kwh_co2
+            }
         }
     }
 
@@ -1595,6 +1599,14 @@ export class Industrial_wwtp_offsite extends Industrial_wwtp{
             wwt_tricloroetile_effl_to_wb(substage){
                 return this.wwt_concentration_effl_to_wb(substage, "tricloroetile_infl_wwtp", "wwt_tricloroetile_infl", "tricloroetile_effl")
             },
+            wwt_conv_kwh(substage) {
+                let location = substage.location
+                let lat = location.lat
+                let lng = location.lng
+                let code = utils.get_country_code_from_coordinates(lat, lng)
+                if(code == null) return null
+                return Countries[code].conv_kwh_co2
+            }
 
 
         }
@@ -1833,6 +1845,7 @@ export class Domestic_wwtp extends WWTP{
         }
 
         //Water received from local WWTP
+        this.location = null
         this.vol_infl_wwtp = 0
         this.bod_infl_wwtp = 0
         this.tn_infl_wwtp = 0
@@ -1956,6 +1969,14 @@ export class Domestic_wwtp extends WWTP{
             wwt_tricloroetile_effl_to_wb(substage){
                 return this.wwt_concentration_effl_to_wb(substage, "tricloroetile_infl_wwtp", "wwt_tricloroetile_infl", "tricloroetile_effl")
             },
+            wwt_conv_kwh(substage) {
+                let location = substage.location
+                let lat = location.lat
+                let lng = location.lng
+                let code = utils.get_country_code_from_coordinates(lat, lng)
+                if(code == null) return null
+                return Countries[code].conv_kwh_co2
+            }
         }
     }
 

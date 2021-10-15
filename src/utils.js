@@ -2,6 +2,12 @@ let main = require("./main")
 
 
 let utils = {
+    get_country_code_from_coordinates(lat, lng){
+        let crg = require('country-reverse-geocoding').country_reverse_geocoding();
+        let country = crg.get_country(lat, lng);
+        let code = country.code
+        return code
+    },
     getRandomColor(){
         let letters = '0123456789ABCDEF';
         let color = '#';

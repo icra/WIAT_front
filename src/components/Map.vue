@@ -522,6 +522,7 @@ export default {
 
     async onMapClick(e) {
 
+
       let _this = this
 
       let greenIcon = new L.Icon({

@@ -161,7 +161,7 @@ export default {
       for (let key of Object.keys(new_wwtp)){
         if(typeof wwtp[key] !== "function") new_wwtp[key] = wwtp[key]
       }
-      new_wwtp.industry_type = industry_type
+      //new_wwtp.industry_type = industry_type
       return new_wwtp
     },
 

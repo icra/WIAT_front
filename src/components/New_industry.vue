@@ -1608,7 +1608,7 @@ export default {
             this.industry.onsite_wwtp = this.copy_wwtp(this.industry.onsite_wwtp,  new Industrial_wwtp_onsite())
           }
         }
-        this.industry.onsite_wwtp.industry_type = this.industry.industry_type
+        this.industry.onsite_wwtp.location = this.industry.location
         this.industry.onsite_wwtp.wwt_bod_infl = this.industry.bod_effl_concentration
         this.industry.onsite_wwtp.wwt_tn_infl = this.industry.tn_effl_concentration
         this.industry.onsite_wwtp.wwt_tp_infl = this.industry.tp_effl_concentration
@@ -1631,7 +1631,7 @@ export default {
         if(this.industry.direct_discharge === null) {
           this.industry.direct_discharge = this.copy_wwtp(this.industry.direct_discharge,  new Direct_discharge())
         }
-        this.industry.direct_discharge.industry_type = this.industry.industry_type
+        this.industry.direct_discharge.location = this.industry.location
         this.industry.direct_discharge.wwt_bod_effl_to_wb = this.industry.bod_effl_concentration
         this.industry.direct_discharge.wwt_tn_effl_to_wb = this.industry.tn_effl_concentration
         this.industry.direct_discharge.wwt_tp_effl_to_wb = this.industry.tp_effl_concentration
@@ -1662,7 +1662,7 @@ export default {
           }
           this.industry.offsite_wwtp.wwt_bod_infl = this.industry.bod_effl_concentration*this.cod_to_bod
         }
-        this.industry.offsite_wwtp.industry_type = this.industry.industry_type
+        this.industry.offsite_wwtp.location = this.industry.location
         this.industry.offsite_wwtp.wwt_tn_infl = this.industry.tn_effl_concentration
         this.industry.offsite_wwtp.wwt_tp_infl = this.industry.tp_effl_concentration
         this.industry.offsite_wwtp.wwt_diclo_infl = this.industry.diclo_effl //1,2-Dichloroethane

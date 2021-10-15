@@ -12,6 +12,7 @@
     "chart.js": "^2.9.4",
     "chroma-js": "^1.4.1",
     "core-js": "^3.6.5",
+    "country-reverse-geocoding": "^0.2.2",
     "esri-leaflet-geocoder": "^2.0.2",
     "georaster": "^1.5.4",
     "georaster-layer-for-leaflet": "^3.0.1",
