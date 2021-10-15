@@ -21,6 +21,7 @@
 
           </v-col>
 
+
           <v-col v-else cols="9" style="height: 100%">
             <template class="report" >
 
@@ -61,11 +62,12 @@
                         ></v-data-table>
                       </div>
 
+                      <canvas id="chart" width="50" height="50"> </canvas>
+
                     </v-card>
                   </v-tab-item>
                 </v-tabs-items>
               </div>
-
 
 
             </template>
@@ -154,8 +156,6 @@
     </div>
 
 
-    <!-- <canvas v-show="false" id="chart" width="300" height="150"> </canvas> -->
-
 
 
     <br>
@@ -168,8 +168,9 @@ let _ = require('lodash');
 import PDFJSViewer from "@/components/PDFJSViewer";
 import pdfMake from 'pdfmake/build/pdfmake.js'
 import Vue from "vue";
-import {utils, industry_statistics, metrics} from "../utils"
-
+import {utils, metrics} from "../utils"
+import { Chart, LineController, LineElement, PointElement, LinearScale, Title, RadialLinearScale, RadarController } from 'chart.js'
+Chart.register(LineController, LineElement, PointElement, LinearScale, Title, RadialLinearScale, RadarController);
 
 export default {
   name: "Make_report",
@@ -207,9 +208,10 @@ export default {
 
     },
 
-    selected_industries: async function () {
+    selected_industries: async function (new_selected_industries) {
       this.layers_table = await this.generate_layers_table()
       this.pollutants_table = await this.generate_pollutants_table()
+      if(new_selected_industries.length > 0) this.pieChart_base64()
 
     },
     include_future: async function () {
@@ -308,7 +310,7 @@ export default {
             tp[industry.name] = ("-")
           }
 
-          let dilution_factor_value = await metrics.dilution_factor(this.global_layers, industry, assessment_days)
+          let dilution_factor_value = await metrics.dilution_factor(this.global_layers, industry)
           if(Number.isFinite(dilution_factor_value)){
             dilution_factor_row[industry.name] = (dilution_factor_value.toExponential(3))
           }else{
@@ -605,7 +607,7 @@ export default {
       for (const industryAux of industries) {
         let total = 0
         let industry = industryAux.industry
-        let emissions = industry_statistics.emissions_and_descriptions(industry)
+        let emissions = metrics.emissions_and_descriptions(industry)
         if(Number.isFinite(emissions["wwt_KPI_GHG_elec"])){
           let value = days_factor*emissions["wwt_KPI_GHG_elec"]
           elec.push(value.toExponential(3))
@@ -746,7 +748,7 @@ export default {
         }else{
           tp.push("-")
         }
-        let dilution_factor_value = await metrics.dilution_factor(this.global_layers, industry, assessment_days)
+        let dilution_factor_value = await metrics.dilution_factor(this.global_layers, industry)
         if(Number.isFinite(dilution_factor_value)){
           dilution_factor_row.push(dilution_factor_value.toExponential(3))
         }else{
@@ -1048,37 +1050,61 @@ export default {
 
     },
 
-    pieChart_base64(industry) {
-      let labels_for_pie = []
-      let dataset_for_pie = [{
-        borderWidth: 1,
-        data: [],
-        backgroundColor: []
-      }]
+    async pieChart_base64() {
 
-      industry.emissions_and_descriptions().forEach(func => {
-        labels_for_pie.push(func.description)
-        dataset_for_pie[0].data.push(func.emissions.total)
-        dataset_for_pie[0].backgroundColor.push(utils.getRandomColor())
-      })
-
-      let options = {
-        animation: false
+      const data = {
+        labels: [
+          'Global warming Potential',
+          'Dillution factor',
+          'Recycled water factor',
+        ],
+        datasets: []
       };
-      let content = {
-        type: 'pie',
-        data: {
-          datasets: dataset_for_pie,
-          labels: labels_for_pie,
+
+      for (let industryAux of this.selected_industries){
+        let industry = industryAux.industry
+        let global_warming_potential = metrics.global_warming_potential(industry)
+        let dilution_factor = await metrics.dilution_factor(this.global_layers, industry)
+        let recycled_water_factor = metrics.recycled_water_factor(industry)
+
+        data.datasets.push({
+          label: industry.name,
+          data: [global_warming_potential, dilution_factor, recycled_water_factor],
+          fill: true,
+          backgroundColor: 'rgba(54, 162, 235, 0.2)',
+          borderColor: 'rgb(54, 162, 235)',
+          pointBackgroundColor: 'rgb(54, 162, 235)',
+          pointBorderColor: '#fff',
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: 'rgb(54, 162, 235)'
+        })
+      }
+      //metrics.global_warming_potential()
+
+      const config = {
+        type: 'radar',
+        data: data,
+        options: {
+          elements: {
+            line: {
+              borderWidth: 3
+            }
+          },
+          animation: false,
+          scales: {
+            r: {
+              max: 100,
+            }
+          }
         },
-        options: options
       };
-      let pieChart = new Chart(document.getElementById('chart').getContext('2d'), content);
-      return pieChart.toBase64Image()
+      let pieChart = new Chart(document.getElementById('chart').getContext('2d'), config);
+      //return pieChart.toBase64Image()
 
     }
 
   },
+
 
   computed: {
 
@@ -1120,7 +1146,7 @@ export default {
           emission_table.header.push({
             text: industry.name, value: industry.name,
           })
-          let emissions = industry_statistics.emissions_and_descriptions(industry)
+          let emissions = metrics.emissions_and_descriptions(industry)
           if(Number.isFinite(emissions["wwt_KPI_GHG_elec"])){
             let value = (days_factor*emissions["wwt_KPI_GHG_elec"])
             elec[industry.name] = value.toExponential(3)
