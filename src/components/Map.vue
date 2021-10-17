@@ -858,7 +858,7 @@ export default {
     },
 
 
-    define_raster_layer(geotiff_file_data, geotiff_file_palette, color_function, color_legend, label_legend, units="", scale=1, resolution=16){
+    define_raster_layer(geotiff_file_data, geotiff_file_palette, color_function, color_legend, label_legend, units="", scale=1, resolution=16, noData=null){
       let _this = this
       let obj = {}
       let url_to_geotiff_data = "https://wiat-server.icradev.cat/image?filename="+geotiff_file_data
@@ -905,7 +905,8 @@ export default {
         let value_number = Number.parseFloat(value)
         if(value_number === NaN) value_string = value
         else {
-          if (value_number < 0) value_string = "No data"
+          if (noData == null && value_number < 0) value_string = "No data"
+          else if (noData != null && value_number == noData) value_string = "No data"
 
           else {
             if(units !== "%") {
@@ -929,7 +930,9 @@ export default {
         let value_number = Number.parseFloat(value)
         if(value_number === NaN) value_string = value
         else {
-          if (value_number < 0) value_string = "No data"
+
+          if (noData == null && value_number < 0) value_string = "No data"
+          else if (noData != null && value_number == noData) value_string = "No data"
 
           else {
             if(units !== "%") {
@@ -1167,7 +1170,7 @@ export default {
       //Streamflow
       let color_function_streamflow = function(values) {
         let value = values[0]
-        if (value < 0) return
+        if (value < 0 || value >= 100000002004087730000) return
         else if (value <= 3.01) return '#d1e2f3'
         else if(value <= 12.07) return '#9ac8e0'
         else if(value <= 35.49) return '#529dcc'
@@ -1179,6 +1182,7 @@ export default {
       let label_legend_streamflow = ["<=3.01 m3/seconds", "<=12.07 m3/seconds", "<=35.49 m3/seconds", "<=123.89 m3/seconds", ">=123.90 m3/seconds"]
 
       this.layers["Streamflow"].layers.baseline.annual.layer = this.define_raster_layer("dismanual",  null, color_function_streamflow, color_legend_streamflow, label_legend_streamflow, " m3/seconds")
+      this.layers["Streamflow"].layers.future.layer = this.define_raster_layer("streamflow_2030",  null, color_function_streamflow, color_legend_streamflow, label_legend_streamflow, " m3/seconds", 1, 16, 100000002004087730000)
 
 
 
