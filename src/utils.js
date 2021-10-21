@@ -100,6 +100,9 @@ let metrics = {
             }
         }
 
+        sources["supply_chain_emissions"] = industry.emissions_from_supply_chain()
+
+
         return sources
     },
 

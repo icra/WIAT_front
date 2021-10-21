@@ -192,6 +192,16 @@ export default {
       new_industry.tetracloroetile_effl= industry.tetracloroetile_effl //tetrachloroethene
       new_industry.tricloroetile_effl= industry.tricloroetile_effl //Trichloroethylene
 
+      new_industry.operation_type = industry.operation_type
+      new_industry.industry_provided = industry.industry_provided
+      new_industry.km_air = industry.km_air
+      new_industry.km_barge = industry.km_barge
+      new_industry.km_ocean = industry.km_ocean
+      new_industry.km_rail = industry.km_rail
+      new_industry.km_truck = industry.km_truck
+      new_industry.volume_cargo = industry.volume_cargo
+      new_industry.weight_cargo = industry.weight_cargo
+
 
       if(new_industry.has_onsite_wwtp)
         if(new_industry.has_offsite_wwtp){

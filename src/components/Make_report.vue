@@ -1142,6 +1142,7 @@ export default {
         let slu = {value: "Emissions from sludge management", unit: "kgCO2eq"}
         let reus = {value: "Emissions from water reuse transport", unit: "kgCO2eq"}
         let disc = {value: "Emissions from water discharged", unit: "kgCO2eq"}
+        let supply_chain = {value: "Emissions from raw material supply", unit: "kgCO2eq"}
         let total = {value: "Total emissions", unit: "kgCO2eq"}
 
 
@@ -1205,13 +1206,15 @@ export default {
             disc[industry.name] = ("-")
           }
 
+          let raw_material_tranport = days_factor*emissions["supply_chain_emissions"]
+          supply_chain[industry.name] = raw_material_tranport.toExponential(3)
+          total_emission += raw_material_tranport
+
           total[industry.name] = total_emission.toExponential(3)
 
         }
 
-
         emission_table.header.push({text: "Unit", value: "unit", sortable: false,})
-
 
         emission_table.emissions.push(elec)
         emission_table.emissions.push(fuel)

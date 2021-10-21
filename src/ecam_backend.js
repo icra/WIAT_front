@@ -75,8 +75,16 @@ export class Industry{
         this.bod_effl_concentration = 0
         this.tn_effl_concentration = 0
         this.tp_effl_concentration = 0
-
         this.volume_used = 0
+        this.operation_type = "final_product"
+        this.industry_provided = null
+        this.km_air = 0
+        this.km_barge = 0
+        this.km_ocean = 0
+        this.km_rail = 0
+        this.km_truck = 0
+        this.volume_cargo = 0
+        this.weight_cargo = 0
 
         //Priority pollutants
         this.diclo_effl = 0 //1,2-Dichloroethane
@@ -90,6 +98,43 @@ export class Industry{
         this.nonilfenols_effl = 0 //Nonylphenols
         this.tetracloroetile_effl = 0 //tetrachloroethene
         this.tricloroetile_effl = 0 //Trichloroethylene
+
+    }
+
+    emissions_from_supply_chain(){  //kgCO2-eq for supplying materials (supply chain)
+
+        //https://storage.googleapis.com/scsc/Green%20Freight/EDF-Green-Freight-Handbook.pdf
+        if(this.operation_type == "final_product") return {
+            total: 0,
+            co2: 0,
+            ch4: 0,
+            n2o: 0,
+        };
+
+        let co2   = 0;
+
+        //Air
+        if (this.km_air >= 3700) co2 += (868.3/1459972)*this.km_air*this.weight_cargo
+        else co2 += (2050/1459972)*this.km_air*this.weight_cargo
+
+        //Barge
+        co2 += (17.5/1459972)*this.km_barge*this.weight_cargo
+
+        //Ocean
+        co2 += (90.125/32800)*this.km_ocean*this.volume_cargo
+
+        //Rail
+        co2 += (22.9/1459972)*this.km_rail*this.weight_cargo
+
+        //Truck
+        co2 += (1700/1459972)*this.km_truck*this.weight_cargo
+
+        return {
+            total: co2,
+            co2: co2,
+            ch4: 0,
+            n2o: 0,
+        };
 
     }
 

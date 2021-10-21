@@ -216,7 +216,7 @@
               <div style="width: 100%;">
                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                       <span>
-                        Industry type
+                        Standard industrial classification
                       </span>
 
                 </div>
@@ -236,6 +236,232 @@
             </v-col>
 
           </v-row>
+
+          <!-- supply chain -->
+          <v-row style="background-color: #F2F4F3" align="center">
+            <v-col cols="8" >
+              <div style="width: 100%;">
+                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                      <span>
+                        Operation type
+                      </span>
+
+                </div>
+              </div>
+            </v-col>
+            <v-col cols="4">
+              <div>
+                <v-select
+                    v-model="operation_type"
+                    :items="operation_typologies"
+                    item-text="text"
+                    item-value="value"
+                    label="Select"
+                ></v-select>
+              </div>
+            </v-col>
+          </v-row>
+          <v-row style="background-color: #F2F4F3" align="center">
+            <v-col cols="8" >
+              <div style="width: 100%;">
+                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                      <span>
+                        To which industry supplies products
+                      </span>
+
+                </div>
+              </div>
+            </v-col>
+            <v-col cols="4">
+              <div>
+                <v-select
+                    v-model="industry_provided"
+                    :items="final_product_industries"
+                    item-text="text"
+                    item-value="value"
+                    label="Select"
+                ></v-select>
+              </div>
+            </v-col>
+          </v-row>
+          <v-row style="background-color: #F2F4F3" align="center">
+            <v-col cols="8" >
+              <div style="width: 100%;">
+                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                      <span>
+                        Daily freight weight supplied :
+                      </span>
+
+                </div>
+              </div>
+            </v-col>
+            <v-col cols="4">
+              <div>
+                <div>
+                  <v-text-field
+                      v-model="weight_cargo"
+                      suffix="km/dia"
+                      type="number"
+                  ></v-text-field>
+
+                </div>
+              </div>
+
+            </v-col>
+          </v-row>  <!-- weight -->
+          <v-row style="background-color: #F2F4F3" align="center">
+            <v-col cols="8" >
+              <div style="width: 100%;">
+                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                      <span>
+                        Daily freight volume supplied :
+                      </span>
+
+                </div>
+              </div>
+            </v-col>
+            <v-col cols="4">
+              <div>
+                <div>
+                  <v-text-field
+                      v-model="volume_cargo"
+                      suffix="m3/dia"
+                      type="number"
+                  ></v-text-field>
+
+                </div>
+              </div>
+
+            </v-col>
+          </v-row>  <!-- volume -->
+
+          <v-row style="background-color: #F2F4F3" align="center">
+            <v-col cols="8" >
+              <div style="width: 100%;">
+                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                      <span>
+                        Distance the shipment has traveled by cargo aircraft:
+                      </span>
+
+                </div>
+              </div>
+            </v-col>
+            <v-col cols="4">
+              <div>
+                <div>
+                  <v-text-field
+                      v-model="km_air"
+                      suffix="km"
+                      type="number"
+                  ></v-text-field>
+
+                </div>
+              </div>
+
+            </v-col>
+          </v-row>  <!-- air -->
+          <v-row style="background-color: #F2F4F3" align="center">
+            <v-col cols="8" >
+              <div style="width: 100%;">
+                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                      <span>
+                        Distance the shipment has traveled by barge
+                      </span>
+
+                </div>
+              </div>
+            </v-col>
+            <v-col cols="4">
+              <div>
+                <div>
+                  <v-text-field
+                      v-model="km_barge"
+                      suffix="km"
+                      type="number"
+                  ></v-text-field>
+
+                </div>
+              </div>
+
+            </v-col>
+          </v-row>  <!-- barge -->
+          <v-row style="background-color: #F2F4F3" align="center">
+            <v-col cols="8" >
+              <div style="width: 100%;">
+                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                      <span>
+                        Distance the shipment has traveled by sea
+                      </span>
+
+                </div>
+              </div>
+            </v-col>
+            <v-col cols="4">
+              <div>
+                <div>
+                  <v-text-field
+                      v-model="km_ocean"
+                      suffix="km"
+                      type="number"
+                  ></v-text-field>
+
+                </div>
+              </div>
+
+            </v-col>
+          </v-row>  <!-- ocean -->
+          <v-row style="background-color: #F2F4F3" align="center">
+            <v-col cols="8" >
+              <div style="width: 100%;">
+                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                      <span>
+                        Distance the shipment has traveled by rail
+                      </span>
+
+                </div>
+              </div>
+            </v-col>
+            <v-col cols="4">
+              <div>
+                <div>
+                  <v-text-field
+                      v-model="km_rail"
+                      suffix="km"
+                      type="number"
+                  ></v-text-field>
+
+                </div>
+              </div>
+
+            </v-col>
+          </v-row>  <!-- rail -->
+          <v-row style="background-color: #F2F4F3" align="center">
+            <v-col cols="8" >
+              <div style="width: 100%;">
+                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                      <span>
+                        Distance the shipment has traveled by truck
+                      </span>
+
+                </div>
+              </div>
+            </v-col>
+            <v-col cols="4">
+              <div>
+                <div>
+                  <v-text-field
+                      v-model="km_truck"
+                      suffix="km"
+                      type="number"
+                  ></v-text-field>
+
+                </div>
+              </div>
+
+            </v-col>
+          </v-row>  <!-- truck -->
+
+          <!-- Pollutants -->
           <v-row style="background-color: #F2F4F3" align="center">
             <v-col cols="8" >
               <div style="width: 100%;">
@@ -345,7 +571,7 @@
 
           </v-row>
 
-          <!-- Priority pollutants -->
+          <!-- Dangerous Priority pollutants -->
           <v-row style="background-color: #F2F4F3" align="center">
             <v-col cols="8" >
               <div style="width: 100%;">
@@ -1293,8 +1519,6 @@
     </v-stepper>
 
 
-
-
   </div>
 </template>
 
@@ -1376,17 +1600,6 @@ export default {
       global_layers: utils.format_layer_description(Vue.prototype.$layers_description),
       cod_to_bod: 2.4,
       industry_type: defaultIndustry.industry_type,
-      industry_typologies_2: [
-        {text: "Undefined", value: null},
-        {text: "Others", value: null},
-        {text: "Alcohol refining", value: "alcohol"},
-        {text: "Beer and malt", value: "beer"},
-        {text: "Fish processing", value: "fish"},
-        {text: "Iron and steel manufacturing", value: "iron"},
-        {text: "Meat and poultry", value: "meat"},
-        {text: "Nitrogen fertiliser", value: "nitrogen"},
-        {text: "Plastics and resins", value: "plastics"},
-        {text: "Starch production", value: "starch"}],
       industry_typologies: [
         {text: "Undefined", value: null},
         {text: "Others", value: null},
@@ -1415,7 +1628,23 @@ export default {
         {text: "C32 -- Other manufacturing", value: "other_manufacturing"},
         {text: "C33 -- Repair and installation of machinery and equipment", value: "repair"}
       ],
-    };
+
+      //Supply chain
+      operation_type: defaultIndustry.operation_type,
+      operation_typologies: [
+        {text: "Final product", value: "final_product"},
+        {text: "Supply chain", value: "supply_chain"},
+      ],
+      industry_provided: defaultIndustry.industry_provided,
+      km_air: defaultIndustry.km_air,
+      km_barge: defaultIndustry.km_barge,
+      km_ocean: defaultIndustry.km_ocean,
+      km_rail: defaultIndustry.km_rail,
+      km_truck: defaultIndustry.km_truck,
+      volume_cargo: defaultIndustry.volume_cargo,
+      weight_cargo: defaultIndustry.weight_cargo
+
+    }
   },
   created() {
     if (this.industry === undefined) this.$router.push('/')
@@ -1477,7 +1706,6 @@ export default {
     },
   },
   methods: {
-    //this.industry.onsite_wwtp = new Industrial_wwtp_onsite_external_domestic(
     copy_wwtp(old_wwtp,  new_wwtp){
 
       if(old_wwtp != null){
@@ -1588,10 +1816,19 @@ export default {
       this.industry.nonilfenols_effl = this.nonilfenols_effl //Nonylphenols
       this.industry.tetracloroetile_effl = this.tetracloroetile_effl //tetrachloroethene
       this.industry.tricloroetile_effl = this.tricloroetile_effl //Trichloroethylene
+      this.industry.km_air = this.km_air
+      this.industry.km_barge = this.km_barge
+      this.industry.km_ocean = this.km_ocean
+      this.industry.km_rail = this.km_rail
+      this.industry.km_truck = this.km_truck
+      this.industry.km_truck = this.km_truck
+      this.industry.operation_type = this.operation_type
+      this.industry.industry_provided = this.industry_provided
+      this.industry.volume_cargo = this.volume_cargo
+      this.industry.weight_cargo = this.weight_cargo
 
 
       //Local wwtp
-
       if(this.has_onsite_wwtp){
         if(this.has_offsite_wwtp){
           if(this.offsite_wwtp_type === "Domestic"){
@@ -1733,6 +1970,21 @@ export default {
   },
 
   computed: {
+    final_product_industries(){
+      let _this = this
+      let final_product_industries = this.assessment.industries.filter(industry => {
+        return industry.operation_type === "final_product" && industry.name !== _this.industry.name
+        //return industry.operation_type === "final_product"
+      })
+
+      return final_product_industries.map(industry => {
+        return {
+          text: industry.name,
+          value: industry.name
+        }
+      })
+
+    },
     ind_bod_effl(){
       if(this.industry_type === "food"){  //noves categories
         return 336.2591324200910/2.4
