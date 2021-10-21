@@ -107,10 +107,9 @@ let metrics = {
         return Object.values(this.emissions_and_descriptions(industry)).reduce((a, b) => a + b, 0)
     },
 
-
     async dilution_factor(global_layers, industry){
 
-        let flow_acc = global_layers["Flow accumulation"].layers.baseline.annual.layer
+        let streamflow = global_layers["Streamflow"].layers.baseline.annual.layer
 
         let water_discharged = 0    // m3/day
         if(industry.has_onsite_wwtp) water_discharged += industry.onsite_wwtp.wwt_vol_disc  //m3/day
@@ -119,24 +118,24 @@ let metrics = {
 
         if(water_discharged == 0) return NaN
 
-        let flow_acc_value = await flow_acc.data_on_point(industry.location.lat, industry.location.lng)/365 //flow accumulation (m3/day)
+        let streamflow_value = await streamflow.data_on_point(industry.location.lat, industry.location.lng)*86400 //streamflow (m3/day)
 
         //let dilution_factor = water_discharged/(water_discharged + flow_acc_value)
-        let dilution_factor = (water_discharged + flow_acc_value)/water_discharged
+        let dilution_factor = (water_discharged + streamflow_value)/water_discharged
 
         return dilution_factor
 
     },
 
     recycled_water_factor(industry){
-        if(industry.has_onsite_wwtp && industry.volume_withdrawn > 0) {
+        if(industry.has_onsite_wwtp && industry.volume_used > 0) {
             let recycled_water_factor = industry.onsite_wwtp.wwt_vol_reused / industry.volume_used
             return recycled_water_factor
         }
         return NaN
     },
 
-    async dbo_in_river(global_layers, industry, assessment_days, future = false){
+    /*async dbo_in_river(global_layers, industry, assessment_days, future = false){
         let pharmaceutical_pollution = global_layers["Surface Water Pharmaceutical Pollution"].layers.baseline.annual.layer
         let flow_acc = global_layers["Flow accumulation"].layers.baseline.annual.layer
 
@@ -167,7 +166,7 @@ let metrics = {
             return dbo
         }
 
-    },
+    },*/
 
     bod_effl(industry){
         let load = 0

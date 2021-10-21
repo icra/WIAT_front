@@ -1061,6 +1061,11 @@ export default {
         datasets: []
       };
 
+      /*const groupedByAssessments = _.groupBy(this.selected_industries, function(n) {
+        return n.assessment.name;
+      });*/
+
+
       for (let industryAux of this.selected_industries){
         let industry = industryAux.industry
         let global_warming_potential = metrics.global_warming_potential(industry)
@@ -1079,7 +1084,7 @@ export default {
           pointHoverBorderColor: 'rgb(54, 162, 235)'
         })
       }
-      //metrics.global_warming_potential()
+
 
       const config = {
         type: 'radar',

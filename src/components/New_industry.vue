@@ -1390,30 +1390,30 @@ export default {
       industry_typologies: [
         {text: "Undefined", value: null},
         {text: "Others", value: null},
-        {text: "Manufacture of food products", value: "food"},
-        {text: "Manufacture of beverages", value: "beverages"},
-        {text: "Manufacture of tobacco products", value: "tobacco"},
-        {text: "Manufacture of textiles", value: "textiles"},
-        {text: "Manufacture of wearing apparel", value: "wearing"},
-        {text: "Manufacture of leather and related products", value: "leather"},
-        {text: "Manufacture of wood and of products of wood and cork, except furniture; manufacture of articles of straw and plaiting materials", value: "wood"},
-        {text: "Manufacture of paper and paper products", value: "paper"},
-        {text: "Printing and reproduction of recorded media", value: "printing"},
-        {text: "Manufacture of coke and refined petroleum products", value: "coke"},
-        {text: "Manufacture of chemicals and chemical products", value: "chemicals"},
-        {text: "Manufacture of basic pharmaceutical products and pharmaceutical preparations", value: "pharmaceutical"},
-        {text: "Manufacture of rubber and plastic products", value: "rubber"},
-        {text: "Manufacture of other non-metallic mineral products", value: "mineral"},
-        {text: "Manufacture of basic metals", value: "metals"},
-        {text: "Manufacture of fabricated metal products, except machinery and equipment", value: "fabricated_metals"},
-        {text: "Manufacture of computer, electronic and optical products", value: "computer"},
-        {text: "Manufacture of electrical equipment", value: "electrical"},
-        {text: "Manufacture of machinery and equipment n.e.c.", value: "machinery"},
-        {text: "Manufacture of motor vehicles, trailers and semi-trailers", value: "vehicles"},
-        {text: "Manufacture of other transport equipment", value: "transport"},
-        {text: "Manufacture of furniture", value: "furniture"},
-        {text: "Other manufacturing", value: "other_manufacturing"},
-        {text: "Repair and installation of machinery and equipment", value: "repair"}
+        {text: "C10 -- Manufacture of food products", value: "food"},
+        {text: "C11 -- Manufacture of beverages", value: "beverages"},
+        {text: "C12 -- Manufacture of tobacco products", value: "tobacco"},
+        {text: "C13 -- Manufacture of textiles", value: "textiles"},
+        {text: "C14 -- Manufacture of wearing apparel", value: "wearing"},
+        {text: "C15 -- Manufacture of leather and related products", value: "leather"},
+        {text: "C16 -- Manufacture of wood and of products of wood and cork, except furniture; manufacture of articles of straw and plaiting materials", value: "wood"},
+        {text: "C17 -- Manufacture of paper and paper products", value: "paper"},
+        {text: "C18 -- Printing and reproduction of recorded media", value: "printing"},
+        {text: "C19 -- Manufacture of coke and refined petroleum products", value: "coke"},
+        {text: "C20 -- Manufacture of chemicals and chemical products", value: "chemicals"},
+        {text: "C21 -- Manufacture of basic pharmaceutical products and pharmaceutical preparations", value: "pharmaceutical"},
+        {text: "C22 -- Manufacture of rubber and plastic products", value: "rubber"},
+        {text: "C23 -- Manufacture of other non-metallic mineral products", value: "mineral"},
+        {text: "C24 -- Manufacture of basic metals", value: "metals"},
+        {text: "C25 -- Manufacture of fabricated metal products, except machinery and equipment", value: "fabricated_metals"},
+        {text: "C26 -- Manufacture of computer, electronic and optical products", value: "computer"},
+        {text: "C27 -- Manufacture of electrical equipment", value: "electrical"},
+        {text: "C28 -- Manufacture of machinery and equipment n.e.c.", value: "machinery"},
+        {text: "C29 -- Manufacture of motor vehicles, trailers and semi-trailers", value: "vehicles"},
+        {text: "C30 -- Manufacture of other transport equipment", value: "transport"},
+        {text: "C31 -- Manufacture of furniture", value: "furniture"},
+        {text: "C32 -- Other manufacturing", value: "other_manufacturing"},
+        {text: "C33 -- Repair and installation of machinery and equipment", value: "repair"}
       ],
     };
   },
@@ -1484,11 +1484,12 @@ export default {
         for (let key of Object.keys(new_wwtp)){
           if(typeof new_wwtp[key] !== "function" && old_wwtp.hasOwnProperty(key)) new_wwtp[key] = old_wwtp[key]
         }
-        if(old_wwtp.constructor.name == "Domestic" && new_wwtp.constructor.name == "Industrial_wwtp_offsite"){
+
+        if(old_wwtp.constructor.name == "Domestic_wwtp" && new_wwtp.constructor.name == "Industrial_wwtp_offsite"){
           new_wwtp.bod_infl_wwtp = new_wwtp.bod_infl_wwtp/this.cod_to_bod
           new_wwtp.wwt_bod_effl_to_wb = new_wwtp.wwt_bod_effl_to_wb/this.cod_to_bod
           new_wwtp.wwt_bod_infl = new_wwtp.wwt_bod_infl/this.cod_to_bod
-        }else if(old_wwtp.constructor.name == "Industrial_wwtp_offsite" && new_wwtp.constructor.name == "Domestic"){
+        }else if(old_wwtp.constructor.name == "Industrial_wwtp_offsite" && new_wwtp.constructor.name == "Domestic_wwtp"){
           new_wwtp.bod_infl_wwtp = new_wwtp.bod_infl_wwtp*this.cod_to_bod
           new_wwtp.wwt_bod_effl_to_wb = new_wwtp.wwt_bod_effl_to_wb*this.cod_to_bod
           new_wwtp.wwt_bod_infl = new_wwtp.wwt_bod_infl*this.cod_to_bod
