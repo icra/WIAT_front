@@ -105,7 +105,7 @@ export class Industry{
     emissions_from_supply_chain(){  //kgCO2-eq for supplying materials (supply chain)
 
         //https://storage.googleapis.com/scsc/Green%20Freight/EDF-Green-Freight-Handbook.pdf
-        if(this.operation_type == "final_product") return {
+        if(this.operation_type == "Final product") return {
             total: 0,
             co2: 0,
             ch4: 0,

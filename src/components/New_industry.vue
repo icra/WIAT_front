@@ -263,7 +263,7 @@
             </v-col>
           </v-row>
 
-          <div v-if="operation_type == 'supply_chain'">
+          <div v-if="operation_type == 'Supply chain'">
             <v-row style="background-color: #F2F4F3" align="center">
               <v-col cols="8" >
                 <div style="width: 100%;">
@@ -1637,8 +1637,7 @@ export default {
       //Supply chain
       operation_type: defaultIndustry.operation_type,
       operation_typologies: [
-        {text: "Final product", value: "final_product"},
-        {text: "Supply chain", value: "supply_chain"},
+        "Final product", "Supply chain"
       ],
       industry_provided: defaultIndustry.industry_provided,
       km_air: defaultIndustry.km_air,
@@ -1657,8 +1656,8 @@ export default {
   watch: {
 
     operation_type(new_value){
-      if(new_value == "supply_chain") this.industry_provided = this.final_product_industries[0].value
-      else if(new_value == "final_product") this.industry_provided = null
+      if(new_value == "Supply chain") this.industry_provided = this.final_product_industries[0].value
+      else if(new_value == "Final product") this.industry_provided = null
     },
     offsite_wwtp_type(type){
       if(type == "Industrial"){
@@ -1982,7 +1981,7 @@ export default {
     final_product_industries(){
       let _this = this
       let final_product_industries = this.assessment.industries.filter(industry => {
-        return industry.operation_type === "final_product" && industry.name !== _this.industry.name
+        return industry.operation_type === "Final product" && industry.name !== _this.industry.name
         //return industry.operation_type === "final_product"
       })
 

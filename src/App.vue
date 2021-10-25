@@ -778,8 +778,8 @@ export default {
 
       //If any industry belong to the supply chain of this industry, change it to final product industry
       this.created_assessments[this.selected_assessment].industries.forEach(industry => {
-        if (industry.operation_type == 'supply_chain' && industry.industry_provided == this.created_assessments[this.selected_assessment].industries[this.selected_industry].name){
-          industry.operation_type = 'final_product'
+        if (industry.operation_type == 'Supply chain' && industry.industry_provided == this.created_assessments[this.selected_assessment].industries[this.selected_industry].name){
+          industry.operation_type = 'Final product'
           industry.industry_provided = null
         }
       })

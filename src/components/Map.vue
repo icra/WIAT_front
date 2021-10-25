@@ -1183,7 +1183,7 @@ export default {
       let label_legend_streamflow = ["<=3 m3/seconds", "<=12 m3/seconds", "<=35 m3/seconds", "<=123 m3/seconds", ">=123 m3/seconds"]
 
       this.layers["Streamflow"].layers.baseline.annual.layer = this.define_raster_layer("dismanual",  'streamflow_color', undefined, color_legend_streamflow, label_legend_streamflow, " m3/seconds")
-      this.layers["Streamflow"].layers.future.layer = this.define_raster_layer("streamflow_2030",  null, color_function_streamflow, color_legend_streamflow, label_legend_streamflow, " m3/seconds", 1, 32, 100000002004087730000)
+      this.layers["Streamflow"].layers.future.layer = this.define_raster_layer("streamflow_2030",  'streamflow_2030_color', undefined, color_legend_streamflow, label_legend_streamflow, " m3/seconds", 1, 32, 100000002004087730000)
 
 
 
