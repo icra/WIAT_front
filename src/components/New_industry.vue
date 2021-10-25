@@ -163,6 +163,7 @@
             </v-col>
 
           </v-row>
+
           <v-row style="background-color: #F2F4F3" align="center">
             <v-col cols="8" >
               <div style="width: 100%;">
@@ -216,6 +217,33 @@
               <div style="width: 100%;">
                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                       <span>
+                        Amount of product produced by the industry
+                      </span>
+
+                </div>
+              </div>
+            </v-col>
+            <v-col cols="4">
+              <div>
+                <div>
+                  <v-text-field
+                      v-model="product_produced"
+                      suffix="tonnes/day"
+                      type="number"
+                  ></v-text-field>
+
+                </div>
+              </div>
+
+            </v-col>
+
+          </v-row>
+
+          <v-row style="background-color: #F2F4F3" align="center">
+            <v-col cols="8" >
+              <div style="width: 100%;">
+                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                      <span>
                         Standard industrial classification
                       </span>
 
@@ -254,8 +282,6 @@
                 <v-select
                     v-model="operation_type"
                     :items="operation_typologies"
-                    item-text="text"
-                    item-value="value"
                     label="Select"
                 ></v-select>
               </div>
@@ -277,8 +303,7 @@
                 <v-select
                     v-model="industry_provided"
                     :items="final_product_industries"
-                    item-text="text"
-                    item-value="value"
+
                     label="Select"
                 ></v-select>
               </div>
@@ -1536,6 +1561,7 @@ import {
 } from "../ecam_backend";
 import Vue from 'vue'
 import {utils, metrics} from "../utils"
+import standard_industrial_classification from "../standard_industrial_classification"
 
 export default {
   name: "new_assessment",
@@ -1600,40 +1626,12 @@ export default {
       global_layers: utils.format_layer_description(Vue.prototype.$layers_description),
       cod_to_bod: 2.4,
       industry_type: defaultIndustry.industry_type,
-      industry_typologies: [
-        {text: "Undefined", value: null},
-        {text: "Others", value: null},
-        {text: "C10 -- Manufacture of food products", value: "food"},
-        {text: "C11 -- Manufacture of beverages", value: "beverages"},
-        {text: "C12 -- Manufacture of tobacco products", value: "tobacco"},
-        {text: "C13 -- Manufacture of textiles", value: "textiles"},
-        {text: "C14 -- Manufacture of wearing apparel", value: "wearing"},
-        {text: "C15 -- Manufacture of leather and related products", value: "leather"},
-        {text: "C16 -- Manufacture of wood and of products of wood and cork, except furniture; manufacture of articles of straw and plaiting materials", value: "wood"},
-        {text: "C17 -- Manufacture of paper and paper products", value: "paper"},
-        {text: "C18 -- Printing and reproduction of recorded media", value: "printing"},
-        {text: "C19 -- Manufacture of coke and refined petroleum products", value: "coke"},
-        {text: "C20 -- Manufacture of chemicals and chemical products", value: "chemicals"},
-        {text: "C21 -- Manufacture of basic pharmaceutical products and pharmaceutical preparations", value: "pharmaceutical"},
-        {text: "C22 -- Manufacture of rubber and plastic products", value: "rubber"},
-        {text: "C23 -- Manufacture of other non-metallic mineral products", value: "mineral"},
-        {text: "C24 -- Manufacture of basic metals", value: "metals"},
-        {text: "C25 -- Manufacture of fabricated metal products, except machinery and equipment", value: "fabricated_metals"},
-        {text: "C26 -- Manufacture of computer, electronic and optical products", value: "computer"},
-        {text: "C27 -- Manufacture of electrical equipment", value: "electrical"},
-        {text: "C28 -- Manufacture of machinery and equipment n.e.c.", value: "machinery"},
-        {text: "C29 -- Manufacture of motor vehicles, trailers and semi-trailers", value: "vehicles"},
-        {text: "C30 -- Manufacture of other transport equipment", value: "transport"},
-        {text: "C31 -- Manufacture of furniture", value: "furniture"},
-        {text: "C32 -- Other manufacturing", value: "other_manufacturing"},
-        {text: "C33 -- Repair and installation of machinery and equipment", value: "repair"}
-      ],
+      industry_typologies: standard_industrial_classification,
 
       //Supply chain
       operation_type: defaultIndustry.operation_type,
       operation_typologies: [
-        {text: "Final product", value: "final_product"},
-        {text: "Supply chain", value: "supply_chain"},
+        "Final product", "Supply chain",
       ],
       industry_provided: defaultIndustry.industry_provided,
       km_air: defaultIndustry.km_air,
@@ -1642,7 +1640,8 @@ export default {
       km_rail: defaultIndustry.km_rail,
       km_truck: defaultIndustry.km_truck,
       volume_cargo: defaultIndustry.volume_cargo,
-      weight_cargo: defaultIndustry.weight_cargo
+      weight_cargo: defaultIndustry.weight_cargo,
+      product_produced: defaultIndustry.product_produced
 
     }
   },
@@ -1826,6 +1825,7 @@ export default {
       this.industry.industry_provided = this.industry_provided
       this.industry.volume_cargo = this.volume_cargo
       this.industry.weight_cargo = this.weight_cargo
+      this.industry.product_produced = this.product_produced
 
 
       //Local wwtp
@@ -1973,7 +1973,7 @@ export default {
     final_product_industries(){
       let _this = this
       let final_product_industries = this.assessment.industries.filter(industry => {
-        return industry.operation_type === "final_product" && industry.name !== _this.industry.name
+        return industry.operation_type === "Final product" && industry.name !== _this.industry.name
         //return industry.operation_type === "final_product"
       })
 

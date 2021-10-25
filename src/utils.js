@@ -58,11 +58,9 @@ let utils = {
 
 
 
-function effl_load(industry, effl){
+async function effl_delta(industry, effl, global_layers){
     let load = 0
     if(industry.has_onsite_wwtp) {
-        console.log(effl, '--', industry.onsite_wwtp[effl])
-
         load += industry.onsite_wwtp[effl] * industry.onsite_wwtp.wwt_vol_disc // g/day
     }
     if(industry.has_direct_discharge) {
@@ -71,7 +69,44 @@ function effl_load(industry, effl){
     if(industry.has_offsite_wwtp){
         load += industry.offsite_wwtp[effl] * industry.offsite_wwtp.wwt_vol_disc  // g/day
     }
-    return load //g/day
+
+    let water_discharged = 0
+    if(industry.has_onsite_wwtp) water_discharged += industry.onsite_wwtp.wwt_vol_disc  //m3/day
+    if(industry.has_direct_discharge) water_discharged += industry.direct_discharge.wwt_vol_disc //m3/day
+    if(industry.has_offsite_wwtp) water_discharged += industry.offsite_wwtp.wwt_vol_disc //m3/day
+
+    let streamflow = global_layers["Streamflow"].layers.baseline.annual.layer
+    let streamflow_value = await streamflow.data_on_point(industry.location.lat, industry.location.lng)*86400 //streamflow (m3/day)
+    let water_withdrawn = industry.volume_withdrawn
+
+    let delta = load / (streamflow_value + water_discharged - water_withdrawn)
+
+    if(isNaN(delta)) return NaN
+    return delta //g/m3
+}
+
+function effl_efficiency(industry, pollutant_effl, pollutant_infl){   //Amount of pollutant filtered
+    let load = 0
+    let treated = 0
+    if(industry.has_onsite_wwtp) {
+        load += industry.onsite_wwtp[pollutant_effl] * industry.onsite_wwtp.wwt_vol_disc // g/day
+        treated += industry.onsite_wwtp.wwt_vol_trea
+    }
+    if(industry.has_direct_discharge) {
+        load += industry.direct_discharge[pollutant_effl]  *  industry.direct_discharge.wwt_vol_disc  // g/day
+        treated += industry.direct_discharge.wwt_vol_disc
+    }
+    if(industry.has_offsite_wwtp){
+        load += industry.offsite_wwtp[pollutant_effl] * industry.offsite_wwtp.wwt_vol_disc  // g/day
+        treated += industry.offsite_wwtp.wwt_vol_trea
+    }
+
+    let load_infl = industry[pollutant_infl] * treated
+
+    let eff = load / load_infl
+
+    if(isNaN(eff)) return NaN
+    return eff
 }
 
 let metrics = {
@@ -100,7 +135,7 @@ let metrics = {
             }
         }
 
-        sources["supply_chain_emissions"] = industry.emissions_from_supply_chain()
+        sources["supply_chain_emissions"] = industry.emissions_from_supply_chain().total
 
 
         return sources
@@ -130,6 +165,18 @@ let metrics = {
 
     },
 
+    async available_ratio(global_layers, industry){
+
+        let streamflow = global_layers["Streamflow"].layers.baseline.annual.layer
+        let streamflow_value = await streamflow.data_on_point(industry.location.lat, industry.location.lng)*86400 //streamflow (m3/day)
+        let water_withdrawn = industry.water_withdrawn
+
+        let available_ratio = water_withdrawn / streamflow_value
+        if (isNaN(available_ratio)) return NaN
+        else return available_ratio
+
+    },
+
     recycled_water_factor(industry){
         if(industry.has_onsite_wwtp && industry.volume_used > 0) {
             let recycled_water_factor = industry.onsite_wwtp.wwt_vol_reused / industry.volume_used
@@ -137,6 +184,32 @@ let metrics = {
         }
         return NaN
     },
+
+    treated_water_factor(industry){
+
+        let water_discharged = 0    // m3/day
+        let water_treated = 0
+        if(industry.has_onsite_wwtp) {
+            water_discharged += industry.onsite_wwtp.wwt_vol_disc
+            water_treated += industry.onsite_wwtp.wwt_vol_disc
+        }  //m3/day
+        if(industry.has_direct_discharge) water_discharged += industry.direct_discharge.wwt_vol_disc //m3/day
+        if(industry.has_offsite_wwtp) {
+            water_discharged += industry.offsite_wwtp.wwt_vol_disc
+            water_treated += industry.offsite_wwtp.wwt_vol_disc
+        } //m3/day
+
+        if (water_discharged == 0) return NaN
+        else return water_treated/water_discharged
+    },
+
+    efficiency_factor(industry){
+        let product_produced = industry.product_produced
+        let vol_used = industry.vol_used
+        let efficiency = product_produced/vol_used
+        return NaN
+    },
+
 
     /*async dbo_in_river(global_layers, industry, assessment_days, future = false){
         let pharmaceutical_pollution = global_layers["Surface Water Pharmaceutical Pollution"].layers.baseline.annual.layer
@@ -171,7 +244,7 @@ let metrics = {
 
     },*/
 
-    bod_effl(industry){
+    async bod_effl(industry, global_layers){
         let load = 0
         if(industry.has_onsite_wwtp) {
             load += industry.onsite_wwtp.wwt_bod_effl_to_wb * 2.4 * industry.onsite_wwtp.wwt_vol_disc // g/day
@@ -183,47 +256,95 @@ let metrics = {
             if(industry.offsite_wwtp_type == "Domestic") load += industry.offsite_wwtp.wwt_bod_effl_to_wb * industry.offsite_wwtp.wwt_vol_disc  // g/day
             else load += industry.offsite_wwtp.wwt_bod_effl_to_wb * 2.4 * industry.offsite_wwtp.wwt_vol_disc  // g/day
         }
-        return load  //g/day
+
+        let water_discharged = 0
+        if(industry.has_onsite_wwtp) water_discharged += industry.onsite_wwtp.wwt_vol_disc  //m3/day
+        if(industry.has_direct_discharge) water_discharged += industry.direct_discharge.wwt_vol_disc //m3/day
+        if(industry.has_offsite_wwtp) water_discharged += industry.offsite_wwtp.wwt_vol_disc //m3/day
+
+        let streamflow = global_layers["Streamflow"].layers.baseline.annual.layer
+        let streamflow_value = await streamflow.data_on_point(industry.location.lat, industry.location.lng)*86400 //streamflow (m3/day)
+        let water_withdrawn = industry.volume_withdrawn
+
+        let delta = load / (streamflow_value + water_discharged - water_withdrawn)
+
+        if(isNaN(delta)) return NaN
+        return delta //g/m3
+    },
+    bod_efficiency(industry){
+        let load = 0
+        let water_treated = 0
+
+        if(industry.has_onsite_wwtp) {
+            load += industry.onsite_wwtp.wwt_bod_effl_to_wb * 2.4 * industry.onsite_wwtp.wwt_vol_disc // g/day
+            water_treated += industry.onsite_wwtp.wwt_vol_trea
+        }
+        if(industry.has_direct_discharge) {
+            load += industry.direct_discharge.wwt_bod_effl_to_wb * 2.4 * industry.direct_discharge.wwt_vol_disc  // g/day
+            water_treated = industry.direct_discharge.wwt_vol_disc
+        }
+        if(industry.has_offsite_wwtp){
+            if(industry.offsite_wwtp_type == "Domestic") load += industry.offsite_wwtp.wwt_bod_effl_to_wb * industry.offsite_wwtp.wwt_vol_disc  // g/day
+            else load += industry.offsite_wwtp.wwt_bod_effl_to_wb * 2.4 * industry.offsite_wwtp.wwt_vol_disc  // g/day
+            water_treated += industry.offsite_wwtp.wwt_vol_trea
+        }
+        let bod_industry = industry.bod_effl_concentration * water_treated
+        let eff = load / bod_industry
+        if(isNaN(eff)) return NaN
+        return eff
     },
 
-    tn_effl(industry){
-        return effl_load(industry, "wwt_tn_effl_to_wb")
+    async tn_effl(industry, global_layers){
+        let value = await effl_delta(industry, "wwt_tn_effl_to_wb", global_layers)
+        return value
     },
-    tp_effl(industry){
-        return effl_load(industry, "wwt_tp_effl_to_wb")
+    async tp_effl(industry, global_layers){
+        let value = await effl_delta(industry, "wwt_tp_effl_to_wb", global_layers)
+        return value
     },
-    dichloroethane_effl(industry){
-        return effl_load(industry, "wwt_diclo_effl_to_wb")
+    async dichloroethane_effl(industry, global_layers){
+        let value = await effl_delta(industry, "wwt_diclo_effl_to_wb", global_layers)
+        return value
     },
-    cadmium_effl(industry){
-        return effl_load(industry, "wwt_cadmium_effl_to_wb")
+    async cadmium_effl(industry, global_layers){
+        let value = await effl_delta(industry, "wwt_cadmium_effl_to_wb", global_layers)
+        return value
     },
-    hexaclorobenzene_effl(industry){
-        return effl_load(industry, "wwt_hexaclorobenzene_effl_to_wb")
+    async hexaclorobenzene_effl(industry, global_layers){
+        let value = await effl_delta(industry, "wwt_hexaclorobenzene_effl_to_wb", global_layers)
+        return value
     },
-    mercury_effl(industry){
-        return effl_load(industry, "wwt_mercury_effl_to_wb")
+    async mercury_effl(industry, global_layers){
+        let value = await effl_delta(industry, "wwt_mercury_effl_to_wb", global_layers)
+        return value
     },
-    lead_effl(industry){
-        return effl_load(industry, "wwt_plomo_effl_to_wb")
+    async lead_effl(industry, global_layers){
+        let value = await effl_delta(industry, "wwt_plomo_effl_to_wb", global_layers)
+        return value
     },
-    nickel_effl(industry){
-        return effl_load(industry, "wwt_niquel_effl_to_wb")
+    async nickel_effl(industry, global_layers){
+        let value = await effl_delta(industry, "wwt_niquel_effl_to_wb", global_layers)
+        return value
     },
-    chloroalkanes_effl(industry){
-        return effl_load(industry, "wwt_chloro_effl_to_wb")
+    async chloroalkanes_effl(industry, global_layers){
+        let value = await effl_delta(industry, "wwt_chloro_effl_to_wb", global_layers)
+        return value
     },
-    hexaclorobutadie_effl(industry){
-        return effl_load(industry, "wwt_hexaclorobutadie_effl_to_wb")
+    async hexaclorobutadie_effl(industry, global_layers){
+        let value = await effl_delta(industry, "wwt_hexaclorobutadie_effl_to_wb", global_layers)
+        return value
     },
-    nonylphenols_effl(industry){
-        return effl_load(industry, "wwt_nonilfenols_effl_to_wb")
+    async nonylphenols_effl(industry, global_layers){
+        let value = await effl_delta(industry, "wwt_nonilfenols_effl_to_wb", global_layers)
+        return value
     },
-    tetrachloroethene_effl(industry){
-        return effl_load(industry, "wwt_tetracloroetile_effl_to_wb")
+    async tetrachloroethene_effl(industry, global_layers){
+        let value = await effl_delta(industry, "wwt_tetracloroetile_effl_to_wb", global_layers)
+        return value
     },
-    tricloroetile_effl(industry){
-        return effl_load(industry, "wwt_tricloroetile_effl_to_wb")
+    async tricloroetile_effl(industry, global_layers){
+        let value = await effl_delta(industry, "wwt_tricloroetile_effl_to_wb", global_layers)
+        return value
     },
 
 }
