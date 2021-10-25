@@ -921,6 +921,7 @@ export default {
       }
       async function data_on_point(lat, lng){
         let value = await _this.get_raster_data(lat, lng, geotiff_file_data)*scale
+        console.log(value)
         return value
       }
 
@@ -1171,17 +1172,17 @@ export default {
       let color_function_streamflow = function(values) {
         let value = values[0]
         if (value <= 0 || value >= 100000002004087730000) return
-        else if (value <= 3.01) return '#d1e2f3'
-        else if(value <= 12.07) return '#9ac8e0'
-        else if(value <= 35.49) return '#529dcc'
+        else if (value <= 3) return '#d1e2f3'
+        else if(value <= 12) return '#9ac8e0'
+        else if(value <= 35) return '#529dcc'
         else if(value <= 123.89) return '#1d6cb1'
         else if(value > 123.89) return '#08306b'
 
       }
       let color_legend_streamflow = ['#d1e2f3', '#9ac8e0', '#529dcc', '#1d6cb1', '#08306b' ]
-      let label_legend_streamflow = ["<=3.01 m3/seconds", "<=12.07 m3/seconds", "<=35.49 m3/seconds", "<=123.89 m3/seconds", ">=123.90 m3/seconds"]
+      let label_legend_streamflow = ["<=3 m3/seconds", "<=12 m3/seconds", "<=35 m3/seconds", "<=123 m3/seconds", ">=123 m3/seconds"]
 
-      this.layers["Streamflow"].layers.baseline.annual.layer = this.define_raster_layer("dismanual",  null, color_function_streamflow, color_legend_streamflow, label_legend_streamflow, " m3/seconds")
+      this.layers["Streamflow"].layers.baseline.annual.layer = this.define_raster_layer("dismanual",  'streamflow_color', undefined, color_legend_streamflow, label_legend_streamflow, " m3/seconds")
       this.layers["Streamflow"].layers.future.layer = this.define_raster_layer("streamflow_2030",  null, color_function_streamflow, color_legend_streamflow, label_legend_streamflow, " m3/seconds", 1, 32, 100000002004087730000)
 
 

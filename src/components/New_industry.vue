@@ -238,7 +238,8 @@
           </v-row>
 
           <!-- supply chain -->
-          <v-row style="background-color: #F2F4F3" align="center">
+
+          <v-row v-if="final_product_industries.length > 0" style="background-color: #F2F4F3" align="center">
             <v-col cols="8" >
               <div style="width: 100%;">
                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
@@ -261,205 +262,209 @@
               </div>
             </v-col>
           </v-row>
-          <v-row style="background-color: #F2F4F3" align="center">
-            <v-col cols="8" >
-              <div style="width: 100%;">
-                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+
+          <div v-if="operation_type == 'supply_chain'">
+            <v-row style="background-color: #F2F4F3" align="center">
+              <v-col cols="8" >
+                <div style="width: 100%;">
+                  <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                       <span>
-                        To which industry supplies products
+                        To which final product industry supplies products
                       </span>
 
+                  </div>
                 </div>
-              </div>
-            </v-col>
-            <v-col cols="4">
-              <div>
-                <v-select
-                    v-model="industry_provided"
-                    :items="final_product_industries"
-                    item-text="text"
-                    item-value="value"
-                    label="Select"
-                ></v-select>
-              </div>
-            </v-col>
-          </v-row>
-          <v-row style="background-color: #F2F4F3" align="center">
-            <v-col cols="8" >
-              <div style="width: 100%;">
-                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                      <span>
-                        Daily freight weight supplied :
-                      </span>
-
-                </div>
-              </div>
-            </v-col>
-            <v-col cols="4">
-              <div>
+              </v-col>
+              <v-col cols="4">
                 <div>
-                  <v-text-field
-                      v-model="weight_cargo"
-                      suffix="km/dia"
-                      type="number"
-                  ></v-text-field>
-
+                  <v-select
+                      v-model="industry_provided"
+                      :items="final_product_industries"
+                      item-text="text"
+                      item-value="value"
+                      label="Select"
+                  ></v-select>
                 </div>
-              </div>
-
-            </v-col>
-          </v-row>  <!-- weight -->
-          <v-row style="background-color: #F2F4F3" align="center">
-            <v-col cols="8" >
-              <div style="width: 100%;">
-                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+              </v-col>
+            </v-row>
+            <v-row style="background-color: #F2F4F3" align="center">
+              <v-col cols="8" >
+                <div style="width: 100%;">
+                  <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                       <span>
-                        Daily freight volume supplied :
+                        Daily freight weight supplied to the final product industry:
                       </span>
 
+                  </div>
                 </div>
-              </div>
-            </v-col>
-            <v-col cols="4">
-              <div>
+              </v-col>
+              <v-col cols="4">
                 <div>
-                  <v-text-field
-                      v-model="volume_cargo"
-                      suffix="m3/dia"
-                      type="number"
-                  ></v-text-field>
+                  <div>
+                    <v-text-field
+                        v-model="weight_cargo"
+                        suffix="km/dia"
+                        type="number"
+                    ></v-text-field>
 
+                  </div>
                 </div>
-              </div>
 
-            </v-col>
-          </v-row>  <!-- volume -->
-
-          <v-row style="background-color: #F2F4F3" align="center">
-            <v-col cols="8" >
-              <div style="width: 100%;">
-                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+              </v-col>
+            </v-row>  <!-- weight -->
+            <v-row style="background-color: #F2F4F3" align="center">
+              <v-col cols="8" >
+                <div style="width: 100%;">
+                  <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                       <span>
-                        Distance the shipment has traveled by cargo aircraft:
+                        Daily freight volume supplied to the final product industry:
                       </span>
 
+                  </div>
                 </div>
-              </div>
-            </v-col>
-            <v-col cols="4">
-              <div>
+              </v-col>
+              <v-col cols="4">
                 <div>
-                  <v-text-field
-                      v-model="km_air"
-                      suffix="km"
-                      type="number"
-                  ></v-text-field>
+                  <div>
+                    <v-text-field
+                        v-model="volume_cargo"
+                        suffix="m3/dia"
+                        type="number"
+                    ></v-text-field>
 
+                  </div>
                 </div>
-              </div>
 
-            </v-col>
-          </v-row>  <!-- air -->
-          <v-row style="background-color: #F2F4F3" align="center">
-            <v-col cols="8" >
-              <div style="width: 100%;">
-                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+              </v-col>
+            </v-row>  <!-- volume -->
+
+            <v-row style="background-color: #F2F4F3" align="center">
+              <v-col cols="8" >
+                <div style="width: 100%;">
+                  <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                       <span>
-                        Distance the shipment has traveled by barge
+                        Distance the shipment has traveled by cargo aircraft to the final product industry:
                       </span>
 
+                  </div>
                 </div>
-              </div>
-            </v-col>
-            <v-col cols="4">
-              <div>
+              </v-col>
+              <v-col cols="4">
                 <div>
-                  <v-text-field
-                      v-model="km_barge"
-                      suffix="km"
-                      type="number"
-                  ></v-text-field>
+                  <div>
+                    <v-text-field
+                        v-model="km_air"
+                        suffix="km"
+                        type="number"
+                    ></v-text-field>
 
+                  </div>
                 </div>
-              </div>
 
-            </v-col>
-          </v-row>  <!-- barge -->
-          <v-row style="background-color: #F2F4F3" align="center">
-            <v-col cols="8" >
-              <div style="width: 100%;">
-                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+              </v-col>
+            </v-row>  <!-- air -->
+            <v-row style="background-color: #F2F4F3" align="center">
+              <v-col cols="8" >
+                <div style="width: 100%;">
+                  <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                       <span>
-                        Distance the shipment has traveled by sea
+                        Distance the shipment has traveled by barge to the final product industry
                       </span>
 
+                  </div>
                 </div>
-              </div>
-            </v-col>
-            <v-col cols="4">
-              <div>
+              </v-col>
+              <v-col cols="4">
                 <div>
-                  <v-text-field
-                      v-model="km_ocean"
-                      suffix="km"
-                      type="number"
-                  ></v-text-field>
+                  <div>
+                    <v-text-field
+                        v-model="km_barge"
+                        suffix="km"
+                        type="number"
+                    ></v-text-field>
 
+                  </div>
                 </div>
-              </div>
 
-            </v-col>
-          </v-row>  <!-- ocean -->
-          <v-row style="background-color: #F2F4F3" align="center">
-            <v-col cols="8" >
-              <div style="width: 100%;">
-                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+              </v-col>
+            </v-row>  <!-- barge -->
+            <v-row style="background-color: #F2F4F3" align="center">
+              <v-col cols="8" >
+                <div style="width: 100%;">
+                  <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                       <span>
-                        Distance the shipment has traveled by rail
+                        Distance the shipment has traveled by sea to the final product industry
                       </span>
 
+                  </div>
                 </div>
-              </div>
-            </v-col>
-            <v-col cols="4">
-              <div>
+              </v-col>
+              <v-col cols="4">
                 <div>
-                  <v-text-field
-                      v-model="km_rail"
-                      suffix="km"
-                      type="number"
-                  ></v-text-field>
+                  <div>
+                    <v-text-field
+                        v-model="km_ocean"
+                        suffix="km"
+                        type="number"
+                    ></v-text-field>
 
+                  </div>
                 </div>
-              </div>
 
-            </v-col>
-          </v-row>  <!-- rail -->
-          <v-row style="background-color: #F2F4F3" align="center">
-            <v-col cols="8" >
-              <div style="width: 100%;">
-                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+              </v-col>
+            </v-row>  <!-- ocean -->
+            <v-row style="background-color: #F2F4F3" align="center">
+              <v-col cols="8" >
+                <div style="width: 100%;">
+                  <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                       <span>
-                        Distance the shipment has traveled by truck
+                        Distance the shipment has traveled by rail to the final product industry
                       </span>
 
+                  </div>
                 </div>
-              </div>
-            </v-col>
-            <v-col cols="4">
-              <div>
+              </v-col>
+              <v-col cols="4">
                 <div>
-                  <v-text-field
-                      v-model="km_truck"
-                      suffix="km"
-                      type="number"
-                  ></v-text-field>
+                  <div>
+                    <v-text-field
+                        v-model="km_rail"
+                        suffix="km"
+                        type="number"
+                    ></v-text-field>
 
+                  </div>
                 </div>
-              </div>
 
-            </v-col>
-          </v-row>  <!-- truck -->
+              </v-col>
+            </v-row>  <!-- rail -->
+            <v-row style="background-color: #F2F4F3" align="center">
+              <v-col cols="8" >
+                <div style="width: 100%;">
+                  <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                      <span>
+                        Distance the shipment has traveled by truck to the final product industry
+                      </span>
+
+                  </div>
+                </div>
+              </v-col>
+              <v-col cols="4">
+                <div>
+                  <div>
+                    <v-text-field
+                        v-model="km_truck"
+                        suffix="km"
+                        type="number"
+                    ></v-text-field>
+
+                  </div>
+                </div>
+
+              </v-col>
+            </v-row>  <!-- truck -->
+
+          </div>
 
           <!-- Pollutants -->
           <v-row style="background-color: #F2F4F3" align="center">
@@ -1651,6 +1656,10 @@ export default {
   },
   watch: {
 
+    operation_type(new_value){
+      if(new_value == "supply_chain") this.industry_provided = this.final_product_industries[0].value
+      else if(new_value == "final_product") this.industry_provided = null
+    },
     offsite_wwtp_type(type){
       if(type == "Industrial"){
         this.wwtp_offsite_estimations = Industrial_wwtp_offsite.get_estimations()
@@ -1681,9 +1690,9 @@ export default {
         }
 
 
-        metrics.dilution_factor(this.global_layers, this.industry)
-        metrics.recycled_water_factor(this.industry)
-        metrics.dbo_in_river(this.global_layers, this.industry)
+        //metrics.dilution_factor(this.global_layers, this.industry)
+        //metrics.recycled_water_factor(this.industry)
+        //metrics.dbo_in_river(this.global_layers, this.industry)
 
       }
     },

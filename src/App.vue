@@ -775,6 +775,15 @@ export default {
       if(this.icon_selected === -1) this.icon_selected = 0
       this.rightMenu = false
       this.snackbars.delete_industry.v_model = true
+
+      //If any industry belong to the supply chain of this industry, change it to final product industry
+      this.created_assessments[this.selected_assessment].industries.forEach(industry => {
+        if (industry.operation_type == 'supply_chain' && industry.industry_provided == this.created_assessments[this.selected_assessment].industries[this.selected_industry].name){
+          industry.operation_type = 'final_product'
+          industry.industry_provided = null
+        }
+      })
+
       this.$assessments[this.selected_assessment].delete_industry(this.selected_industry)
       this.update_markers()
       try {
