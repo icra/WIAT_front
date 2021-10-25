@@ -106,7 +106,7 @@ function effl_efficiency(industry, pollutant_effl, pollutant_infl){   //Amount o
     let eff = load / load_infl
 
     if(isNaN(eff)) return NaN
-    return eff
+    return eff*100
 }
 
 let metrics = {
@@ -161,7 +161,7 @@ let metrics = {
         //let dilution_factor = water_discharged/(water_discharged + flow_acc_value)
         let dilution_factor = (water_discharged + streamflow_value)/water_discharged
 
-        return dilution_factor
+        return dilution_factor*100
 
     },
 
@@ -173,14 +173,14 @@ let metrics = {
 
         let available_ratio = water_withdrawn / streamflow_value
         if (isNaN(available_ratio)) return NaN
-        else return available_ratio
+        else return available_ratio*100
 
     },
 
     recycled_water_factor(industry){
         if(industry.has_onsite_wwtp && industry.volume_used > 0) {
             let recycled_water_factor = industry.onsite_wwtp.wwt_vol_reused / industry.volume_used
-            return recycled_water_factor
+            return recycled_water_factor*100
         }
         return NaN
     },
@@ -200,7 +200,7 @@ let metrics = {
         } //m3/day
 
         if (water_discharged == 0) return NaN
-        else return water_treated/water_discharged
+        else return 100*water_treated/water_discharged
     },
 
     efficiency_factor(industry){
@@ -209,7 +209,6 @@ let metrics = {
         let efficiency = product_produced/vol_used
         return NaN
     },
-
 
     /*async dbo_in_river(global_layers, industry, assessment_days, future = false){
         let pharmaceutical_pollution = global_layers["Surface Water Pharmaceutical Pollution"].layers.baseline.annual.layer
@@ -291,59 +290,123 @@ let metrics = {
         let bod_industry = industry.bod_effl_concentration * water_treated
         let eff = load / bod_industry
         if(isNaN(eff)) return NaN
-        return eff
+        return eff*100
     },
 
     async tn_effl(industry, global_layers){
         let value = await effl_delta(industry, "wwt_tn_effl_to_wb", global_layers)
         return value
     },
+    tn_efficiency(industry){
+        let value = effl_efficiency(industry, "wwt_tn_effl_to_wb", "tn_effl_concentration")
+        return value
+    },
+
     async tp_effl(industry, global_layers){
         let value = await effl_delta(industry, "wwt_tp_effl_to_wb", global_layers)
         return value
     },
+    tp_efficiency(industry){
+        let value = effl_efficiency(industry, "wwt_tp_effl_to_wb", "tp_effl_concentration")
+        return value
+    },
+
     async dichloroethane_effl(industry, global_layers){
         let value = await effl_delta(industry, "wwt_diclo_effl_to_wb", global_layers)
         return value
     },
+    dichloroethane_efficiency(industry){
+        let value = effl_efficiency(industry, "wwt_diclo_effl_to_wb", "diclo_effl")
+        return value
+    },
+
     async cadmium_effl(industry, global_layers){
         let value = await effl_delta(industry, "wwt_cadmium_effl_to_wb", global_layers)
         return value
     },
+    cadmium_efficiency(industry){
+        let value = effl_efficiency(industry, "wwt_cadmium_effl_to_wb", "cadmium_effl")
+        return value
+    },
+
     async hexaclorobenzene_effl(industry, global_layers){
         let value = await effl_delta(industry, "wwt_hexaclorobenzene_effl_to_wb", global_layers)
         return value
     },
+    hexaclorobenzene_efficiency(industry){
+        let value = effl_efficiency(industry, "wwt_hexaclorobenzene_effl_to_wb", "hexaclorobenzene_effl")
+        return value
+    },
+
     async mercury_effl(industry, global_layers){
         let value = await effl_delta(industry, "wwt_mercury_effl_to_wb", global_layers)
         return value
     },
+    mercury_efficiency(industry){
+        let value = effl_efficiency(industry, "wwt_mercury_effl_to_wb", "mercury_effl")
+        return value
+    },
+
     async lead_effl(industry, global_layers){
         let value = await effl_delta(industry, "wwt_plomo_effl_to_wb", global_layers)
         return value
     },
+    lead_efficiency(industry){
+        let value = effl_efficiency(industry, "wwt_plomo_effl_to_wb", "plomo_effl")
+        return value
+    },
+
     async nickel_effl(industry, global_layers){
         let value = await effl_delta(industry, "wwt_niquel_effl_to_wb", global_layers)
         return value
     },
+    nickel_efficiency(industry){
+        let value = effl_efficiency(industry, "wwt_niquel_effl_to_wb", "niquel_effl")
+        return value
+    },
+
     async chloroalkanes_effl(industry, global_layers){
         let value = await effl_delta(industry, "wwt_chloro_effl_to_wb", global_layers)
         return value
     },
+    chloroalkanes_efficiency(industry){
+        let value = effl_efficiency(industry, "wwt_chloro_effl_to_wb", "chloro_effl")
+        return value
+    },
+
     async hexaclorobutadie_effl(industry, global_layers){
         let value = await effl_delta(industry, "wwt_hexaclorobutadie_effl_to_wb", global_layers)
         return value
     },
+    hexaclorobutadie_efficiency(industry){
+        let value = effl_efficiency(industry, "wwt_hexaclorobutadie_effl_to_wb", "hexaclorobutadie_effl")
+        return value
+    },
+
     async nonylphenols_effl(industry, global_layers){
         let value = await effl_delta(industry, "wwt_nonilfenols_effl_to_wb", global_layers)
         return value
     },
+    nonylphenols_efficiency(industry){
+        let value = effl_efficiency(industry, "wwt_nonilfenols_effl_to_wb", "nonilfenols_effl")
+        return value
+    },
+
     async tetrachloroethene_effl(industry, global_layers){
         let value = await effl_delta(industry, "wwt_tetracloroetile_effl_to_wb", global_layers)
         return value
     },
+    tetrachloroethene_efficiency(industry){
+        let value = effl_efficiency(industry, "wwt_tetracloroetile_effl_to_wb", "tetracloroetile_effl")
+        return value
+    },
+
     async tricloroetile_effl(industry, global_layers){
         let value = await effl_delta(industry, "wwt_tricloroetile_effl_to_wb", global_layers)
+        return value
+    },
+    tricloroetile_efficiency(industry){
+        let value = effl_efficiency(industry, "wwt_tricloroetile_effl_to_wb", "tricloroetile_effl")
         return value
     },
 

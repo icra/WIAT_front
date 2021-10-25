@@ -188,7 +188,7 @@
             </v-col>
 
           </v-row>
-          <v-row style="background-color: #F2F4F3" align="center" v-if="has_offsite_wwtp">
+          <v-row style="background-color: #F2F4F3" align="center">
             <v-col cols="8" >
               <div style="width: 100%;">
                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
@@ -202,6 +202,7 @@
             <v-col cols="4">
               <div>
                 <v-select
+                    :disabled="!has_offsite_wwtp"
                     v-model="offsite_wwtp_type"
                     :items="industrial_domestic"
                     label="Select"
@@ -239,7 +240,7 @@
 
           <!-- supply chain -->
 
-          <v-row v-if="final_product_industries.length > 0" style="background-color: #F2F4F3" align="center">
+          <v-row style="background-color: #F2F4F3" align="center">
             <v-col cols="8" >
               <div style="width: 100%;">
                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
@@ -253,6 +254,7 @@
             <v-col cols="4">
               <div>
                 <v-select
+                    :disabled="final_product_industries.length == 0"
                     v-model="operation_type"
                     :items="operation_typologies"
                     item-text="text"
@@ -263,7 +265,7 @@
             </v-col>
           </v-row>
 
-          <div v-if="operation_type == 'Supply chain'">
+          <div>
             <v-row style="background-color: #F2F4F3" align="center">
               <v-col cols="8" >
                 <div style="width: 100%;">
@@ -283,6 +285,7 @@
                       item-text="text"
                       item-value="value"
                       label="Select"
+                      :disabled="operation_type == 'Final product'"
                   ></v-select>
                 </div>
               </v-col>
@@ -305,6 +308,7 @@
                         v-model="weight_cargo"
                         suffix="km/dia"
                         type="number"
+                        :disabled="operation_type == 'Final product'"
                     ></v-text-field>
 
                   </div>
@@ -330,6 +334,7 @@
                         v-model="volume_cargo"
                         suffix="m3/dia"
                         type="number"
+                        :disabled="operation_type == 'Final product'"
                     ></v-text-field>
 
                   </div>
@@ -356,6 +361,7 @@
                         v-model="km_air"
                         suffix="km"
                         type="number"
+                        :disabled="operation_type == 'Final product'"
                     ></v-text-field>
 
                   </div>
@@ -381,6 +387,7 @@
                         v-model="km_barge"
                         suffix="km"
                         type="number"
+                        :disabled="operation_type == 'Final product'"
                     ></v-text-field>
 
                   </div>
@@ -406,6 +413,7 @@
                         v-model="km_ocean"
                         suffix="km"
                         type="number"
+                        :disabled="operation_type == 'Final product'"
                     ></v-text-field>
 
                   </div>
@@ -431,6 +439,7 @@
                         v-model="km_rail"
                         suffix="km"
                         type="number"
+                        :disabled="operation_type == 'Final product'"
                     ></v-text-field>
 
                   </div>
@@ -456,6 +465,7 @@
                         v-model="km_truck"
                         suffix="km"
                         type="number"
+                        :disabled="operation_type == 'Final product'"
                     ></v-text-field>
 
                   </div>
@@ -1705,12 +1715,47 @@ export default {
       if (industry === undefined) {
         this.$router.push('/')
       }
+
+      document.getElementsByClassName('outer').forEach(div => {
+        div.scrollTo(0, 0)
+      })
       this.stepper_model = 1
       this.water_withdrawn = industry.volume_withdrawn
       this.has_onsite_wwtp = industry.has_onsite_wwtp
       this.has_offsite_wwtp = industry.has_offsite_wwtp
       this.offsite_wwtp_type = industry.offsite_wwtp_type
       this.has_direct_discharge = industry.has_direct_discharge
+      this.ind_tn_effl_concentration = industry.tn_effl_concentration
+      this.ind_tp_effl_concentration = industry.tp_effl_concentration
+      this.ind_bod_effl_concentration = industry.bod_effl_concentration
+      this.volume_used =  industry.volume_used
+
+      //Priority pollutants
+      this.diclo_effl = industry.diclo_effl //1,2-Dichloroethane
+      this.cadmium_effl  = industry.cadmium_effl //Cadmium
+      this.hexaclorobenzene_effl = industry.hexaclorobenzene_effl //Hexachlorobenzene
+      this.mercury_effl = industry.mercury_effl //mercury
+      this.plomo_effl = industry.plomo_effl //lead
+      this.niquel_effl = industry.niquel_effl //nickel
+      this.chloro_effl = industry.chloro_effl //chloroalkanes
+      this.hexaclorobutadie_effl = industry.hexaclorobutadie_effl //Hexachlorobutadiene
+      this.nonilfenols_effl = industry.nonilfenols_effl //Nonylphenols
+      this.tetracloroetile_effl = industry.tetracloroetile_effl //tetrachloroethene
+      this.tricloroetile_effl = industry.tricloroetile_effl //Trichloroethylene
+      this.industry_type = industry.industry_type
+
+      //Supply chain
+      this.operation_type = industry.operation_type
+      this.industry_provided = industry.industry_provided
+      this.km_air = industry.km_air
+      this.km_barge = industry.km_barge
+      this.km_ocean = industry.km_ocean
+      this.km_rail = industry.km_rail
+      this.km_truck = industry.km_truck
+      this.volume_cargo = industry.volume_cargo
+      this.weight_cargo = industry.weight_cargo
+
+
     },
   },
   methods: {

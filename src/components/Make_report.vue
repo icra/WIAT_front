@@ -63,11 +63,20 @@
                       ></v-data-table>
 
                       <div class = table_descriptor>
-                        <b> Quality Indicators: </b>
+                        <b> Increment in pollutant load after discharging water: </b>
                       </div>
                       <v-data-table
                           :headers="pollutants_table.header"
                           :items="pollutants_table.value"
+                          class="elevation-1"
+                      ></v-data-table>
+
+                      <div class = table_descriptor>
+                        <b> Pollutant treatment efficiency: </b>
+                      </div>
+                      <v-data-table
+                          :headers="treatment_efficiency_table.header"
+                          :items="treatment_efficiency_table.value"
                           class="elevation-1"
                       ></v-data-table>
 
@@ -229,7 +238,8 @@ export default {
       tab: 0,
       layers_table: {header: [], value: []},
       pollutants_table: {header: [], value: []},
-      water_quantity: {header: [], value: []}
+      water_quantity: {header: [], value: []},
+      treatment_efficiency_table: {header: [], value: []},
 
     }
   },
@@ -239,12 +249,12 @@ export default {
       this.layers_table = await this.generate_layers_table()
       this.pollutants_table = await this.generate_pollutants_table()
       this.water_quantity = await this.generate_water_quality_table()
+      this.treatment_efficiency_table = this.generate_treatment_efficiency_table()
     },
 
     selected_assessments: function (new_selected_assessments){
       this.selected_industries = []
       let _this = this
-      console.log(new_selected_assessments)
       new_selected_assessments.forEach(assessment => {
         assessment.industries.forEach(industry => {
           _this.selected_industries.push({
@@ -260,6 +270,7 @@ export default {
       this.layers_table = await this.generate_layers_table()
       this.pollutants_table = await this.generate_pollutants_table()
       this.water_quantity = await this.generate_water_quality_table()
+      this.treatment_efficiency_table = this.generate_treatment_efficiency_table()
       if(new_selected_industries.length > 0) this.pieChart_base64()
 
     },
@@ -267,12 +278,14 @@ export default {
       this.layers_table = await this.generate_layers_table()
       this.pollutants_table = await this.generate_pollutants_table()
       this.water_quantity = await this.generate_water_quality_table()
+      this.treatment_efficiency_table = this.generate_treatment_efficiency_table()
 
     },
     units_model: async function () {
       this.layers_table = await this.generate_layers_table()
       this.pollutants_table = await this.generate_pollutants_table()
       this.water_quantity = await this.generate_water_quality_table()
+      this.treatment_efficiency_table = this.generate_treatment_efficiency_table()
 
       this.bod_to_cod = 1
       if(this.units_model === "cod") this.bod_to_cod = 1/2.4
@@ -281,12 +294,190 @@ export default {
       this.layers_table = await this.generate_layers_table()
       this.pollutants_table = await this.generate_pollutants_table()
       this.water_quantity = await this.generate_water_quality_table()
+      this.treatment_efficiency_table = this.generate_treatment_efficiency_table()
 
     },
 
 
   },
   methods: {
+    generate_treatment_efficiency_table() {
+
+      let _this = this
+
+      const groupedByAssessments = _.groupBy(this.selected_industries, function(n) {
+        return n.assessment.name;
+      });
+
+      if(_this.tab !== undefined && _this.tab !== null && Object.values(groupedByAssessments)[_this.tab] != undefined){
+
+        let assessment = Object.values(groupedByAssessments)[_this.tab][0].assessment
+        let assessment_days = utils.daysBetween(assessment.assessment_period_start, assessment.assessment_period_end)
+
+        let days_factor = 1
+        if(this.period_model === "annual") days_factor = 365
+        else if(this.period_model === "assessment") days_factor = assessment_days
+
+        let pollutants_table = {
+          header: [{text: "Impact calculation", value: "value", sortable: false}],
+          value: []
+        }
+
+
+        let tn = {value: "TN treatment efficiency", unit: "%"}
+        let tp = {value: "TP treatment efficiency", unit: "%"}
+        let dichloroethane = {value: "1,2-Dichloroethane treatment efficiency", unit: "%"}
+        let cadmium = {value: "Cadmium treatment efficiency", unit: "%"}
+        let hexachlorobenzene = {value: "Hexachlorobenzene treatment efficiency", unit: "%"}
+        let mercury = {value: "Mercury treatment efficiency", unit: "%"}
+        let lead = {value: "Lead treatment efficiency", unit: "%"}
+        let nickel = {value: "Nickel treatment efficiency", unit: "%"}
+        let chloroalkanes = {value: "Chloroalkanes treatment efficiency", unit: "%"}
+        let hexaclorobutadie = {value: "Hexachlorobutadiene treatment efficiency", unit: "%"}
+        let nonylphenols = {value: "Nonylphenols treatment efficiency", unit: "%"}
+        let tetrachloroethene = {value: "Tetrachloroethene treatment efficiency", unit: "%"}
+        let trichloroethylene = {value: "Trichloroethylene treatment efficiency", unit: "%"}
+        let bod = {value: "", unit: "%"}
+        if(this.units_model === "bod") {
+          bod.value = "BOD treatment efficiency"
+        }
+        else {
+          bod.value = "COD treatment efficiency"
+        }
+
+
+        for (const industryAux of Object.values(groupedByAssessments)[_this.tab]) {
+          let industry = industryAux.industry
+          pollutants_table.header.push({
+            text: industry.name, value: industry.name,
+          })
+
+          let tn_value = metrics.tn_efficiency(industry)
+          if(Number.isFinite(tn_value)){
+            tn[industry.name] = ((days_factor*tn_value).toExponential(3))
+          }else{
+            tn[industry.name] = ("-")
+          }
+          let tp_value = metrics.tp_efficiency(industry)
+          if(Number.isFinite(tp_value)){
+            tp[industry.name] = ((days_factor*tp_value).toExponential(3))
+          }else{
+            tp[industry.name] = ("-")
+          }
+
+          let bod_value = metrics.bod_efficiency(industry)
+          if(Number.isFinite(bod_value)){
+            bod[industry.name] = ((days_factor*bod_value*this.bod_to_cod).toExponential(3))
+          }else{
+            bod[industry.name] = ("-")
+          }
+
+          //let dbo_value = await metrics.dbo_in_river(this.global_layers, industry, assessment_days)
+
+          let dichloroethane_value = metrics.dichloroethane_efficiency(industry)
+          if(Number.isFinite(dichloroethane_value)){
+            dichloroethane[industry.name] = ((days_factor*dichloroethane_value).toExponential(3))
+          }else{
+            dichloroethane[industry.name] = ("-")
+          }
+
+          let cadmium_value = metrics.cadmium_efficiency(industry)
+          if(Number.isFinite(cadmium_value)){
+            cadmium[industry.name] = ((days_factor*cadmium_value).toExponential(3))
+          }else{
+            cadmium[industry.name] = ("-")
+          }
+
+          let hexaclorobenzene_value = metrics.hexaclorobenzene_efficiency(industry)
+          if(Number.isFinite(hexaclorobenzene_value)){
+            hexachlorobenzene[industry.name] = ((days_factor*hexaclorobenzene_value).toExponential(3))
+          }else{
+            hexachlorobenzene[industry.name] = ("-")
+          }
+
+          let mercury_value = metrics.mercury_efficiency(industry)
+          if(Number.isFinite(mercury_value)){
+            mercury[industry.name] = ((days_factor*mercury_value).toExponential(3))
+          }else{
+            mercury[industry.name] = ("-")
+          }
+
+          let lead_value = metrics.lead_efficiency(industry)
+          if(Number.isFinite(lead_value)){
+            lead[industry.name] = ((days_factor*lead_value).toExponential(3))
+          }else{
+            lead[industry.name] = ("-")
+          }
+
+          let nickel_value = metrics.nickel_efficiency(industry)
+          if(Number.isFinite(nickel_value)){
+            nickel[industry.name] = ((days_factor*nickel_value).toExponential(3))
+          }else{
+            nickel[industry.name] = ("-")
+          }
+
+          let chloroalkanes_value = metrics.chloroalkanes_efficiency(industry)
+          if(Number.isFinite(chloroalkanes_value)){
+            chloroalkanes[industry.name] = ((days_factor*chloroalkanes_value).toExponential(3))
+          }else{
+            chloroalkanes[industry.name] = ("-")
+          }
+
+          let hexaclorobutadie_value = metrics.hexaclorobutadie_efficiency(industry)
+          if(Number.isFinite(hexaclorobutadie_value)){
+            hexaclorobutadie[industry.name] = ((days_factor*hexaclorobutadie_value).toExponential(3))
+          }else{
+            hexaclorobutadie[industry.name] = ("-")
+          }
+
+          let nonylphenols_value = metrics.nonylphenols_efficiency(industry)
+          if(Number.isFinite(nonylphenols_value)){
+            nonylphenols[industry.name] = ((days_factor*nonylphenols_value).toExponential(3))
+          }else{
+            nonylphenols[industry.name] = ("-")
+          }
+
+          let tetrachloroethene_value = metrics.tetrachloroethene_efficiency(industry)
+          if(Number.isFinite(tetrachloroethene_value)){
+            tetrachloroethene[industry.name] = ((days_factor*tetrachloroethene_value).toExponential(3))
+          }else{
+            tetrachloroethene[industry.name] = ("-")
+          }
+
+          let trichloroethylene_value = metrics.tricloroetile_efficiency(industry)
+          if(Number.isFinite(trichloroethylene_value)){
+            trichloroethylene[industry.name] = ((days_factor*trichloroethylene_value).toExponential(3))
+          }else{
+            trichloroethylene[industry.name] = ("-")
+          }
+
+        }
+
+        pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
+
+
+        pollutants_table.value.push(bod)
+        pollutants_table.value.push(tn)
+        pollutants_table.value.push(tp)
+        pollutants_table.value.push(dichloroethane)
+        pollutants_table.value.push(cadmium)
+        pollutants_table.value.push(hexachlorobenzene)
+        pollutants_table.value.push(mercury)
+        pollutants_table.value.push(lead)
+        pollutants_table.value.push(nickel)
+        pollutants_table.value.push(chloroalkanes)
+        pollutants_table.value.push(hexaclorobutadie)
+        pollutants_table.value.push(nonylphenols)
+        pollutants_table.value.push(tetrachloroethene)
+        pollutants_table.value.push(trichloroethylene)
+
+
+
+        return pollutants_table
+      }
+      else return {header: [], emissions: []}
+
+    },
 
     async button_generate_pdf_clicked(){
       if (this.selected_industries.length > 0) {
@@ -320,10 +511,10 @@ export default {
         }
 
         let ghg_potential = {value: "Global Warming Potential", unit: "kgCO2eq"}
-        let dilution_factor_row = {value: "Dilution factor", unit: "-"}
-        let recycled_factor = {value: "Recycled water factor", unit: "-"}
-        let treated_factor = {value: "Treated water factor", unit: "-"}
-        let available_ratio = {value: "Consumption available ratio", unit: "-"}
+        let dilution_factor_row = {value: "Dilution factor", unit: "%"}
+        let recycled_factor = {value: "Recycled water factor", unit: "%"}
+        let treated_factor = {value: "Treated water factor", unit: "%"}
+        let available_ratio = {value: "Consumption available ratio", unit: "%"}
         let efficiency_factor = {value: "Water efficiency", unit: "tonnes/m3"}
 
         for (const industryAux of Object.values(groupedByAssessments)[_this.tab]) {
@@ -345,14 +536,16 @@ export default {
             dilution_factor_row[industry.name] = ("-")
           }
 
-          if(Number.isFinite(metrics.recycled_water_factor(industry))){
-            recycled_factor[industry.name] = (metrics.recycled_water_factor(industry).toExponential(3))
+          let recycled_water_factor_value = metrics.recycled_water_factor(industry)
+          if(Number.isFinite(recycled_water_factor_value)){
+            recycled_factor[industry.name] = (recycled_water_factor_value.toExponential(3))
           }else{
             recycled_factor[industry.name] = ("-")
           }
 
-          if(Number.isFinite(metrics.treated_water_factor(industry))){
-            treated_factor[industry.name] = (metrics.treated_water_factor(industry).toExponential(3))
+          let treated_water_factor = metrics.treated_water_factor(industry)
+          if(Number.isFinite(treated_water_factor)){
+            treated_factor[industry.name] = (treated_water_factor.toExponential(3))
           }else{
             treated_factor[industry.name] = ("-")
           }
@@ -445,7 +638,7 @@ export default {
           }else{
             tn[industry.name] = ("-")
           }
-          let tp_value = metrics.tp_effl(industry, this.global_layers)
+          let tp_value = await metrics.tp_effl(industry, this.global_layers)
           if(Number.isFinite(tp_value)){
             tp[industry.name] = ((days_factor*tp_value).toExponential(3))
           }else{
@@ -518,7 +711,7 @@ export default {
           }
 
           let nonylphenols_value = await metrics.nonylphenols_effl(industry, this.global_layers)
-          if(Number.isFinite(metrics.nonylphenols_effl(nonylphenols_value))){
+          if(Number.isFinite(nonylphenols_value)){
             nonylphenols[industry.name] = ((days_factor*nonylphenols_value).toExponential(3))
           }else{
             nonylphenols[industry.name] = ("-")
