@@ -76,7 +76,7 @@ export class Industry{
         this.tn_effl_concentration = 0
         this.tp_effl_concentration = 0
         this.volume_used = 0
-        this.operation_type = "final_product"
+        this.operation_type = "Final product"
         this.industry_provided = null
         this.km_air = 0
         this.km_barge = 0
@@ -85,6 +85,7 @@ export class Industry{
         this.km_truck = 0
         this.volume_cargo = 0
         this.weight_cargo = 0
+        this.product_produced = 0
 
         //Priority pollutants
         this.diclo_effl = 0 //1,2-Dichloroethane

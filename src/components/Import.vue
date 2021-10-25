@@ -179,6 +179,7 @@ export default {
       new_industry.tp_effl_concentration = industry.tp_effl_concentration
       new_industry.bod_effl_concentration = industry.bod_effl_concentration
       new_industry.vol_used = industry.vol_used
+      new_industry.product_produced = industry.product_produced
 
       new_industry.diclo_effl= industry.diclo_effl //1,2-Dichloroethane
       new_industry.cadmium_effl= industry.cadmium_effl //Cadmium
