@@ -109,6 +109,25 @@ function effl_efficiency(industry, pollutant_effl, pollutant_infl){   //Amount o
     return eff*100
 }
 
+function water_discharged(industry){
+    let water_discharged = 0
+    if(industry.has_onsite_wwtp) water_discharged += industry.onsite_wwtp.wwt_vol_disc  //m3/day
+    if(industry.has_direct_discharge) water_discharged += industry.direct_discharge.wwt_vol_disc //m3/day
+    if(industry.has_offsite_wwtp) water_discharged += industry.offsite_wwtp.wwt_vol_disc //m3/day
+    return water_discharged
+}
+
+async function withdrawn_factor(industry, global_layers){
+
+    let streamflow = global_layers["Streamflow"].layers.baseline.annual.layer
+    let streamflow_value = await streamflow.data_on_point(industry.location.lat, industry.location.lng)*86400 //streamflow (m3/day)
+    let factor = industry.volume_withdrawn / streamflow_value //Withdrawals that account for an average of five percent or more of the annual average significantly affects the water source
+    if(isNaN(factor)) return NaN
+    return factor
+
+
+}
+
 let metrics = {
 
     emissions_and_descriptions(industry){
@@ -178,8 +197,8 @@ let metrics = {
     },
 
     recycled_water_factor(industry){
-        if(industry.has_onsite_wwtp && industry.volume_used > 0) {
-            let recycled_water_factor = industry.onsite_wwtp.wwt_vol_reused / industry.volume_used
+        if(industry.has_onsite_wwtp && industry.water_withdrawn > 0) {
+            let recycled_water_factor = industry.onsite_wwtp.wwt_vol_reused / industry.water_withdrawn
             return recycled_water_factor*100
         }
         return NaN
@@ -270,6 +289,7 @@ let metrics = {
         if(isNaN(delta)) return NaN
         return delta //g/m3
     },
+
     bod_efficiency(industry){
         let load = 0
         let water_treated = 0
@@ -409,6 +429,21 @@ let metrics = {
         let value = effl_efficiency(industry, "wwt_tricloroetile_effl_to_wb", "tricloroetile_effl")
         return value
     },
+
+    async reporting_metrics(industry, global_layers){
+        let _this = this
+        let withdrawn_factor_value = await withdrawn_factor(industry, global_layers)
+        return {
+            "g4-en8": industry.volume_withdrawn,
+            "g4-en9": withdrawn_factor_value,
+            "g4-en10": _this.recycled_water_factor(industry),
+            "g4-en22": water_discharged(industry),
+            "wd": industry.water_withdrawn,
+            "dis": water_discharged(industry),
+            "con": industry.volume_used,
+            "re": industry.onsite_wwtp != null ? industry.onsite_wwtp.wwt_vol_reused : 0
+        }
+    }
 
 }
 

@@ -42,7 +42,7 @@
                           class="elevation-1"
                       ></v-data-table>
 
-                      <!--
+
                       <div class = table_descriptor>
                         <b > Global Warming Potential: </b>
                       </div>
@@ -51,7 +51,6 @@
                           :items="emissions_table.emissions"
                           class="elevation-1"
                       ></v-data-table>
-                      -->
 
                       <div class = table_descriptor>
                         <b> Availabilty & Quantity Indicators: </b>
@@ -77,6 +76,15 @@
                       <v-data-table
                           :headers="treatment_efficiency_table.header"
                           :items="treatment_efficiency_table.value"
+                          class="elevation-1"
+                      ></v-data-table>
+
+                      <div class = table_descriptor>
+                        <b> Reporting indicators: </b>
+                      </div>
+                      <v-data-table
+                          :headers="reporting_indicators.header"
+                          :items="reporting_indicators.value"
                           class="elevation-1"
                       ></v-data-table>
 
@@ -240,6 +248,7 @@ export default {
       pollutants_table: {header: [], value: []},
       water_quantity: {header: [], value: []},
       treatment_efficiency_table: {header: [], value: []},
+      reporting_indicators: {header: [], value: []},
 
     }
   },
@@ -250,6 +259,7 @@ export default {
       this.pollutants_table = await this.generate_pollutants_table()
       this.water_quantity = await this.generate_water_quality_table()
       this.treatment_efficiency_table = this.generate_treatment_efficiency_table()
+      this.reporting_indicators = await this.generate_reporting_indicators_table()
     },
 
     selected_assessments: function (new_selected_assessments){
@@ -271,6 +281,8 @@ export default {
       this.pollutants_table = await this.generate_pollutants_table()
       this.water_quantity = await this.generate_water_quality_table()
       this.treatment_efficiency_table = this.generate_treatment_efficiency_table()
+      this.reporting_indicators = await this.generate_reporting_indicators_table()
+
       if(new_selected_industries.length > 0) this.pieChart_base64()
 
     },
@@ -279,6 +291,7 @@ export default {
       this.pollutants_table = await this.generate_pollutants_table()
       this.water_quantity = await this.generate_water_quality_table()
       this.treatment_efficiency_table = this.generate_treatment_efficiency_table()
+      this.reporting_indicators = await this.generate_reporting_indicators_table()
 
     },
     units_model: async function () {
@@ -286,6 +299,8 @@ export default {
       this.pollutants_table = await this.generate_pollutants_table()
       this.water_quantity = await this.generate_water_quality_table()
       this.treatment_efficiency_table = this.generate_treatment_efficiency_table()
+      this.reporting_indicators = await this.generate_reporting_indicators_table()
+
 
       this.bod_to_cod = 1
       if(this.units_model === "cod") this.bod_to_cod = 1/2.4
@@ -295,12 +310,88 @@ export default {
       this.pollutants_table = await this.generate_pollutants_table()
       this.water_quantity = await this.generate_water_quality_table()
       this.treatment_efficiency_table = this.generate_treatment_efficiency_table()
+      this.reporting_indicators = await this.generate_reporting_indicators_table()
 
     },
 
 
   },
   methods: {
+
+    async generate_reporting_indicators_table() {
+
+      let _this = this
+
+      const groupedByAssessments = _.groupBy(this.selected_industries, function(n) {
+        return n.assessment.name;
+      });
+
+      if(_this.tab !== undefined && _this.tab !== null && Object.values(groupedByAssessments)[_this.tab] != undefined){
+
+        let assessment = Object.values(groupedByAssessments)[_this.tab][0].assessment
+        let assessment_days = utils.daysBetween(assessment.assessment_period_start, assessment.assessment_period_end)
+
+        let days_factor = 1
+        if(this.period_model === "annual") days_factor = 365
+        else if(this.period_model === "assessment") days_factor = assessment_days
+
+        let table = {
+          header: [{text: "", value: "value", sortable: false}],
+          value: []
+        }
+
+        let g4_en8 = {value: "G4-EN8 (GRI)", unit: "m3"}
+        let g4_en9 = {value: "G4-EN9 (GRI)", unit: "%"}
+        let g4_en10 = {value: "G4-EN10 (GRI)", unit: "%"}
+        let g4_en22 = {value: "G4-EN22 (GRI)", unit: "m3"}
+
+        for (const industryAux of Object.values(groupedByAssessments)[_this.tab]) {
+          let industry = industryAux.industry
+          let indicators = metrics.reporting_metrics(industry)
+
+          table.header.push({
+            text: industry.name, value: industry.name,
+          })
+
+          let en8 = indicators["g4-en8"]
+          if(Number.isFinite(en8)){
+            g4_en8[industry.name] = ((days_factor*en8).toExponential(3))
+          }else{
+            g4_en8[industry.name] = ("-")
+          }
+          let en9 = indicators["g4-en9"]
+          if(Number.isFinite(en9)){
+            g4_en9[industry.name] = ((days_factor*en9).toExponential(3))
+          }else{
+            g4_en9[industry.name] = ("-")
+          }
+          let en10 = indicators["g4-en10"]
+          if(Number.isFinite(en10)){
+            g4_en10[industry.name] = ((days_factor*en10).toExponential(3))
+          }else{
+            g4_en10[industry.name] = ("-")
+          }
+
+          let en22 = indicators["g4-en22"]
+          if(Number.isFinite(en22)){
+            g4_en22[industry.name] = ((days_factor*en22).toExponential(3))
+          }else{
+            g4_en22[industry.name] = ("-")
+          }
+        }
+
+        table.header.push({text: "Unit", value: "unit", sortable: false,})
+
+        table.value.push(g4_en8)
+        table.value.push(g4_en10)
+        table.value.push(g4_en22)
+
+        return table
+      }
+      else return {header: [], emissions: []}
+
+    },
+
     generate_treatment_efficiency_table() {
 
       let _this = this
@@ -319,7 +410,7 @@ export default {
         else if(this.period_model === "assessment") days_factor = assessment_days
 
         let pollutants_table = {
-          header: [{text: "Impact calculation", value: "value", sortable: false}],
+          header: [{text: "", value: "value", sortable: false}],
           value: []
         }
 
@@ -506,11 +597,10 @@ export default {
         else if(this.period_model === "assessment") days_factor = assessment_days
 
         let pollutants_table = {
-          header: [{text: "Impact calculation", value: "value", sortable: false}],
+          header: [{text: "", value: "value", sortable: false}],
           value: []
         }
 
-        let ghg_potential = {value: "Global Warming Potential", unit: "kgCO2eq"}
         let dilution_factor_row = {value: "Dilution factor", unit: "%"}
         let recycled_factor = {value: "Recycled water factor", unit: "%"}
         let treated_factor = {value: "Treated water factor", unit: "%"}
@@ -523,11 +613,6 @@ export default {
             text: industry.name, value: industry.name,
           })
 
-          if(Number.isFinite(metrics.global_warming_potential(industry))){
-            ghg_potential[industry.name] = ((days_factor*metrics.global_warming_potential(industry)).toExponential(3))
-          }else{
-            ghg_potential[industry.name] = ("-")
-          }
 
           let dilution_factor_value = await metrics.dilution_factor(this.global_layers, industry)
           if(Number.isFinite(dilution_factor_value)){
@@ -566,7 +651,6 @@ export default {
         pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
 
 
-        pollutants_table.value.push(ghg_potential)
         pollutants_table.value.push(dilution_factor_row)
         pollutants_table.value.push(recycled_factor)
         pollutants_table.value.push(treated_factor)
@@ -598,7 +682,7 @@ export default {
         else if(this.period_model === "assessment") days_factor = assessment_days
 
         let pollutants_table = {
-          header: [{text: "Impact calculation", value: "value", sortable: false}],
+          header: [{text: "", value: "value", sortable: false}],
           value: []
         }
 
@@ -1598,7 +1682,6 @@ export default {
 
           let raw_material_tranport = days_factor*emissions["supply_chain_emissions"]
           supply_chain[industry.name] = raw_material_tranport.toExponential(3)
-          console.log(emissions["supply_chain_emissions"])
           total_emission += raw_material_tranport
 
           total[industry.name] = total_emission.toExponential(3)
@@ -1614,6 +1697,7 @@ export default {
         emission_table.emissions.push(slu)
         emission_table.emissions.push(reus)
         emission_table.emissions.push(disc)
+        emission_table.emissions.push(supply_chain)
         emission_table.emissions.push(total)
 
 

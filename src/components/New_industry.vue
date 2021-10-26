@@ -306,7 +306,7 @@
                   <div>
                     <v-text-field
                         v-model="weight_cargo"
-                        suffix="km/dia"
+                        suffix="kg/day"
                         type="number"
                         :disabled="operation_type == 'Final product'"
                     ></v-text-field>
@@ -332,7 +332,7 @@
                   <div>
                     <v-text-field
                         v-model="volume_cargo"
-                        suffix="m3/dia"
+                        suffix="m3/day"
                         type="number"
                         :disabled="operation_type == 'Final product'"
                     ></v-text-field>
