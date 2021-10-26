@@ -109,6 +109,22 @@ function effl_efficiency(industry, pollutant_effl, pollutant_infl){   //Amount o
     return eff*100
 }
 
+function effl_concentration(industry, pollutant_effl){   //Amount of pollutant filtered
+    let load = 0
+    if(industry.has_onsite_wwtp) {
+        load += industry.onsite_wwtp[pollutant_effl] * industry.onsite_wwtp.wwt_vol_disc // g/day
+    }
+    if(industry.has_direct_discharge) {
+        load += industry.direct_discharge[pollutant_effl]  *  industry.direct_discharge.wwt_vol_disc  // g/day
+    }
+    if(industry.has_offsite_wwtp){
+        load += industry.offsite_wwtp[pollutant_effl] * industry.offsite_wwtp.wwt_vol_disc  // g/day
+    }
+    let water_discharged = water_discharged(industry)
+
+    return load/water_discharged
+}
+
 function water_discharged(industry){
     let water_discharged = 0
     if(industry.has_onsite_wwtp) water_discharged += industry.onsite_wwtp.wwt_vol_disc  //m3/day
@@ -124,9 +140,20 @@ async function withdrawn_factor(industry, global_layers){
     let factor = industry.volume_withdrawn / streamflow_value //Withdrawals that account for an average of five percent or more of the annual average significantly affects the water source
     if(isNaN(factor)) return NaN
     return factor
-
-
 }
+
+async function discharged_factor(industry, global_layers){
+
+    let streamflow = global_layers["Streamflow"].layers.baseline.annual.layer
+    let streamflow_value = await streamflow.data_on_point(industry.location.lat, industry.location.lng)*86400 //streamflow (m3/day)
+
+    let water_discharged = water_discharged(industry)
+
+    let factor = water_discharged / streamflow_value //Withdrawals that account for an average of five percent or more of the annual average significantly affects the water source
+    if(isNaN(factor)) return NaN
+    return factor
+}
+
 
 let metrics = {
 
@@ -433,17 +460,48 @@ let metrics = {
     async reporting_metrics(industry, global_layers){
         let _this = this
         let withdrawn_factor_value = await withdrawn_factor(industry, global_layers)
+        let discharged_factor_value = await discharged_factor(industry, global_layers)
+
         return {
             "g4-en8": industry.volume_withdrawn,
-            "g4-en9": withdrawn_factor_value,
+            "g4-en9": withdrawn_factor_value,   //mes gran que 5% mal
             "g4-en10": _this.recycled_water_factor(industry),
             "g4-en22": water_discharged(industry),
-            "wd": industry.water_withdrawn,
-            "dis": water_discharged(industry),
-            "con": industry.volume_used,
-            "re": industry.onsite_wwtp != null ? industry.onsite_wwtp.wwt_vol_reused : 0
+            "g4_en26": discharged_factor_value,
+            "wd": industry.water_withdrawn, //Water withdrawn
+            "dis": water_discharged(industry),  //water discharged
+            "re": industry.onsite_wwtp != null ? industry.onsite_wwtp.wwt_vol_reused : 0    //water reused
         }
+    },
+
+    ecotoxicity_potential_tu(industry){ //load of tu (tu/day)
+        let toxic_units = {
+            diclo: water_discharged(industry)*effl_concentration(industry, "wwt_diclo_effl_to_wb")/150,
+            cadmium: water_discharged(industry)*effl_concentration(industry, "wwt_cadmium_effl_to_wb")/0.0095,
+            hexaclorobenzene: water_discharged(industry)*effl_concentration(industry, "wwt_hexaclorobenzene_effl_to_wb")/0.03,
+            mercury: water_discharged(industry)*effl_concentration(industry, "wwt_mercury_effl_to_wb")/0.0014,
+            lead: water_discharged(industry)*effl_concentration(industry, "wwt_plomo_effl_to_wb")/0.44,
+            nickel: water_discharged(industry)*effl_concentration(industry, "wwt_niquel_effl_to_wb")/1.41775,
+            chloroalkanes: water_discharged(industry)*effl_concentration(industry, "wwt_chloro_effl_to_wb")/65,
+            hexaclorobutadie: water_discharged(industry)*effl_concentration(industry, "wwt_hexaclorobutadie_effl_to_wb")/0.5,
+            nonylphenols: water_discharged(industry)*effl_concentration(industry, "wwt_nonilfenols_effl_to_wb")/0.15,
+            tetracloroetile: water_discharged(industry)*effl_concentration(industry, "wwt_tetracloroetile_effl_to_wb")/3.2,
+            tricloroetile: water_discharged(industry)*effl_concentration(industry, "wwt_tricloroetile_effl_to_wb")/76,
+        }
+        let total_toxic_units = Object.values(toxic_units).reduce((a, b) => a + b, 0)
+        toxic_units["total"] = total_toxic_units
+        return toxic_units
+    },
+    async delta_toxic_units(industry, global_layers){
+        let total_tu = this.ecotoxicity_potential_tu(industry).total
+        let streamflow = global_layers["Streamflow"].layers.baseline.annual.layer
+        let streamflow_value = await streamflow.data_on_point(industry.location.lat, industry.location.lng)*86400 //streamflow (m3/day)
+        let delta = total_tu/streamflow_value
+        if(isNaN(delta)) return NaN
+        return delta
+
     }
+
 
 }
 

@@ -340,10 +340,15 @@ export default {
           value: []
         }
 
-        let g4_en8 = {value: "G4-EN8 (GRI)", unit: "m3"}
-        let g4_en9 = {value: "G4-EN9 (GRI)", unit: "%"}
-        let g4_en10 = {value: "G4-EN10 (GRI)", unit: "%"}
-        let g4_en22 = {value: "G4-EN22 (GRI)", unit: "m3"}
+        let g4_en8 = {value: "Water withdrawal (GRI 303-1)", unit: "m3/year"}
+        let g4_en9 = {value: "Effect of water withdrawal on the water body (GRI 303-2)", unit: "%"}
+        let g4_en10 = {value: "Water recycled and reused (GRI 303-3)", unit: "%"}
+        let g4_en22 = {value: "Water discharge (GRI 306-1)", unit: "m3/year"}
+        let g4_en26 = {value: "Effect of water discharges on the water body (GRI 306-5)", unit: "%"}
+
+        let wd = {value: "Water withdrawn (CDP W1.2b)", unit: "ML/year"}
+        let dis = {value: "Water discharged (CDP W1.2b)", unit: "ML/year"}
+        let re = {value: "Water reused (CDP W1.2b)", unit: "ML/year"}
 
         for (const industryAux of Object.values(groupedByAssessments)[_this.tab]) {
           let industry = industryAux.industry
@@ -355,36 +360,69 @@ export default {
 
           let en8 = indicators["g4-en8"]
           if(Number.isFinite(en8)){
-            g4_en8[industry.name] = ((days_factor*en8).toExponential(3))
+            g4_en8[industry.name] = ((365*en8).toExponential(3))
           }else{
             g4_en8[industry.name] = ("-")
           }
           let en9 = indicators["g4-en9"]
           if(Number.isFinite(en9)){
-            g4_en9[industry.name] = ((days_factor*en9).toExponential(3))
+            g4_en9[industry.name] = ((365*en9).toExponential(3))
           }else{
             g4_en9[industry.name] = ("-")
           }
           let en10 = indicators["g4-en10"]
           if(Number.isFinite(en10)){
-            g4_en10[industry.name] = ((days_factor*en10).toExponential(3))
+            g4_en10[industry.name] = ((365*en10).toExponential(3))
           }else{
             g4_en10[industry.name] = ("-")
           }
 
           let en22 = indicators["g4-en22"]
           if(Number.isFinite(en22)){
-            g4_en22[industry.name] = ((days_factor*en22).toExponential(3))
+            g4_en22[industry.name] = ((365*en22).toExponential(3))
           }else{
             g4_en22[industry.name] = ("-")
+          }
+
+          let en26 = indicators["g4-en26"]
+          if(Number.isFinite(en26)){
+            g4_en26[industry.name] = ((365*en26).toExponential(3))
+          }else{
+            g4_en26[industry.name] = ("-")
+          }
+
+          let wd_value = indicators["wd"]
+          if(Number.isFinite(wd_value)){
+            wd[industry.name] = ((0.001*365*wd_value).toExponential(3))
+          }else{
+            wd[industry.name] = ("-")
+          }
+
+          let dis_value = indicators["dis"]
+          if(Number.isFinite(dis_value)){
+            dis[industry.name] = ((0.001*365*dis_value).toExponential(3))
+          }else{
+            dis[industry.name] = ("-")
+          }
+
+          let re_value = indicators["dis"]
+          if(Number.isFinite(re_value)){
+            re[industry.name] = ((0.001*365*re_value).toExponential(3))
+          }else{
+            re[industry.name] = ("-")
           }
         }
 
         table.header.push({text: "Unit", value: "unit", sortable: false,})
 
         table.value.push(g4_en8)
+        table.value.push(g4_en9)
         table.value.push(g4_en10)
         table.value.push(g4_en22)
+        table.value.push(g4_en26)
+        table.value.push(wd)
+        table.value.push(dis)
+        table.value.push(re)
 
         return table
       }
