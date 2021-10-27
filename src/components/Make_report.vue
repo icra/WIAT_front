@@ -34,7 +34,7 @@
                     <br>
                     <v-card flat style="margin-left: 10px;">
                       <div class = table_descriptor>
-                        <b > Industry information: </b>
+                        <b > Industry information </b>
                       </div>
                       <v-data-table
                           :headers="industry_table.header"
@@ -44,7 +44,20 @@
 
 
                       <div class = table_descriptor>
-                        <b > Global Warming Potential: </b>
+                        <b > Global Warming Potential </b>
+                        <v-tooltip bottom max-width="700px">
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-icon
+                                color='#1C195B'
+                                style="padding-right: 10px"
+                                v-bind="attrs"
+                                v-on="on"
+                            >
+                              mdi-information-outline
+                            </v-icon>
+                          </template>
+                          <span>This metric indicates the CO2 emissions from the industry. It counts the amount of CO2 equivalent that is produced during the water treatment, water discharge, the emissions from sludge management and the emissions from biogas. It will always have positive values; higher values indicate higher impact. </span>
+                        </v-tooltip>
                       </div>
                       <v-data-table
                           :headers="emissions_table.header"
@@ -53,16 +66,99 @@
                       ></v-data-table>
 
                       <div class = table_descriptor>
-                        <b> Availabilty & Quantity Indicators: </b>
+                        <b> Availability & Quantity Indicators </b>
                       </div>
                       <v-data-table
                           :headers="water_quantity.header"
                           :items="water_quantity.value"
                           class="elevation-1"
+                      >
+                        <template v-slot:item.value="{ item }">
+                          <v-tooltip bottom max-width="700px" v-if="item.info">
+                            <template v-slot:activator="{ on, attrs }">
+                              {{item.value}}
+                              <v-icon
+                                  color='#1C195B'
+                                  style="padding-right: 10px"
+                                  v-bind="attrs"
+                                  v-on="on"
+                                  size="18px"
+                              >
+                                mdi-information-outline
+                              </v-icon>
+                            </template>
+                            <span>{{ item.info }}</span>
+                          </v-tooltip>
+                          <span v-else>
+                            {{item.value}}
+                          </span>
+                        </template>
+                      </v-data-table>
+
+                      <div class = table_descriptor>
+                        <b> Eutrophication potential </b>
+                        <v-tooltip bottom max-width="700px">
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-icon
+                                color='#1C195B'
+                                style="padding-right: 10px"
+                                v-bind="attrs"
+                                v-on="on"
+                            >
+                              mdi-information-outline
+                            </v-icon>
+                          </template>
+                        <span>
+                          Eutrophication potential (EP) is defined as the potential to cause over-fertilization of water. and soil, which can result in increased growth of biomass. It will always have positive values; higher values indicate higher impact.
+                        </span>
+                        </v-tooltip>
+                      </div>
+                      <v-data-table
+                          :headers="eutrophication_table.header"
+                          :items="eutrophication_table.value"
+                          class="elevation-1"
                       ></v-data-table>
 
                       <div class = table_descriptor>
-                        <b> Increment in pollutant load after discharging water: </b>
+                        <b> Ecotoxicity potential </b>
+                        <v-tooltip bottom max-width="700px">
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-icon
+                                color='#1C195B'
+                                style="padding-right: 10px"
+                                v-bind="attrs"
+                                v-on="on"
+                            >
+                              mdi-information-outline
+                            </v-icon>
+                          </template>
+                          <span>
+                            Index that reflects the potential harm of a unit of chemical released into the environment. It is based on both the inherent toxicity of a compound and its potential dose. It will always have positive values; higher values indicate higher impact.
+                          </span>
+                        </v-tooltip>
+                      </div>
+                      <v-data-table
+                          :headers="ecotoxicity_table.header"
+                          :items="ecotoxicity_table.value"
+                          class="elevation-1"
+                      ></v-data-table>
+
+                      <div class = table_descriptor>
+                        <b> Increment in pollutant load after discharging water </b>
+                        <v-tooltip bottom max-width="700px">
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-icon
+                                color='#1C195B'
+                                style="padding-right: 10px"
+                                v-bind="attrs"
+                                v-on="on"
+                            >
+                              mdi-information-outline
+                            </v-icon>
+                          </template>
+                          <span>For each pollutant, we can calculate the increment of the concentration of the pollutant in the receiving water body by dividing the load of the pollutant discharged to the water body by the water body streamflow. This indicator will always have positive values, higher values indicate higher impact. </span>
+                        </v-tooltip>
+
                       </div>
                       <v-data-table
                           :headers="pollutants_table.header"
@@ -71,7 +167,7 @@
                       ></v-data-table>
 
                       <div class = table_descriptor>
-                        <b> Pollutant treatment efficiency: </b>
+                        <b> Pollutant treatment efficiency </b>
                       </div>
                       <v-data-table
                           :headers="treatment_efficiency_table.header"
@@ -90,7 +186,7 @@
 
                       <div v-if="selected_layers.length > 0">
                         <div class = table_descriptor>
-                          <b > Layers information: </b>
+                          <b > Layers information </b>
                         </div>
                         <v-data-table
                             :headers="layers_table.header"
@@ -118,6 +214,7 @@
                 :label="assessment.name"
                 :value="assessment"
                 color="#1C195B"
+                style="margin-left: 38px"
             >
 
             </v-checkbox>
@@ -249,6 +346,9 @@ export default {
       water_quantity: {header: [], value: []},
       treatment_efficiency_table: {header: [], value: []},
       reporting_indicators: {header: [], value: []},
+      ecotoxicity_table: {header: [], value: []},
+      eutrophication_table:  {header: [], value: []},
+
 
     }
   },
@@ -260,6 +360,9 @@ export default {
       this.water_quantity = await this.generate_water_quality_table()
       this.treatment_efficiency_table = this.generate_treatment_efficiency_table()
       this.reporting_indicators = await this.generate_reporting_indicators_table()
+      this.ecotoxicity_table = this.generate_ecotoxicity_table()
+      this.eutrophication_table = this.generate_eutrophication_table()
+
     },
 
     selected_assessments: function (new_selected_assessments){
@@ -282,6 +385,9 @@ export default {
       this.water_quantity = await this.generate_water_quality_table()
       this.treatment_efficiency_table = this.generate_treatment_efficiency_table()
       this.reporting_indicators = await this.generate_reporting_indicators_table()
+      this.ecotoxicity_table = this.generate_ecotoxicity_table()
+      this.eutrophication_table = this.generate_eutrophication_table()
+
 
       if(new_selected_industries.length > 0) this.pieChart_base64()
 
@@ -292,6 +398,9 @@ export default {
       this.water_quantity = await this.generate_water_quality_table()
       this.treatment_efficiency_table = this.generate_treatment_efficiency_table()
       this.reporting_indicators = await this.generate_reporting_indicators_table()
+      this.ecotoxicity_table = this.generate_ecotoxicity_table()
+      this.eutrophication_table = this.generate_eutrophication_table()
+
 
     },
     units_model: async function () {
@@ -300,6 +409,8 @@ export default {
       this.water_quantity = await this.generate_water_quality_table()
       this.treatment_efficiency_table = this.generate_treatment_efficiency_table()
       this.reporting_indicators = await this.generate_reporting_indicators_table()
+      this.ecotoxicity_table = this.generate_ecotoxicity_table()
+      this.eutrophication_table = this.generate_eutrophication_table()
 
 
       this.bod_to_cod = 1
@@ -311,12 +422,250 @@ export default {
       this.water_quantity = await this.generate_water_quality_table()
       this.treatment_efficiency_table = this.generate_treatment_efficiency_table()
       this.reporting_indicators = await this.generate_reporting_indicators_table()
+      this.ecotoxicity_table = this.generate_ecotoxicity_table()
+      this.eutrophication_table = this.generate_eutrophication_table()
+
+    },
+
+  },
+  methods: {
+
+    generate_eutrophication_table() {
+
+      let _this = this
+
+      const groupedByAssessments = _.groupBy(this.selected_industries, function(n) {
+        return n.assessment.name;
+      });
+
+      if(_this.tab !== undefined && _this.tab !== null && Object.values(groupedByAssessments)[_this.tab] != undefined){
+
+        let assessment = Object.values(groupedByAssessments)[_this.tab][0].assessment
+        let assessment_days = utils.daysBetween(assessment.assessment_period_start, assessment.assessment_period_end)
+
+        let days_factor = 1
+        if(this.period_model === "annual") days_factor = 365
+        else if(this.period_model === "assessment") days_factor = assessment_days
+
+        let pollutants_table = {
+          header: [{text: "", value: "value", sortable: false}],
+          value: []
+        }
+
+        let tn = {value: "TN", unit: "gPO4eq"}
+        let tp = {value: "TP", unit: "gPO4eq"}
+        let total = {value: "Total", unit: "gPO4eq"}
+        let cod = {value: "", unit: "gPO4eq"}
+        if(this.units_model === "bod") {
+          cod.value = "BOD"
+        }
+        else {
+          cod.value = "COD"
+        }
+
+        for (const industryAux of Object.values(groupedByAssessments)[_this.tab]) {
+          let industry = industryAux.industry
+
+          pollutants_table.header.push({
+            text: industry.name, value: industry.name,
+          })
+
+          let eutrophication = metrics.eutrophication_potential(industry)
+
+          let cod_value = eutrophication.cod
+          if(Number.isFinite(cod_value)){
+            cod[industry.name] = ((days_factor*cod_value).toExponential(3))
+          }else{
+            cod[industry.name] = ("-")
+          }
+
+          let tn_value = eutrophication.tn
+          if(Number.isFinite(tn_value)){
+            tn[industry.name] = ((days_factor*tn_value).toExponential(3))
+          }else{
+            tn[industry.name] = ("-")
+          }
+
+          let tp_value = eutrophication.tp
+          if(Number.isFinite(tp_value)){
+            tp[industry.name] = ((days_factor*tp_value).toExponential(3))
+          }else{
+            tp[industry.name] = ("-")
+          }
+
+          let total_value = eutrophication.total
+          if(Number.isFinite(total_value)){
+            total[industry.name] = ((days_factor*total_value).toExponential(3))
+          }else{
+            total[industry.name] = ("-")
+          }
+        }
+
+        pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
+
+        pollutants_table.value.push(cod)
+        pollutants_table.value.push(tn)
+        pollutants_table.value.push(tp)
+        pollutants_table.value.push(total)
+
+        return pollutants_table
+      }
+      else return {header: [], emissions: []}
 
     },
 
 
-  },
-  methods: {
+    generate_ecotoxicity_table() {
+
+      let _this = this
+
+      const groupedByAssessments = _.groupBy(this.selected_industries, function(n) {
+        return n.assessment.name;
+      });
+
+      if(_this.tab !== undefined && _this.tab !== null && Object.values(groupedByAssessments)[_this.tab] != undefined){
+
+        let assessment = Object.values(groupedByAssessments)[_this.tab][0].assessment
+        let assessment_days = utils.daysBetween(assessment.assessment_period_start, assessment.assessment_period_end)
+
+        let days_factor = 1
+        if(this.period_model === "annual") days_factor = 365
+        else if(this.period_model === "assessment") days_factor = assessment_days
+
+        let pollutants_table = {
+          header: [{text: "", value: "value", sortable: false}],
+          value: []
+        }
+
+        let dichloroethane = {value: "1,2-Dichloroethane", unit: "TU"}
+        let cadmium = {value: "Cadmium", unit: "TU"}
+        let hexachlorobenzene = {value: "Hexachlorobenzene", unit: "TU"}
+        let mercury = {value: "Mercury", unit: "TU"}
+        let lead = {value: "Lead", unit: "TU"}
+        let nickel = {value: "Nickel", unit: "TU"}
+        let chloroalkanes = {value: "Chloroalkanes", unit: "TU"}
+        let hexaclorobutadie = {value: "Hexachlorobutadiene", unit: "TU"}
+        let nonylphenols = {value: "Nonylphenols", unit: "TU"}
+        let tetrachloroethene = {value: "Tetrachloroethene", unit: "TU"}
+        let trichloroethylene = {value: "Trichloroethylene", unit: "TU"}
+        let total = {value: "Total", unit: "TU"}
+
+        for (const industryAux of Object.values(groupedByAssessments)[_this.tab]) {
+          let industry = industryAux.industry
+
+          pollutants_table.header.push({
+            text: industry.name, value: industry.name,
+          })
+
+          let tu = metrics.ecotoxicity_potential_tu(industry)
+
+          let dichloroethane_value = tu.diclo
+          if(Number.isFinite(dichloroethane_value)){
+            dichloroethane[industry.name] = ((days_factor*dichloroethane_value).toExponential(3))
+          }else{
+            dichloroethane[industry.name] = ("-")
+          }
+
+          let cadmium_value = tu.cadmium
+          if(Number.isFinite(cadmium_value)){
+            cadmium[industry.name] = ((days_factor*cadmium_value).toExponential(3))
+          }else{
+            cadmium[industry.name] = ("-")
+          }
+
+          let hexaclorobenzene_value = tu.hexaclorobenzene
+          if(Number.isFinite(hexaclorobenzene_value)){
+            hexachlorobenzene[industry.name] = ((days_factor*hexaclorobenzene_value).toExponential(3))
+          }else{
+            hexachlorobenzene[industry.name] = ("-")
+          }
+
+          let mercury_value = tu.mercury
+          if(Number.isFinite(mercury_value)){
+            mercury[industry.name] = ((days_factor*mercury_value).toExponential(3))
+          }else{
+            mercury[industry.name] = ("-")
+          }
+
+          let lead_value = tu.lead
+          if(Number.isFinite(lead_value)){
+            lead[industry.name] = ((days_factor*lead_value).toExponential(3))
+          }else{
+            lead[industry.name] = ("-")
+          }
+
+          let nickel_value = tu.nickel
+          if(Number.isFinite(nickel_value)){
+            nickel[industry.name] = ((days_factor*nickel_value).toExponential(3))
+          }else{
+            nickel[industry.name] = ("-")
+          }
+
+          let chloroalkanes_value = tu.chloroalkanes
+          if(Number.isFinite(chloroalkanes_value)){
+            chloroalkanes[industry.name] = ((days_factor*chloroalkanes_value).toExponential(3))
+          }else{
+            chloroalkanes[industry.name] = ("-")
+          }
+
+          let hexaclorobutadie_value = tu.hexaclorobutadie
+          if(Number.isFinite(hexaclorobutadie_value)){
+            hexaclorobutadie[industry.name] = ((days_factor*hexaclorobutadie_value).toExponential(3))
+          }else{
+            hexaclorobutadie[industry.name] = ("-")
+          }
+
+          let nonylphenols_value = tu.nonylphenols
+          if(Number.isFinite(nonylphenols_value)){
+            nonylphenols[industry.name] = ((days_factor*nonylphenols_value).toExponential(3))
+          }else{
+            nonylphenols[industry.name] = ("-")
+          }
+
+          let tetrachloroethene_value = tu.tetracloroetile
+          if(Number.isFinite(tetrachloroethene_value)){
+            tetrachloroethene[industry.name] = ((days_factor*tetrachloroethene_value).toExponential(3))
+          }else{
+            tetrachloroethene[industry.name] = ("-")
+          }
+
+          let trichloroethylene_value = tu.tricloroetile
+          if(Number.isFinite(trichloroethylene_value)){
+            trichloroethylene[industry.name] = ((days_factor*trichloroethylene_value).toExponential(3))
+          }else{
+            trichloroethylene[industry.name] = ("-")
+          }
+
+          let total_value = tu.total
+          if(Number.isFinite(total_value)){
+            total[industry.name] = ((days_factor*total_value).toExponential(3))
+          }else{
+            total[industry.name] = ("-")
+          }
+
+
+        }
+
+        pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
+
+        pollutants_table.value.push(dichloroethane)
+        pollutants_table.value.push(cadmium)
+        pollutants_table.value.push(hexachlorobenzene)
+        pollutants_table.value.push(mercury)
+        pollutants_table.value.push(lead)
+        pollutants_table.value.push(nickel)
+        pollutants_table.value.push(chloroalkanes)
+        pollutants_table.value.push(hexaclorobutadie)
+        pollutants_table.value.push(nonylphenols)
+        pollutants_table.value.push(tetrachloroethene)
+        pollutants_table.value.push(trichloroethylene)
+        pollutants_table.value.push(total)
+
+        return pollutants_table
+      }
+      else return {header: [], emissions: []}
+
+    },
 
     async generate_reporting_indicators_table() {
 
@@ -352,7 +701,7 @@ export default {
 
         for (const industryAux of Object.values(groupedByAssessments)[_this.tab]) {
           let industry = industryAux.industry
-          let indicators = metrics.reporting_metrics(industry)
+          let indicators = metrics.reporting_metrics(industry, this.global_layers)
 
           table.header.push({
             text: industry.name, value: industry.name,
@@ -483,99 +832,97 @@ export default {
 
           let tn_value = metrics.tn_efficiency(industry)
           if(Number.isFinite(tn_value)){
-            tn[industry.name] = ((days_factor*tn_value).toExponential(3))
+            tn[industry.name] = ((tn_value).toExponential(3))
           }else{
             tn[industry.name] = ("-")
           }
           let tp_value = metrics.tp_efficiency(industry)
           if(Number.isFinite(tp_value)){
-            tp[industry.name] = ((days_factor*tp_value).toExponential(3))
+            tp[industry.name] = ((tp_value).toExponential(3))
           }else{
             tp[industry.name] = ("-")
           }
 
           let bod_value = metrics.bod_efficiency(industry)
           if(Number.isFinite(bod_value)){
-            bod[industry.name] = ((days_factor*bod_value*this.bod_to_cod).toExponential(3))
+            bod[industry.name] = ((bod_value).toExponential(3))
           }else{
             bod[industry.name] = ("-")
           }
 
-          //let dbo_value = await metrics.dbo_in_river(this.global_layers, industry, assessment_days)
-
           let dichloroethane_value = metrics.dichloroethane_efficiency(industry)
           if(Number.isFinite(dichloroethane_value)){
-            dichloroethane[industry.name] = ((days_factor*dichloroethane_value).toExponential(3))
+            dichloroethane[industry.name] = ((dichloroethane_value).toExponential(3))
           }else{
             dichloroethane[industry.name] = ("-")
           }
 
           let cadmium_value = metrics.cadmium_efficiency(industry)
           if(Number.isFinite(cadmium_value)){
-            cadmium[industry.name] = ((days_factor*cadmium_value).toExponential(3))
+            cadmium[industry.name] = ((cadmium_value).toExponential(3))
           }else{
             cadmium[industry.name] = ("-")
           }
 
           let hexaclorobenzene_value = metrics.hexaclorobenzene_efficiency(industry)
           if(Number.isFinite(hexaclorobenzene_value)){
-            hexachlorobenzene[industry.name] = ((days_factor*hexaclorobenzene_value).toExponential(3))
+            hexachlorobenzene[industry.name] = ((hexaclorobenzene_value).toExponential(3))
           }else{
             hexachlorobenzene[industry.name] = ("-")
           }
 
           let mercury_value = metrics.mercury_efficiency(industry)
           if(Number.isFinite(mercury_value)){
-            mercury[industry.name] = ((days_factor*mercury_value).toExponential(3))
+            mercury[industry.name] = ((mercury_value).toExponential(3))
           }else{
             mercury[industry.name] = ("-")
           }
 
           let lead_value = metrics.lead_efficiency(industry)
           if(Number.isFinite(lead_value)){
-            lead[industry.name] = ((days_factor*lead_value).toExponential(3))
+            lead[industry.name] = ((lead_value).toExponential(3))
           }else{
             lead[industry.name] = ("-")
           }
 
           let nickel_value = metrics.nickel_efficiency(industry)
           if(Number.isFinite(nickel_value)){
-            nickel[industry.name] = ((days_factor*nickel_value).toExponential(3))
+            nickel[industry.name] = ((nickel_value).toExponential(3))
           }else{
             nickel[industry.name] = ("-")
           }
 
           let chloroalkanes_value = metrics.chloroalkanes_efficiency(industry)
           if(Number.isFinite(chloroalkanes_value)){
-            chloroalkanes[industry.name] = ((days_factor*chloroalkanes_value).toExponential(3))
+            chloroalkanes[industry.name] = ((chloroalkanes_value).toExponential(3))
           }else{
             chloroalkanes[industry.name] = ("-")
           }
 
           let hexaclorobutadie_value = metrics.hexaclorobutadie_efficiency(industry)
           if(Number.isFinite(hexaclorobutadie_value)){
-            hexaclorobutadie[industry.name] = ((days_factor*hexaclorobutadie_value).toExponential(3))
+            hexaclorobutadie[industry.name] = ((hexaclorobutadie_value).toExponential(3))
           }else{
             hexaclorobutadie[industry.name] = ("-")
           }
 
           let nonylphenols_value = metrics.nonylphenols_efficiency(industry)
           if(Number.isFinite(nonylphenols_value)){
-            nonylphenols[industry.name] = ((days_factor*nonylphenols_value).toExponential(3))
+            nonylphenols[industry.name] = ((nonylphenols_value).toExponential(3))
           }else{
             nonylphenols[industry.name] = ("-")
           }
 
           let tetrachloroethene_value = metrics.tetrachloroethene_efficiency(industry)
           if(Number.isFinite(tetrachloroethene_value)){
-            tetrachloroethene[industry.name] = ((days_factor*tetrachloroethene_value).toExponential(3))
+            tetrachloroethene[industry.name] = ((tetrachloroethene_value).toExponential(3))
           }else{
             tetrachloroethene[industry.name] = ("-")
           }
 
           let trichloroethylene_value = metrics.tricloroetile_efficiency(industry)
           if(Number.isFinite(trichloroethylene_value)){
-            trichloroethylene[industry.name] = ((days_factor*trichloroethylene_value).toExponential(3))
+            trichloroethylene[industry.name] = ((trichloroethylene_value).toExponential(3))
           }else{
             trichloroethylene[industry.name] = ("-")
           }
@@ -640,17 +987,19 @@ export default {
         }
 
         let dilution_factor_row = {value: "Dilution factor", unit: "%"}
-        let recycled_factor = {value: "Recycled water factor", unit: "%"}
-        let treated_factor = {value: "Treated water factor", unit: "%"}
-        let available_ratio = {value: "Consumption available ratio", unit: "%"}
-        let efficiency_factor = {value: "Water efficiency", unit: "tonnes/m3"}
+        let recycled_factor = {value: "Recycled water factor", unit: "%", info:"This metric indicates the percentage of the reused water used by the industry. Values that may have this metric range from 0 to 100, the larger its value the less impact it will generate."}
+        let treated_factor = {value: "Treated water factor", unit: "%", info:"Amount of water treated in the treatment plant divided by the amount of water withdrawn. The higher the value, the better."}
+        let available_ratio = {value: "Consumption available ratio", unit: "%", info: "This metric is calculated from the relationship between the amount of water withdrawn by the industry and the amount of water available and multiplied by 100. It indicates the percentage of the available water withdrawn by the industry’s consumption. This metric may have values ranging from 0, to a value greater than 100, indicating that the demand for water is higher than the available."}
+        let efficiency_factor = {value: "Water efficiency", unit: "tonnes/m3", info: "Tonnes of product produced by the industry per cubic meter of water used"}
+        let water_quality_standards = {value: "Water quality standards", unit: "%"}
+
+
 
         for (const industryAux of Object.values(groupedByAssessments)[_this.tab]) {
           let industry = industryAux.industry
           pollutants_table.header.push({
             text: industry.name, value: industry.name,
           })
-
 
           let dilution_factor_value = await metrics.dilution_factor(this.global_layers, industry)
           if(Number.isFinite(dilution_factor_value)){
@@ -672,7 +1021,7 @@ export default {
           }else{
             treated_factor[industry.name] = ("-")
           }
-          let available_ratio_value = metrics.available_ratio(industry)
+          let available_ratio_value = metrics.available_ratio(this.global_layers, industry)
           if(Number.isFinite(available_ratio_value)){
             available_ratio[industry.name] = (available_ratio_value.toExponential(3))
           }else{
@@ -724,8 +1073,6 @@ export default {
           value: []
         }
 
-
-
         let tn = {value: "TN load increment", unit: "g/m3"}
         let tp = {value: "TP load increment", unit: "g/m3"}
         let dichloroethane = {value: "1,2-Dichloroethane load increment", unit: "g/m3"}
@@ -739,6 +1086,8 @@ export default {
         let nonylphenols = {value: "Nonylphenols load increment", unit: "g/m3"}
         let tetrachloroethene = {value: "Tetrachloroethene load increment", unit: "g/m3"}
         let trichloroethylene = {value: "Trichloroethylene load increment", unit: "g/m3"}
+        let tu = {value: "Toxic Units load increment", unit: "TU/m3"}
+
         let bod = {value: "", unit: "g/m3"}
         if(this.units_model === "bod") {
           bod.value = "BOD load increment"
@@ -756,20 +1105,20 @@ export default {
 
           let tn_value = await metrics.tn_effl(industry,this.global_layers)
           if(Number.isFinite(tn_value)){
-            tn[industry.name] = ((days_factor*tn_value).toExponential(3))
+            tn[industry.name] = ((tn_value).toExponential(3))
           }else{
             tn[industry.name] = ("-")
           }
           let tp_value = await metrics.tp_effl(industry, this.global_layers)
           if(Number.isFinite(tp_value)){
-            tp[industry.name] = ((days_factor*tp_value).toExponential(3))
+            tp[industry.name] = ((tp_value).toExponential(3))
           }else{
             tp[industry.name] = ("-")
           }
 
           let bod_value = await metrics.bod_effl(industry, this.global_layers)
           if(Number.isFinite(bod_value)){
-            bod[industry.name] = ((days_factor*bod_value*this.bod_to_cod).toExponential(3))
+            bod[industry.name] = ((bod_value*this.bod_to_cod).toExponential(3))
           }else{
             bod[industry.name] = ("-")
           }
@@ -778,79 +1127,86 @@ export default {
 
           let dichloroethane_value = await metrics.dichloroethane_effl(industry, this.global_layers)
           if(Number.isFinite(dichloroethane_value)){
-            dichloroethane[industry.name] = ((days_factor*dichloroethane_value).toExponential(3))
+            dichloroethane[industry.name] = ((dichloroethane_value).toExponential(3))
           }else{
             dichloroethane[industry.name] = ("-")
           }
 
           let cadmium_value = await metrics.cadmium_effl(industry, this.global_layers)
           if(Number.isFinite(cadmium_value)){
-            cadmium[industry.name] = ((days_factor*cadmium_value).toExponential(3))
+            cadmium[industry.name] = ((cadmium_value).toExponential(3))
           }else{
             cadmium[industry.name] = ("-")
           }
 
           let hexaclorobenzene_value = await metrics.hexaclorobenzene_effl(industry, this.global_layers)
           if(Number.isFinite(hexaclorobenzene_value)){
-            hexachlorobenzene[industry.name] = ((days_factor*hexaclorobenzene_value).toExponential(3))
+            hexachlorobenzene[industry.name] = ((hexaclorobenzene_value).toExponential(3))
           }else{
             hexachlorobenzene[industry.name] = ("-")
           }
 
           let mercury_value = await metrics.mercury_effl(industry, this.global_layers)
           if(Number.isFinite(mercury_value)){
-            mercury[industry.name] = ((days_factor*mercury_value).toExponential(3))
+            mercury[industry.name] = ((mercury_value).toExponential(3))
           }else{
             mercury[industry.name] = ("-")
           }
 
           let lead_value = await metrics.lead_effl(industry, this.global_layers)
           if(Number.isFinite(lead_value)){
-            lead[industry.name] = ((days_factor*lead_value).toExponential(3))
+            lead[industry.name] = ((lead_value).toExponential(3))
           }else{
             lead[industry.name] = ("-")
           }
 
           let nickel_value = await metrics.nickel_effl(industry, this.global_layers)
           if(Number.isFinite(nickel_value)){
-            nickel[industry.name] = ((days_factor*nickel_value).toExponential(3))
+            nickel[industry.name] = ((nickel_value).toExponential(3))
           }else{
             nickel[industry.name] = ("-")
           }
 
           let chloroalkanes_value = await  metrics.chloroalkanes_effl(industry, this.global_layers)
           if(Number.isFinite(chloroalkanes_value)){
-            chloroalkanes[industry.name] = ((days_factor*chloroalkanes_value).toExponential(3))
+            chloroalkanes[industry.name] = ((chloroalkanes_value).toExponential(3))
           }else{
             chloroalkanes[industry.name] = ("-")
           }
 
           let hexaclorobutadie_value = await metrics.hexaclorobutadie_effl(industry,this.global_layers)
           if(Number.isFinite(hexaclorobutadie_value)){
-            hexaclorobutadie[industry.name] = ((days_factor*hexaclorobutadie_value).toExponential(3))
+            hexaclorobutadie[industry.name] = ((hexaclorobutadie_value).toExponential(3))
           }else{
             hexaclorobutadie[industry.name] = ("-")
           }
 
           let nonylphenols_value = await metrics.nonylphenols_effl(industry, this.global_layers)
           if(Number.isFinite(nonylphenols_value)){
-            nonylphenols[industry.name] = ((days_factor*nonylphenols_value).toExponential(3))
+            nonylphenols[industry.name] = ((nonylphenols_value).toExponential(3))
           }else{
             nonylphenols[industry.name] = ("-")
           }
 
           let tetrachloroethene_value = await metrics.tetrachloroethene_effl(industry, this.global_layers)
           if(Number.isFinite(tetrachloroethene_value)){
-            tetrachloroethene[industry.name] = ((days_factor*tetrachloroethene_value).toExponential(3))
+            tetrachloroethene[industry.name] = ((tetrachloroethene_value).toExponential(3))
           }else{
             tetrachloroethene[industry.name] = ("-")
           }
 
           let trichloroethylene_value = await metrics.tricloroetile_effl(industry, this.global_layers)
           if(Number.isFinite(trichloroethylene_value)){
-            trichloroethylene[industry.name] = ((days_factor*trichloroethylene_value).toExponential(3))
+            trichloroethylene[industry.name] = ((trichloroethylene_value).toExponential(3))
           }else{
             trichloroethylene[industry.name] = ("-")
+          }
+
+          let tu_value = await metrics.delta_toxic_units(industry, this.global_layers)
+          if(Number.isFinite(tu_value)){
+            tu[industry.name] = ((tu_value).toExponential(3))
+          }else{
+            tu[industry.name] = ("-")
           }
 
         }
@@ -872,6 +1228,7 @@ export default {
         pollutants_table.value.push(nonylphenols)
         pollutants_table.value.push(tetrachloroethene)
         pollutants_table.value.push(trichloroethylene)
+        pollutants_table.value.push(tu)
 
 
 
@@ -965,6 +1322,7 @@ export default {
 
       return id
     },
+
 
     async layers_table_pdf(dd, industries, assessment_days){
 

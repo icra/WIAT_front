@@ -921,7 +921,6 @@ export default {
       }
       async function data_on_point(lat, lng){
         let value = await _this.get_raster_data(lat, lng, geotiff_file_data)*scale
-        console.log(value)
         return value
       }
 

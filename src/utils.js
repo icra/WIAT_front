@@ -85,6 +85,14 @@ async function effl_delta(industry, effl, global_layers){
     return delta //g/m3
 }
 
+function water_discharged(industry){
+    let water_discharged = 0
+    if(industry.has_onsite_wwtp) water_discharged += industry.onsite_wwtp.wwt_vol_disc  //m3/day
+    if(industry.has_direct_discharge) water_discharged += industry.direct_discharge.wwt_vol_disc //m3/day
+    if(industry.has_offsite_wwtp) water_discharged += industry.offsite_wwtp.wwt_vol_disc //m3/day
+    return water_discharged
+}
+
 function effl_efficiency(industry, pollutant_effl, pollutant_infl){   //Amount of pollutant filtered
     let load = 0
     let treated = 0
@@ -120,17 +128,9 @@ function effl_concentration(industry, pollutant_effl){   //Amount of pollutant f
     if(industry.has_offsite_wwtp){
         load += industry.offsite_wwtp[pollutant_effl] * industry.offsite_wwtp.wwt_vol_disc  // g/day
     }
-    let water_discharged = water_discharged(industry)
+    let discharged = water_discharged(industry)
 
-    return load/water_discharged
-}
-
-function water_discharged(industry){
-    let water_discharged = 0
-    if(industry.has_onsite_wwtp) water_discharged += industry.onsite_wwtp.wwt_vol_disc  //m3/day
-    if(industry.has_direct_discharge) water_discharged += industry.direct_discharge.wwt_vol_disc //m3/day
-    if(industry.has_offsite_wwtp) water_discharged += industry.offsite_wwtp.wwt_vol_disc //m3/day
-    return water_discharged
+    return load/discharged
 }
 
 async function withdrawn_factor(industry, global_layers){
@@ -147,13 +147,12 @@ async function discharged_factor(industry, global_layers){
     let streamflow = global_layers["Streamflow"].layers.baseline.annual.layer
     let streamflow_value = await streamflow.data_on_point(industry.location.lat, industry.location.lng)*86400 //streamflow (m3/day)
 
-    let water_discharged = water_discharged(industry)
+    let wd = water_discharged(industry)
 
-    let factor = water_discharged / streamflow_value //Withdrawals that account for an average of five percent or more of the annual average significantly affects the water source
+    let factor = wd / streamflow_value //Withdrawals that account for an average of five percent or more of the annual average significantly affects the water source
     if(isNaN(factor)) return NaN
     return factor
 }
-
 
 let metrics = {
 
@@ -492,6 +491,7 @@ let metrics = {
         toxic_units["total"] = total_toxic_units
         return toxic_units
     },
+
     async delta_toxic_units(industry, global_layers){
         let total_tu = this.ecotoxicity_potential_tu(industry).total
         let streamflow = global_layers["Streamflow"].layers.baseline.annual.layer
@@ -500,8 +500,53 @@ let metrics = {
         if(isNaN(delta)) return NaN
         return delta
 
-    }
+    },
 
+    //Fem una mitjana? No m'acaba de convèncer
+    /*nqa(industry){
+        let nqa_per_pollutant = {
+            diclo: effl_concentration(industry, "wwt_diclo_effl_to_wb")/0.01,
+            cadmium: effl_concentration(industry, "wwt_cadmium_effl_to_wb")/0.001,
+            hexaclorobenzene: effl_concentration(industry, "wwt_hexaclorobenzene_effl_to_wb")/0.0005,
+            mercury: effl_concentration(industry, "wwt_mercury_effl_to_wb")/0.00007,
+            lead: effl_concentration(industry, "wwt_plomo_effl_to_wb")/0.0072,
+            nickel: effl_concentration(industry, "wwt_niquel_effl_to_wb")/0.02,
+            chloroalkanes: effl_concentration(industry, "wwt_chloro_effl_to_wb")/0.0014,
+            hexaclorobutadie: effl_concentration(industry, "wwt_hexaclorobutadie_effl_to_wb")/0.0006,
+            nonylphenols: effl_concentration(industry, "wwt_nonilfenols_effl_to_wb")/0.002,
+            tetracloroetile: effl_concentration(industry, "wwt_tetracloroetile_effl_to_wb")/0.01,
+            tricloroetile: effl_concentration(industry, "wwt_tricloroetile_effl_to_wb")/0.01,
+        }
+
+        let avg_nqa_factor = Object.values(nqa_per_pollutant).reduce((a, b) => a + b, 0) / Object.values(nqa_per_pollutant).length //Com mes amunt de 1, mes et passes dels límits legals
+        return avg_nqa_factor*100
+    }*/
+
+    eutrophication_potential(industry){
+        let cod_load = 0
+        if(industry.has_onsite_wwtp) {
+            cod_load += industry.onsite_wwtp.wwt_bod_effl_to_wb * industry.onsite_wwtp.wwt_vol_disc // g/day
+        }
+        if(industry.has_direct_discharge) {
+            cod_load += industry.direct_discharge.wwt_bod_effl_to_wb * industry.direct_discharge.wwt_vol_disc  // g/day
+        }
+        if(industry.has_offsite_wwtp){
+            if(industry.offsite_wwtp_type == "Domestic") cod_load += industry.offsite_wwtp.wwt_bod_effl_to_wb * industry.offsite_wwtp.wwt_vol_disc / 2.4  // g/day
+            else cod_load += industry.offsite_wwtp.wwt_bod_effl_to_wb * industry.offsite_wwtp.wwt_vol_disc  // g/day
+        }
+
+        let eutrophication = {
+            cod: cod_load*(1/0.022),
+            tn: water_discharged(industry)*effl_concentration(industry, "wwt_tn_effl_to_wb")*(1/0.42),
+            tp: water_discharged(industry)*effl_concentration(industry, "wwt_tp_effl_to_wb")*(1/3.06),
+        }
+
+        let total_eutrophication = Object.values(eutrophication).reduce((a, b) => a + b, 0)
+        eutrophication["total"] = total_eutrophication
+
+        return eutrophication
+
+    }
 
 }
 
