@@ -7,7 +7,7 @@ import {utils} from "./utils"
 import Countries from "./countries"
 
 //sum array of numbers
-Array.prototype.sum=function(){return this.reduce((p,c)=>(p+c),0)};
+Array.prototype.sum=function(){return this.reduce((p,c)=>(parseFloat(p)+parseFloat(c)),0)};
 
 /*
   ASSESSMENT: main class
@@ -1803,10 +1803,9 @@ export class Domestic_wwtp extends WWTP{
             },
 
 
-
             //energy
             "wwt_nrg_cons": {question: "Energy consumed from the grid", value: 0, unit: "kWh", description_tooltip: "Total energy consumed during the assessment period by all wastewater treatment plants managed by the undertaking"},  //kWh | energy consumed from the grid
-            "wwt_conv_kwh": {question: "Emission factor for grid electricity", value: 0, unit: "kgCO2eq/kWh", description_tooltip: "Emission factor for grid electricity (indirect emissions)"},  //kgCO2eq/kWh | conversion factor
+            "wwt_conv_kwh": {question: "Emission factor for grid electricity", estimation_equation: true, value: 0, unit: "kgCO2eq/kWh", description_tooltip: "Emission factor for grid electricity (indirect emissions)"},  //kgCO2eq/kWh | conversion factor
 
             //SLUDGE MANAGEMENT
             "wwt_mass_slu": {

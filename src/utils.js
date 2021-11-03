@@ -76,8 +76,8 @@ async function effl_delta(industries, effl, global_layers){
         return _load
     }).sum()
 
-    let water_discharged = water_discharged(industries)
-    let streamflow_value = streamflow(industries, global_layers) //streamflow (m3/day)
+    let water_discharged = calculate_water_discharged(industries)
+    let streamflow_value = await streamflow(industries, global_layers) //streamflow (m3/day)
     let water_withdrawn = industries.map(industry => industry.volume_withdrawn).sum()
 
     let delta = load / (streamflow_value + water_discharged - water_withdrawn)
@@ -86,7 +86,7 @@ async function effl_delta(industries, effl, global_layers){
     return delta //g/m3
 }
 
-function water_discharged(industries){
+function calculate_water_discharged(industries){
 
     return industries.map(industry => {
         let water_discharged = 0
@@ -97,14 +97,15 @@ function water_discharged(industries){
     }).sum()
 }
 
-function streamflow(industries, global_layers){
+async function streamflow(industries, global_layers){
 
     let streamflow = global_layers["Streamflow"].layers.baseline.annual.layer
-    let streamflow_value = industries.map(async industry => {
+    let streamflow_value = await Promise.all(
+        industries.map(async industry => {
         let _streamflow = await streamflow.data_on_point(industry.location.lat, industry.location.lng)*86400
         return _streamflow
-    }).sum() //streamflow (m3/day)
-    return streamflow_value
+    })) //streamflow (m3/day)
+    return streamflow_value.sum()
 
 }
 
@@ -159,14 +160,14 @@ function effl_concentration(industries, pollutant_effl){
 
     }).sum()
 
-    let discharged = water_discharged(industries)
+    let discharged = calculate_water_discharged(industries)
 
     return load/discharged
 }
 
 async function withdrawn_factor(industries, global_layers){
 
-    let streamflow_value = streamflow(industries, global_layers) //streamflow (m3/day)
+    let streamflow_value = await streamflow(industries, global_layers) //streamflow (m3/day)
     let factor = industries.map(industry => industry.volume_withdrawn).sum() / streamflow_value //Withdrawals that account for an average of five percent or more of the annual average significantly affects the water source
     if(isNaN(factor)) return NaN
     return factor
@@ -174,9 +175,9 @@ async function withdrawn_factor(industries, global_layers){
 
 async function discharged_factor(industries, global_layers){
 
-    let streamflow_value = streamflow(industries, global_layers) //streamflow (m3/day)
+    let streamflow_value = await streamflow(industries, global_layers) //streamflow (m3/day)
 
-    let wd = water_discharged(industries)
+    let wd = calculate_water_discharged(industries)
 
     let factor = wd / streamflow_value //Withdrawals that account for an average of five percent or more of the annual average significantly affects the water source
     if(isNaN(factor)) return NaN
@@ -220,11 +221,11 @@ let metrics = {
 
     async dilution_factor(global_layers, industries){
 
-        let water_discharged = water_discharged(industries)    // m3/day
+        let water_discharged = calculate_water_discharged(industries)    // m3/day
 
         if(water_discharged == 0) return NaN
 
-        let streamflow_value = streamflow(industries, global_layers) //streamflow (m3/day)
+        let streamflow_value = await streamflow(industries, global_layers) //streamflow (m3/day)
 
         //let dilution_factor = water_discharged/(water_discharged + flow_acc_value)
         let dilution_factor = (water_discharged + streamflow_value)/water_discharged
@@ -235,8 +236,9 @@ let metrics = {
 
     async available_ratio(global_layers, industries){
 
-        let streamflow_value = streamflow(industries, global_layers) //streamflow (m3/day)
-        let water_withdrawn = industries.map(industry => industry.water_withdrawn).sum()
+        let streamflow_value = await streamflow(industries, global_layers) //streamflow (m3/day)
+        let water_withdrawn = industries.map(industry => industry.volume_withdrawn).sum()
+
 
         let available_ratio = water_withdrawn / streamflow_value
         if (isNaN(available_ratio)) return NaN
@@ -245,7 +247,7 @@ let metrics = {
     },
 
     recycled_water_factor(industries){
-        let water_withdrawn = industries.map(industry => industry.water_withdrawn).sum()
+        let water_withdrawn = industries.map(industry => industry.volume_withdrawn).sum()
         let recycled_water = industries.map(industry => {
             if(industry.has_onsite_wwtp) return industry.onsite_wwtp.wwt_vol_reused
             else return 0
@@ -260,7 +262,7 @@ let metrics = {
 
     treated_water_factor(industries){
 
-        let water_discharged = water_discharged(industries)    // m3/day
+        let water_discharged = calculate_water_discharged(industries)    // m3/day
         let water_treated = industries.map(industry => {
             let _water_treated = 0
             if(industry.has_onsite_wwtp) {
@@ -299,8 +301,8 @@ let metrics = {
             return _load
         }).sum()
 
-        let water_discharged = water_discharged(industries)
-        let streamflow_value = streamflow(industries, global_layers)
+        let water_discharged = calculate_water_discharged(industries)
+        let streamflow_value = await streamflow(industries, global_layers)
         let water_withdrawn = industries.map(industry => industry.volume_withdrawn).sum()
 
         let delta = load / (streamflow_value + water_discharged - water_withdrawn)
@@ -470,10 +472,10 @@ let metrics = {
             "g4-en8": industries.map(industry => industry.volume_withdrawn).sum(),
             "g4-en9": withdrawn_factor_value,   //mes gran que 5% mal
             "g4-en10": _this.recycled_water_factor(industries),
-            "g4-en22": water_discharged(industries),
+            "g4-en22": calculate_water_discharged(industries),
             "g4_en26": discharged_factor_value,
             "wd": 0.001*industries.map(industry => industry.volume_withdrawn).sum(), //Water withdrawn
-            "dis": 0.001*water_discharged(industries),  //water discharged
+            "dis": 0.001*calculate_water_discharged(industries),  //water discharged
             "re": 0.001*industries.map(industry => {
                 if (industry.onsite_wwtp != null) return industry.onsite_wwtp.wwt_vol_reused
                 else return 0
@@ -503,8 +505,8 @@ let metrics = {
 
     async delta_toxic_units(industries, global_layers){
         let total_tu = this.ecotoxicity_potential_tu(industries).total
-        let water_discharged = water_discharged(industries)
-        let streamflow_value = streamflow(industries, global_layers) //streamflow (m3/day)
+        let water_discharged = calculate_water_discharged(industries)
+        let streamflow_value = await streamflow(industries, global_layers) //streamflow (m3/day)
         let water_withdrawn = industries.map(industry => industry.volume_withdrawn).sum()
         let delta = total_tu/(streamflow_value - water_withdrawn + water_discharged)
         if(isNaN(delta)) return NaN
@@ -532,8 +534,8 @@ let metrics = {
             return pollutant_above_law
         }).sum()   //Number of pollutants which concentration is above the permission
 
-        //Number of pollutants which concentration is above the permission
-        return pollutant_above_law_factor
+        //Porcentage of pollutants which concentration is above the permission
+        return 100*pollutant_above_law_factor/11
     },
     eutrophication_potential(industries){
         let cod_load = industries.map(industry => {
@@ -552,7 +554,7 @@ let metrics = {
         }).sum()
 
         let eutrophication = {
-            cod: (cod_load / water_discharged(industries))*0.022,
+            cod: (cod_load / calculate_water_discharged(industries))*0.022,
             tn: effl_concentration(industries, "wwt_tn_effl_to_wb")*0.42,
             tp: effl_concentration(industries, "wwt_tp_effl_to_wb")*3.06,
         }
