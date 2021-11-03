@@ -16,19 +16,19 @@
           </v-col>
         </v-row>
         <v-row style="height: 85%" class = "border_report">
-          <v-col v-if="selected_industries.length === 0" cols="9" style="height: 100%">
+          <v-col v-show="selected_industries.length === 0" cols="9" style="height: 100%">
             Please, select at least an industry to make the report
 
           </v-col>
 
 
-          <v-col v-else cols="9" style="height: 100%">
+          <v-col v-show="selected_industries.length > 0" cols="9" style="height: 100%">
             <template class="report" >
 
               <div style="width: 100%; height: 100%">
                 <v-tabs-items v-model="tab">
                   <v-tab-item
-                      v-for="assessment_name in assessment_names"
+                      v-for="(assessment_name, idx) in assessment_names"
                       :key="assessment_name"
                   >
                     <br>
@@ -41,7 +41,6 @@
                           :items="industry_table.industries"
                           class="elevation-1"
                       ></v-data-table>
-
 
                       <div class = table_descriptor>
                         <b > Global Warming Potential </b>
@@ -64,6 +63,11 @@
                           :items="emissions_table.emissions"
                           class="elevation-1"
                       ></v-data-table>
+                      <div id="global_warming_chart_wrapper" style="width:1000px; margin-top: 20px; margin-bottom: 20px">
+                        <BarChart :chartdata="ghg_emission_chart.chartData" :options="ghg_emission_chart.options"></BarChart>
+                        <!--<canvas :id="'global_warming_potential_chart_tab_'+index"> </canvas>-->
+                      </div>
+
 
                       <div class = table_descriptor>
                         <b> Availability & Quantity Indicators </b>
@@ -195,7 +199,11 @@
                         ></v-data-table>
                       </div>
 
+                      <div class = table_descriptor>
+                        <b > Charts and diagrams </b>
+                      </div>
                       <canvas id="chart" width="50" height="50"> </canvas>
+
 
                     </v-card>
                   </v-tab-item>
@@ -215,6 +223,7 @@
                 :value="assessment"
                 color="#1C195B"
                 style="margin-left: 38px"
+                :key="assessment.name"
             >
 
             </v-checkbox>
@@ -246,6 +255,13 @@
                 selected-color="#1C195B"
             >
             </v-treeview>
+            <v-select
+                v-model="aggregation_level"
+                :items="aggregation_items"
+                filled
+                label="Aggregation level"
+                style="padding-top: 10px"
+            ></v-select>
             <v-select
                 v-model="include_future"
                 :items="yes_no"
@@ -309,18 +325,18 @@
 
 <script>
 
+import BarChart from "@/components/BarChart";
 let _ = require('lodash');
 import PDFJSViewer from "@/components/PDFJSViewer";
 import pdfMake from 'pdfmake/build/pdfmake.js'
 import Vue from "vue";
 import {utils, metrics} from "../utils"
-import { Chart, LineController, LineElement, PointElement, LinearScale, Title, RadialLinearScale, RadarController } from 'chart.js'
 import standard_industrial_classification from "../standard_industrial_classification"
-Chart.register(LineController, LineElement, PointElement, LinearScale, Title, RadialLinearScale, RadarController);
 
 export default {
   name: "Make_report",
   components: {
+    BarChart,
     PDFJSViewer
   },
   data() {
@@ -348,87 +364,313 @@ export default {
       reporting_indicators: {header: [], value: []},
       ecotoxicity_table: {header: [], value: []},
       eutrophication_table:  {header: [], value: []},
+      emissions_table: {header: [], value: []},
+      aggregation_level: "industry",
+      aggregation_items: [{text: "Industry", value: "industry"}, {text: "Final product and supply chain", value: "supply_chain"}, {text: "Country", value: "country"}],
+
+      ghg_emission_chart: {
+        chartData: null,
+        options: null
+      }
 
 
-    }
+  }
   },
   watch: {
+    aggregation_level: async function () {
+      /*this.layers_table = await this.generate_layers_table()
+      this.pollutants_table = await this.generate_pollutants_table()
+      this.water_quantity = await this.generate_water_quality_table()
+      this.treatment_efficiency_table = this.generate_treatment_efficiency_table()
+      this.reporting_indicators = await this.generate_reporting_indicators_table()
+      this.ecotoxicity_table = this.generate_ecotoxicity_table()
+      this.eutrophication_table = this.generate_eutrophication_table()*/
+      this.emissions_table = this.generate_emissions_table()
+    },
 
     selected_layers: async function () {
-      this.layers_table = await this.generate_layers_table()
+      /*this.layers_table = await this.generate_layers_table()
       this.pollutants_table = await this.generate_pollutants_table()
       this.water_quantity = await this.generate_water_quality_table()
       this.treatment_efficiency_table = this.generate_treatment_efficiency_table()
       this.reporting_indicators = await this.generate_reporting_indicators_table()
       this.ecotoxicity_table = this.generate_ecotoxicity_table()
-      this.eutrophication_table = this.generate_eutrophication_table()
-
+      this.eutrophication_table = this.generate_eutrophication_table()*/
+      this.emissions_table = this.generate_emissions_table()
     },
 
-    selected_assessments: function (new_selected_assessments){
-      this.selected_industries = []
-      let _this = this
-      new_selected_assessments.forEach(assessment => {
-        assessment.industries.forEach(industry => {
-          _this.selected_industries.push({
-            "industry": industry,
-            "assessment": assessment,
-            "name": industry.name
+    selected_assessments: function (new_selected_assessments, old_value){
+
+      if(new_selected_assessments.length > 0){
+        this.selected_industries = []
+        if (old_value.length == 0) this.tab = 0
+        let _this = this
+        new_selected_assessments.forEach(assessment => {
+          assessment.industries.forEach(industry => {
+            _this.selected_industries.push({
+              "industry": industry,
+              "assessment": assessment,
+              "name": industry.name
+            })
           })
         })
-      })
+
+        Vue.nextTick(function () {
+          _this.emissions_table = _this.generate_emissions_table()
+        })
+        /*this.layers_table = await this.generate_layers_table()
+        this.pollutants_table = await this.generate_pollutants_table()
+        this.water_quantity = await this.generate_water_quality_table()
+        this.treatment_efficiency_table = this.generate_treatment_efficiency_table()
+        this.reporting_indicators = await this.generate_reporting_indicators_table()
+        this.ecotoxicity_table = this.generate_ecotoxicity_table()
+        this.eutrophication_table = this.generate_eutrophication_table()*/
+
+        //if(new_selected_industries.length > 0) this.pieChart_base64()
+
+      }
+      else this.selected_industries = []
     },
 
-    selected_industries: async function (new_selected_industries) {
-      this.layers_table = await this.generate_layers_table()
-      this.pollutants_table = await this.generate_pollutants_table()
-      this.water_quantity = await this.generate_water_quality_table()
-      this.treatment_efficiency_table = this.generate_treatment_efficiency_table()
-      this.reporting_indicators = await this.generate_reporting_indicators_table()
-      this.ecotoxicity_table = this.generate_ecotoxicity_table()
-      this.eutrophication_table = this.generate_eutrophication_table()
-
-
-      if(new_selected_industries.length > 0) this.pieChart_base64()
-
-    },
     include_future: async function () {
-      this.layers_table = await this.generate_layers_table()
+      /*this.layers_table = await this.generate_layers_table()
       this.pollutants_table = await this.generate_pollutants_table()
       this.water_quantity = await this.generate_water_quality_table()
       this.treatment_efficiency_table = this.generate_treatment_efficiency_table()
       this.reporting_indicators = await this.generate_reporting_indicators_table()
       this.ecotoxicity_table = this.generate_ecotoxicity_table()
-      this.eutrophication_table = this.generate_eutrophication_table()
-
-
+      this.eutrophication_table = this.generate_eutrophication_table()*/
+      this.emissions_table = this.generate_emissions_table()
     },
+
     units_model: async function () {
-      this.layers_table = await this.generate_layers_table()
+      /*this.layers_table = await this.generate_layers_table()
       this.pollutants_table = await this.generate_pollutants_table()
       this.water_quantity = await this.generate_water_quality_table()
       this.treatment_efficiency_table = this.generate_treatment_efficiency_table()
       this.reporting_indicators = await this.generate_reporting_indicators_table()
       this.ecotoxicity_table = this.generate_ecotoxicity_table()
-      this.eutrophication_table = this.generate_eutrophication_table()
-
+      this.eutrophication_table = this.generate_eutrophication_table()*/
+      this.emissions_table = this.generate_emissions_table()
 
       this.bod_to_cod = 1
       if(this.units_model === "cod") this.bod_to_cod = 1/2.4
     },
+
     period_model: async function () {
-      this.layers_table = await this.generate_layers_table()
+      /*this.layers_table = await this.generate_layers_table()
       this.pollutants_table = await this.generate_pollutants_table()
       this.water_quantity = await this.generate_water_quality_table()
       this.treatment_efficiency_table = this.generate_treatment_efficiency_table()
       this.reporting_indicators = await this.generate_reporting_indicators_table()
       this.ecotoxicity_table = this.generate_ecotoxicity_table()
-      this.eutrophication_table = this.generate_eutrophication_table()
+      this.eutrophication_table = this.generate_eutrophication_table()*/
+      this.emissions_table = this.generate_emissions_table()
+
+    },
+
+    tab: async function () {
+
+      let _this = this
+      Vue.nextTick(function () {
+        if(_this.selected_assessments.length > 0){
+          _this.emissions_table =_this.generate_emissions_table()
+        }
+      })
+
 
     },
 
   },
   methods: {
+
+    generate_emissions_table() {
+
+      let _this = this
+
+      const groupedByAssessments = _.groupBy(this.selected_industries, function(n) {
+        return n.assessment.name;
+      });
+
+      if(_this.tab !== undefined && Object.values(groupedByAssessments)[_this.tab] != undefined){
+
+        let assessment = Object.values(groupedByAssessments)[_this.tab][0].assessment
+        let assessment_days = utils.daysBetween(assessment.assessment_period_start, assessment.assessment_period_end)
+
+        let days_factor = 1
+        if(this.period_model === "annual") days_factor = 365
+        else if(this.period_model === "assessment") days_factor = assessment_days
+
+        let emission_table = {
+          header: [{text: "", value: "value", sortable: false}],
+          emissions: []
+        }
+
+        let elec = {value: "Indirect emissions from electricity consumption", unit: "kgCO2eq"}
+        let fuel = {value: "Emissions from fuel engines", unit: "kgCO2eq"}
+        let tre = {value: "Emissions from treatment", unit: "kgCO2eq"}
+        let biog = {value: "Emissions from biogas", unit: "kgCO2eq"}
+        let slu = {value: "Emissions from sludge management", unit: "kgCO2eq"}
+        let reus = {value: "Emissions from water reuse transport", unit: "kgCO2eq"}
+        let disc = {value: "Emissions from water discharged", unit: "kgCO2eq"}
+        let supply_chain = {value: "Emissions for supply products to final product industry", unit: "kgCO2eq"}
+        let total = {value: "Total emissions", unit: "kgCO2eq"}
+
+
+        const data_chart = {
+          labels: [],
+          datasets: [{
+            data: [],
+            backgroundColor: []
+          }]
+        };
+
+        for (const [key, industries] of Object.entries(_this.industries_aggregated())) {
+          let total_emission = 0
+          emission_table.header.push({
+            text: key, value: key,
+          })
+          let emissions = metrics.emissions_and_descriptions(industries)
+          if(Number.isFinite(emissions["wwt_KPI_GHG_elec"])){
+            let value = (days_factor*emissions["wwt_KPI_GHG_elec"])
+            elec[key] = value.toExponential(3)
+            total_emission += value
+          }else{
+            elec[key] = ("-")
+          }
+          if(Number.isFinite(emissions["wwt_KPI_GHG_fuel"])){
+            let value = emissions["wwt_KPI_GHG_fuel"]*days_factor
+            fuel[key] = value.toExponential(3)
+            total_emission += value
+
+          }else{
+            fuel[key] = ("-")
+          }
+          if(Number.isFinite(emissions["wwt_KPI_GHG_tre"])){
+            let value = days_factor*emissions["wwt_KPI_GHG_tre"]
+            tre[key] = value.toExponential(3)
+            total_emission += value
+
+          }else{
+            tre[key] = ("-")
+          }
+          if(Number.isFinite(emissions["wwt_KPI_GHG_biog"])){
+            let value = days_factor*emissions["wwt_KPI_GHG_biog"]
+            biog[key] = value.toExponential(3)
+            total_emission += value
+          }else{
+            biog[key] = ("-")
+          }
+          if(Number.isFinite(emissions["wwt_KPI_GHG_slu"])){
+            let value = days_factor*emissions["wwt_KPI_GHG_slu"]
+            slu[key] = value.toExponential(3)
+            total_emission += value
+
+          }else{
+            slu[key] = ("-")
+          }
+          if(Number.isFinite(emissions["wwt_KPI_GHG_reus_trck"])){
+            let value = days_factor*emissions["wwt_KPI_GHG_reus_trck"]
+            reus[key] = value.toExponential(3)
+            total_emission += value
+          }else{
+            reus[key] = ("-")
+          }
+          if(Number.isFinite(emissions["wwt_KPI_GHG_disc"])){
+            let value = days_factor*emissions["wwt_KPI_GHG_disc"]
+            disc[key] = value.toExponential(3)
+            total_emission += value
+          }else{
+            disc[key] = ("-")
+          }
+
+          let raw_material_transport = days_factor*emissions["supply_chain_emissions"]
+          supply_chain[key] = raw_material_transport.toExponential(3)
+          total_emission += raw_material_transport
+
+          total[key] = total_emission.toExponential(3)
+
+          data_chart.datasets[0].data.push(total_emission)
+          data_chart.labels.push(key)
+          data_chart.datasets[0].backgroundColor.push('rgba(210,109,9,0.93)')
+        }
+
+        emission_table.header.push({text: "Unit", value: "unit", sortable: false,})
+        emission_table.emissions.push(elec)
+        emission_table.emissions.push(fuel)
+        emission_table.emissions.push(tre)
+        emission_table.emissions.push(biog)
+        emission_table.emissions.push(slu)
+        emission_table.emissions.push(reus)
+        emission_table.emissions.push(disc)
+        emission_table.emissions.push(supply_chain)
+        emission_table.emissions.push(total)
+
+        //CHART
+        const config = {
+          type: 'bar',
+          data: data_chart,
+          options: {
+            animation: false,
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: 'kgCO2eq emission'
+                }
+              },
+              x: {
+                title: {
+                  display: true,
+                  text: 'Industry'
+                }
+              }
+            }
+          },
+        };
+        console.log(config)
+
+        /*if (_this.ghg_emission_chart != null) _this.ghg_emission_chart.destroy()
+        console.log("global_warming_potential_chart_tab_"+_this.tab)
+        _this.ghg_emission_chart = new Chart(document.getElementById("global_warming_potential_chart_tab_"+_this.tab).getContext('2d'), config);*/
+        /*if (document.getElementById( "global_warming_chart") !== null) document.getElementById( "global_warming_chart").remove();
+        let canvas = document.createElement('canvas');
+        canvas.setAttribute('id','global_warming_chart');
+        canvas.setAttribute('width','300');
+        canvas.setAttribute('height','100');
+        document.getElementById('global_warming_chart_wrapper').appendChild(canvas);
+        new Chart(document.getElementById("global_warming_chart").getContext('2d'), config);*/
+        _this.ghg_emission_chart = {
+          chartData: data_chart,
+          options: {
+            animation: false,
+            scales: {
+              y: {
+                beginAtZero: true,
+                title: {
+                  display: true,
+                  text: 'kgCO2eq emission'
+                }
+              },
+              x: {
+                title: {
+                  display: true,
+                  text: 'Industry'
+                }
+              }
+            }
+          },
+        }
+
+
+
+        return emission_table
+      }
+      return {header: [], emissions: []}
+
+    },
+
 
     generate_eutrophication_table() {
 
@@ -452,10 +694,10 @@ export default {
           value: []
         }
 
-        let tn = {value: "TN", unit: "gPO4eq"}
-        let tp = {value: "TP", unit: "gPO4eq"}
-        let total = {value: "Total", unit: "gPO4eq"}
-        let cod = {value: "", unit: "gPO4eq"}
+        let tn = {value: "TN", unit: "gPO4eq/m3"}
+        let tp = {value: "TP", unit: "gPO4eq/m3"}
+        let total = {value: "Total", unit: "gPO4eq/m3"}
+        let cod = {value: "", unit: "gPO4eq/m3"}
         if(this.units_model === "bod") {
           cod.value = "BOD"
         }
@@ -514,7 +756,6 @@ export default {
 
     },
 
-
     generate_ecotoxicity_table() {
 
       let _this = this
@@ -537,18 +778,18 @@ export default {
           value: []
         }
 
-        let dichloroethane = {value: "1,2-Dichloroethane", unit: "TU"}
-        let cadmium = {value: "Cadmium", unit: "TU"}
-        let hexachlorobenzene = {value: "Hexachlorobenzene", unit: "TU"}
-        let mercury = {value: "Mercury", unit: "TU"}
-        let lead = {value: "Lead", unit: "TU"}
-        let nickel = {value: "Nickel", unit: "TU"}
-        let chloroalkanes = {value: "Chloroalkanes", unit: "TU"}
-        let hexaclorobutadie = {value: "Hexachlorobutadiene", unit: "TU"}
-        let nonylphenols = {value: "Nonylphenols", unit: "TU"}
-        let tetrachloroethene = {value: "Tetrachloroethene", unit: "TU"}
-        let trichloroethylene = {value: "Trichloroethylene", unit: "TU"}
-        let total = {value: "Total", unit: "TU"}
+        let dichloroethane = {value: "1,2-Dichloroethane", unit: "TU/m3"}
+        let cadmium = {value: "Cadmium", unit: "TU/m3"}
+        let hexachlorobenzene = {value: "Hexachlorobenzene", unit: "TU/m3"}
+        let mercury = {value: "Mercury", unit: "TU/m3"}
+        let lead = {value: "Lead", unit: "TU/m3"}
+        let nickel = {value: "Nickel", unit: "TU/m3"}
+        let chloroalkanes = {value: "Chloroalkanes", unit: "TU/m3"}
+        let hexaclorobutadie = {value: "Hexachlorobutadiene", unit: "TU/m3"}
+        let nonylphenols = {value: "Nonylphenols", unit: "TU/m3"}
+        let tetrachloroethene = {value: "Tetrachloroethene", unit: "TU/m3"}
+        let trichloroethylene = {value: "Trichloroethylene", unit: "TU/m3"}
+        let total = {value: "Total", unit: "TU/m3"}
 
         for (const industryAux of Object.values(groupedByAssessments)[_this.tab]) {
           let industry = industryAux.industry
@@ -991,7 +1232,7 @@ export default {
         let treated_factor = {value: "Treated water factor", unit: "%", info:"Amount of water treated in the treatment plant divided by the amount of water withdrawn. The higher the value, the better."}
         let available_ratio = {value: "Consumption available ratio", unit: "%", info: "This metric is calculated from the relationship between the amount of water withdrawn by the industry and the amount of water available and multiplied by 100. It indicates the percentage of the available water withdrawn by the industry’s consumption. This metric may have values ranging from 0, to a value greater than 100, indicating that the demand for water is higher than the available."}
         let efficiency_factor = {value: "Water efficiency", unit: "tonnes/m3", info: "Tonnes of product produced by the industry per cubic meter of water used"}
-        let water_quality_standards = {value: "Water quality standards", unit: "%"}
+        let water_quality_standards = {value: "Environmental quality standards", unit: "Quantity of emitted pollutants exceeding the maximum allowable concentration"}
 
 
 
@@ -1033,6 +1274,12 @@ export default {
             efficiency_factor[industry.name] = ("-")
           }
 
+          if(Number.isFinite(metrics.nqa(industry))){
+            water_quality_standards[industry.name] = metrics.nqa(industry)
+          }else{
+            water_quality_standards[industry.name] = ("-")
+          }
+
         }
 
         pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
@@ -1043,6 +1290,8 @@ export default {
         pollutants_table.value.push(treated_factor)
         pollutants_table.value.push(available_ratio)
         pollutants_table.value.push(efficiency_factor)
+        pollutants_table.value.push(water_quality_standards)
+
 
 
         return pollutants_table
@@ -1323,7 +1572,6 @@ export default {
       return id
     },
 
-
     async layers_table_pdf(dd, industries, assessment_days){
 
       let selected_layers_formatted = this.selected_layers.map(function (layer) {
@@ -1388,6 +1636,7 @@ export default {
       }
 
     },
+
     emissions_table_pdf(dd, industries, assessment_days) {
 
       let days_factor = 1
@@ -1499,6 +1748,7 @@ export default {
       dd.content.push(emissions_table)
 
     },
+
     async quality_quantity_indicators(dd, industries, assessment_days) {
 
       let days_factor = 1
@@ -1691,6 +1941,48 @@ export default {
       dd.content.push(emissions_table)
 
     },
+
+    industries_aggregated(){
+      let _this = this
+
+      const groupedByAssessments = _.groupBy(this.selected_industries, function(n) {
+        return n.assessment.name;
+      });
+
+      if(_this.tab !== undefined && _this.tab !== null && Object.values(groupedByAssessments)[_this.tab] != undefined){
+
+        let industriesOfassessment = Object.values(groupedByAssessments)[_this.tab].map(industry => {return industry.industry})
+        if(_this.aggregation_level == "country"){
+          //Agrupació per països
+          const groupedByCountry = _.groupBy(industriesOfassessment, function(industry) {
+            return utils.get_country_code_from_coordinates(industry.location.lat, industry.location.lng)
+          }) //Array of arrays of industries
+          return groupedByCountry
+        }
+        else if(_this.aggregation_level == "industry"){
+          let industries = {}
+          industriesOfassessment.forEach(industry => {
+            industries[industry.name] = [industry]
+          })
+          return industries
+        } else if(_this.aggregation_level == "supply_chain"){
+          let industries = {}
+          industriesOfassessment.filter(industry => {
+            return industry.operation_type == "Final product"
+          }).forEach(industry => {
+            industries[industry.name] = [industry]
+          })
+          industriesOfassessment.filter(industry => {
+            return industry.operation_type == "Supply chain"
+          }).forEach(industry => {
+            industries[industry.industry_provided].push(industry)
+          })
+          return industries
+        }
+      }
+    },
+
+
     async generate_pdf(){
       this.generating_pdf = true
 
@@ -1879,52 +2171,66 @@ export default {
         datasets: []
       };
 
-      /*const groupedByAssessments = _.groupBy(this.selected_industries, function(n) {
+      const groupedByAssessments = _.groupBy(this.selected_industries, function(n) {
         return n.assessment.name;
-      });*/
+      });
+
+      let _this = this
+
+      if(_this.tab !== undefined && _this.tab !== null && Object.values(groupedByAssessments)[_this.tab] != undefined){
+
+        let assessment = Object.values(groupedByAssessments)[_this.tab][0].assessment
+        let assessment_days = utils.daysBetween(assessment.assessment_period_start, assessment.assessment_period_end)
+
+        let days_factor = 1
+        if(this.period_model === "annual") days_factor = 365
+        else if(this.period_model === "assessment") days_factor = assessment_days
+
+        for (const industryAux of Object.values(groupedByAssessments)[_this.tab]) {
+          let industry = industryAux.industry
+
+          let global_warming_potential = metrics.global_warming_potential(industry)
+          let dilution_factor = await metrics.dilution_factor(this.global_layers, industry)
+          let recycled_water_factor = metrics.recycled_water_factor(industry)
+
+          data.datasets.push({
+            label: industry.name,
+            data: [global_warming_potential, dilution_factor, recycled_water_factor],
+            fill: true,
+            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+            borderColor: 'rgb(54, 162, 235)',
+            pointBackgroundColor: 'rgb(54, 162, 235)',
+            pointBorderColor: '#fff',
+            pointHoverBackgroundColor: '#fff',
+            pointHoverBorderColor: 'rgb(54, 162, 235)'
+          })
+        }
 
 
-      for (let industryAux of this.selected_industries){
-        let industry = industryAux.industry
-        let global_warming_potential = metrics.global_warming_potential(industry)
-        let dilution_factor = await metrics.dilution_factor(this.global_layers, industry)
-        let recycled_water_factor = metrics.recycled_water_factor(industry)
+        const config = {
+          type: 'radar',
+          data: data,
+          options: {
+            elements: {
+              line: {
+                borderWidth: 3
+              }
+            },
+            animation: false,
+            scales: {
+              r: {
+                max: 100,
+              }
+            }
+          },
+        };
+        //let pieChart = new Chart(document.getElementById('chart').getContext('2d'), config);
+        //return pieChart.toBase64Image()
 
-        data.datasets.push({
-          label: industry.name,
-          data: [global_warming_potential, dilution_factor, recycled_water_factor],
-          fill: true,
-          backgroundColor: 'rgba(54, 162, 235, 0.2)',
-          borderColor: 'rgb(54, 162, 235)',
-          pointBackgroundColor: 'rgb(54, 162, 235)',
-          pointBorderColor: '#fff',
-          pointHoverBackgroundColor: '#fff',
-          pointHoverBorderColor: 'rgb(54, 162, 235)'
-        })
       }
 
 
-      const config = {
-        type: 'radar',
-        data: data,
-        options: {
-          elements: {
-            line: {
-              borderWidth: 3
-            }
-          },
-          animation: false,
-          scales: {
-            r: {
-              max: 100,
-            }
-          }
-        },
-      };
-      let pieChart = new Chart(document.getElementById('chart').getContext('2d'), config);
-      //return pieChart.toBase64Image()
-
-    }
+      }
 
   },
 
@@ -1968,143 +2274,9 @@ export default {
             assessment_period: assessment_days
           })
         })
-
-
-
-
-
         return table
       }
       else return {header: [], industries: []}
-
-
-
-
-
-    },
-
-    emissions_table() {
-
-      let _this = this
-
-      const groupedByAssessments = _.groupBy(this.selected_industries, function(n) {
-        return n.assessment.name;
-      });
-
-      if(_this.tab !== undefined && _this.tab !== null && Object.values(groupedByAssessments)[_this.tab] != undefined){
-
-        let assessment = Object.values(groupedByAssessments)[_this.tab][0].assessment
-        let assessment_days = utils.daysBetween(assessment.assessment_period_start, assessment.assessment_period_end)
-
-        let days_factor = 1
-        if(this.period_model === "annual") days_factor = 365
-        else if(this.period_model === "assessment") days_factor = assessment_days
-
-        let emission_table = {
-          header: [{text: "", value: "value", sortable: false}],
-          emissions: []
-        }
-
-        let elec = {value: "Indirect emissions from electricity consumption", unit: "kgCO2eq"}
-        let fuel = {value: "Emissions from fuel engines", unit: "kgCO2eq"}
-        let tre = {value: "Emissions from treatment", unit: "kgCO2eq"}
-        let biog = {value: "Emissions from biogas", unit: "kgCO2eq"}
-        let slu = {value: "Emissions from sludge management", unit: "kgCO2eq"}
-        let reus = {value: "Emissions from water reuse transport", unit: "kgCO2eq"}
-        let disc = {value: "Emissions from water discharged", unit: "kgCO2eq"}
-        let supply_chain = {value: "Emissions from raw material supply", unit: "kgCO2eq"}
-        let total = {value: "Total emissions", unit: "kgCO2eq"}
-
-
-        for (const industryAux of Object.values(groupedByAssessments)[_this.tab]) {
-          let industry = industryAux.industry
-          let total_emission = 0
-          emission_table.header.push({
-            text: industry.name, value: industry.name,
-          })
-          let emissions = metrics.emissions_and_descriptions(industry)
-          if(Number.isFinite(emissions["wwt_KPI_GHG_elec"])){
-            let value = (days_factor*emissions["wwt_KPI_GHG_elec"])
-            elec[industry.name] = value.toExponential(3)
-            total_emission += value
-          }else{
-            elec[industry.name] = ("-")
-          }
-          if(Number.isFinite(emissions["wwt_KPI_GHG_fuel"])){
-            let value = emissions["wwt_KPI_GHG_fuel"]*days_factor
-            fuel[industry.name] = value.toExponential(3)
-            total_emission += value
-
-          }else{
-            fuel[industry.name] = ("-")
-          }
-          if(Number.isFinite(emissions["wwt_KPI_GHG_tre"])){
-            let value = days_factor*emissions["wwt_KPI_GHG_tre"]
-            tre[industry.name] = value.toExponential(3)
-            total_emission += value
-
-          }else{
-            tre[industry.name] = ("-")
-          }
-          if(Number.isFinite(emissions["wwt_KPI_GHG_biog"])){
-            let value = days_factor*emissions["wwt_KPI_GHG_biog"]
-            biog[industry.name] = value.toExponential(3)
-            total_emission += value
-          }else{
-            biog[industry.name] = ("-")
-          }
-          if(Number.isFinite(emissions["wwt_KPI_GHG_slu"])){
-            let value = days_factor*emissions["wwt_KPI_GHG_slu"]
-            slu[industry.name] = value.toExponential(3)
-            total_emission += value
-
-          }else{
-            slu[industry.name] = ("-")
-          }
-          if(Number.isFinite(emissions["wwt_KPI_GHG_reus_trck"])){
-            let value = days_factor*emissions["wwt_KPI_GHG_reus_trck"]
-            reus[industry.name] = value.toExponential(3)
-            total_emission += value
-          }else{
-            reus[industry.name] = ("-")
-          }
-          if(Number.isFinite(emissions["wwt_KPI_GHG_disc"])){
-            let value = days_factor*emissions["wwt_KPI_GHG_disc"]
-            disc[industry.name] = value.toExponential(3)
-            total_emission += value
-          }else{
-            disc[industry.name] = ("-")
-          }
-
-          let raw_material_tranport = days_factor*emissions["supply_chain_emissions"]
-          supply_chain[industry.name] = raw_material_tranport.toExponential(3)
-          total_emission += raw_material_tranport
-
-          total[industry.name] = total_emission.toExponential(3)
-
-        }
-
-        emission_table.header.push({text: "Unit", value: "unit", sortable: false,})
-
-        emission_table.emissions.push(elec)
-        emission_table.emissions.push(fuel)
-        emission_table.emissions.push(tre)
-        emission_table.emissions.push(biog)
-        emission_table.emissions.push(slu)
-        emission_table.emissions.push(reus)
-        emission_table.emissions.push(disc)
-        emission_table.emissions.push(supply_chain)
-        emission_table.emissions.push(total)
-
-
-        return emission_table
-      }
-      else return {header: [], emissions: []}
-
-
-
-
-
     },
 
     assessment_names: function() {
@@ -2124,7 +2296,6 @@ export default {
       return this.layers
     },
 
-
     is_there_any_industry_created: function () {
 
       let industries = []
@@ -2135,6 +2306,7 @@ export default {
       return industries.length > 0
 
     },
+
     assessments_and_industries_tree: function () {  //Assessments without any industry are ignored
       let id = 0
       let items = []

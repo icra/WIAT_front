@@ -322,13 +322,14 @@
                   @click="edit_assessment"
                   small
                   outlined
+                  block
               >
                 Edit
               </v-btn>
             </v-form>
           </div>
           <div style="margin: 7px; padding: 7px;">
-            <v-btn @click = "delete_assessment" small outlined>
+            <v-btn @click = "delete_assessment" small outlined block>
               Delete
             </v-btn>
           </div>
@@ -351,7 +352,7 @@
                   outlined
                   block
               >
-                Edit industry
+                Rename
               </v-btn>
             </v-form>
           </div>

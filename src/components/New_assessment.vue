@@ -29,7 +29,6 @@ export default {
       let new_assessment = new Assessment()
       new_assessment.name = this.assessment_name
       this.$assessments.push(new_assessment)
-      console.log(this.$assessments);
     }
   },
   created: function() {

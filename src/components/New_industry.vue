@@ -1845,7 +1845,6 @@ export default {
 
     tab_1_continue(){
       document.getElementsByClassName('outer').forEach(div => {
-        console.log(div)
         div.scrollTo(0, 0)
       })
       this.industry.volume_withdrawn = this.water_withdrawn
