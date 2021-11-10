@@ -12,6 +12,7 @@ Array.prototype.sum=function(){return this.reduce((p,c)=>(parseFloat(p)+parseFlo
 /*
   ASSESSMENT: main class
 */
+
 export class Assessment{
     constructor(){
         this.name="new assessment";
@@ -147,7 +148,7 @@ export class Direct_discharge{
         let inputs = {}
         inputs["None"] = {
 
-            "wwt_vol_disc" :{question:"Volume of discharged waste water to water body every day", value: 0, unit: "m3/day"},
+            "wwt_vol_disc" :{question:"Volume of discharged wastewater to water body every day", value: 0, unit: "m3/day"},
 
             //emission factors (discharge)
             "wwt_ch4_efac_dis": {
@@ -411,7 +412,7 @@ export class WWTP{
             "Fuel engines" :{
                 //fuel engines
                 "wwt_fuel_typ" :{question:"Fuel type (engines)", value: 0, type: "option", items: Tables["Fuel type options"]}, //Option | type of fuel (see Tables)
-                "wwt_vol_fuel" :{question:"Volume of fuel consumed", value: 0, unit: "L"}, //L of fuel
+                "wwt_vol_fuel" :{question:"Volume of fuel consumed", value: 0, unit: "L/day"}, //L of fuel
             },
 
             "Biogas produced from anaerobic digestion" : {
@@ -419,7 +420,7 @@ export class WWTP{
                 "wwt_biog_pro": {
                     question: "Biogas produced (volume)",
                     value: 0,
-                    unit: "Nm3",
+                    unit: "Nm3/day",
                     estimation_type: "equation",
                     description_tooltip: "Biogas produced during the assessment period by the wastewater treatment plant managed by the undertaking",
                     estimation_equation: true,
@@ -457,7 +458,7 @@ export class WWTP{
                     type: "option",
                     items: Tables["Fuel type options"]
                 }, //Option | type of fuel for digester
-                "wwt_fuel_dig": {question: "Fuel consumed for the digester", value: 0, unit: "L"}, //L | volume of fuel used in the digester
+                "wwt_fuel_dig": {question: "Fuel consumed for the digester", value: 0, unit: "L/day"}, //L | volume of fuel used in the digester
                 //"wwt_nrg_biog_eff" :{question:"Energy efficiency for biogas valorization with respect to the theoretical maximum", value: 43},
                 //"wwt_nrg_biog" :{question:"Electrical energy produced from biogas valorization", value: 0},
             },
@@ -489,7 +490,7 @@ export class WWTP{
                     type: "option",
                     items: Tables["Fuel type options"]
                 }, //Option | type of fuel
-                "wwt_reus_vol_trck": {question: "Volume of fuel consumed (trucks)", value: 0}, //L | volume of fuel used
+                "wwt_reus_vol_trck": {question: "Volume of fuel consumed (trucks)", value: 0, unit: "L/day"}, //L | volume of fuel used
 
             },
             //GHG emissions avoided from reusing water
@@ -532,7 +533,7 @@ export class WWTP{
             //sludge composting
             "Sludge composting in WWTP" : {
 
-                "wwt_mass_slu_comp": {question: "Sludge composted (dry weight)", value: 0, unit: "kg", description_tooltip: "Amount of sludge that is sent to composting (dry weight)"}, //kg of sludge composted
+                "wwt_mass_slu_comp": {question: "Sludge composted (dry weight)", value: 0, unit: "kg/L", description_tooltip: "Amount of sludge that is sent to composting (dry weight)"}, //kg of sludge composted
                 "wwt_slu_comp_emis_treated_or_piles_covered": {
                     question: "Are composting emissions treated and/or piles are covered",
                     value: 0,
@@ -576,7 +577,7 @@ export class WWTP{
             //sludge incineration
             "Sludge incineration" : {
 
-                "wwt_mass_slu_inc": {question: "Sludge incinerated (dry weight)", value: 0, unit: "kg"}, //kg of sludge incinerated
+                "wwt_mass_slu_inc": {question: "Sludge incinerated (dry weight)", value: 0, unit: "kg/day"}, //kg of sludge incinerated
                 "wwt_temp_inc": {
                     question: "Average highest temperature of combustion achieved in a Fluidized Bed incinerator",
                     value: 1023,
@@ -603,7 +604,7 @@ export class WWTP{
             //sludge LA
             "Sludge sent to dry application" : {
 
-                "wwt_mass_slu_app": {question: "Sludge sent to land application (dry weight)", value: 0, unit: "kg"}, //kg of sludge sent to LA
+                "wwt_mass_slu_app": {question: "Sludge sent to land application (dry weight)", value: 0, unit: "kg/day"}, //kg of sludge sent to LA
                 "wwt_slu_la_solids_content": {
                     question: "Solids content of sludge sent to land application",
                     value: 0,
@@ -643,7 +644,7 @@ export class WWTP{
             },
             //sludge LF
             "Sludge landfilling" : {
-                "wwt_mass_slu_land": {question: "Sludge sent to landfilling (dry weight)", value: 0, unit: "kg"}, //kg of sludge sent to LF
+                "wwt_mass_slu_land": {question: "Sludge sent to landfilling (dry weight)", value: 0, unit: "kg/day"}, //kg of sludge sent to LF
                 "wwt_slu_lf_TVS": {
                     question: "Total Volatile Solids (TVS) content of sludge sent to land application",
                     value: 0,
@@ -682,7 +683,8 @@ export class WWTP{
                     items: Tables["Type of sludge disposed"],
                     estimation_based_on: null,
                     estimation_factor: "N_cont",
-                    description: "description"
+                    description: "description",
+                    unit: "%"
                 }, //N content
                 "wwt_slu_lf_low_CN_EF": {
                     question: "N2O emission factor for low C:N ratio",
@@ -693,7 +695,7 @@ export class WWTP{
             },
             //sludge
             "Sludge stockpiling" : {
-                "wwt_mass_slu_stock": {question: "Sludge stockpiled (dry weight)", value: 0, unit: "kg"}, //kg of sludge stockpiled
+                "wwt_mass_slu_stock": {question: "Sludge stockpiled (dry weight)", value: 0, unit: "kg/day"}, //kg of sludge stockpiled
                 "wwt_slu_sp_lifespan": {question: "Stockpile lifespan", value: 0, unit: "years", description_tooltip:"Expected timespan that the biosolid stockpile (BSP) will be emitting GHGs"}, //years
             },
             //sludge truck transport
@@ -705,7 +707,7 @@ export class WWTP{
                     type: "option",
                     items: Tables["Fuel type options"]
                 }, //Option | fuel type
-                "wwt_vol_tslu": {question: "Volume of fuel consumed (trucks)", value: 0, unit: "L"}, //L | volume of fuel
+                "wwt_vol_tslu": {question: "Volume of fuel consumed (trucks)", value: 0, unit: "L/day"}, //L | volume of fuel
             }
         }
     }
@@ -1110,7 +1112,7 @@ export class Industrial_wwtp extends WWTP{
             //"wwt_tot_nit": {question: "Total nitrogen in untreated wastewater", value: 0, unit: "kgTN/m3"},  //kgTN/m3 | Total nitrogen in untreated wastewater
 
             "wwt_bod_effl_to_wb": {
-                question: "Effluent COD concentration of the WWTP",
+                question: "Concentration of COD in the WWTP effluent",
                 value: 0,
                 unit: "g/m3",
                 estimation_equation: true
@@ -1120,14 +1122,14 @@ export class Industrial_wwtp extends WWTP{
             //"wwt_P_infl": {question: "Influent P load", value: 0, unit: "kg"}, //kgP
 
             "wwt_tn_effl_to_wb": {
-                question: "Effluent Total Nitrogen concentration of the WWTP",
+                question: "Concentration of Total Nitrogen in the WWTP effluent",
                 value: 0,
                 unit: "g/m3",
                 estimation_equation: true
             },  //kgN   TAULA 6.10c
 
             "wwt_tp_effl_to_wb": {
-                question: "Effluent Total Phosphorus concentration of the WWTP",
+                question: "Concentration of Total Phosphorus in the WWTP effluent",
                 value: 0,
                 unit: "g/m3",
                 estimation_equation: true
@@ -1136,77 +1138,77 @@ export class Industrial_wwtp extends WWTP{
 
             //Priority pollutants
             "wwt_diclo_effl_to_wb": {
-                question: "Effluent 1,2-Dichloroethane concentration of the WWTP",
+                question: "Concentration of 1,2-Dichloroethane in the WWTP effluent",
                 value: 0,
                 unit: "g/m3",
                 estimation_equation: true
             },
 
             "wwt_cadmium_effl_to_wb": {
-                question: "Effluent cadmium concentration of the WWTP",
+                question: "Concentration of cadmium in the WWTP effluent",
                 value: 0,
                 unit: "g/m3",
                 estimation_equation: true
             },
 
             "wwt_hexaclorobenzene_effl_to_wb": {
-                question: "Effluent hexachlorobenzene concentration of the WWTP",
+                question: "Concentration of hexachlorobenzene in the WWTP effluent",
                 value: 0,
                 unit: "g/m3",
                 estimation_equation: true
             },
 
             "wwt_mercury_effl_to_wb": {
-                question: "Effluent mercury concentration of the WWTP",
+                question: "Concentration of mercury in the WWTP effluent",
                 value: 0,
                 unit: "g/m3",
                 estimation_equation: true
             },
 
             "wwt_plomo_effl_to_wb": {
-                question: "Effluent lead concentration of the WWTP",
+                question: "Concentration of lead in the WWTP effluent",
                 value: 0,
                 unit: "g/m3",
                 estimation_equation: true
             },
 
             "wwt_niquel_effl_to_wb": {
-                question: "Effluent nickel concentration of the WWTP",
+                question: "Concentration of nickel in the WWTP effluent",
                 value: 0,
                 unit: "g/m3",
                 estimation_equation: true
             },
 
             "wwt_chloro_effl_to_wb": {
-                question: "Effluent chloroalkanes concentration of the WWTP",
+                question: "Concentration of chloroalkanes in the WWTP effluent",
                 value: 0,
                 unit: "g/m3",
                 estimation_equation: true
             },
 
             "wwt_hexaclorobutadie_effl_to_wb": {
-                question: "Effluent hexachlorobutadiene concentration of the WWTP",
+                question: "Concentration of hexachlorobutadiene in the WWTP effluent",
                 value: 0,
                 unit: "g/m3",
                 estimation_equation: true
             },
 
             "wwt_nonilfenols_effl_to_wb": {
-                question: "Effluent nonylphenols concentration of the WWTP",
+                question: "Concentration of nonylphenols in the WWTP effluent",
                 value: 0,
                 unit: "g/m3",
                 estimation_equation: true
             },
 
             "wwt_tetracloroetile_effl_to_wb": {
-                question: "Effluent tetrachloroethene concentration of the WWTP",
+                question: "Concentration of tetrachloroethene in the WWTP effluent",
                 value: 0,
                 unit: "g/m3",
                 estimation_equation: true
             },
 
             "wwt_tricloroetile_effl_to_wb": {
-                question: "Effluent trichloroethylene concentration of the WWTP",
+                question: "Concentration of trichloroethylene in the WWTP effluent",
                 value: 0,
                 unit: "g/m3",
                 estimation_equation: true
@@ -1465,7 +1467,7 @@ export class Industrial_wwtp_onsite_external_domestic extends Industrial_wwtp_on
 
     static info_inputs(){
         let inputs = Industrial_wwtp_onsite.info_inputs()
-        inputs["None"]["wwt_vol_treated_external"] = {question: "Volume of water from the WWTP treated in an off-site WWTP every day", value: 0, unit: "m3/day"}
+        inputs["None"]["wwt_vol_treated_external"] = {question: "Volume of water from the WWTP also treated in an off-site WWTP every day", value: 0, unit: "m3/day"}
         //inputs["None"]["wwt_cod_effl_treated_external"] = {question: "Effluent BOD load leaving the WWTP to external WWTP ", value: 0, unit: "kg"}
         //inputs["None"]["wwt_tn_effl_treated_external"] = {question: "Effluent Total Nitrogen load leaving the WWTP to external WWTP ", value: 0, unit: "kg"}
         return inputs
@@ -1695,13 +1697,13 @@ export class Domestic_wwtp extends WWTP{
 
             "wwt_treatment_type" :{question:"Type of wastewater treatment", value: 0, type: "option", items: Tables["WW treatment type"]}, //Option | type of treatment (see Tables)
 
-            "wwt_vol_trea": {question: "Volume of waste water discharged from the industry treated in the WWTP every day", value: 0, unit: "m3/day"},
+            "wwt_vol_trea": {question: "Volume of wastewater discharged from the industry treated in the WWTP every day", value: 0, unit: "m3/day"},
             "wwt_vol_disc" :{question:"Volume of discharged effluent to water body every day", value: 0, unit: "m3/day"},
 
             //"wwt_tot_nit": {question: "Total nitrogen in untreated wastewater", value: 0, unit: "kgTN/m3"},  //kgTN/m3 | Total nitrogen in untreated wastewater
 
             "wwt_bod_effl_to_wb": {
-                question: "Effluent BOD concentration leaving the WWTP to water body",
+                question: "Concentration of BOD in the WWTP effluent",
                 value: 0,
                 unit: "g/m3",
                 estimation_equation: true
@@ -1710,7 +1712,7 @@ export class Domestic_wwtp extends WWTP{
             //"wwt_P_infl": {question: "Influent P load", value: 0, unit: "kg"}, //kgP
 
             "wwt_tn_effl_to_wb": {
-                question: "Effluent Total Nitrogen concentration leaving the WWTP to water body",
+                question: "Concentration of Total Nitrogen in the WWTP effluent",
                 value: 0,
                 unit: "g/m3",
                 estimation_equation: true
@@ -1718,7 +1720,7 @@ export class Domestic_wwtp extends WWTP{
             },  //kgN   TAULA 6.10c
 
             "wwt_tp_effl_to_wb": {
-                question: "Effluent Total Phosphorus concentration leaving the WWTP to water body",
+                question: "Concentration of Total Phosphorus in the WWTP effluent",
                 value: 0,
                 unit: "g/m3",
                 estimation_equation: true
@@ -1726,77 +1728,77 @@ export class Domestic_wwtp extends WWTP{
             },
             //Priority pollutants
             "wwt_diclo_effl_to_wb": {
-                question: "Effluent 1,2-Dichloroethane concentration of the WWTP",
+                question: "Concentration of 1,2-Dichloroethane in the WWTP effluent",
                 value: 0,
                 unit: "g/m3",
                 estimation_equation: true
             },
 
             "wwt_cadmium_effl_to_wb": {
-                question: "Effluent cadmium concentration of the WWTP",
+                question: "Concentration of cadmium in the WWTP effluent",
                 value: 0,
                 unit: "g/m3",
                 estimation_equation: true
             },
 
             "wwt_hexaclorobenzene_effl_to_wb": {
-                question: "Effluent hexachlorobenzene concentration of the WWTP",
+                question: "Concentration of hexachlorobenzene in the WWTP effluent",
                 value: 0,
                 unit: "g/m3",
                 estimation_equation: true
             },
 
             "wwt_mercury_effl_to_wb": {
-                question: "Effluent mercury concentration of the WWTP",
+                question: "Concentration of mercury in the WWTP effluent",
                 value: 0,
                 unit: "g/m3",
                 estimation_equation: true
             },
 
             "wwt_plomo_effl_to_wb": {
-                question: "Effluent lead concentration of the WWTP",
+                question: "Concentration of lead in the WWTP effluent",
                 value: 0,
                 unit: "g/m3",
                 estimation_equation: true
             },
 
             "wwt_niquel_effl_to_wb": {
-                question: "Effluent nickel concentration of the WWTP",
+                question: "Concentration of nickel in the WWTP effluent",
                 value: 0,
                 unit: "g/m3",
                 estimation_equation: true
             },
 
             "wwt_chloro_effl_to_wb": {
-                question: "Effluent chloroalkanes concentration of the WWTP",
+                question: "Concentration of chloroalkanes in the WWTP effluent",
                 value: 0,
                 unit: "g/m3",
                 estimation_equation: true
             },
 
             "wwt_hexaclorobutadie_effl_to_wb": {
-                question: "Effluent hexachlorobutadiene concentration of the WWTP",
+                question: "Concentration of hexachlorobutadiene in the WWTP effluent",
                 value: 0,
                 unit: "g/m3",
                 estimation_equation: true
             },
 
             "wwt_nonilfenols_effl_to_wb": {
-                question: "Effluent nonylphenols concentration of the WWTP",
+                question: "Concentration of nonylphenols in the WWTP effluent",
                 value: 0,
                 unit: "g/m3",
                 estimation_equation: true
             },
 
             "wwt_tetracloroetile_effl_to_wb": {
-                question: "Effluent tetrachloroethene concentration of the WWTP",
+                question: "Concentration of tetrachloroethene in the WWTP effluent",
                 value: 0,
                 unit: "g/m3",
                 estimation_equation: true
             },
 
             "wwt_tricloroetile_effl_to_wb": {
-                question: "Effluent trichloroethylene concentration of the WWTP",
+                question: "Concentration of trichloroethylene in the WWTP effluent",
                 value: 0,
                 unit: "g/m3",
                 estimation_equation: true

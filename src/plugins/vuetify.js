@@ -4,7 +4,7 @@ import Vuetify from 'vuetify/lib/framework';
 
 //Icons
 import icraLogo from '@/components/Logos/icraLogo'
-import wbcsdLogo from '@/components/Logos/wbcsd'
+import wbcsdLogo from '@/components/Logos/WBCSD-Logo_white-01'
 
 
 Vue.use(Vuetify);

@@ -123,6 +123,7 @@ Vue.prototype.$layers_description = [
               },
               monthly: false,
               future: true,
+              info: "Flow accumulation indicates the accumulated flow as the accumulated weight of all cells flowing into each downslope cell. It counts the amount of water in each cell due to precipitation-evaporation water budget."
             },
           },
           {
@@ -352,24 +353,6 @@ Vue.prototype.$layers_description = [
           }
         },
           {
-            name: 'Coastal Pharmaceutical Pollution',
-            layer: {
-              layers: {
-                baseline: {
-                  annual: {
-                    layer: null
-                  },
-                  monthly: []
-                },
-                future: {
-                  layer: null
-                },
-              },
-              monthly: false,
-              future: false,
-            }
-          },
-          {
             name: 'Surface Water Pharmaceutical Pollution',
             layer: {
               layers: {
@@ -385,9 +368,29 @@ Vue.prototype.$layers_description = [
               },
               monthly: false,
               future: true,
+              info: "Surface Water Pharmaceutical Pollution Indicates the concentration of the Diclofenac on the rivers from domestic uses, it takes in count the population consumption, the in-stream attenuation, excretion, and the removal at sanitation facilities."
             }
-          }
+          },
 
+          {
+            name: 'Coastal Pharmaceutical Pollution',
+            layer: {
+              layers: {
+                baseline: {
+                  annual: {
+                    layer: null
+                  },
+                  monthly: []
+                },
+                future: {
+                  layer: null
+                },
+              },
+              monthly: false,
+              future: false,
+              info: "Coastal Pharmaceutical Pollution Indicates the amount of Diclofenac exported by the rivers to the ocean."
+            }
+          },
         ]
       },
     ],
@@ -411,6 +414,8 @@ Vue.prototype.$layers_description = [
           },
           monthly: false,
           future: false,
+          info: "The Peak RepRisk country ESG risk index quantifies business conduct risk exposure related to environmental, social, and governance (ESG) issues in the corresponding country. The index provides insights into potential financial, reputational, and compliance risks, such as human rights violations and environmental destruction."
+
         }
       },
       {
@@ -429,7 +434,7 @@ Vue.prototype.$layers_description = [
           },
           monthly: false,
           future: false,
-          info: "The Peak RepRisk country ESG risk index quantifies business conduct risk exposure related to environmental, social, and governance (ESG) issues in the corresponding country. The index provides insights into potential financial, reputational, and compliance risks, such as human rights violations and environmental destruction. "
+          info: "Unimproved/no drinking water reflects the percentage of the population collecting drinking water from an unprotected dug well or spring, or directly from a river, dam, lake, pond, stream, canal, or irrigation canal."
         }
       },
       {
@@ -448,6 +453,7 @@ Vue.prototype.$layers_description = [
           },
           monthly: false,
           future: false,
+          info: "Unimproved/no sanitation reflects the percentage of the population using pit latrines without a slab or platform, hanging/bucket latrines, or directly disposing human waste in fields, forests, bushes, open bodies of water, beaches, other open spaces, or with solid waste."
         }
       },
     ]

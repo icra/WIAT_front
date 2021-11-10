@@ -144,8 +144,23 @@
                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                       <span>
                         Does the industry directly discharge wastewater into the water body?
+                        <v-tooltip
+                            bottom
+                            max-width="500"
+                        >
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-icon
+                                color=#1C195B
+                                v-bind="attrs"
+                                v-on="on"
+                                size="20px"
+                            >
+                              mdi-information-variant
+                            </v-icon>
+                          </template>
+                        <span>Untreated water</span>
+                      </v-tooltip>
                       </span>
-
                 </div>
               </div>
             </v-col>
@@ -244,10 +259,26 @@
             <v-col cols="8" >
               <div style="width: 100%;">
                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                      <span>
-                        Operation type
-                      </span>
+                  <span>
+                    Operation type
+                    <v-tooltip
+                        bottom
+                        max-width="500"
+                    >
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-icon
+                            color=#1C195B
+                            v-bind="attrs"
+                            v-on="on"
+                            size="20px"
+                        >
+                          mdi-information-variant
+                        </v-icon>
+                      </template>
+                      <span>Does the industry receive products from other industries (Final product industry), or does it supply products to an industry (Supply chain industry)</span>
+                    </v-tooltip>
 
+                  </span>
                 </div>
               </div>
             </v-col>
@@ -271,7 +302,7 @@
                 <div style="width: 100%;">
                   <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                       <span>
-                        To which final product industry supplies products
+                        To which final product industry does this industry supply freight
                       </span>
 
                   </div>
@@ -348,7 +379,7 @@
                 <div style="width: 100%;">
                   <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                       <span>
-                        Distance the shipment has traveled by cargo aircraft to the final product industry:
+                        Distance the freight has traveled by cargo aircraft to the final product industry:
                       </span>
 
                   </div>
@@ -359,7 +390,7 @@
                   <div>
                     <v-text-field
                         v-model="km_air"
-                        suffix="km"
+                        suffix="km/day"
                         type="number"
                         :disabled="operation_type == 'Final product'"
                     ></v-text-field>
@@ -374,7 +405,7 @@
                 <div style="width: 100%;">
                   <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                       <span>
-                        Distance the shipment has traveled by barge to the final product industry
+                        Distance the freight has traveled by barge to the final product industry
                       </span>
 
                   </div>
@@ -385,7 +416,7 @@
                   <div>
                     <v-text-field
                         v-model="km_barge"
-                        suffix="km"
+                        suffix="km/day"
                         type="number"
                         :disabled="operation_type == 'Final product'"
                     ></v-text-field>
@@ -400,7 +431,7 @@
                 <div style="width: 100%;">
                   <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                       <span>
-                        Distance the shipment has traveled by sea to the final product industry
+                        Distance the freight has traveled by sea to the final product industry
                       </span>
 
                   </div>
@@ -411,7 +442,7 @@
                   <div>
                     <v-text-field
                         v-model="km_ocean"
-                        suffix="km"
+                        suffix="km/day"
                         type="number"
                         :disabled="operation_type == 'Final product'"
                     ></v-text-field>
@@ -426,7 +457,7 @@
                 <div style="width: 100%;">
                   <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                       <span>
-                        Distance the shipment has traveled by rail to the final product industry
+                        Distance the freight has traveled by rail to the final product industry
                       </span>
 
                   </div>
@@ -437,7 +468,7 @@
                   <div>
                     <v-text-field
                         v-model="km_rail"
-                        suffix="km"
+                        suffix="km/day"
                         type="number"
                         :disabled="operation_type == 'Final product'"
                     ></v-text-field>
@@ -452,7 +483,7 @@
                 <div style="width: 100%;">
                   <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                       <span>
-                        Distance the shipment has traveled by truck to the final product industry
+                        Distance the freight has traveled by truck to the final product industry
                       </span>
 
                   </div>
@@ -463,7 +494,7 @@
                   <div>
                     <v-text-field
                         v-model="km_truck"
-                        suffix="km"
+                        suffix="km/day"
                         type="number"
                         :disabled="operation_type == 'Final product'"
                     ></v-text-field>
@@ -482,7 +513,7 @@
               <div style="width: 100%;">
                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                       <span>
-                        COD concentration in the industry effluent
+                        Concentration of COD in the industry effluent
                       </span>
 
 
@@ -518,7 +549,7 @@
               <div style="width: 100%;">
                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                       <span>
-                        Total Nitrogen concentration in the industry effluent
+                        Concentration of Total Nitrogen in the industry effluent
                       </span>
 
 
@@ -554,7 +585,7 @@
               <div style="width: 100%;">
                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                       <span>
-                        Total Phosphorus concentration in the industry effluent
+                        Concentration of Total Phosphorus in the industry effluent
                       </span>
 
 
@@ -592,7 +623,7 @@
               <div style="width: 100%;">
                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                       <span>
-                        1,2-Dichloroethane concentration in the industry effluent
+                        Concentration of 1,2-Dichloroethane in the industry effluent
                       </span>
 
                   <v-btn v-if="ind_diclo_effl !== null"
@@ -626,10 +657,8 @@
               <div style="width: 100%;">
                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                       <span>
-                        Cadmium concentration in the industry effluent
+                        Concentration of cadmium in the industry effluent
                       </span>
-
-
 
                   <v-btn v-if="ind_cadmium_effl !== null"
                          outlined
@@ -662,7 +691,8 @@
               <div style="width: 100%;">
                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                       <span>
-                        Hexachlorobenzene concentration in the industry effluent
+                        Concentration of hexachlorobenzene in the industry effluent
+
                       </span>
 
 
@@ -697,7 +727,7 @@
               <div style="width: 100%;">
                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                       <span>
-                        Mercury concentration in the industry effluent
+                        Concentration of mercury in the industry effluent
                       </span>
 
 
@@ -733,7 +763,7 @@
               <div style="width: 100%;">
                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                       <span>
-                        Lead concentration in the industry effluent
+                        Concentration of lead in the industry effluent
                       </span>
 
 
@@ -769,7 +799,7 @@
               <div style="width: 100%;">
                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                       <span>
-                        Nickel concentration in the industry effluent
+                        Concentration of nickel in the industry effluent
                       </span>
 
 
@@ -805,7 +835,7 @@
               <div style="width: 100%;">
                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                       <span>
-                        Chloroalkanes concentration in the industry effluent
+                        Concentration of chloroalkanes in the industry effluent
                       </span>
 
 
@@ -841,11 +871,8 @@
               <div style="width: 100%;">
                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                       <span>
-                        Hexachlorobutadiene concentration in the industry effluent
+                        Concentration of hexachlorobutadiene in the industry effluent
                       </span>
-
-
-
                   <v-btn v-if="ind_hexaclorobutadie_effl !== null"
                          outlined
                          x-small
@@ -877,7 +904,7 @@
               <div style="width: 100%;">
                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                       <span>
-                        Nonylphenols concentration in the industry effluent
+                        Concentration of nonylphenols in the industry effluent
                       </span>
 
 
@@ -913,7 +940,7 @@
               <div style="width: 100%;">
                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                       <span>
-                        Tetrachloroethene concentration in the industry effluent
+                        Concentration of tetrachloroethene in the industry effluent
                       </span>
 
 
@@ -949,10 +976,8 @@
               <div style="width: 100%;">
                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                       <span>
-                        Trichloroethylene concentration in the industry effluent
+                        Concentration of trichloroethylene in the industry effluent
                       </span>
-
-
 
                   <v-btn v-if="ind_tricloroetile_effl !== null"
                          outlined
