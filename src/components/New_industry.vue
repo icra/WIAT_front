@@ -253,6 +253,33 @@
 
           </v-row>
 
+          <v-row style="background-color: #F2F4F3" align="center">
+            <v-col cols="8" >
+              <div style="width: 100%;">
+                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                      <span>
+                        Amount of product produced by the industry
+                      </span>
+
+                </div>
+              </div>
+            </v-col>
+            <v-col cols="4">
+              <div>
+                <div>
+                  <v-text-field
+                      v-model="product_produced"
+                      suffix="tonnes/day"
+                      type="number"
+                  ></v-text-field>
+
+                </div>
+              </div>
+
+            </v-col>
+          </v-row>
+
+
           <!-- supply chain -->
 
           <v-row style="background-color: #F2F4F3" align="center">
@@ -1681,7 +1708,8 @@ export default {
       km_rail: defaultIndustry.km_rail,
       km_truck: defaultIndustry.km_truck,
       volume_cargo: defaultIndustry.volume_cargo,
-      weight_cargo: defaultIndustry.weight_cargo
+      weight_cargo: defaultIndustry.weight_cargo,
+      product_produced: defaultIndustry.product_produced
 
     }
   },
@@ -1779,7 +1807,7 @@ export default {
       this.km_truck = industry.km_truck
       this.volume_cargo = industry.volume_cargo
       this.weight_cargo = industry.weight_cargo
-
+      this.product_produced = industry.product_produced
 
     },
   },
@@ -1903,6 +1931,7 @@ export default {
       this.industry.industry_provided = this.industry_provided
       this.industry.volume_cargo = this.volume_cargo
       this.industry.weight_cargo = this.weight_cargo
+      this.industry.product_produced = this.product_produced
 
 
       //Local wwtp

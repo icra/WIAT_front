@@ -138,7 +138,7 @@ function effl_efficiency(industries, pollutant_effl, pollutant_infl){   //Amount
         return treated*industry[pollutant_infl]
     }).sum()
 
-    let eff = load / load_infl
+    let eff = 1 - (load / load_infl)
 
     if(isNaN(eff)) return NaN
     return eff*100
@@ -280,7 +280,9 @@ let metrics = {
 
     efficiency_factor(industries){
         let product_produced = industries.map(industry => industry.product_produced).sum()
-        let vol_used = industries.map(industry => industry.vol_used).sum()
+        let vol_used = industries.map(industry => industry.volume_used).sum()
+        console.log(product_produced)
+        console.log(vol_used)
         if (vol_used>0) return product_produced/vol_used
         return NaN
     },
@@ -338,10 +340,10 @@ let metrics = {
             if(industry.has_offsite_wwtp){
                 water_treated += industry.offsite_wwtp.wwt_vol_trea
             }
-            return water_treated*industry.bod_effl_concentration
+            return water_treated*industry.bod_effl_concentration*2.4
         }).sum()
 
-        let eff = load / bod_industry
+        let eff = 1 - (load / bod_industry)
         if(isNaN(eff)) return NaN
         return eff*100
     },
