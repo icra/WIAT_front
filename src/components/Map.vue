@@ -602,6 +602,7 @@ export default {
     },
 
     toggle_layer_selection_menu(){
+      console.log('aa')
       this.$emit('selectLayer');
     },
     industry_created(){ //Delete clicked marker and add industry marker
@@ -1972,7 +1973,8 @@ aside.toolbox {
   border-style: solid;
   border-width: 1px;
   background-color: white;
-  display: table}
+  display: table
+}
 
 .leaflet-touch .leaflet-bar button {
   width: 70px;

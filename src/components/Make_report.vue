@@ -913,18 +913,18 @@ export default {
           value: []
         }
 
-        let dichloroethane = {value: "1,2-Dichloroethane", unit: "TU/m3"}
-        let cadmium = {value: "Cadmium", unit: "TU/m3"}
-        let hexachlorobenzene = {value: "Hexachlorobenzene", unit: "TU/m3"}
-        let mercury = {value: "Mercury", unit: "TU/m3"}
-        let lead = {value: "Lead", unit: "TU/m3"}
-        let nickel = {value: "Nickel", unit: "TU/m3"}
-        let chloroalkanes = {value: "Chloroalkanes", unit: "TU/m3"}
-        let hexaclorobutadie = {value: "Hexachlorobutadiene", unit: "TU/m3"}
-        let nonylphenols = {value: "Nonylphenols", unit: "TU/m3"}
-        let tetrachloroethene = {value: "Tetrachloroethene", unit: "TU/m3"}
-        let trichloroethylene = {value: "Trichloroethylene", unit: "TU/m3"}
-        let total = {value: "Total", unit: "TU/m3"}
+        let dichloroethane = {value: "1,2-Dichloroethane", unit: "TU"}
+        let cadmium = {value: "Cadmium", unit: "TU"}
+        let hexachlorobenzene = {value: "Hexachlorobenzene", unit: "TU"}
+        let mercury = {value: "Mercury", unit: "TU"}
+        let lead = {value: "Lead", unit: "TU"}
+        let nickel = {value: "Nickel", unit: "TU"}
+        let chloroalkanes = {value: "Chloroalkanes", unit: "TU"}
+        let hexaclorobutadie = {value: "Hexachlorobutadiene", unit: "TU"}
+        let nonylphenols = {value: "Nonylphenols", unit: "TU"}
+        let tetrachloroethene = {value: "Tetrachloroethene", unit: "TU"}
+        let trichloroethylene = {value: "Trichloroethylene", unit: "TU"}
+        let total = {value: "Total", unit: "TU"}
 
         const data_chart = {
           labels: [],
@@ -1044,7 +1044,7 @@ export default {
               },
               scaleLabel: {
                 display: true,
-                labelString: 'TU/m3'
+                labelString: 'TU'
               }
             }],
             xAxes: [{
@@ -1220,7 +1220,7 @@ export default {
         let recycled_factor = {value: "Recycled water factor", unit: "%", info:"This metric indicates the percentage of the reused water used by the industry. Values that may have this metric range from 0 to 100, the larger its value the less impact it will generate."}
         let treated_factor = {value: "Treated water factor", unit: "%", info:"Amount of water treated in the treatment plant divided by the amount of water withdrawn. The higher the value, the better."}
         let available_ratio = {value: "Consumption available ratio", unit: "%", info: "This metric is calculated from the relationship between the amount of water withdrawn by the industry and the amount of water available and multiplied by 100. It indicates the percentage of the available water withdrawn by the industry’s consumption. This metric may have values ranging from 0, to a value greater than 100, indicating that the demand for water is higher than the available."}
-        let efficiency_factor = {value: "Water efficiency", unit: "tonnes/m3", info: "Tonnes of product produced by the industry per cubic meter of water used"}
+        let efficiency_factor = {value: "Specific water consumption", unit: "tonnes/m3", info: "Tonnes of product produced by the industry per cubic meter of water used"}
         let water_quality_standards = {value: "Environmental quality standards", unit: "%", info: "Percentage of emitted pollutants exceeding the maximum allowable concentration"}
 
 
@@ -1582,7 +1582,7 @@ export default {
         let nonylphenols = {value: "Nonylphenols load increment", unit: "g/m3"}
         let tetrachloroethene = {value: "Tetrachloroethene load increment", unit: "g/m3"}
         let trichloroethylene = {value: "Trichloroethylene load increment", unit: "g/m3"}
-        let tu = {value: "Toxic Units load increment", unit: "TU/m3"}
+        let tu = {value: "Toxic Units load increment", unit: "TU"}
 
         let bod = {value: "", unit: "g/m3"}
         if(this.units_model === "bod") {
@@ -2056,7 +2056,7 @@ export default {
               {text:'Recycled water factor (%)',style: "bold"},
               {text:"Treated water factor (%)",style: "bold"},
               {text:"Consumption available ratio (%)",style: "bold"},
-              {text:"Water efficiency (tonnes/m3)",style: "bold"},
+              {text:"Specific water consumption (tonnes/m3)",style: "bold"},
               {text:"Environmental Quality Standards (%)",style: "bold"},
             ]
           ]
@@ -2546,7 +2546,7 @@ export default {
               [
                 {text: [{text: "TCE", style: "bold"}, {text: "6" , sup: true, style: "asterisk"}, {text: "(g/m3)", style: "bold"}]},
               ], //trichloroethylene
-              {text:"Toxic units (TU/m3)",style: "bold"},
+              {text:"Toxic units (TU)",style: "bold"},
             ]
           ]
         }

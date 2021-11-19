@@ -1603,6 +1603,7 @@ import {
 } from "../ecam_backend";
 import Vue from 'vue'
 import {utils, metrics} from "../utils"
+import standard_industries_classification from "../standard_industrial_classification"
 
 export default {
   name: "new_assessment",
@@ -1667,34 +1668,7 @@ export default {
       global_layers: utils.format_layer_description(Vue.prototype.$layers_description),
       cod_to_bod: 2.4,
       industry_type: defaultIndustry.industry_type,
-      industry_typologies: [
-        {text: "Undefined", value: null},
-        {text: "Others", value: null},
-        {text: "C10 -- Manufacture of food products", value: "food"},
-        {text: "C11 -- Manufacture of beverages", value: "beverages"},
-        {text: "C12 -- Manufacture of tobacco products", value: "tobacco"},
-        {text: "C13 -- Manufacture of textiles", value: "textiles"},
-        {text: "C14 -- Manufacture of wearing apparel", value: "wearing"},
-        {text: "C15 -- Manufacture of leather and related products", value: "leather"},
-        {text: "C16 -- Manufacture of wood and of products of wood and cork, except furniture; manufacture of articles of straw and plaiting materials", value: "wood"},
-        {text: "C17 -- Manufacture of paper and paper products", value: "paper"},
-        {text: "C18 -- Printing and reproduction of recorded media", value: "printing"},
-        {text: "C19 -- Manufacture of coke and refined petroleum products", value: "coke"},
-        {text: "C20 -- Manufacture of chemicals and chemical products", value: "chemicals"},
-        {text: "C21 -- Manufacture of basic pharmaceutical products and pharmaceutical preparations", value: "pharmaceutical"},
-        {text: "C22 -- Manufacture of rubber and plastic products", value: "rubber"},
-        {text: "C23 -- Manufacture of other non-metallic mineral products", value: "mineral"},
-        {text: "C24 -- Manufacture of basic metals", value: "metals"},
-        {text: "C25 -- Manufacture of fabricated metal products, except machinery and equipment", value: "fabricated_metals"},
-        {text: "C26 -- Manufacture of computer, electronic and optical products", value: "computer"},
-        {text: "C27 -- Manufacture of electrical equipment", value: "electrical"},
-        {text: "C28 -- Manufacture of machinery and equipment n.e.c.", value: "machinery"},
-        {text: "C29 -- Manufacture of motor vehicles, trailers and semi-trailers", value: "vehicles"},
-        {text: "C30 -- Manufacture of other transport equipment", value: "transport"},
-        {text: "C31 -- Manufacture of furniture", value: "furniture"},
-        {text: "C32 -- Other manufacturing", value: "other_manufacturing"},
-        {text: "C33 -- Repair and installation of machinery and equipment", value: "repair"}
-      ],
+      industry_typologies: standard_industries_classification,
 
       //Supply chain
       operation_type: defaultIndustry.operation_type,
@@ -1925,7 +1899,6 @@ export default {
       this.industry.km_barge = this.km_barge
       this.industry.km_ocean = this.km_ocean
       this.industry.km_rail = this.km_rail
-      this.industry.km_truck = this.km_truck
       this.industry.km_truck = this.km_truck
       this.industry.operation_type = this.operation_type
       this.industry.industry_provided = this.industry_provided

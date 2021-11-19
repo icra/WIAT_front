@@ -49,7 +49,7 @@
                     :key="item.title"
                 >
                   <v-list-item
-                      @click="left_side_menu_icon_selected(index); selected_layer=null; secondMenu=false; rightMenu=false"
+                      @click="left_side_menu_icon_selected(index)"
                       :class="(hover || icon_selected === index)? 'icon_hovered_pressed' : ''"
                       :to="{ name: item.to}"
                       style="height: 75px" :value="index"
@@ -85,7 +85,7 @@
     <v-navigation-drawer
         style="z-index:1; background-color: #F2F4F3; left: 4rem"
         v-model="secondMenu"
-        :width="secondMenu ? '20rem' : '0rem'"
+        :width="secondMenu ? '18rem' : '0rem'"
         app
         clipped
     >
@@ -578,10 +578,10 @@ export default {
   created() {
     window.addEventListener('beforeunload', e => this.beforeunloadFn(e))
   },
+
   methods: {
-    prova(item){
-      console.log(item)
-    },
+
+
     beforeunloadFn(){
       event.preventDefault()
       event.returnValue = ""
@@ -623,6 +623,10 @@ export default {
 
     left_side_menu_icon_selected(index){
       this.icon_selected = index;
+      this.selected_layer=null;
+      this.secondMenu=false;
+      this.rightMenu=false;
+      if (index == 0) this.update_markers()
       if (this.icon_selected !== 0 && this.right_sidebar_content === 6) this.rightMenu=false  //Close layer selection menu if map is not active
     },
 
@@ -741,6 +745,7 @@ export default {
           industry: assessment.industries.length,
           latlng: this.latlng_selected
         }
+        console.log(marker)
         this.$location_markers.push(marker)
         assessment.add_industry(industry)
         this.snackbars.new_industry.v_model = true
@@ -890,12 +895,14 @@ export default {
     },
 
     manageContentClass: function(){
-      return {
-        'left_sidebar_opened': !this.rightMenu && this.secondMenu,
-        'right_sidebar_opened': this.rightMenu && !this.secondMenu,
-        'right_and_left_opened': this.rightMenu && this.secondMenu,
-        'zero_sidebar_opened': !this.rightMenu && !this.secondMenu,
 
+      //Right sidebar is the right lateral menu (except for the layer selection menu, which is map_sidebar)
+      return {
+        'left_sidebar_opened': this.secondMenu,
+        'right_sidebar_opened': this.rightMenu && !this.secondMenu && this.right_sidebar_content != 6,
+        'zero_sidebar_opened': !this.rightMenu && !this.secondMenu,
+        'map_and_left_opened': this.rightMenu && this.secondMenu && this.right_sidebar_content == 6,
+        'map_sidebar_opened': this.rightMenu && !this.secondMenu && this.right_sidebar_content == 6,
       }
     },
     /*layers_filtered: function() {
@@ -932,16 +939,20 @@ html::-webkit-scrollbar {
   width: calc(100% - 4rem);
 }
 .left_sidebar_opened{
-  left: 24rem;
-  width: calc(100% - 24rem);
+  left: 22rem;
+  width: calc(100% - 22rem);
 }
 .right_sidebar_opened{
   left: 4rem;
-  width: calc(100% - 24rem);
+  width: calc(100% - 4rem);
 }
-.right_and_left_opened{
-  left: 24rem;
-  width: calc(100% - 44rem);
+.map_and_left_opened{
+  left: 22rem;
+  width: calc(100% - 42rem);
+}
+.map_sidebar_opened{
+  left: 4rem;
+  width: calc(100% - 24rem);
 }
 
 .header{
