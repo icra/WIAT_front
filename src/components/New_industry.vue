@@ -7,7 +7,7 @@
 
 
     <v-stepper v-model="stepper_model" alt-labels>
-      <v-stepper-header>
+      <v-stepper-header >
         <v-stepper-step
             step="1"
             editable
@@ -19,7 +19,7 @@
 
         <v-stepper-step
             step="2"
-            :editable="industry.has_onsite_wwtp"
+            :editable="industry.has_onsite_wwtp == 1"
 
         >
           On-site WWTP
@@ -29,20 +29,27 @@
 
         <v-stepper-step
             step="3"
-            :editable="industry.has_direct_discharge"
+            :editable="industry.has_direct_discharge == 1"
         >
           Direct discharge
         </v-stepper-step>
 
+        <v-divider></v-divider>
+
         <v-stepper-step
             step="4"
-            :editable="industry.has_offsite_wwtp"
+            :editable="industry.has_offsite_wwtp == 1"
         >
           Offsite WWTP
         </v-stepper-step>
+        <v-stepper-step
+            v-show="false"
+            step="5"
+        >
+          Finish page
+        </v-stepper-step>
 
 
-        <v-divider></v-divider>
 
       </v-stepper-header>
 
@@ -61,507 +68,76 @@
 
 
           </v-row>
-          <v-row style="background-color: #F2F4F3" align="center">
+          <v-row
+              align="center"
+              v-for = "industry_input in array_intersection(industry_inputs, basic_inputs)"
+              :key="industry_input"
+          >
             <v-col cols="8" >
               <div style="width: 100%;">
                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                      <span>
-                        Amount of water withdrawn from the water body every day
-                      </span>
 
-                </div>
-              </div>
-            </v-col>
-            <v-col cols="4">
-              <div>
-                <div>
-                  <v-text-field
-                      v-model="water_withdrawn"
-                      suffix="m3/day"
-                      type="number"
-                  ></v-text-field>
-
-                </div>
-              </div>
-
-            </v-col>
-
-          </v-row>
-          <v-row style="background-color: #F2F4F3" align="center">
-            <v-col cols="8" >
-              <div style="width: 100%;">
-                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                      <span>
-                        Amount of water used in the industry every day
-                      </span>
-
-                </div>
-              </div>
-            </v-col>
-            <v-col cols="4">
-              <div>
-                <div>
-                  <v-text-field
-                      v-model="volume_used"
-                      suffix="m3/day"
-                      type="number"
-                  ></v-text-field>
-
-                </div>
-              </div>
-
-            </v-col>
-
-          </v-row>
-          <v-row style="background-color: #F2F4F3" align="center">
-            <v-col cols="8" >
-              <div style="width: 100%;">
-                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                      <span>
-                        Has the industry an on-site treatment wastewater plant?
-                      </span>
-
-                </div>
-              </div>
-            </v-col>
-            <v-col cols="4">
-              <div>
-                <v-select
-                    v-model="has_onsite_wwtp"
-                    :items="yes_no"
-                    item-text="text"
-                    item-value="value"
-                    label="Select"
-                ></v-select>
-              </div>
-
-            </v-col>
-
-          </v-row>
-          <v-row style="background-color: #F2F4F3" align="center">
-            <v-col cols="8" >
-              <div style="width: 100%;">
-                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                      <span>
-                        Does the industry directly discharge wastewater into the water body?
-                        <v-tooltip
-                            bottom
-                            max-width="500"
-                        >
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-icon
-                                color=#1C195B
-                                v-bind="attrs"
-                                v-on="on"
-                                size="20px"
-                            >
-                              mdi-information-variant
-                            </v-icon>
-                          </template>
-                        <span>Untreated water</span>
-                      </v-tooltip>
-                      </span>
-                </div>
-              </div>
-            </v-col>
-            <v-col cols="4">
-              <div>
-                <v-select
-                    v-model="has_direct_discharge"
-                    :items="yes_no"
-                    item-text="text"
-                    item-value="value"
-                    label="Select"
-                ></v-select>
-              </div>
-
-            </v-col>
-
-          </v-row>
-          <v-row style="background-color: #F2F4F3" align="center">
-            <v-col cols="8" >
-              <div style="width: 100%;">
-                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                      <span>
-                        Has the industry an off-site treatment wastewater plant?
-                      </span>
-
-                </div>
-              </div>
-            </v-col>
-            <v-col cols="4">
-              <div>
-                <v-select
-                    v-model="has_offsite_wwtp"
-                    :items="yes_no"
-                    item-text="text"
-                    item-value="value"
-                    label="Select"
-                ></v-select>
-              </div>
-
-            </v-col>
-
-          </v-row>
-          <v-row style="background-color: #F2F4F3" align="center">
-            <v-col cols="8" >
-              <div style="width: 100%;">
-                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                      <span>
-                        Off-site treatment wastewater plant type
-                      </span>
-
-                </div>
-              </div>
-            </v-col>
-            <v-col cols="4">
-              <div>
-                <v-select
-                    :disabled="!has_offsite_wwtp"
-                    v-model="offsite_wwtp_type"
-                    :items="industrial_domestic"
-                    label="Select"
-                ></v-select>
-              </div>
-
-            </v-col>
-
-          </v-row>
-          <v-row style="background-color: #F2F4F3" align="center">
-            <v-col cols="8" >
-              <div style="width: 100%;">
-                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                      <span>
-                        Standard industrial classification
-                      </span>
-
-                </div>
-              </div>
-            </v-col>
-            <v-col cols="4">
-              <div>
-                <v-select
-                    v-model="industry_type"
-                    :items="industry_typologies"
-                    item-text="text"
-                    item-value="value"
-                    label="Select"
-                ></v-select>
-              </div>
-
-            </v-col>
-
-          </v-row>
-
-          <v-row style="background-color: #F2F4F3" align="center">
-            <v-col cols="8" >
-              <div style="width: 100%;">
-                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                      <span>
-                        Amount of product produced by the industry
-                      </span>
-
-                </div>
-              </div>
-            </v-col>
-            <v-col cols="4">
-              <div>
-                <div>
-                  <v-text-field
-                      v-model="product_produced"
-                      suffix="tonnes/day"
-                      type="number"
-                  ></v-text-field>
-
-                </div>
-              </div>
-
-            </v-col>
-          </v-row>
-
-
-          <!-- supply chain -->
-
-          <v-row style="background-color: #F2F4F3" align="center">
-            <v-col cols="8" >
-              <div style="width: 100%;">
-                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                  <span>
-                    Operation type
-                    <v-tooltip
-                        bottom
-                        max-width="500"
-                    >
+                  <div>
+                    <span>
+                    {{user_inputs[industry_input].question}}
+                    </span>
+                    <v-tooltip bottom v-if="required.includes(industry_input)">
                       <template v-slot:activator="{ on, attrs }">
-                        <v-icon
-                            color=#1C195B
-                            v-bind="attrs"
-                            v-on="on"
-                            size="20px"
-                        >
-                          mdi-information-variant
-                        </v-icon>
+                        <span
+                          v-bind="attrs"
+                          v-on="on"
+                          style="color: red"
+                        >*</span>
                       </template>
-                      <span>Does the industry receive products from other industries (Final product industry), or does it supply products to an industry (Supply chain industry)</span>
+                      <span>Required input</span>
                     </v-tooltip>
 
-                  </span>
+                  </div>
+                  <v-btn v-if="button_estimation.includes(industry_input) && !isNaN(button_estimations(industry_input)) && button_estimations(industry_input) != null"
+                         outlined
+                         x-small
+                         @click="industry_model[industry_input] = button_estimations(industry_input)"
+                  >
+                    Estimation:  {{button_estimations(industry_input)}}<!-- Botó amb estimació -->
+                  </v-btn>
+                </div>
+                <div v-if="select_estimation.includes(industry_input)" style="width: 100%">
+                  <select v-model = "industry_model[industry_input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                    <option
+                        v-for="item in select_estimations(industry_input)"
+                        :value="item.value"
+                    >
+                      <!--Desplegable amb estimació-->
+                      {{item.name}} ({{item.value.toFixed(3)}})
+                    </option>
+                    <option :value="industry_model[industry_input]">Custom value</option>
+                  </select>
                 </div>
               </div>
             </v-col>
             <v-col cols="4">
               <div>
-                <v-select
-                    :disabled="final_product_industries.length == 0"
-                    v-model="operation_type"
-                    :items="operation_typologies"
-                    item-text="text"
-                    item-value="value"
-                    label="Select"
-                ></v-select>
-              </div>
-            </v-col>
-          </v-row>
-
-          <div>
-            <v-row style="background-color: #F2F4F3" align="center">
-              <v-col cols="8" >
-                <div style="width: 100%;">
-                  <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                      <span>
-                        To which final product industry does this industry supply freight
-                      </span>
-
-                  </div>
-                </div>
-              </v-col>
-              <v-col cols="4">
                 <div>
                   <v-select
-                      v-model="industry_provided"
-                      :items="final_product_industries"
-                      item-text="text"
-                      item-value="value"
-                      label="Select"
-                      :disabled="operation_type == 'Final product'"
-                  ></v-select>
-                </div>
-              </v-col>
-            </v-row>
-            <v-row style="background-color: #F2F4F3" align="center">
-              <v-col cols="8" >
-                <div style="width: 100%;">
-                  <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                      <span>
-                        Daily freight weight supplied to the final product industry:
-                      </span>
-
-                  </div>
-                </div>
-              </v-col>
-              <v-col cols="4">
-                <div>
-                  <div>
-                    <v-text-field
-                        v-model="weight_cargo"
-                        suffix="kg/day"
-                        type="number"
-                        :disabled="operation_type == 'Final product'"
-                    ></v-text-field>
-
-                  </div>
-                </div>
-
-              </v-col>
-            </v-row>  <!-- weight -->
-            <v-row style="background-color: #F2F4F3" align="center">
-              <v-col cols="8" >
-                <div style="width: 100%;">
-                  <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                      <span>
-                        Daily freight volume supplied to the final product industry:
-                      </span>
-
-                  </div>
-                </div>
-              </v-col>
-              <v-col cols="4">
-                <div>
-                  <div>
-                    <v-text-field
-                        v-model="volume_cargo"
-                        suffix="m3/day"
-                        type="number"
-                        :disabled="operation_type == 'Final product'"
-                    ></v-text-field>
-
-                  </div>
-                </div>
-
-              </v-col>
-            </v-row>  <!-- volume -->
-
-            <v-row style="background-color: #F2F4F3" align="center">
-              <v-col cols="8" >
-                <div style="width: 100%;">
-                  <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                      <span>
-                        Distance the freight has traveled by cargo aircraft to the final product industry:
-                      </span>
-
-                  </div>
-                </div>
-              </v-col>
-              <v-col cols="4">
-                <div>
-                  <div>
-                    <v-text-field
-                        v-model="km_air"
-                        suffix="km/day"
-                        type="number"
-                        :disabled="operation_type == 'Final product'"
-                    ></v-text-field>
-
-                  </div>
-                </div>
-
-              </v-col>
-            </v-row>  <!-- air -->
-            <v-row style="background-color: #F2F4F3" align="center">
-              <v-col cols="8" >
-                <div style="width: 100%;">
-                  <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                      <span>
-                        Distance the freight has traveled by barge to the final product industry
-                      </span>
-
-                  </div>
-                </div>
-              </v-col>
-              <v-col cols="4">
-                <div>
-                  <div>
-                    <v-text-field
-                        v-model="km_barge"
-                        suffix="km/day"
-                        type="number"
-                        :disabled="operation_type == 'Final product'"
-                    ></v-text-field>
-
-                  </div>
-                </div>
-
-              </v-col>
-            </v-row>  <!-- barge -->
-            <v-row style="background-color: #F2F4F3" align="center">
-              <v-col cols="8" >
-                <div style="width: 100%;">
-                  <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                      <span>
-                        Distance the freight has traveled by sea to the final product industry
-                      </span>
-
-                  </div>
-                </div>
-              </v-col>
-              <v-col cols="4">
-                <div>
-                  <div>
-                    <v-text-field
-                        v-model="km_ocean"
-                        suffix="km/day"
-                        type="number"
-                        :disabled="operation_type == 'Final product'"
-                    ></v-text-field>
-
-                  </div>
-                </div>
-
-              </v-col>
-            </v-row>  <!-- ocean -->
-            <v-row style="background-color: #F2F4F3" align="center">
-              <v-col cols="8" >
-                <div style="width: 100%;">
-                  <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                      <span>
-                        Distance the freight has traveled by rail to the final product industry
-                      </span>
-
-                  </div>
-                </div>
-              </v-col>
-              <v-col cols="4">
-                <div>
-                  <div>
-                    <v-text-field
-                        v-model="km_rail"
-                        suffix="km/day"
-                        type="number"
-                        :disabled="operation_type == 'Final product'"
-                    ></v-text-field>
-
-                  </div>
-                </div>
-
-              </v-col>
-            </v-row>  <!-- rail -->
-            <v-row style="background-color: #F2F4F3" align="center">
-              <v-col cols="8" >
-                <div style="width: 100%;">
-                  <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                      <span>
-                        Distance the freight has traveled by truck to the final product industry
-                      </span>
-
-                  </div>
-                </div>
-              </v-col>
-              <v-col cols="4">
-                <div>
-                  <div>
-                    <v-text-field
-                        v-model="km_truck"
-                        suffix="km/day"
-                        type="number"
-                        :disabled="operation_type == 'Final product'"
-                    ></v-text-field>
-
-                  </div>
-                </div>
-
-              </v-col>
-            </v-row>  <!-- truck -->
-
-          </div>
-
-          <!-- Pollutants -->
-          <v-row style="background-color: #F2F4F3" align="center">
-            <v-col cols="8" >
-              <div style="width: 100%;">
-                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                      <span>
-                        Concentration of COD in the industry effluent
-                      </span>
-
-
-
-                  <v-btn v-if="ind_bod_effl !== null"
-                         outlined
-                         x-small
-                         @click="ind_bod_effl_concentration = parseFloat(ind_bod_effl)"
+                    v-if="type_option[industry_input]"
+                    v-model="industry_model[industry_input]"
+                    item-text="text"
+                    item-value="value"
+                    :items="type_option[industry_input].items"
+                    label="Select"
                   >
-                    Estimation: {{parseFloat(ind_bod_effl).toExponential(2)}} g/m3
-                  </v-btn>
-
-                </div>
-              </div>
-            </v-col>
-            <v-col cols="4">
-              <div>
-                <div>
+                  </v-select>
                   <v-text-field
-                      v-model="ind_bod_effl_concentration"
-                      suffix="g/m3"
+                      v-else-if="required.includes(industry_input)"
+                      v-model="industry_model[industry_input]"
+                      :suffix=user_inputs[industry_input].unit
+                      type="number"
+                      :rules="[v => (!!v && v>0) || 'Item is required!']"
+                  ></v-text-field>
+                  <v-text-field
+                      v-else
+                      v-model="industry_model[industry_input]"
+                      :suffix=user_inputs[industry_input].unit
                       type="number"
                   ></v-text-field>
 
@@ -569,474 +145,106 @@
               </div>
 
             </v-col>
-
           </v-row>
-          <v-row style="background-color: #F2F4F3" align="center">
-            <v-col cols="8" >
-              <div style="width: 100%;">
-                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                      <span>
-                        Concentration of Total Nitrogen in the industry effluent
-                      </span>
-
-
-
-                  <v-btn v-if="ind_tn_effl != null"
-                         outlined
-                         x-small
-                         @click="ind_tn_effl_concentration = parseFloat(ind_tn_effl)"
-                  >
-                    Estimation: {{parseFloat(ind_tn_effl).toExponential(2)}} g/m3
-                  </v-btn>
-
-                </div>
-              </div>
-            </v-col>
-            <v-col cols="4">
-              <div>
-                <div>
-                  <v-text-field
-                      v-model="ind_tn_effl_concentration"
-                      suffix="g/m3"
-                      type="number"
-                  ></v-text-field>
-
-                </div>
-              </div>
-
-            </v-col>
-
-          </v-row>
-          <v-row style="background-color: #F2F4F3" align="center">
-            <v-col cols="8" >
-              <div style="width: 100%;">
-                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                      <span>
-                        Concentration of Total Phosphorus in the industry effluent
-                      </span>
-
-
-
-                  <v-btn v-if="ind_tp_effl != null"
-                         outlined
-                         x-small
-                         @click="ind_tp_effl_concentration = parseFloat(ind_tp_effl)"
-                  >
-                    Estimation: {{parseFloat(ind_tp_effl).toExponential(2)}} g/m3
-                  </v-btn>
-
-                </div>
-              </div>
-            </v-col>
-            <v-col cols="4">
-              <div>
-                <div>
-                  <v-text-field
-                      v-model="ind_tp_effl_concentration"
-                      suffix="g/m3"
-                      type="number"
-                  ></v-text-field>
-
-                </div>
-              </div>
-
-            </v-col>
-
-          </v-row>
-
-          <!-- Dangerous Priority pollutants -->
-          <v-row style="background-color: #F2F4F3" align="center">
-            <v-col cols="8" >
-              <div style="width: 100%;">
-                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                      <span>
-                        Concentration of 1,2-Dichloroethane in the industry effluent
-                      </span>
-
-                  <v-btn v-if="ind_diclo_effl !== null"
-                         outlined
-                         x-small
-                         @click="diclo_effl = parseFloat(ind_diclo_effl)"
-                  >
-                    Estimation: {{parseFloat(ind_diclo_effl).toExponential(2)}} g/m3
-                  </v-btn>
-
-                </div>
-              </div>
-            </v-col>
-            <v-col cols="4">
-              <div>
-                <div>
-                  <v-text-field
-                      v-model="diclo_effl"
-                      suffix="g/m3"
-                      type="number"
-                  ></v-text-field>
-
-                </div>
-              </div>
-
-            </v-col>
-
-          </v-row>
-          <v-row style="background-color: #F2F4F3" align="center">
-            <v-col cols="8" >
-              <div style="width: 100%;">
-                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                      <span>
-                        Concentration of cadmium in the industry effluent
-                      </span>
-
-                  <v-btn v-if="ind_cadmium_effl !== null"
-                         outlined
-                         x-small
-                         @click="cadmium_effl = parseFloat(ind_cadmium_effl)"
-                  >
-                    Estimation: {{parseFloat(ind_cadmium_effl).toExponential(2)}} g/m3
-                  </v-btn>
-
-                </div>
-              </div>
-            </v-col>
-            <v-col cols="4">
-              <div>
-                <div>
-                  <v-text-field
-                      v-model="cadmium_effl"
-                      suffix="g/m3"
-                      type="number"
-                  ></v-text-field>
-
-                </div>
-              </div>
-
-            </v-col>
-
-          </v-row>
-          <v-row style="background-color: #F2F4F3" align="center">
-            <v-col cols="8" >
-              <div style="width: 100%;">
-                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                      <span>
-                        Concentration of hexachlorobenzene in the industry effluent
-
-                      </span>
-
-
-                  <v-btn v-if="ind_hexaclorobenzene_effl !== null"
-                         outlined
-                         x-small
-                         @click="hexaclorobenzene_effl = parseFloat(ind_hexaclorobenzene_effl)"
-                  >
-                    Estimation: {{parseFloat(ind_hexaclorobenzene_effl).toExponential(2)}} g/m3
-                  </v-btn>
-
-                </div>
-              </div>
-            </v-col>
-            <v-col cols="4">
-              <div>
-                <div>
-                  <v-text-field
-                      v-model="hexaclorobenzene_effl"
-                      suffix="g/m3"
-                      type="number"
-                  ></v-text-field>
-
-                </div>
-              </div>
-
-            </v-col>
-
-          </v-row>
-          <v-row style="background-color: #F2F4F3" align="center">
-            <v-col cols="8" >
-              <div style="width: 100%;">
-                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                      <span>
-                        Concentration of mercury in the industry effluent
-                      </span>
-
-
-
-                  <v-btn v-if="ind_mercury_effl !== null"
-                         outlined
-                         x-small
-                         @click="mercury_effl = parseFloat(ind_mercury_effl)"
-                  >
-                    Estimation: {{parseFloat(ind_mercury_effl).toExponential(2)}} g/m3
-                  </v-btn>
-
-                </div>
-              </div>
-            </v-col>
-            <v-col cols="4">
-              <div>
-                <div>
-                  <v-text-field
-                      v-model="mercury_effl"
-                      suffix="g/m3"
-                      type="number"
-                  ></v-text-field>
-
-                </div>
-              </div>
-
-            </v-col>
-
-          </v-row>
-          <v-row style="background-color: #F2F4F3" align="center">
-            <v-col cols="8" >
-              <div style="width: 100%;">
-                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                      <span>
-                        Concentration of lead in the industry effluent
-                      </span>
-
-
-
-                  <v-btn v-if="ind_plomo_effl !== null"
-                         outlined
-                         x-small
-                         @click="plomo_effl = parseFloat(ind_plomo_effl)"
-                  >
-                    Estimation: {{parseFloat(ind_plomo_effl).toExponential(2)}} g/m3
-                  </v-btn>
-
-                </div>
-              </div>
-            </v-col>
-            <v-col cols="4">
-              <div>
-                <div>
-                  <v-text-field
-                      v-model="plomo_effl"
-                      suffix="g/m3"
-                      type="number"
-                  ></v-text-field>
-
-                </div>
-              </div>
-
-            </v-col>
-
-          </v-row>
-          <v-row style="background-color: #F2F4F3" align="center">
-            <v-col cols="8" >
-              <div style="width: 100%;">
-                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                      <span>
-                        Concentration of nickel in the industry effluent
-                      </span>
-
-
-
-                  <v-btn v-if="ind_niquel_effl !== null"
-                         outlined
-                         x-small
-                         @click="niquel_effl = parseFloat(ind_niquel_effl)"
-                  >
-                    Estimation: {{parseFloat(ind_niquel_effl).toExponential(2)}} g/m3
-                  </v-btn>
-
-                </div>
-              </div>
-            </v-col>
-            <v-col cols="4">
-              <div>
-                <div>
-                  <v-text-field
-                      v-model="niquel_effl"
-                      suffix="g/m3"
-                      type="number"
-                  ></v-text-field>
-
-                </div>
-              </div>
-
-            </v-col>
-
-          </v-row>
-          <v-row style="background-color: #F2F4F3" align="center">
-            <v-col cols="8" >
-              <div style="width: 100%;">
-                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                      <span>
-                        Concentration of chloroalkanes in the industry effluent
-                      </span>
-
-
-
-                  <v-btn v-if="ind_chloro_effl !== null"
-                         outlined
-                         x-small
-                         @click="chloro_effl = parseFloat(ind_chloro_effl)"
-                  >
-                    Estimation: {{parseFloat(ind_chloro_effl).toExponential(2)}} g/m3
-                  </v-btn>
-
-                </div>
-              </div>
-            </v-col>
-            <v-col cols="4">
-              <div>
-                <div>
-                  <v-text-field
-                      v-model="chloro_effl"
-                      suffix="g/m3"
-                      type="number"
-                  ></v-text-field>
-
-                </div>
-              </div>
-
-            </v-col>
-
-          </v-row>
-          <v-row style="background-color: #F2F4F3" align="center">
-            <v-col cols="8" >
-              <div style="width: 100%;">
-                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                      <span>
-                        Concentration of hexachlorobutadiene in the industry effluent
-                      </span>
-                  <v-btn v-if="ind_hexaclorobutadie_effl !== null"
-                         outlined
-                         x-small
-                         @click="hexaclorobutadie_effl = parseFloat(ind_hexaclorobutadie_effl)"
-                  >
-                    Estimation: {{parseFloat(ind_hexaclorobutadie_effl).toExponential(2)}} g/m3
-                  </v-btn>
-
-                </div>
-              </div>
-            </v-col>
-            <v-col cols="4">
-              <div>
-                <div>
-                  <v-text-field
-                      v-model="hexaclorobutadie_effl"
-                      suffix="g/m3"
-                      type="number"
-                  ></v-text-field>
-
-                </div>
-              </div>
-
-            </v-col>
-
-          </v-row>
-          <v-row style="background-color: #F2F4F3" align="center">
-            <v-col cols="8" >
-              <div style="width: 100%;">
-                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                      <span>
-                        Concentration of nonylphenols in the industry effluent
-                      </span>
-
-
-
-                  <v-btn v-if="ind_nonilfenols_effl !== null"
-                         outlined
-                         x-small
-                         @click="nonilfenols_effl = parseFloat(ind_nonilfenols_effl)"
-                  >
-                    Estimation: {{parseFloat(ind_nonilfenols_effl).toExponential(2)}} g/m3
-                  </v-btn>
-
-                </div>
-              </div>
-            </v-col>
-            <v-col cols="4">
-              <div>
-                <div>
-                  <v-text-field
-                      v-model="nonilfenols_effl"
-                      suffix="g/m3"
-                      type="number"
-                  ></v-text-field>
-
-                </div>
-              </div>
-
-            </v-col>
-
-          </v-row>
-          <v-row style="background-color: #F2F4F3" align="center">
-            <v-col cols="8" >
-              <div style="width: 100%;">
-                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                      <span>
-                        Concentration of tetrachloroethene in the industry effluent
-                      </span>
-
-
-
-                  <v-btn v-if="ind_tetracloroetile_effl !== null"
-                         outlined
-                         x-small
-                         @click="tetracloroetile_effl = parseFloat(ind_tetracloroetile_effl)"
-                  >
-                    Estimation: {{parseFloat(ind_tetracloroetile_effl).toExponential(2)}} g/m3
-                  </v-btn>
-
-                </div>
-              </div>
-            </v-col>
-            <v-col cols="4">
-              <div>
-                <div>
-                  <v-text-field
-                      v-model="tetracloroetile_effl"
-                      suffix="g/m3"
-                      type="number"
-                  ></v-text-field>
-
-                </div>
-              </div>
-
-            </v-col>
-
-          </v-row>
-          <v-row style="background-color: #F2F4F3" align="center">
-            <v-col cols="8" >
-              <div style="width: 100%;">
-                <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                      <span>
-                        Concentration of trichloroethylene in the industry effluent
-                      </span>
-
-                  <v-btn v-if="ind_tricloroetile_effl !== null"
-                         outlined
-                         x-small
-                         @click="tricloroetile_effl = parseFloat(ind_tricloroetile_effl)"
-                  >
-                    Estimation: {{parseFloat(ind_tricloroetile_effl).toExponential(2)}} g/m3
-                  </v-btn>
-
-                </div>
-              </div>
-            </v-col>
-            <v-col cols="4">
-              <div>
-                <div>
-                  <v-text-field
-                      v-model="tricloroetile_effl"
-                      suffix="g/m3"
-                      type="number"
-                  ></v-text-field>
-
-                </div>
-              </div>
-
-            </v-col>
-
-          </v-row>
+          <v-expansion-panels style="padding-top: 20px">
+            <v-expansion-panel>
+              <v-expansion-panel-header color="#1c195b">
+                <h3 style="color: white">SHOW ADVANCED INPUTS</h3>
+                <template v-slot:actions>
+                  <v-icon color="white">
+                    $expand
+                  </v-icon>
+                </template>
+              </v-expansion-panel-header>
+              <v-expansion-panel-content style="padding: 30px">
+                <v-row
+                    align="center"
+                    v-for = "industry_input in array_difference(industry_inputs, basic_inputs)"
+                    :key="industry_input"
+                >
+                  <v-col cols="8" >
+                    <div style="width: 100%;">
+                      <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+
+                        <div>
+                    <span>
+                    {{user_inputs[industry_input].question}}
+                    </span>
+                          <v-tooltip bottom v-if="required.includes(industry_input)">
+                            <template v-slot:activator="{ on, attrs }">
+                        <span
+                            v-bind="attrs"
+                            v-on="on"
+                            style="color: red"
+                        >*</span>
+                            </template>
+                            <span>Required input</span>
+                          </v-tooltip>
+
+                        </div>
+                        <v-btn v-if="button_estimation.includes(industry_input) && !isNaN(button_estimations(industry_input)) && button_estimations(industry_input) != null"
+                               outlined
+                               x-small
+                               @click="industry_model[industry_input] = button_estimations(industry_input)"
+                        >
+                          Estimation:  {{button_estimations(industry_input)}}<!-- Botó amb estimació -->
+                        </v-btn>
+                      </div>
+                      <div v-if="select_estimation.includes(industry_input)" style="width: 100%">
+                        <select v-model = "industry_model[industry_input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                          <option
+                              v-for="item in select_estimations(industry_input)"
+                              :value="item.value"
+                          >
+                            <!--Desplegable amb estimació-->
+                            {{item.name}} ({{item.value.toFixed(3)}})
+                          </option>
+                          <option :value="industry_model[industry_input]">Custom value</option>
+                        </select>
+                      </div>
+                    </div>
+                  </v-col>
+                  <v-col cols="4">
+                    <div>
+                      <div>
+                        <v-select
+                            v-if="type_option[industry_input]"
+                            v-model="industry_model[industry_input]"
+                            item-text="text"
+                            item-value="value"
+                            :items="type_option[industry_input].items"
+                            label="Select"
+                        >
+                        </v-select>
+                        <v-text-field
+                            v-else-if="required.includes(industry_input)"
+                            v-model="industry_model[industry_input]"
+                            :suffix=user_inputs[industry_input].unit
+                            type="number"
+                            :rules="[v => (!!v && v>0) || 'Item is required!']"
+                        ></v-text-field>
+                        <v-text-field
+                            v-else
+                            v-model="industry_model[industry_input]"
+                            :suffix=user_inputs[industry_input].unit
+                            type="number"
+                        ></v-text-field>
+
+                      </div>
+                    </div>
+
+                  </v-col>
+                </v-row>
+
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </v-expansion-panels>
 
           <br>
           <v-btn
-              color="primary"
               @click="tab_1_continue"
+              :disabled="tab_1_disabled"
+              outlined
           >
             SAVE AND CONTINUE
           </v-btn>
@@ -1062,194 +270,149 @@
           </v-row>
           <br>
           <div v-if="industry.has_onsite_wwtp && stepper_model == 2">
+            <v-row
+                align="center"
+                v-for = "input in array_intersection(onsite_wwtp_inputs, basic_inputs)"
+                :key="input"
 
-            <!-- Show inputs under "None" key -->
-            <div
-                v-for="[key, value] of Object.entries(this.onsite_inputs.None)"
-                :key="key"
             >
-              <div>
-                <v-row style="background-color: #F2F4F3" align="center">
-                  <v-col cols="8" >
-                    <div style="width: 100%;">
-                      <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                      <span>
-                        {{value.question}}
-                        <!-- Input -->
-                        <v-tooltip
-                            bottom
-                            v-if="value.description_tooltip"
-                            max-width="500"
-                        >
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-icon
-                                color=#1C195B
-                                v-bind="attrs"
-                                v-on="on"
-                                size="20px"
-                            >
-                              mdi-information-variant
-                            </v-icon>
-                          </template>
-                          <span>{{value.description_tooltip}}</span>
-                        </v-tooltip>
-
-                      </span>
-
-                        <v-btn v-if="value.estimation_equation && industrial_wwtp_onsite_estimations[key](wwtp_aux_inputs) !== null"
-                          outlined
-                          x-small
-                          @click="wwtp_aux_inputs[key] = parseFloat(industrial_wwtp_onsite_estimations[key](wwtp_aux_inputs))"
-                          >
-                          Estimation: {{parseFloat(industrial_wwtp_onsite_estimations[key](wwtp_aux_inputs)).toExponential(2)}}{{value.unit}} <!-- Botó amb estimació -->
-                        </v-btn>
-
-                      </div>
-                      <div v-if="value.estimation_type === 'option'" style="width: 100%">
-                        <select v-model="wwtp_aux_inputs[key]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
-                          <option
-                              v-for="item in value.items"
-                              :value="value.estimation_based_on === null ? item[value.estimation_factor] : (typeof wwtp_aux_inputs[value.estimation_based_on] == 'function' ? item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]() : item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on])"
-                          >
-                            <!--Desplegable amb estimació-->
-                            {{item.name}} {{item[value.description]}} ({{value.estimation_based_on === null ? item[value.estimation_factor] : (typeof wwtp_aux_inputs[value.estimation_based_on] == 'function' ? parseFloat(item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]()).toFixed(3) : parseFloat(item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]).toFixed(3))}} {{value.unit}})
-                          </option>
-                          <option :value="wwtp_aux_inputs[key]">Custom value</option>
-                        </select>
-                      </div>
-                    </div>
-                  </v-col>
-                  <v-col cols="4">
-                    <div>
-                      <div v-if="value.type === 'option'">
-                        <v-select
-                            v-model="wwtp_aux_inputs[key]"
-                            :items="value.items"
-                            item-text="text"
-                            item-value="value"
-                            label="Select"
-                        ></v-select>
-                      </div>
-                      <div v-else >
-                        <v-text-field
-                            v-model="wwtp_aux_inputs[key]"
-                            :suffix="value.unit"
-                            type="number"
-                        ></v-text-field>
-
-                      </div>
-                    </div>
-
-                  </v-col>
-
-                </v-row>
-
-
-              </div>
-            </div>
-            <!-- Show other -->
-            <v-expansion-panels>
-              <v-expansion-panel
-                  v-for="[title, form] of Object.entries(this.onsite_inputs)"
-                  :key="title"
-                  v-if="title !== 'None'"
-              >
-                <v-expansion-panel-header>
-                  {{ title }}
-                </v-expansion-panel-header>
-                <v-expansion-panel-content>
-                  <div
-                      v-for="[key, value] of Object.entries(form)"
-                      :key="key"
-                  >
-                    <div>
-                      <v-row style="background-color: #F2F4F3" align="center">
-                        <v-col cols="8" >
-                          <div style="width: 100%;">
-                            <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                      <span>
-                        {{value.question}}
-                        <!-- Input -->
-                        <v-tooltip
-                            bottom
-                            v-if="value.description_tooltip"
-                            max-width="500"
-                        >
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-icon
-                                color=#1C195B
-                                v-bind="attrs"
-                                v-on="on"
-                                size="20px"
-                            >
-                              mdi-information-variant
-                            </v-icon>
-                          </template>
-                          <span>{{value.description_tooltip}}</span>
-                        </v-tooltip>
-
-                      </span>
-
-                              <v-btn v-if="value.estimation_equation && industrial_wwtp_onsite_estimations[key](wwtp_aux_inputs) !== null"
-                                     outlined
-                                     x-small
-                                     @click="wwtp_aux_inputs[key] = parseFloat(industrial_wwtp_onsite_estimations[key](wwtp_aux_inputs))"
-                              >
-                                Estimation: {{parseFloat(industrial_wwtp_onsite_estimations[key](wwtp_aux_inputs)).toExponential(2)}}{{value.unit}} <!-- Botó amb estimació -->
-                              </v-btn>
-
-                            </div>
-                            <div v-if="value.estimation_type === 'option'" style="width: 100%">
-                              <select v-model="wwtp_aux_inputs[key]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
-                                <option
-                                    v-for="item in value.items"
-                                    :value="value.estimation_based_on === null ? item[value.estimation_factor] : (typeof wwtp_aux_inputs[value.estimation_based_on] == 'function' ? item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]() : item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on])"
-                                >
-                                  <!--Desplegable amb estimació-->
-                                  {{item.name}} {{item[value.description]}} ({{value.estimation_based_on === null ? item[value.estimation_factor] : (typeof wwtp_aux_inputs[value.estimation_based_on] == 'function' ? parseFloat(item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]()).toFixed(3) : parseFloat(item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]).toFixed(3))}} {{value.unit}})
-                                </option>
-                                <option :value="wwtp_aux_inputs[key]">Custom value</option>
-                              </select>
-                            </div>
-                          </div>
-                        </v-col>
-                        <v-col cols="4">
-                          <div>
-                            <div v-if="value.type === 'option'">
-                              <v-select
-                                  v-model="wwtp_aux_inputs[key]"
-                                  :items="value.items"
-                                  item-text="text"
-                                  item-value="value"
-                                  label="Select"
-                              ></v-select>
-                            </div>
-                            <div v-else >
-                              <v-text-field
-                                  v-model="wwtp_aux_inputs[key]"
-                                  :suffix="value.unit"
-                                  type="number"
-                              ></v-text-field>
-
-                            </div>
-                          </div>
-
-                        </v-col>
-
-                      </v-row>
-
-
-                    </div>
+              <v-col cols="8" >
+                <div style="width: 100%;">
+                  <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                    <span>
+                      {{user_inputs[input].question}}
+                    </span>
+                    <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
+                           outlined
+                           x-small
+                           @click="onsite_wwtp_model[input] = button_estimations(input)"
+                    >
+                      Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
+                    </v-btn>
                   </div>
+                  <div v-if="select_estimation.includes(input)" style="width: 100%">
+                    <select v-model = "onsite_wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                      <option
+                          v-for="item in select_estimations(input)"
+                          :value="item.value"
+                      >
+                        <!--Desplegable amb estimació-->
+                        {{item.name}} ({{item.value.toFixed(3)}})
+                      </option>
+                      <option :value="onsite_wwtp_model[input]">Custom value</option>
+                    </select>
+                  </div>
+
+                </div>
+              </v-col>
+              <v-col cols="4">
+                <div>
+                  <div>
+                    <v-select
+                        v-if="type_option[input]"
+                        v-model="onsite_wwtp_model[input]"
+                        item-text="text"
+                        item-value="value"
+                        :items="type_option[input].items"
+                        label="Select"
+                    >
+                    </v-select>
+                    <v-text-field
+                        v-else
+                        v-model="onsite_wwtp_model[input]"
+                        :suffix=user_inputs[input].unit
+                        type="number"
+                    ></v-text-field>
+
+                  </div>
+                </div>
+
+              </v-col>
+
+            </v-row>
+            <v-expansion-panels style="padding-top: 20px">
+              <v-expansion-panel>
+                <v-expansion-panel-header color="#1c195b">
+                  <h3 style="color: white">SHOW ADVANCED INPUTS</h3>
+                  <template v-slot:actions>
+                    <v-icon color="white">
+                      $expand
+                    </v-icon>
+                  </template>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content style="padding: 30px">
+                  <v-row
+                      align="center"
+                      v-for = "input in array_difference(onsite_wwtp_inputs, basic_inputs)"
+                      :key="input"
+
+                  >
+                    <v-col cols="8" >
+                      <div style="width: 100%;">
+                        <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                    <span>
+                      {{user_inputs[input].question}}
+                    </span>
+                          <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
+                                 outlined
+                                 x-small
+                                 @click="onsite_wwtp_model[input] = button_estimations(input)"
+                          >
+                            Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
+                          </v-btn>
+                        </div>
+                        <div v-if="select_estimation.includes(input)" style="width: 100%">
+                          <select v-model = "onsite_wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                            <option
+                                v-for="item in select_estimations(input)"
+                                :value="item.value"
+                            >
+                              <!--Desplegable amb estimació-->
+                              {{item.name}} ({{item.value.toFixed(3)}})
+                            </option>
+                            <option :value="onsite_wwtp_model[input]">Custom value</option>
+                          </select>
+                        </div>
+
+                      </div>
+                    </v-col>
+                    <v-col cols="4">
+                      <div>
+                        <div>
+                          <v-select
+                              v-if="type_option[input]"
+                              v-model="onsite_wwtp_model[input]"
+                              item-text="text"
+                              item-value="value"
+                              :items="type_option[input].items"
+                              label="Select"
+                          >
+                          </v-select>
+                          <v-text-field
+                              v-else
+                              v-model="onsite_wwtp_model[input]"
+                              :suffix=user_inputs[input].unit
+                              type="number"
+                          ></v-text-field>
+
+                        </div>
+                      </div>
+
+                    </v-col>
+
+                  </v-row>
+
                 </v-expansion-panel-content>
               </v-expansion-panel>
             </v-expansion-panels>
 
+
+
           </div>
           <br>
           <v-btn
-              color="primary"
-              @click="tab_2_continue"
+            outlined
+            @click="tab_2_continue"
           >
             SAVE AND CONTINUE
           </v-btn>
@@ -1269,98 +432,76 @@
             </v-col>
           </v-row>
           <br>
-          <div v-if="industry.has_direct_discharge && stepper_model == 3">
 
-            <!-- Show inputs under "None" key -->
-            <div
-                v-for="[key, value] of Object.entries(this.direct_discharge_inputs.None)"
-                :key="key"
+          <div v-if="industry.has_direct_discharge == 1 && stepper_model == 3">
+            <v-row
+                align="center"
+                v-for = "input in direct_discharge_inputs"
+                :key="input"
+
             >
-              <div>
-                <v-row style="background-color: #F2F4F3" align="center">
-                  <v-col cols="8" >
-                    <div style="width: 100%;">
-                      <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                      <span>
-                        {{value.question}}
-                        <!-- Input -->
-                        <v-tooltip
-                            bottom
-                            v-if="value.description_tooltip"
-                            max-width="500"
-                        >
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-icon
-                                color=#1C195B
-                                v-bind="attrs"
-                                v-on="on"
-                                size="20px"
-                            >
-                              mdi-information-variant
-                            </v-icon>
-                          </template>
-                          <span>{{value.description_tooltip}}</span>
-                        </v-tooltip>
+              <v-col cols="8" >
+                <div style="width: 100%;">
+                  <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                    <span>
+                      {{user_inputs[input].question}}
+                    </span>
+                    <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
+                           outlined
+                           x-small
+                           @click="direct_discharge_model[input] = button_estimations(input)"
+                    >
+                      Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
+                    </v-btn>
+                  </div>
+                  <div v-if="select_estimation.includes(input)" style="width: 100%">
+                    <select v-model = "direct_discharge_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                      <option
+                          v-for="item in select_estimations(input)"
+                          :value="item.value"
+                      >
+                        <!--Desplegable amb estimació-->
+                        {{item.name}} ({{item.value.toFixed(3)}})
+                      </option>
+                      <option :value="direct_discharge_model[input]">Custom value</option>
+                    </select>
+                  </div>
 
-                      </span>
+                </div>
+              </v-col>
+              <v-col cols="4">
+                <div>
+                  <div>
+                    <v-select
+                        v-if="type_option[input]"
+                        v-model="direct_discharge_model[input]"
+                        item-text="text"
+                        item-value="value"
+                        :items="type_option[input].items"
+                        label="Select"
+                    >
+                    </v-select>
+                    <v-text-field
+                        v-else
+                        v-model="direct_discharge_model[input]"
+                        :suffix=user_inputs[input].unit
+                        type="number"
+                    ></v-text-field>
 
-                        <v-btn v-if="value.estimation_equation && direct_discharge_estimations[key](wwtp_aux_inputs) !== null"
-                               outlined
-                               x-small
-                               @click="wwtp_aux_inputs[key] = parseFloat(direct_discharge_estimations[key](wwtp_aux_inputs))"
-                        >
-                          Estimation: {{parseFloat(direct_discharge_estimations[key](wwtp_aux_inputs)).toExponential(2)}}{{value.unit}} <!-- Botó amb estimació -->
-                        </v-btn>
+                  </div>
+                </div>
 
-                      </div>
-                      <div v-if="value.estimation_type === 'option'" style="width: 100%">
-                        <select v-model="wwtp_aux_inputs[key]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
-                          <option
-                              v-for="item in value.items"
-                              :value="value.estimation_based_on === null ? item[value.estimation_factor] : (typeof wwtp_aux_inputs[value.estimation_based_on] == 'function' ? item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]() : item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on])"
-                          >
-                            <!--Desplegable amb estimació-->
-                            {{item.name}} {{item[value.description]}} ({{value.estimation_based_on === null ? item[value.estimation_factor] : (typeof wwtp_aux_inputs[value.estimation_based_on] == 'function' ? parseFloat(item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]()).toFixed(3) : parseFloat(item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]).toFixed(3))}} {{value.unit}})
-                          </option>
-                          <option :value="wwtp_aux_inputs[key]">Custom value</option>
-                        </select>
-                      </div>
-                    </div>
-                  </v-col>
-                  <v-col cols="4">
-                    <div>
-                      <div v-if="value.type === 'option'">
-                        <v-select
-                            v-model="wwtp_aux_inputs[key]"
-                            :items="value.items"
-                            item-text="text"
-                            item-value="value"
-                            label="Select"
-                        ></v-select>
-                      </div>
-                      <div v-else >
-                        <v-text-field
-                            v-model="wwtp_aux_inputs[key]"
-                            :suffix="value.unit"
-                            type="number"
-                        ></v-text-field>
+              </v-col>
 
-                      </div>
-                    </div>
+            </v-row>
 
-                  </v-col>
-
-                </v-row>
-
-
-              </div>
-            </div>
 
           </div>
+
           <br>
 
           <v-btn
-              color="primary"
+              outlined
               @click="tab_3_continue"
           >
             SAVE AND CONTINUE
@@ -1388,199 +529,180 @@
           </v-row>
           <br>
           <div v-if="industry.has_offsite_wwtp && stepper_model == 4">
+            <v-row
+                align="center"
+                v-for = "input in array_intersection(offsite_wwtp_inputs, basic_inputs)"
+                :key="input"
 
-            <!-- Show inputs under "None" key -->
-            <div
-                v-for="[key, value] of Object.entries(this.offsite_inputs.None)"
-                :key="key"
             >
-              <div>
-                <v-row style="background-color: #F2F4F3" align="center">
-                  <v-col cols="8" >
-                    <div style="width: 100%;">
-                      <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                      <span>
-                        {{value.question}}
-                        <!-- Input -->
-                        <v-tooltip
-                            bottom
-                            v-if="value.description_tooltip"
-                            max-width="500"
-                        >
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-icon
-                                color=#1C195B
-                                v-bind="attrs"
-                                v-on="on"
-                                size="20px"
-                            >
-                              mdi-information-variant
-                            </v-icon>
-                          </template>
-                          <span>{{value.description_tooltip}}</span>
-                        </v-tooltip>
-
-                      </span>
-
-                        <v-btn v-if="value.estimation_equation && wwtp_offsite_estimations[key](wwtp_aux_inputs) !== null"
-                               outlined
-                               x-small
-                               @click="wwtp_aux_inputs[key] = parseFloat(wwtp_offsite_estimations[key](wwtp_aux_inputs))"
-                        >
-                          Estimation: {{parseFloat(wwtp_offsite_estimations[key](wwtp_aux_inputs)).toExponential(2)}}{{value.unit}} <!-- Botó amb estimació -->
-                        </v-btn>
-
-                      </div>
-                      <div v-if="value.estimation_type === 'option'" style="width: 100%">
-                        <select v-model="wwtp_aux_inputs[key]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
-                          <option
-                              v-for="item in value.items"
-                              :value="value.estimation_based_on === null ? item[value.estimation_factor] : (typeof wwtp_aux_inputs[value.estimation_based_on] == 'function' ? item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]() : item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on])"
-                          >
-                            <!--Desplegable amb estimació-->
-                            {{item.name}} {{item[value.description]}} ({{value.estimation_based_on === null ? item[value.estimation_factor] : (typeof wwtp_aux_inputs[value.estimation_based_on] == 'function' ? parseFloat(item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]()).toFixed(3) : parseFloat(item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]).toFixed(3))}} {{value.unit}})
-                          </option>
-                          <option :value="wwtp_aux_inputs[key]">Custom value</option>
-                        </select>
-                      </div>
-                    </div>
-                  </v-col>
-                  <v-col cols="4">
-                    <div>
-                      <div v-if="value.type === 'option'">
-                        <v-select
-                            v-model="wwtp_aux_inputs[key]"
-                            :items="value.items"
-                            item-text="text"
-                            item-value="value"
-                            label="Select"
-                        ></v-select>
-                      </div>
-                      <div v-else >
-                        <v-text-field
-                            v-model="wwtp_aux_inputs[key]"
-                            :suffix="value.unit"
-                            type="number"
-                        ></v-text-field>
-
-                      </div>
-                    </div>
-
-                  </v-col>
-
-                </v-row>
-
-
-              </div>
-            </div>
-            <!-- Show other -->
-            <v-expansion-panels>
-              <v-expansion-panel
-                  v-for="[title, form] of Object.entries(this.offsite_inputs)"
-                  :key="title"
-                  v-if="title !== 'None'"
-              >
-                <v-expansion-panel-header>
-                  {{ title }}
-                </v-expansion-panel-header>
-                <v-expansion-panel-content>
-                  <div
-                      v-for="[key, value] of Object.entries(form)"
-                      :key="key"
-                  >
-                    <div>
-                      <v-row style="background-color: #F2F4F3" align="center">
-                        <v-col cols="8" >
-                          <div style="width: 100%;">
-                            <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                      <span>
-                        {{value.question}}
-                        <!-- Input -->
-                        <v-tooltip
-                            bottom
-                            v-if="value.description_tooltip"
-                            max-width="500"
-                        >
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-icon
-                                color=#1C195B
-                                v-bind="attrs"
-                                v-on="on"
-                                size="20px"
-                            >
-                              mdi-information-variant
-                            </v-icon>
-                          </template>
-                          <span>{{value.description_tooltip}}</span>
-                        </v-tooltip>
-
-                      </span>
-
-                              <v-btn v-if="value.estimation_equation && wwtp_offsite_estimations[key](wwtp_aux_inputs) !== null"
-                                     outlined
-                                     x-small
-                                     @click="wwtp_aux_inputs[key] = parseFloat(wwtp_offsite_estimations[key](wwtp_aux_inputs))"
-                              >
-                                Estimation: {{parseFloat(wwtp_offsite_estimations[key](wwtp_aux_inputs)).toExponential(2)}}{{value.unit}} <!-- Botó amb estimació -->
-                              </v-btn>
-
-                            </div>
-                            <div v-if="value.estimation_type === 'option'" style="width: 100%">
-                              <select v-model="wwtp_aux_inputs[key]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
-                                <option
-                                    v-for="item in value.items"
-                                    :value="value.estimation_based_on === null ? item[value.estimation_factor] : (typeof wwtp_aux_inputs[value.estimation_based_on] == 'function' ? item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]() : item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on])"
-                                >
-                                  <!--Desplegable amb estimació-->
-                                  {{item.name}} {{item[value.description]}} ({{value.estimation_based_on === null ? item[value.estimation_factor] : (typeof wwtp_aux_inputs[value.estimation_based_on] == 'function' ? parseFloat(item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]()).toFixed(3) : parseFloat(item[value.estimation_factor]*wwtp_aux_inputs[value.estimation_based_on]).toFixed(3))}} {{value.unit}})
-                                </option>
-                                <option :value="wwtp_aux_inputs[key]">Custom value</option>
-                              </select>
-                            </div>
-                          </div>
-                        </v-col>
-                        <v-col cols="4">
-                          <div>
-                            <div v-if="value.type === 'option'">
-                              <v-select
-                                  v-model="wwtp_aux_inputs[key]"
-                                  :items="value.items"
-                                  item-text="text"
-                                  item-value="value"
-                                  label="Select"
-                              ></v-select>
-                            </div>
-                            <div v-else >
-                              <v-text-field
-                                  v-model="wwtp_aux_inputs[key]"
-                                  :suffix="value.unit"
-                                  type="number"
-                              ></v-text-field>
-
-                            </div>
-                          </div>
-
-                        </v-col>
-
-                      </v-row>
-
-
-                    </div>
+              <v-col cols="8" >
+                <div style="width: 100%;">
+                  <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                    <span>
+                      {{user_inputs[input].question}}
+                    </span>
+                    <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
+                           outlined
+                           x-small
+                           @click="offsite_wwtp_model[input] = button_estimations(input)"
+                    >
+                      Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
+                    </v-btn>
                   </div>
+                  <div v-if="select_estimation.includes(input)" style="width: 100%">
+                    <select v-model = "offsite_wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                      <option
+                          v-for="item in select_estimations(input)"
+                          :value="item.value"
+                      >
+                        <!--Desplegable amb estimació-->
+                        {{item.name}} ({{item.value.toFixed(3)}})
+                      </option>
+                      <option :value="offsite_wwtp_model[input]">Custom value</option>
+                    </select>
+                  </div>
+
+                </div>
+              </v-col>
+              <v-col cols="4">
+                <div>
+                  <div>
+                    <v-select
+                        v-if="type_option[input]"
+                        v-model="offsite_wwtp_model[input]"
+                        item-text="text"
+                        item-value="value"
+                        :items="type_option[input].items"
+                        label="Select"
+                    >
+                    </v-select>
+                    <v-text-field
+                        v-else
+                        v-model="offsite_wwtp_model[input]"
+                        :suffix=user_inputs[input].unit
+                        type="number"
+                    ></v-text-field>
+
+                  </div>
+                </div>
+
+              </v-col>
+
+            </v-row>
+            <v-expansion-panels style="padding-top: 20px">
+              <v-expansion-panel>
+                <v-expansion-panel-header color="#1c195b">
+                  <h3 style="color: white">SHOW ADVANCED INPUTS</h3>
+                  <template v-slot:actions>
+                    <v-icon color="white">
+                      $expand
+                    </v-icon>
+                  </template>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content style="padding: 30px">
+                  <v-row
+                      align="center"
+                      v-for = "input in array_difference(offsite_wwtp_inputs, basic_inputs)"
+                      :key="input"
+
+                  >
+                    <v-col cols="8" >
+                      <div style="width: 100%;">
+                        <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                    <span>
+                      {{user_inputs[input].question}}
+                    </span>
+                          <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
+                                 outlined
+                                 x-small
+                                 @click="offsite_wwtp_model[input] = button_estimations(input)"
+                          >
+                            Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
+                          </v-btn>
+                        </div>
+                        <div v-if="select_estimation.includes(input)" style="width: 100%">
+                          <select v-model = "offsite_wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                            <option
+                                v-for="item in select_estimations(input)"
+                                :value="item.value"
+                            >
+                              <!--Desplegable amb estimació-->
+                              {{item.name}} ({{item.value.toFixed(3)}})
+                            </option>
+                            <option :value="offsite_wwtp_model[input]">Custom value</option>
+                          </select>
+                        </div>
+
+                      </div>
+                    </v-col>
+                    <v-col cols="4">
+                      <div>
+                        <div>
+                          <v-select
+                              v-if="type_option[input]"
+                              v-model="offsite_wwtp_model[input]"
+                              item-text="text"
+                              item-value="value"
+                              :items="type_option[input].items"
+                              label="Select"
+                          >
+                          </v-select>
+                          <v-text-field
+                              v-else
+                              v-model="offsite_wwtp_model[input]"
+                              :suffix=user_inputs[input].unit
+                              type="number"
+                          ></v-text-field>
+
+                        </div>
+                      </div>
+
+                    </v-col>
+
+                  </v-row>
+
                 </v-expansion-panel-content>
               </v-expansion-panel>
             </v-expansion-panels>
 
+
           </div>
           <br>
           <v-btn
-              color="primary"
+              outlined
               @click="tab_4_continue"
           >
             SAVE AND CONTINUE
           </v-btn>
 
         </v-stepper-content>  <!-- offsite wwtp -->
+
+        <v-stepper-content step="5">
+
+          {{prova()}}
+
+          <h3>
+            You have finished entering all the required data, but you can continue editing them if you wish.
+          </h3>
+          <br>
+          <br>
+
+          <router-link :to="{name: 'report'}">
+            <v-hover
+                v-slot="{ hover }"
+                open-delay="200"
+            >
+              <h3 :class="`${hover? 'link_to_report_hovered': 'link_to_report'}`">
+                Click here to see the generated report
+              </h3>
+
+            </v-hover>
+
+
+          </router-link>
+
+
+        </v-stepper-content>  <!-- End of questionnaire -->
 
       </v-stepper-items>
     </v-stepper>
@@ -1594,16 +716,21 @@
 import {
   Assessment,
   Industry,
-  Industrial_wwtp_onsite,
-  Industrial_wwtp_onsite_external_domestic,
-  Industrial_wwtp_onsite_external_industrial,
-  Direct_discharge,
-  Industrial_wwtp_offsite,
-  Domestic_wwtp,
+  Tables
 } from "../ecam_backend";
+import {
+  user_inputs,
+  onsite_wwtp_no_offsite,
+  onsite_wwtp_with_offsite_wwtp_inputs,
+  direct_discharge_inputs,
+  offsite_wwtp_inputs,
+  industry_inputs
+} from "../user_inputs";
 import Vue from 'vue'
 import {utils, metrics} from "../utils"
 import standard_industries_classification from "../standard_industrial_classification"
+import Countries from "@/countries";
+
 
 export default {
   name: "new_assessment",
@@ -1617,16 +744,10 @@ export default {
     let defaultIndustry = this.$assessments[this.assessment_id].industries[this.industry_id]
 
     return {
+      industry_type: null,
+
       assessment: this.$assessments[this.assessment_id],
       industry: defaultIndustry,
-
-      onsite_inputs: {},
-      direct_discharge_inputs: {},
-      offsite_inputs: {},
-      estimations: Industrial_wwtp_onsite.get_estimations(),
-      industrial_wwtp_onsite_estimations: Industrial_wwtp_onsite.get_estimations(),
-      direct_discharge_estimations: Direct_discharge.get_estimations(),
-      wwtp_offsite_estimations: Domestic_wwtp.get_estimations(),
 
       stepper_model: 1,
       water_withdrawal_image: require("@/../public/water_flow/water_withdrawal.jpg"),
@@ -1636,59 +757,59 @@ export default {
       external_no_internal_image: require("../../public/water_flow/external_no_internal.jpg"),
       external_internal_image: require("../../public/water_flow/external_internal.jpg"),
 
-      water_withdrawal_valid: true,
-      water_withdrawn: defaultIndustry.volume_withdrawn,
-
-      has_onsite_wwtp: defaultIndustry.has_onsite_wwtp,
-      yes_no: [{text: "Yes", value: true},{text: "No", value: false}],
-      onsite_valid: true,
-      has_offsite_wwtp: defaultIndustry.has_offsite_wwtp,
-      offsite_wwtp_type: defaultIndustry.offsite_wwtp_type,
-      industrial_domestic: ["Domestic", "Industrial"],
-      wwtp_aux_inputs: {},
-      has_direct_discharge: defaultIndustry.has_direct_discharge,
-      ind_tn_effl_concentration: defaultIndustry.tn_effl_concentration,
-      ind_tp_effl_concentration: defaultIndustry.tp_effl_concentration,
-      ind_bod_effl_concentration: defaultIndustry.bod_effl_concentration,
-      volume_used: defaultIndustry.volume_used,
-
-      //Priority pollutants
-      diclo_effl: defaultIndustry.diclo_effl, //1,2-Dichloroethane
-      cadmium_effl: defaultIndustry.cadmium_effl, //Cadmium
-      hexaclorobenzene_effl: defaultIndustry.hexaclorobenzene_effl, //Hexachlorobenzene
-      mercury_effl: defaultIndustry.mercury_effl, //mercury
-      plomo_effl: defaultIndustry.plomo_effl, //lead
-      niquel_effl: defaultIndustry.niquel_effl, //nickel
-      chloro_effl: defaultIndustry.chloro_effl, //chloroalkanes
-      hexaclorobutadie_effl: defaultIndustry.hexaclorobutadie_effl, //Hexachlorobutadiene
-      nonilfenols_effl: defaultIndustry.nonilfenols_effl, //Nonylphenols
-      tetracloroetile_effl: defaultIndustry.tetracloroetile_effl, //tetrachloroethene
-      tricloroetile_effl: defaultIndustry.tricloroetile_effl, //Trichloroethylene
 
       global_layers: utils.format_layer_description(Vue.prototype.$layers_description),
       cod_to_bod: 2.4,
-      industry_type: defaultIndustry.industry_type,
       industry_typologies: standard_industries_classification,
 
-      //Supply chain
-      operation_type: defaultIndustry.operation_type,
-      operation_typologies: [
-        "Final product", "Supply chain"
-      ],
-      industry_provided: defaultIndustry.industry_provided,
-      km_air: defaultIndustry.km_air,
-      km_barge: defaultIndustry.km_barge,
-      km_ocean: defaultIndustry.km_ocean,
-      km_rail: defaultIndustry.km_rail,
-      km_truck: defaultIndustry.km_truck,
-      volume_cargo: defaultIndustry.volume_cargo,
-      weight_cargo: defaultIndustry.weight_cargo,
-      product_produced: defaultIndustry.product_produced
+      user_inputs: user_inputs,
+      onsite_wwtp_inputs: [],
+      industry_inputs: industry_inputs,
+      direct_discharge_inputs: direct_discharge_inputs,
+      offsite_wwtp_inputs: offsite_wwtp_inputs,
+      onsite_wwtp_with_offsite_wwtp_inputs: onsite_wwtp_with_offsite_wwtp_inputs,
+      onsite_wwtp_no_offsite: onsite_wwtp_no_offsite,
 
+      type_option: {
+        "has_onsite_wwtp": {items: Tables["Yes/No"]},
+        "has_direct_discharge": {items: Tables["Yes/No"]},
+        "has_offsite_wwtp": {items: Tables["Yes/No"]},
+        "industry_type": {items: standard_industries_classification},
+        "wwt_treatment_type": {items: Tables["WW treatment type"]},
+        "wwt_fuel_typ": {items: Tables["Fuel type options"]},
+        "wwt_dige_typ": {items: Tables["Fuel type options"]},
+        "wwt_reus_trck_typ": {items: Tables["Fuel type options"]},
+        "wwt_slu_comp_emis_treated_or_piles_covered": {items: Tables["Yes/No"]},
+        "wwt_slu_inc_SNCR": {items: Tables["Yes/No"]},
+        "wwt_trck_typ": {items: Tables["Fuel type options"]},
+      },
+      button_estimation: ["ind_cod_effl", "ind_tn_effl", "ind_tp_effl", "ind_diclo_effl", "ind_cadmium_effl", "ind_hexaclorobenzene_effl", "ind_mercury_effl", "ind_plomo_effl", "ind_niquel_effl", "ind_chloro_effl", "ind_hexaclorobutadie_effl", "ind_nonilfenols_effl", "ind_tetracloroetile_effl", "ind_tricloroetile_effl", "wwt_cod_effl", "wwt_tn_effl", "wwt_tp_effl", "wwt_diclo_effl", "wwt_cadmium_effl", "wwt_hexaclorobenzene_effl", "wwt_mercury_effl", "wwt_plomo_effl", "wwt_niquel_effl", "wwt_chloro_effl", "wwt_hexaclorobutadie_effl", "wwt_nonilfenols_effl", "wwt_tetracloroetile_effl", "wwt_tricloroetile_effl", "wwt_conv_kwh",
+        "wwt_biog_pro", "wwt_biog_fla", "wwt_biog_val", "wwt_biog_lkd", "wwt_biog_sold", "wwt_ch4_biog", "wwt_slu_comp_low_CN_EF", "wwt_slu_comp_seqst_rate", "wwt_slu_comp_uncovered_pile_EF", "wwt_temp_inc", "wwt_slu_lf_uncertainty", "wwt_slu_lf_CH4_in_gas", "wwt_slu_lf_DOCf", "wwt_slu_lf_decomp_3yr", "wwt_slu_lf_low_CN_EF" ],
+      select_estimation: ["wwt_cod_slud", "wwt_ch4_efac_dis", "wwt_ch4_efac_tre", "wwt_n2o_efac_tre", "wwt_n2o_efac_dis", "wwt_slu_sto_TVS", "wwt_slu_sto_f_CH4", "wwt_slu_sto_f_CH4", "wwt_slu_comp_N_cont", "wwt_slu_comp_TVS", "wwt_slu_inc_N_cont", "wwt_slu_la_TVS", "wwt_slu_la_N_cont", "wwt_slu_la_EF", "wwt_slu_lf_TVS", "wwt_slu_lf_MCF", "wwt_slu_lf_N_cont"],
+      basic_inputs: ["wwt_treatment_type", "wwt_vol_trea", "wwt_vol_disc", "wwt_vol_reused", "wwt_vol_treated_external", "wwt_cod_effl", "wwt_tn_effl", "wwt_tp_effl", "wwt_ch4_efac_tre", "wwt_n2o_efac_tre", "wwt_ch4_efac_dis", "wwt_n2o_efac_dis", "volume_withdrawn", "volume_used", "has_onsite_wwtp", "has_direct_discharge", "has_offsite_wwtp", "industry_type", "product_produced", "ind_cod_effl", "ind_tn_effl", "ind_tp_effl"],
+      required: ["volume_withdrawn", "volume_used", "product_produced" ],
+      industry_model: {},
+      onsite_wwtp_model: {},
+      direct_discharge_model: {},
+      offsite_wwtp_model: {},
     }
   },
   created() {
     if (this.industry === undefined) this.$router.push('/')
+
+    for (let industry_input of this.industry_inputs) {
+      this.$set(this.industry_model, industry_input, this.industry[industry_input])
+    }
+    for (let input of this.direct_discharge_inputs) {
+      this.$set(this.direct_discharge_model, input, this.industry.direct_discharge[input])
+    }
+    for (let input of this.offsite_wwtp_inputs) {
+      this.$set(this.offsite_wwtp_model, input, this.industry.offsite_wwtp[input])
+    }
+    for (let input of this.onsite_wwtp_with_offsite_wwtp_inputs) {
+      this.$set(this.onsite_wwtp_model, input, this.industry.onsite_wwtp[input])
+    }
+
   },
   watch: {
 
@@ -1696,40 +817,22 @@ export default {
       if(new_value == "Supply chain") this.industry_provided = this.final_product_industries[0].value
       else if(new_value == "Final product") this.industry_provided = null
     },
-    offsite_wwtp_type(type){
-      if(type == "Industrial"){
-        this.wwtp_offsite_estimations = Industrial_wwtp_offsite.get_estimations()
-      }else {
-        this.wwtp_offsite_estimations = Domestic_wwtp.get_estimations()
-      }
-    },
+
     stepper_model(step){
-      if(step == 2 ){
-        this.onsite_inputs = this.industry.onsite_wwtp.get_inputs()
-        this.wwtp_aux_inputs = {}
-        for(let [clau, valor] of Object.entries(this.industry.onsite_wwtp)){
-          this.$set(this.wwtp_aux_inputs, clau, valor);
+      let _this = this
+      if(step == 2){
+
+        this.onsite_wwtp_inputs.splice(0, this.onsite_wwtp_inputs.length)
+
+        if(this.industry.has_offsite_wwtp == 1) {
+          this.onsite_wwtp_with_offsite_wwtp_inputs.forEach(input => {
+            _this.onsite_wwtp_inputs.push(input)
+          })
+        }else{
+          this.onsite_wwtp_no_offsite.forEach(input => {
+            _this.onsite_wwtp_inputs.push(input)
+          })
         }
-      }else if(step == 3){
-        this.direct_discharge_inputs = this.industry.direct_discharge.get_inputs()
-        this.wwtp_aux_inputs = {}
-        for(let [clau, valor] of Object.entries(this.industry.direct_discharge)){
-
-          this.$set(this.wwtp_aux_inputs, clau, valor);
-        }
-      }else if(step == 4){
-
-        this.offsite_inputs = this.industry.offsite_wwtp.get_inputs()
-        this.wwtp_aux_inputs = {}
-        for(let [clau, valor] of Object.entries(this.industry.offsite_wwtp)){
-          this.$set(this.wwtp_aux_inputs, clau, valor);
-        }
-
-
-        //metrics.dilution_factor(this.global_layers, this.industry)
-        //metrics.recycled_water_factor(this.industry)
-        //metrics.dbo_in_river(this.global_layers, this.industry)
-
       }
     },
     industry_id: function (industry_id) {
@@ -1746,65 +849,1003 @@ export default {
       document.getElementsByClassName('outer').forEach(div => {
         div.scrollTo(0, 0)
       })
+
+      for (let industry_input of this.industry_inputs) {
+        this.industry_model[industry_input] = this.industry[industry_input]
+      }
+      for (let input of this.direct_discharge_inputs) {
+        this.direct_discharge_model[input] = this.industry.direct_discharge[input]
+      }
+      for (let input of this.offsite_wwtp_inputs) {
+        this.offsite_wwtp_model[input] = this.industry.offsite_wwtp[input]
+      }
+      for (let input of this.onsite_wwtp_with_offsite_wwtp_inputs) {
+        this.onsite_wwtp_model[input] = this.industry.onsite_wwtp[input]
+      }
+
       this.stepper_model = 1
-      this.water_withdrawn = industry.volume_withdrawn
-      this.has_onsite_wwtp = industry.has_onsite_wwtp
-      this.has_offsite_wwtp = industry.has_offsite_wwtp
-      this.offsite_wwtp_type = industry.offsite_wwtp_type
-      this.has_direct_discharge = industry.has_direct_discharge
-      this.ind_tn_effl_concentration = industry.tn_effl_concentration
-      this.ind_tp_effl_concentration = industry.tp_effl_concentration
-      this.ind_bod_effl_concentration = industry.bod_effl_concentration
-      this.volume_used =  industry.volume_used
-
-      //Priority pollutants
-      this.diclo_effl = industry.diclo_effl //1,2-Dichloroethane
-      this.cadmium_effl  = industry.cadmium_effl //Cadmium
-      this.hexaclorobenzene_effl = industry.hexaclorobenzene_effl //Hexachlorobenzene
-      this.mercury_effl = industry.mercury_effl //mercury
-      this.plomo_effl = industry.plomo_effl //lead
-      this.niquel_effl = industry.niquel_effl //nickel
-      this.chloro_effl = industry.chloro_effl //chloroalkanes
-      this.hexaclorobutadie_effl = industry.hexaclorobutadie_effl //Hexachlorobutadiene
-      this.nonilfenols_effl = industry.nonilfenols_effl //Nonylphenols
-      this.tetracloroetile_effl = industry.tetracloroetile_effl //tetrachloroethene
-      this.tricloroetile_effl = industry.tricloroetile_effl //Trichloroethylene
-      this.industry_type = industry.industry_type
-
-      //Supply chain
-      this.operation_type = industry.operation_type
-      this.industry_provided = industry.industry_provided
-      this.km_air = industry.km_air
-      this.km_barge = industry.km_barge
-      this.km_ocean = industry.km_ocean
-      this.km_rail = industry.km_rail
-      this.km_truck = industry.km_truck
-      this.volume_cargo = industry.volume_cargo
-      this.weight_cargo = industry.weight_cargo
-      this.product_produced = industry.product_produced
 
     },
   },
   methods: {
-    copy_wwtp(old_wwtp,  new_wwtp){
 
-      if(old_wwtp != null){
-        for (let key of Object.keys(new_wwtp)){
-          if(typeof new_wwtp[key] !== "function" && old_wwtp.hasOwnProperty(key)) new_wwtp[key] = old_wwtp[key]
-        }
+    prova(){
+      console.log(this.industry.effl_pollutant_load("wwt_cod_effl"))
+    },
 
-        if(old_wwtp.constructor.name == "Domestic_wwtp" && new_wwtp.constructor.name == "Industrial_wwtp_offsite"){
-          new_wwtp.bod_infl_wwtp = new_wwtp.bod_infl_wwtp/this.cod_to_bod
-          new_wwtp.wwt_bod_effl_to_wb = new_wwtp.wwt_bod_effl_to_wb/this.cod_to_bod
-          new_wwtp.wwt_bod_infl = new_wwtp.wwt_bod_infl/this.cod_to_bod
-        }else if(old_wwtp.constructor.name == "Industrial_wwtp_offsite" && new_wwtp.constructor.name == "Domestic_wwtp"){
-          new_wwtp.bod_infl_wwtp = new_wwtp.bod_infl_wwtp*this.cod_to_bod
-          new_wwtp.wwt_bod_effl_to_wb = new_wwtp.wwt_bod_effl_to_wb*this.cod_to_bod
-          new_wwtp.wwt_bod_infl = new_wwtp.wwt_bod_infl*this.cod_to_bod
-        }
+    array_intersection(arrA, arrB){
+      let intersection = arrA.filter(x => arrB.includes(x));
+      return intersection
+    },
+
+    array_difference(arrA, arrB){
+      let difference = arrA.filter(x => !arrB.includes(x));
+      return difference
+    },
+
+    concentration_effluent_load(pollutant_ind, pollutant_wwtp, pollutant_table){
+
+      let wwtp = this.industry.onsite_wwtp
+      let wwtp_model = this.onsite_wwtp_model
+      if(this.stepper_model == 4){
+        wwtp = this.industry.offsite_wwtp
+        wwtp_model = this.offsite_wwtp_model
       }
 
-      return new_wwtp
+      let influent_load = wwtp_model.wwt_vol_trea*wwtp[pollutant_ind] + wwtp.wwt_vol_from_external*wwtp[pollutant_wwtp]
+      let flowstream = Number(wwtp_model.wwt_vol_trea) + wwtp.wwt_vol_from_external
+
+
+      let loadEffl = Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][wwtp_model.wwt_treatment_type][pollutant_table]*influent_load/flowstream
+      return Number(loadEffl)
+    },
+
+    //Button estimations
+    button_estimations(code){
+      let industry_model = this.industry_model
+      let industry = this.industry
+      let stepper_model = this.stepper_model
+      let wwtp_model = this.onsite_wwtp_model
+      let wwtp = industry.onsite_wwtp
+      if(stepper_model == 4){
+        wwtp_model = this.offsite_wwtp_model
+        wwtp = industry.offsite_wwtp
+      }
+      let _this = this
+
+      let estimations = {
+        ind_cod_effl: function(){
+          if(industry_model.industry_type === 1){  //noves categories
+            return 336.2591324200910/2.4
+          }else if(industry_model.industry_type === 2){  //noves categories
+            return 231.09062980030700/2.4
+          }else if(industry_model.industry_type === 4){  //noves categories
+            return 410.09920634920627/2.4
+          }else if(industry_model.industry_type === 5){  //noves categories
+            return 40/2.4
+          }else if(industry_model.industry_type === 6){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 7){  //noves categories
+            return 33.333333333333336/2.4
+          }else if(industry_model.industry_type === 8){  //noves categories
+            return 366.27272727272725/2.4
+          }else if(industry_model.industry_type === 9){  //noves categories
+            return 750/2.4
+          }else if(industry_model.industry_type === 10){  //noves categories
+            return 300/2.4
+          }else if(industry_model.industry_type === 11){  //noves categories
+            return 598.8096590909091/2.4
+          }else if(industry_model.industry_type === 12){  //noves categories
+            return 559.8717948717948/2.4
+          }else if(industry_model.industry_type === 13){  //noves categories
+            return 603.1034482758621/2.4
+          }else if(industry_model.industry_type === 14){  //noves categories
+            return 59.03846153846154/2.4
+          }else if(industry_model.industry_type === 15){  //noves categories
+            return 586.5384615384615/2.4
+          }else if(industry_model.industry_type === 16){  //noves categories
+            return 641.4117647058823/2.4
+          }else if(industry_model.industry_type === 17){  //noves categories
+            return 33.333333333333336/2.4
+          }else if(industry_model.industry_type === 18){  //noves categories
+            return 86.66666666666667/2.4
+          }else if(industry_model.industry_type === 19){  //noves categories
+            return 328.75/2.4
+          }else if(industry_model.industry_type === 20){  //noves categories
+            return 563.1578947368421/2.4
+          }else if(industry_model.industry_type === 21){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 22){  //noves categories
+            return 35/2.4
+          }else if(industry_model.industry_type === 23){  //noves categories
+            return 35/2.4
+          }else if(industry_model.industry_type === 24){  //noves categories
+            return 40/2.4
+          }else return null
+        },
+        ind_tn_effl: function(){
+          if(industry_model.industry_type === 1){  //noves categories
+            return 12.95454545
+          }else if(industry_model.industry_type === 2){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 4){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 5){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 6){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 7){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 8){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 9){  //noves categories
+            return 90
+          }else if(industry_model.industry_type === 10){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 11){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 12){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 13){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 14){  //noves categories
+            return 18.4374
+          }else if(industry_model.industry_type === 15){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 16){  //noves categories
+            return 70
+          }else if(industry_model.industry_type === 17){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 18){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 19){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 20){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 21){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 22){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 23){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 24){  //noves categories
+            return  null
+          }else return null
+        },
+        ind_tp_effl: function(){
+          if(industry_model.industry_type === 1){  //noves categories
+            return 26.10771604938271
+          }else if(industry_model.industry_type === 2){  //noves categories
+            return  20.452873563218382
+          }else if(industry_model.industry_type === 4){  //noves categories
+            return  32.58536585365854
+          }else if(industry_model.industry_type === 5){  //noves categories
+            return  10
+          }else if(industry_model.industry_type === 6){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 7){  //noves categories
+            return  10
+          }else if(industry_model.industry_type === 8){  //noves categories
+            return  27.528301886792452
+          }else if(industry_model.industry_type === 9){  //noves categories
+            return 40.19230769230769
+          }else if(industry_model.industry_type === 10){  //noves categories
+            return  30
+          }else if(industry_model.industry_type === 11){  //noves categories
+            return  39.810956790123456
+          }else if(industry_model.industry_type === 12){  //noves categories
+            return  35.96774193548387
+          }else if(industry_model.industry_type === 13){  //noves categories
+            return  35.0032786885246
+          }else if(industry_model.industry_type === 14){  //noves categories
+            return 11.279069767441861
+          }else if(industry_model.industry_type === 15){  //noves categories
+            return  10
+          }else if(industry_model.industry_type === 16){  //noves categories
+            return 40.870535714285715
+          }else if(industry_model.industry_type === 17){  //noves categories
+            return  10
+          }else if(industry_model.industry_type === 18){  //noves categories
+            return  25.714285714285715
+          }else if(industry_model.industry_type === 19){  //noves categories
+            return  32.857142857142854
+          }else if(industry_model.industry_type === 20){  //noves categories
+            return  39.25
+          }else if(industry_model.industry_type === 21){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 22){  //noves categories
+            return  10
+          }else if(industry_model.industry_type === 23){  //noves categories
+            return  38.75
+          }else if(industry_model.industry_type === 24){  //noves categories
+            return  10
+          }else return null
+        },
+        ind_diclo_effl: function(){
+          if(industry_model.industry_type === 1){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 2){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 4){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 5){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 6){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 7){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 8){  //noves categories
+            return  100*1e-3
+          }else if(industry_model.industry_type === 9){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 10){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 11){  //noves categories
+            return  647.13333333333*1e-3
+          }else if(industry_model.industry_type === 12){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 13){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 14){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 15){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 16){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 17){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 18){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 19){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 20){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 21){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 22){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 23){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 24){  //noves categories
+            return  null
+          }else return null
+        },
+        ind_cadmium_effl: function(){
+          if(industry_model.industry_type === 1){  //noves categories
+            return 0.32*1e-3
+          }else if(industry_model.industry_type === 2){  //noves categories
+            return 0.455*1e-3
+          }else if(industry_model.industry_type === 4){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 5){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 6){  //noves categories
+            return 0.8860526315789474*1e-3
+          }else if(industry_model.industry_type === 7){  //noves categories
+            return 0.9*1e-3
+          }else if(industry_model.industry_type === 8){  //noves categories
+            return 1.19*1e-3
+          }else if(industry_model.industry_type === 9){  //noves categories
+            return 0.6015384615384615*1e-3
+          }else if(industry_model.industry_type === 10){  //noves categories
+            return 0.33*1e-3
+          }else if(industry_model.industry_type === 11){  //noves categories
+            return 0.5816129032258064*1e-3
+          }else if(industry_model.industry_type === 12){  //noves categories
+            return 0.7260416666666667*1e-3
+          }else if(industry_model.industry_type === 13){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 14){  //noves categories
+            return 1.31*1e-3
+          }else if(industry_model.industry_type === 15){  //noves categories
+            return 21.673333333333332*1e-3
+          }else if(industry_model.industry_type === 16){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 17){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 18){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 19){  //noves categories
+            return 10015*1e-3
+          }else if(industry_model.industry_type === 20){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 21){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 22){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 23){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 24){  //noves categories
+            return  null
+          }else return null
+        },
+        ind_hexaclorobenzene_effl: function(){
+          if(industry_model.industry_type === 1){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 2){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 4){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 5){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 6){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 7){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 8){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 9){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 10){  //noves categories
+            return  2*1e-3
+          }else if(industry_model.industry_type === 11){  //noves categories
+            return 0.009523809523809526*1e-3
+          }else if(industry_model.industry_type === 12){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 13){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 14){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 15){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 16){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 17){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 18){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 19){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 20){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 21){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 22){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 23){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 24){  //noves categories
+            return  null
+          }else return null
+        },
+        ind_mercury_effl: function(){
+          if(industry_model.industry_type === 1){  //noves categories
+            return 95*1e-3
+          }else if(industry_model.industry_type === 2){  //noves categories
+            return  0.1281690140845069*1e-3
+          }else if(industry_model.industry_type === 4){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 5){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 6){  //noves categories
+            return 0.2044736842105263*1e-3
+          }else if(industry_model.industry_type === 7){  //noves categories
+            return 0.1636363636363636*1e-3
+          }else if(industry_model.industry_type === 8){  //noves categories
+            return 0.17*1e-3
+          }else if(industry_model.industry_type === 9){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 10){  //noves categories
+            return 105*1e-3
+          }else if(industry_model.industry_type === 11){  //noves categories
+            return  0.19192982456140348*1e-3
+          }else if(industry_model.industry_type === 12){  //noves categories
+            return 0.2647916666666666*1e-3
+          }else if(industry_model.industry_type === 13){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 14){  //noves categories
+            return 33.48333333333333*1e-3
+          }else if(industry_model.industry_type === 15){  //noves categories
+            return 0.18000000000000002*1e-3
+          }else if(industry_model.industry_type === 16){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 17){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 18){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 19){  //noves categories
+            return 85*1e-3
+          }else if(industry_model.industry_type === 20){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 21){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 22){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 23){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 24){  //noves categories
+            return  null
+          }else return null
+        },
+        ind_plomo_effl: function(){
+          if(industry_model.industry_type === 1){  //noves categories
+            return 1985*1e-3
+          }else if(industry_model.industry_type === 2){  //noves categories
+            return 12.361901408450692*1e-3
+          }else if(industry_model.industry_type === 4){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 5){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 6){  //noves categories
+            return 12.063947368421049*1e-3
+          }else if(industry_model.industry_type === 7){  //noves categories
+            return 11.763636363636364*1e-3
+          }else if(industry_model.industry_type === 8){  //noves categories
+            return 5.36*1e-3
+          }else if(industry_model.industry_type === 9){  //noves categories
+            return 3.3173076923076925*1e-3
+          }else if(industry_model.industry_type === 10){  //noves categories
+            return 1.22*1e-3
+          }else if(industry_model.industry_type === 11){  //noves categories
+            return 14.397151898734155*1e-3
+          }else if(industry_model.industry_type === 12){  //noves categories
+            return 3.4849999999999994*1e-3
+          }else if(industry_model.industry_type === 13){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 14){  //noves categories
+            return 339.66*1e-3
+          }else if(industry_model.industry_type === 15){  //noves categories
+            return 35.682500000000005*1e-3
+          }else if(industry_model.industry_type === 16){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 17){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 18){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 19){  //noves categories
+            return 2212.8*1e-3
+          }else if(industry_model.industry_type === 20){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 21){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 22){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 23){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 24){  //noves categories
+            return  null
+          }else return null
+        },
+        ind_niquel_effl: function(){
+          if(industry_model.industry_type === 1){  //noves categories
+            return 4395*1e-3
+          }else if(industry_model.industry_type === 2){  //noves categories
+            return 15.111126760563366*1e-3
+          }else if(industry_model.industry_type === 4){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 5){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 6){  //noves categories
+            return 24.955526315789474*1e-3
+          }else if(industry_model.industry_type === 7){  //noves categories
+            return 8.272727272727272*1e-3
+          }else if(industry_model.industry_type === 8){  //noves categories
+            return 7.55*1e-3
+          }else if(industry_model.industry_type === 9){  //noves categories
+            return 6.599230769230768*1e-3
+          }else if(industry_model.industry_type === 10){  //noves categories
+            return 8.87*1e-3
+          }else if(industry_model.industry_type === 11){  //noves categories
+            return 92.75778481012654*1e-3
+          }else if(industry_model.industry_type === 12){  //noves categories
+            return 4.578333333333334*1e-3
+          }else if(industry_model.industry_type === 13){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 14){  //noves categories
+            return 18.505000000000003*1e-3
+          }else if(industry_model.industry_type === 15){  //noves categories
+            return 619.9191666666667*1e-3
+          }else if(industry_model.industry_type === 16){  //noves categories
+            return 3854.1666666666642*1e-3
+          }else if(industry_model.industry_type === 17){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 18){  //noves categories
+            return 2000*1e-3
+          }else if(industry_model.industry_type === 19){  //noves categories
+            return 20.14*1e-3
+          }else if(industry_model.industry_type === 20){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 21){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 22){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 23){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 24){  //noves categories
+            return  null
+          }else return null
+        },
+        ind_chloro_effl: function(){
+          if(industry_model.industry_type === 1){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 2){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 4){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 5){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 6){  //noves categories
+            return 3.3494736842105253*1e-3
+          }else if(industry_model.industry_type === 7){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 8){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 9){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 10){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 11){  //noves categories
+            return  8.603859649122807*1e-3
+          }else if(industry_model.industry_type === 12){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 13){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 14){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 15){  //noves categories
+            return  5.809166666666667*1e-3
+          }else if(industry_model.industry_type === 16){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 17){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 18){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 19){  //noves categories
+            return  5105*1e-3
+          }else if(industry_model.industry_type === 20){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 21){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 22){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 23){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 24){  //noves categories
+            return  null
+          }else return null
+        },
+        ind_hexaclorobutadie_effl: function(){
+          if(industry_model.industry_type === 1){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 2){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 4){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 5){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 6){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 7){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 8){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 9){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 10){  //noves categories
+            return 2*1e-3
+          }else if(industry_model.industry_type === 11){  //noves categories
+            return 0.009523809523809526*1e-3
+          }else if(industry_model.industry_type === 12){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 13){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 14){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 15){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 16){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 17){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 18){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 19){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 20){  //noves categories
+            return  null
+          }else if(this.industry_type === 21){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 22){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 23){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 24){  //noves categories
+            return  null
+          }else return null
+        },
+        ind_nonilfenols_effl: function(){
+          if(industry_model.industry_type === 1){  //noves categories
+            return 0.73*1e-3
+          }else if(industry_model.industry_type === 2){  //noves categories
+            return 1.2240140845070406*1e-3
+          }else if(industry_model.industry_type === 4){  //noves categories
+            return 654.5454545454545*1e-3
+          }else if(industry_model.industry_type === 5){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 6){  //noves categories
+            return 555*1e-3
+          }else if(industry_model.industry_type === 7){  //noves categories
+            return 1.6727272727272728*1e-3
+          }else if(industry_model.industry_type === 8){  //noves categories
+            return 441.50470588235294*1e-3
+          }else if(industry_model.industry_type === 9){  //noves categories
+            return 3.326153846153846*1e-3
+          }else if(industry_model.industry_type === 10){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 11){  //noves categories
+            return  56760.85671794876*1e-3
+          }else if(industry_model.industry_type === 12){  //noves categories
+            return 1.2556249999999995*1e-3
+          }else if(industry_model.industry_type === 13){  //noves categories
+            return 1000*1e-3
+          }else if(industry_model.industry_type === 14){  //noves categories
+            return 0.96*1e-3
+          }else if(industry_model.industry_type === 15){  //noves categories
+            return 1.0633333333333335*1e-3
+          }else if(industry_model.industry_type === 16){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 17){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 18){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 19){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 20){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 21){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 22){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 23){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 24){  //noves categories
+            return  null
+          }else return null
+        },
+        ind_tetracloroetile_effl: function(){
+          if(industry_model.industry_type === 1){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 2){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 4){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 5){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 6){  //noves categories
+            return 156.15947368421058*1e-3
+          }else if(industry_model.industry_type === 7){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 8){  //noves categories
+            return  100*1e-3
+          }else if(industry_model.industry_type === 9){  //noves categories
+            return 0.49538461538461537*1e-3
+          }else if(industry_model.industry_type === 10){  //noves categories
+            return  95*1e-3
+          }else if(industry_model.industry_type === 11){  //noves categories
+            return  5.161904761904763*1e-3
+          }else if(industry_model.industry_type === 12){  //noves categories
+            return  0.1964583333333334*1e-3
+          }else if(industry_model.industry_type === 13){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 14){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 15){  //noves categories
+            return  0.2058333333333333*1e-3
+          }else if(industry_model.industry_type === 16){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 17){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 18){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 19){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 20){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 21){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 22){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 23){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 24){  //noves categories
+            return  null
+          }else return null
+        },
+        ind_tricloroetile_effl: function(){
+          if(industry_model.industry_type === 1){  //noves categories
+            return 75*1e-3
+          }else if(industry_model.industry_type === 2){  //noves categories
+            return 0.10253521126760569*1e-3
+          }else if(industry_model.industry_type === 4){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 5){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 6){  //noves categories
+            return 0.6134210526315792*1e-3
+          }else if(industry_model.industry_type === 7){  //noves categories
+            return 0.1818181818181818*1e-3
+          }else if(industry_model.industry_type === 8){  //noves categories
+            return 100*1e-3
+          }else if(industry_model.industry_type === 9){  //noves categories
+            return 0.26538461538461533*1e-3
+          }else if(industry_model.industry_type === 10){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 11){  //noves categories
+            return  0.6655072463768117*1e-3
+          }else if(industry_model.industry_type === 12){  //noves categories
+            return  0.1879166666666667*1e-3
+          }else if(industry_model.industry_type === 13){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 14){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 15){  //noves categories
+            return  0.34*1e-3
+          }else if(industry_model.industry_type === 16){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 17){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 18){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 19){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 20){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 21){  //noves categories
+            return null
+          }else if(industry_model.industry_type === 22){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 23){  //noves categories
+            return  null
+          }else if(industry_model.industry_type === 24){  //noves categories
+            return  null
+          }else return null
+        },
+        wwt_cod_effl: function(){
+
+
+          return _this.concentration_effluent_load("wwt_cod_infl_ind", "wwt_cod_infl_wwtp", "cod_effl")
+        },
+        wwt_tn_effl: function(){
+          return _this.concentration_effluent_load("wwt_tn_infl_ind", "wwt_tn_infl_wwtp", "N_effl")
+        },
+        wwt_tp_effl: function(){
+          return null
+        },
+        wwt_diclo_effl: function() {
+          return _this.concentration_effluent_load("wwt_diclo_infl_ind", "wwt_diclo_infl_wwtp", "diclo_effl")
+        },
+        wwt_cadmium_effl: function() {
+          return _this.concentration_effluent_load("wwt_cadmium_infl_ind", "wwt_cadmium_infl_wwtp", "cadmium_effl")
+        },
+        wwt_hexaclorobenzene_effl: function() {
+          return _this.concentration_effluent_load("wwt_hexaclorobenzene_infl_ind", "wwt_hexaclorobenzene_infl_wwtp", "hexaclorobenzene_effl")
+        },
+        wwt_mercury_effl: function() {
+          return _this.concentration_effluent_load("wwt_mercury_infl_ind", "wwt_mercury_infl_wwtp", "mercury_effl")
+        },
+        wwt_plomo_effl: function() {
+          return _this.concentration_effluent_load("wwt_plomo_infl_ind", "wwt_plomo_infl_wwtp", "plomo_effl")
+        },
+        wwt_niquel_effl: function() {
+          return _this.concentration_effluent_load("wwt_niquel_infl_ind", "wwt_niquel_infl_wwtp", "niquel_effl")
+        },
+        wwt_chloro_effl: function() {
+          return _this.concentration_effluent_load("wwt_chloro_infl_ind", "wwt_chloro_infl_wwtp", "chloro_effl")
+        },
+        wwt_hexaclorobutadie_effl: function() {
+          return _this.concentration_effluent_load("wwt_hexaclorobutadie_infl_ind", "wwt_hexaclorobutadie_infl_wwtp", "hexaclorobutadie_effl")
+        },
+        wwt_nonilfenols_effl: function() {
+          return _this.concentration_effluent_load("wwt_nonilfenols_infl_ind", "wwt_nonilfenols_infl_wwtp", "nonilfenols_effl")
+        },
+        wwt_tetracloroetile_effl: function() {
+          return _this.concentration_effluent_load("wwt_tetracloroetile_infl_ind", "wwt_tetracloroetile_infl_wwtp", "tetracloroetile_effl")
+        },
+        wwt_tricloroetile_effl: function() {
+          return _this.concentration_effluent_load("wwt_tricloroetile_infl_ind", "wwt_tricloroetile_infl_wwtp", "tricloroetile_effl")
+        },
+        wwt_conv_kwh: function(){
+          let location = wwtp.location
+          let lat = location.lat
+          let lng = location.lng
+          let code = utils.get_country_code_from_coordinates(lat, lng)
+          if(code == null) return null
+          return Countries[code].conv_kwh_co2
+        },
+        wwt_biog_pro: function(){
+          let wwt_mass_slu    = wwtp_model.wwt_mass_slu;  //kg  | mass of combined sludge to digestion
+          let VS_to_digestion = wwt_mass_slu    * 0.80; //kg  | VS to digestion: 80% of sludge mass
+          let VS_destroyed    = VS_to_digestion * 0.60; //kg  | VS destroyed: 60% of VS
+          let biogas_volume   = VS_destroyed    * 0.80; //Nm3 | biogas produced (volume)
+          return biogas_volume;
+        },
+        wwt_biog_fla: function(){
+          return 100-wwtp_model.wwt_biog_val-wwtp_model.wwt_biog_lkd-wwtp_model.wwt_biog_sold;
+        },
+        wwt_biog_val: function(){
+          return 100-wwtp_model.wwt_biog_fla-wwtp_model.wwt_biog_lkd-wwtp_model.wwt_biog_sold;
+        },
+        wwt_biog_lkd: function(){
+          return 100-wwtp_model.wwt_biog_val-wwtp_model.wwt_biog_fla-wwtp_model.wwt_biog_sold
+        },
+        wwt_biog_sold: function() {
+          return 100-wwtp_model.wwt_biog_val-wwtp_model.wwt_biog_fla-wwtp_model.wwt_biog_lkd;
+        },
+        wwt_ch4_biog: function(){
+          return 59
+        },
+        wwt_slu_comp_low_CN_EF: function(){
+          return 0.015
+        },
+        wwt_slu_comp_uncovered_pile_EF: function(){
+          return 0.025
+        },
+        wwt_slu_comp_seqst_rate: function(){
+          return 0.25
+        },
+        wwt_temp_inc: function(){
+          return 1023
+        },
+        wwt_slu_lf_uncertainty: function(){
+          return 0.9
+        },
+        wwt_slu_lf_CH4_in_gas: function(){
+          return 0.5
+        },
+        wwt_slu_lf_DOCf: function(){
+          return 80
+        },
+        wwt_slu_lf_decomp_3yr: function(){
+          return 69.9
+        },
+        wwt_slu_lf_low_CN_EF: function(){
+          return 0.015
+        }
+
+
+
+      }
+      return estimations[code]()
+    },
+    select_estimations(code){
+      let wwt_model = this.onsite_wwtp_model
+      let estimations = {
+        wwt_cod_slud: function(){
+          return Tables["type_of_treatment_KREM"].map(option => {
+            return {
+              name: option.name,
+              value: option.K_rem * wwt_model.wwt_mass_slu
+            }
+          })
+        },
+        wwt_ch4_efac_dis: function(){
+          return Tables["type_of_water_body"].map(option => {
+            return {
+              name: option.name,
+              value: option.ch4_efac
+            }
+          })
+        },
+        wwt_ch4_efac_tre: function(){
+          return Tables["type_of_treatment"].map(option => {
+            return {
+              name: option.name,
+              value: option.ch4_efac
+            }
+          })
+        },
+        wwt_n2o_efac_tre: function(){
+          return Tables["N2O EF plants (Table 6.8A)"].map(option => {
+            return {
+              name: option.name,
+              value: option.n2o_efac
+            }
+          })
+        },
+        wwt_n2o_efac_dis: function(){
+          return Tables["N2O EF effluent (Table 6.8A)"].map(option => {
+            return {
+              name: option.name,
+              value: option.n2o_efac
+            }
+          })
+        },
+        wwt_slu_sto_TVS: function(){
+          return Tables["Type of sludge disposed"].map(option => {
+            return {
+              name: option.name,
+              value: option.TVS
+            }
+          })
+        },
+        wwt_slu_sto_f_CH4: function(){
+          return Tables["Type of sludge disposed"].map(option => {
+            return {
+              name: option.name,
+              value: option.f_ch4
+            }
+          })
+        },
+        wwt_slu_comp_TVS: function(){
+          return Tables["Type of sludge disposed"].map(option => {
+            return {
+              name: option.name,
+              value: option.TVS
+            }
+          })
+        },
+        wwt_slu_comp_N_cont: function(){
+          return Tables["Type of sludge disposed"].map(option => {
+            return {
+              name: option.name,
+              value: option.N_cont
+            }
+          })
+        },
+        wwt_slu_inc_N_cont: function(){
+          return Tables["Type of sludge disposed"].map(option => {
+            return {
+              name: option.name,
+              value: option.N_cont
+            }
+          })
+        },
+        wwt_slu_la_TVS: function(){
+          return Tables["Type of sludge disposed"].map(option => {
+            return {
+              name: option.name,
+              value: option.TVS
+            }
+          })
+        },
+        wwt_slu_la_N_cont: function(){
+          return Tables["Type of sludge disposed"].map(option => {
+            return {
+              name: option.name,
+              value: option.N_cont
+            }
+          })
+        },
+        wwt_slu_la_EF: function(){
+          return Tables["Soil type"].map(option => {
+            return {
+              name: option.name,
+              value: option.f_la
+            }
+          })
+        },
+        wwt_slu_lf_TVS: function(){
+          return Tables["Type of sludge disposed"].map(option => {
+            return {
+              name: option.name,
+              value: option.TVS
+            }
+          })
+
+        },
+        wwt_slu_lf_MCF: function(){
+          return Tables["Type of landfill"].map(option => {
+            return {
+              name: option.name,
+              value: option.MCF
+            }
+          })
+
+        },
+        wwt_slu_lf_N_cont: function(){
+          return Tables["Type of sludge disposed"].map(option => {
+            return {
+              name: option.name,
+              value: option.N_cont
+            }
+          })
+        },
+
+
+
+      }
+      return estimations[code]()
+
     },
 
     tab_4_continue(){
@@ -1812,217 +1853,87 @@ export default {
         div.scrollTo(0, 0)
       })
 
-
-      for (let [key, value] of Object.entries(this.wwtp_aux_inputs)){
-        if(Number(value) != NaN && typeof this.industry.offsite_wwtp[key] !== "function") this.industry.offsite_wwtp[key] = Number(value)
+      for(let input of this.offsite_wwtp_inputs){
+        if(!isNaN(this.offsite_wwtp_model[input])) this.industry.offsite_wwtp[input] = Number(this.offsite_wwtp_model[input])
       }
-      this.stepper_model = 1
+      this.stepper_model = 5
     },
-
 
     tab_3_continue(){
       document.getElementsByClassName('outer').forEach(div => {
         div.scrollTo(0, 0)
       })
-      for (let [key, value] of Object.entries(this.wwtp_aux_inputs)){
-        if(Number(value) != NaN && typeof this.industry.direct_discharge[key] !== "function") this.industry.direct_discharge[key] = Number(value)
+      for(let input of this.direct_discharge_inputs){
+        if(!isNaN(this.direct_discharge_model[input])) this.industry.direct_discharge[input] = Number(this.direct_discharge_model[input])
       }
 
-      if(this.has_offsite_wwtp) {
+      if(this.industry.has_offsite_wwtp == 1) {
         this.stepper_model = 4
       }
-      else this.stepper_model = 1
+      else this.stepper_model = 5
     },
 
     tab_2_continue(){
       document.getElementsByClassName('outer').forEach(div => {
         div.scrollTo(0, 0)
       })
-      for (let [key, value] of Object.entries(this.wwtp_aux_inputs)){
-        if(Number(value) != NaN && typeof this.industry.onsite_wwtp[key] !== "function") this.industry.onsite_wwtp[key] = Number(value)
+
+      for(let input of this.onsite_wwtp_inputs){
+        if(!isNaN(this.onsite_wwtp_model[input])) this.industry.onsite_wwtp[input] = Number(this.onsite_wwtp_model[input])
       }
 
-      if(this.has_offsite_wwtp){
-        this.industry.offsite_wwtp.vol_infl_wwtp = this.industry.onsite_wwtp.wwt_vol_treated_external
-        this.industry.offsite_wwtp.tn_infl_wwtp = this.industry.onsite_wwtp.wwt_tn_effl_to_wb
-        this.industry.offsite_wwtp.tp_infl_wwtp = this.industry.onsite_wwtp.wwt_tp_effl_to_wb
-        this.industry.offsite_wwtp.diclo_infl_wwtp = this.industry.onsite_wwtp.wwt_diclo_effl_to_wb //1,2-Dichloroethane
-        this.industry.offsite_wwtp.cadmium_infl_wwtp = this.industry.onsite_wwtp.wwt_cadmium_effl_to_wb //Cadmium
-        this.industry.offsite_wwtp.hexaclorobenzene_infl_wwtp = this.industry.onsite_wwtp.wwt_hexaclorobenzene_effl_to_wb //Hexachlorobenzene
-        this.industry.offsite_wwtp.mercury_infl_wwtp = this.industry.onsite_wwtp.wwt_mercury_effl_to_wb //mercury
-        this.industry.offsite_wwtp.plomo_infl_wwtp = this.industry.onsite_wwtp.wwt_plomo_effl_to_wb //lead
-        this.industry.offsite_wwtp.niquel_infl_wwtp = this.industry.onsite_wwtp.wwt_niquel_effl_to_wb //nickel
-        this.industry.offsite_wwtp.chloro_infl_wwtp = this.industry.onsite_wwtp.wwt_chloro_effl_to_wb //chloroalkanes
-        this.industry.offsite_wwtp.hexaclorobutadie_infl_wwtp = this.industry.onsite_wwtp.wwt_hexaclorobutadie_effl_to_wb //Hexachlorobutadiene
-        this.industry.offsite_wwtp.nonilfenols_infl_wwtp = this.industry.onsite_wwtp.wwt_nonilfenols_effl_to_wb //Nonylphenols
-        this.industry.offsite_wwtp.tetracloroetile_infl_wwtp = this.industry.onsite_wwtp.wwt_tetracloroetile_effl_to_wb //tetrachloroethene
-        this.industry.offsite_wwtp.tricloroetile_infl_wwtp = this.industry.onsite_wwtp.wwt_tricloroetile_effl_to_wb //Trichloroethylene
-
-        if(this.industry.offsite_wwtp_type === "Domestic") this.industry.offsite_wwtp.bod_infl_wwtp = this.industry.onsite_wwtp.wwt_bod_effl_to_wb*this.cod_to_bod
-        else this.industry.offsite_wwtp.bod_infl_wwtp = this.industry.onsite_wwtp.wwt_bod_effl_to_wb
-
+      if(this.industry.has_offsite_wwtp == 1){
+        this.industry.update_offsite_wwtp()
       }
 
-      if(this.has_direct_discharge) {
+      if(this.industry.has_direct_discharge == 1) {
         this.stepper_model = 3
       }
-      else if(this.has_offsite_wwtp) this.stepper_model = 4
-      else this.stepper_model = 1
+      else if(this.industry.has_offsite_wwtp == 1) this.stepper_model = 4
+      else this.stepper_model = 5
     },
 
     tab_1_continue(){
       document.getElementsByClassName('outer').forEach(div => {
         div.scrollTo(0, 0)
       })
-      this.industry.volume_withdrawn = this.water_withdrawn
-      this.industry.has_onsite_wwtp = this.has_onsite_wwtp
-      this.industry.has_offsite_wwtp = this.has_offsite_wwtp
-      this.industry.offsite_wwtp_type = this.offsite_wwtp_type
-      this.industry.has_direct_discharge = this.has_direct_discharge
-      this.industry.industry_type = this.industry_type
-      this.industry.tn_effl_concentration = this.ind_tn_effl_concentration
-      this.industry.tp_effl_concentration = this.ind_tp_effl_concentration
-      this.industry.bod_effl_concentration = this.ind_bod_effl_concentration
-      this.industry.volume_used = this.volume_used
-      this.industry.diclo_effl = this.diclo_effl //1,2-Dichloroethane
-      this.industry.cadmium_effl = this.cadmium_effl //Cadmium
-      this.industry.hexaclorobenzene_effl = this.hexaclorobenzene_effl //Hexachlorobenzene
-      this.industry.mercury_effl = this.mercury_effl //mercury
-      this.industry.plomo_effl = this.plomo_effl //lead
-      this.industry.niquel_effl = this.niquel_effl //nickel
-      this.industry.chloro_effl = this.chloro_effl //chloroalkanes
-      this.industry.hexaclorobutadie_effl = this.hexaclorobutadie_effl //Hexachlorobutadiene
-      this.industry.nonilfenols_effl = this.nonilfenols_effl //Nonylphenols
-      this.industry.tetracloroetile_effl = this.tetracloroetile_effl //tetrachloroethene
-      this.industry.tricloroetile_effl = this.tricloroetile_effl //Trichloroethylene
-      this.industry.km_air = this.km_air
-      this.industry.km_barge = this.km_barge
-      this.industry.km_ocean = this.km_ocean
-      this.industry.km_rail = this.km_rail
-      this.industry.km_truck = this.km_truck
-      this.industry.operation_type = this.operation_type
-      this.industry.industry_provided = this.industry_provided
-      this.industry.volume_cargo = this.volume_cargo
-      this.industry.weight_cargo = this.weight_cargo
-      this.industry.product_produced = this.product_produced
 
+
+      for(let input of this.industry_inputs){
+        if(!isNaN(this.industry_model[input])) this.industry[input] = Number(this.industry_model[input])
+      }
 
       //Local wwtp
-      if(this.has_onsite_wwtp){
-        if(this.has_offsite_wwtp){
-          if(this.offsite_wwtp_type === "Domestic"){
-            //if(this.industry.onsite_wwtp === null || this.industry.onsite_wwtp.constructor.name !== "Industrial_wwtp_onsite_external_domestic") this.industry.onsite_wwtp = new Industrial_wwtp_onsite_external_domestic()
-            if(this.industry.onsite_wwtp === null || this.industry.onsite_wwtp.constructor.name !== "Industrial_wwtp_onsite_external_domestic") this.industry.onsite_wwtp = this.copy_wwtp(this.industry.onsite_wwtp,  new Industrial_wwtp_onsite_external_domestic())
-
-
-            }else{  //Industrial
-            if(this.industry.onsite_wwtp === null || this.industry.onsite_wwtp.constructor.name !== "Industrial_wwtp_onsite_external_industrial") {
-              this.industry.onsite_wwtp = this.copy_wwtp(this.industry.onsite_wwtp,  new Industrial_wwtp_onsite_external_industrial())
-            }
-          }
-        }else{
-          if(this.industry.onsite_wwtp === null || this.industry.onsite_wwtp.constructor.name !== "Industrial_wwtp_onsite") {
-            this.industry.onsite_wwtp = this.copy_wwtp(this.industry.onsite_wwtp,  new Industrial_wwtp_onsite())
-          }
-        }
-        this.industry.onsite_wwtp.location = this.industry.location
-        this.industry.onsite_wwtp.wwt_bod_infl = this.industry.bod_effl_concentration
-        this.industry.onsite_wwtp.wwt_tn_infl = this.industry.tn_effl_concentration
-        this.industry.onsite_wwtp.wwt_tp_infl = this.industry.tp_effl_concentration
-        this.industry.onsite_wwtp.wwt_diclo_infl = this.industry.diclo_effl //1,2-Dichloroethane
-        this.industry.onsite_wwtp.wwt_cadmium_infl = this.industry.cadmium_effl //Cadmium
-        this.industry.onsite_wwtp.wwt_hexaclorobenzene_infl = this.industry.hexaclorobenzene_effl //Hexachlorobenzene
-        this.industry.onsite_wwtp.wwt_mercury_infl = this.industry.mercury_effl //mercury
-        this.industry.onsite_wwtp.wwt_plomo_infl = this.industry.plomo_effl //lead
-        this.industry.onsite_wwtp.wwt_niquel_infl = this.industry.niquel_effl //nickel
-        this.industry.onsite_wwtp.wwt_chloro_infl = this.industry.chloro_effl //chloroalkanes
-        this.industry.onsite_wwtp.wwt_hexaclorobutadie_infl = this.industry.hexaclorobutadie_effl //Hexachlorobutadiene
-        this.industry.onsite_wwtp.wwt_nonilfenols_infl = this.industry.nonilfenols_effl //Nonylphenols
-        this.industry.onsite_wwtp.wwt_tetracloroetile_infl = this.industry.tetracloroetile_effl //tetrachloroethene
-        this.industry.onsite_wwtp.wwt_tricloroetile_infl = this.industry.tricloroetile_effl //Trichloroethylene
-
+      if(this.industry.has_onsite_wwtp == 1){
+        this.industry.update_onsite_wwtp()
+      }else{
+        this.industry.reset_onsite_wwtp()
       }
 
       //Direct discharge
-      if(this.has_direct_discharge){
-        if(this.industry.direct_discharge === null) {
-          this.industry.direct_discharge = this.copy_wwtp(this.industry.direct_discharge,  new Direct_discharge())
-        }
-        this.industry.direct_discharge.location = this.industry.location
-        this.industry.direct_discharge.wwt_bod_effl_to_wb = this.industry.bod_effl_concentration
-        this.industry.direct_discharge.wwt_tn_effl_to_wb = this.industry.tn_effl_concentration
-        this.industry.direct_discharge.wwt_tp_effl_to_wb = this.industry.tp_effl_concentration
-        this.industry.direct_discharge.wwt_diclo_effl_to_wb = this.industry.diclo_effl //1,2-Dichloroethane
-        this.industry.direct_discharge.wwt_cadmium_effl_to_wb = this.industry.cadmium_effl //Cadmium
-        this.industry.direct_discharge.wwt_hexaclorobenzene_effl_to_wb = this.industry.hexaclorobenzene_effl //Hexachlorobenzene
-        this.industry.direct_discharge.wwt_mercury_effl_to_wb = this.industry.mercury_effl //mercury
-        this.industry.direct_discharge.wwt_plomo_effl_to_wb = this.industry.plomo_effl //lead
-        this.industry.direct_discharge.wwt_niquel_effl_to_wb = this.industry.niquel_effl //nickel
-        this.industry.direct_discharge.wwt_chloro_effl_to_wb = this.industry.chloro_effl //chloroalkanes
-        this.industry.direct_discharge.wwt_hexaclorobutadie_effl_to_wb = this.industry.hexaclorobutadie_effl //Hexachlorobutadiene
-        this.industry.direct_discharge.wwt_nonilfenols_effl_to_wb = this.industry.nonilfenols_effl //Nonylphenols
-        this.industry.direct_discharge.wwt_tetracloroetile_effl_to_wb = this.industry.tetracloroetile_effl //tetrachloroethene
-        this.industry.direct_discharge.wwt_tricloroetile_effl_to_wb = this.industry.tricloroetile_effl //Trichloroethylene
-
+      if(this.industry.has_direct_discharge == 1){
+        this.industry.update_direct_discharge()
+      }else{
+        this.industry.reset_direct_discharge()
       }
 
       //Offsite wwtp
-      if(this.has_offsite_wwtp){
-        if(this.offsite_wwtp_type == "Industrial"){
-          if(this.industry.offsite_wwtp === null || this.industry.offsite_wwtp.constructor.name !== "Industrial_wwtp_offsite") {
-            this.industry.offsite_wwtp = this.copy_wwtp(this.industry.offsite_wwtp,  new Industrial_wwtp_offsite())
-          }
-          this.industry.offsite_wwtp.wwt_bod_infl = this.industry.bod_effl_concentration
-        }else {
-          if(this.industry.offsite_wwtp === null || this.industry.offsite_wwtp.constructor.name !== "Domestic_wwtp") {
-            this.industry.offsite_wwtp = this.copy_wwtp(this.industry.offsite_wwtp,  new Domestic_wwtp())
-          }
-          this.industry.offsite_wwtp.wwt_bod_infl = this.industry.bod_effl_concentration*this.cod_to_bod
-        }
-        this.industry.offsite_wwtp.location = this.industry.location
-        this.industry.offsite_wwtp.wwt_tn_infl = this.industry.tn_effl_concentration
-        this.industry.offsite_wwtp.wwt_tp_infl = this.industry.tp_effl_concentration
-        this.industry.offsite_wwtp.wwt_diclo_infl = this.industry.diclo_effl //1,2-Dichloroethane
-        this.industry.offsite_wwtp.wwt_cadmium_infl = this.industry.cadmium_effl //Cadmium
-        this.industry.offsite_wwtp.wwt_hexaclorobenzene_infl = this.industry.hexaclorobenzene_effl //Hexachlorobenzene
-        this.industry.offsite_wwtp.wwt_mercury_infl = this.industry.mercury_effl //mercury
-        this.industry.offsite_wwtp.wwt_plomo_infl = this.industry.plomo_effl //lead
-        this.industry.offsite_wwtp.wwt_niquel_infl = this.industry.niquel_effl //nickel
-        this.industry.offsite_wwtp.wwt_chloro_infl = this.industry.chloro_effl //chloroalkanes
-        this.industry.offsite_wwtp.wwt_hexaclorobutadie_infl = this.industry.hexaclorobutadie_effl //Hexachlorobutadiene
-        this.industry.offsite_wwtp.wwt_nonilfenols_infl = this.industry.nonilfenols_effl //Nonylphenols
-        this.industry.offsite_wwtp.wwt_tetracloroetile_infl = this.industry.tetracloroetile_effl //tetrachloroethene
-        this.industry.offsite_wwtp.wwt_tricloroetile_infl = this.industry.tricloroetile_effl //Trichloroethylene
-
-        if(!this.has_onsite_wwtp){
-          this.industry.offsite_wwtp.vol_infl_wwtp = 0
-          this.industry.offsite_wwtp.bod_infl_wwtp = 0
-          this.industry.offsite_wwtp.tn_infl_wwtp = 0
-          this.industry.offsite_wwtp.tp_infl_wwtp = 0
-          this.industry.offsite_wwtp.diclo_infl_wwtp = 0 //1,2-Dichloroethane
-          this.industry.offsite_wwtp.cadmium_infl_wwtp = 0 //Cadmium
-          this.industry.offsite_wwtp.hexaclorobenzene_infl_wwtp = 0 //Hexachlorobenzene
-          this.industry.offsite_wwtp.mercury_infl_wwtp = 0 //mercury
-          this.industry.offsite_wwtp.plomo_infl_wwtp = 0 //lead
-          this.industry.offsite_wwtp.niquel_infl_wwtp = 0 //nickel
-          this.industry.offsite_wwtp.chloro_infl_wwtp = 0 //chloroalkanes
-          this.industry.offsite_wwtp.hexaclorobutadie_infl_wwtp = 0 //Hexachlorobutadiene
-          this.industry.offsite_wwtp.nonilfenols_infl_wwtp = 0 //Nonylphenols
-          this.industry.offsite_wwtp.tetracloroetile_infl_wwtp = 0 //tetrachloroethene
-          this.industry.offsite_wwtp.tricloroetile_infl_wwtp = 0 //Trichloroethylene
-        }
+      if(this.industry.has_offsite_wwtp == 1){
+        this.industry.update_offsite_wwtp()
+      }else{
+        this.industry.reset_offsite_wwtp()
       }
 
-      if(!this.has_onsite_wwtp){
-        if(this.has_direct_discharge) this.stepper_model = 3
-        else if(this.has_offsite_wwtp) this.stepper_model = 4
+      if(this.industry.has_onsite_wwtp == 0){
+        if(this.industry.has_direct_discharge == 1) this.stepper_model = 3
+        else if(this.industry.has_offsite_wwtp == 1) this.stepper_model = 4
+        else this.stepper_model = 5
       }else{
         this.stepper_model = 2
       }
     },
 
     water_withdrawn_rule(str) {
-
       if (typeof str === "number") return true
       else if(typeof str === "string"){
         if(!isNaN(str) && !isNaN(parseFloat(str)) && parseFloat(str) >=0 ) return true
@@ -2030,6 +1941,7 @@ export default {
       }
       return 'Real positive value required.'
     },
+
     industries_deleted(){ //An industry or assessment has been deleted, if it's the current one return to map
       let _this = this
       let assessment_index =  this.$assessments.findIndex(assessment => assessment.name === _this.assessment.name)
@@ -2040,12 +1952,6 @@ export default {
         if(industry_index === -1) this.$router.push('/')
       }
     },
-    /*industry_enter_leaving(){
-
-      console.log(this.amount_insitu + this.amount_offsite)
-      if(this.water_needed === this.amount_insitu + this.amount_offsite) return true
-      else return ("Amount of water entering the industry must be the same as the amount leaving")
-    }*/
   },
 
   computed: {
@@ -2064,694 +1970,12 @@ export default {
       })
 
     },
-    ind_bod_effl(){
-      if(this.industry_type === "food"){  //noves categories
-        return 336.2591324200910/2.4
-      }else if(this.industry_type === "beverages"){  //noves categories
-        return 231.09062980030700/2.4
-      }else if(this.industry_type === "textiles"){  //noves categories
-        return 410.09920634920627/2.4
-      }else if(this.industry_type === "wearing"){  //noves categories
-        return 40/2.4
-      }else if(this.industry_type === "leather"){  //noves categories
-        return null
-      }else if(this.industry_type === "wood"){  //noves categories
-        return 33.333333333333336/2.4
-      }else if(this.industry_type === "paper"){  //noves categories
-        return 366.27272727272725/2.4
-      }else if(this.industry_type === "printing"){  //noves categories
-        return 750/2.4
-      }else if(this.industry_type === "coke"){  //noves categories
-        return 300/2.4
-      }else if(this.industry_type === "chemicals"){  //noves categories
-        return 598.8096590909091/2.4
-      }else if(this.industry_type === "pharmaceutical"){  //noves categories
-        return 559.8717948717948/2.4
-      }else if(this.industry_type === "rubber"){  //noves categories
-        return 603.1034482758621/2.4
-      }else if(this.industry_type === "mineral"){  //noves categories
-        return 59.03846153846154/2.4
-      }else if(this.industry_type === "metals"){  //noves categories
-        return 586.5384615384615/2.4
-      }else if(this.industry_type === "fabricated_metals"){  //noves categories
-        return 641.4117647058823/2.4
-      }else if(this.industry_type === "computer"){  //noves categories
-        return 33.333333333333336/2.4
-      }else if(this.industry_type === "electrical"){  //noves categories
-        return 86.66666666666667/2.4
-      }else if(this.industry_type === "machinery"){  //noves categories
-        return 328.75/2.4
-      }else if(this.industry_type === "vehicles"){  //noves categories
-        return 563.1578947368421/2.4
-      }else if(this.industry_type === "transport"){  //noves categories
-        return null
-      }else if(this.industry_type === "furniture"){  //noves categories
-        return 35/2.4
-      }else if(this.industry_type === "other_manufacturing"){  //noves categories
-        return 35/2.4
-      }else if(this.industry_type === "repair"){  //noves categories
-        return 40/2.4
-      }else return null
-    },
-    ind_tn_effl(){
-      if(this.industry_type === "food"){  //noves categories
-        return 12.95454545
-      }else if(this.industry_type === "beverages"){  //noves categories
-        return  null
-      }else if(this.industry_type === "textiles"){  //noves categories
-        return  null
-      }else if(this.industry_type === "wearing"){  //noves categories
-        return  null
-      }else if(this.industry_type === "leather"){  //noves categories
-        return null
-      }else if(this.industry_type === "wood"){  //noves categories
-        return  null
-      }else if(this.industry_type === "paper"){  //noves categories
-        return  null
-      }else if(this.industry_type === "printing"){  //noves categories
-        return 90
-      }else if(this.industry_type === "coke"){  //noves categories
-        return  null
-      }else if(this.industry_type === "chemicals"){  //noves categories
-        return  null
-      }else if(this.industry_type === "pharmaceutical"){  //noves categories
-        return  null
-      }else if(this.industry_type === "rubber"){  //noves categories
-        return  null
-      }else if(this.industry_type === "mineral"){  //noves categories
-        return 18.4374
-      }else if(this.industry_type === "metals"){  //noves categories
-        return  null
-      }else if(this.industry_type === "fabricated_metals"){  //noves categories
-        return 70
-      }else if(this.industry_type === "computer"){  //noves categories
-        return  null
-      }else if(this.industry_type === "electrical"){  //noves categories
-        return  null
-      }else if(this.industry_type === "machinery"){  //noves categories
-        return  null
-      }else if(this.industry_type === "vehicles"){  //noves categories
-        return  null
-      }else if(this.industry_type === "transport"){  //noves categories
-        return null
-      }else if(this.industry_type === "furniture"){  //noves categories
-        return  null
-      }else if(this.industry_type === "other_manufacturing"){  //noves categories
-        return  null
-      }else if(this.industry_type === "repair"){  //noves categories
-        return  null
-      }else return null
-    },
-    ind_tp_effl(){
-      if(this.industry_type === "food"){  //noves categories
-        return 26.10771604938271
-      }else if(this.industry_type === "beverages"){  //noves categories
-        return  20.452873563218382
-      }else if(this.industry_type === "textiles"){  //noves categories
-        return  32.58536585365854
-      }else if(this.industry_type === "wearing"){  //noves categories
-        return  10
-      }else if(this.industry_type === "leather"){  //noves categories
-        return null
-      }else if(this.industry_type === "wood"){  //noves categories
-        return  10
-      }else if(this.industry_type === "paper"){  //noves categories
-        return  27.528301886792452
-      }else if(this.industry_type === "printing"){  //noves categories
-        return 40.19230769230769
-      }else if(this.industry_type === "coke"){  //noves categories
-        return  30
-      }else if(this.industry_type === "chemicals"){  //noves categories
-        return  39.810956790123456
-      }else if(this.industry_type === "pharmaceutical"){  //noves categories
-        return  35.96774193548387
-      }else if(this.industry_type === "rubber"){  //noves categories
-        return  35.0032786885246
-      }else if(this.industry_type === "mineral"){  //noves categories
-        return 11.279069767441861
-      }else if(this.industry_type === "metals"){  //noves categories
-        return  10
-      }else if(this.industry_type === "fabricated_metals"){  //noves categories
-        return 40.870535714285715
-      }else if(this.industry_type === "computer"){  //noves categories
-        return  10
-      }else if(this.industry_type === "electrical"){  //noves categories
-        return  25.714285714285715
-      }else if(this.industry_type === "machinery"){  //noves categories
-        return  32.857142857142854
-      }else if(this.industry_type === "vehicles"){  //noves categories
-        return  39.25
-      }else if(this.industry_type === "transport"){  //noves categories
-        return null
-      }else if(this.industry_type === "furniture"){  //noves categories
-        return  10
-      }else if(this.industry_type === "other_manufacturing"){  //noves categories
-        return  38.75
-      }else if(this.industry_type === "repair"){  //noves categories
-        return  10
-      }else return null
-    },
 
-    ind_diclo_effl(){
-      if(this.industry_type === "food"){  //noves categories
-        return null
-      }else if(this.industry_type === "beverages"){  //noves categories
-        return  null
-      }else if(this.industry_type === "textiles"){  //noves categories
-        return  null
-      }else if(this.industry_type === "wearing"){  //noves categories
-        return  null
-      }else if(this.industry_type === "leather"){  //noves categories
-        return null
-      }else if(this.industry_type === "wood"){  //noves categories
-        return  null
-      }else if(this.industry_type === "paper"){  //noves categories
-        return  100*1e-3
-      }else if(this.industry_type === "printing"){  //noves categories
-        return null
-      }else if(this.industry_type === "coke"){  //noves categories
-        return  null
-      }else if(this.industry_type === "chemicals"){  //noves categories
-        return  647.13333333333*1e-3
-      }else if(this.industry_type === "pharmaceutical"){  //noves categories
-        return  null
-      }else if(this.industry_type === "rubber"){  //noves categories
-        return  null
-      }else if(this.industry_type === "mineral"){  //noves categories
-        return null
-      }else if(this.industry_type === "metals"){  //noves categories
-        return  null
-      }else if(this.industry_type === "fabricated_metals"){  //noves categories
-        return null
-      }else if(this.industry_type === "computer"){  //noves categories
-        return  null
-      }else if(this.industry_type === "electrical"){  //noves categories
-        return  null
-      }else if(this.industry_type === "machinery"){  //noves categories
-        return  null
-      }else if(this.industry_type === "vehicles"){  //noves categories
-        return  null
-      }else if(this.industry_type === "transport"){  //noves categories
-        return null
-      }else if(this.industry_type === "furniture"){  //noves categories
-        return  null
-      }else if(this.industry_type === "other_manufacturing"){  //noves categories
-        return  null
-      }else if(this.industry_type === "repair"){  //noves categories
-        return  null
-      }else return null
+    tab_1_disabled(){
+      let industry = this.industry_model
+      let disabled = Number(industry.volume_withdrawn)>0 && Number(industry.volume_used)>0 && Number(industry.product_produced)>0
+      return !disabled
     },
-    ind_cadmium_effl(){
-      if(this.industry_type === "food"){  //noves categories
-        return 0.32*1e-3
-      }else if(this.industry_type === "beverages"){  //noves categories
-        return 0.455*1e-3
-      }else if(this.industry_type === "textiles"){  //noves categories
-        return  null
-      }else if(this.industry_type === "wearing"){  //noves categories
-        return  null
-      }else if(this.industry_type === "leather"){  //noves categories
-        return 0.8860526315789474*1e-3
-      }else if(this.industry_type === "wood"){  //noves categories
-        return 0.9*1e-3
-      }else if(this.industry_type === "paper"){  //noves categories
-        return 1.19*1e-3
-      }else if(this.industry_type === "printing"){  //noves categories
-        return 0.6015384615384615*1e-3
-      }else if(this.industry_type === "coke"){  //noves categories
-        return 0.33*1e-3
-      }else if(this.industry_type === "chemicals"){  //noves categories
-        return 0.5816129032258064*1e-3
-      }else if(this.industry_type === "pharmaceutical"){  //noves categories
-        return 0.7260416666666667*1e-3
-      }else if(this.industry_type === "rubber"){  //noves categories
-        return  null
-      }else if(this.industry_type === "mineral"){  //noves categories
-        return 1.31*1e-3
-      }else if(this.industry_type === "metals"){  //noves categories
-        return 21.673333333333332*1e-3
-      }else if(this.industry_type === "fabricated_metals"){  //noves categories
-        return null
-      }else if(this.industry_type === "computer"){  //noves categories
-        return  null
-      }else if(this.industry_type === "electrical"){  //noves categories
-        return  null
-      }else if(this.industry_type === "machinery"){  //noves categories
-        return 10015*1e-3
-      }else if(this.industry_type === "vehicles"){  //noves categories
-        return  null
-      }else if(this.industry_type === "transport"){  //noves categories
-        return null
-      }else if(this.industry_type === "furniture"){  //noves categories
-        return  null
-      }else if(this.industry_type === "other_manufacturing"){  //noves categories
-        return  null
-      }else if(this.industry_type === "repair"){  //noves categories
-        return  null
-      }else return null
-    },
-    ind_hexaclorobenzene_effl(){
-      if(this.industry_type === "food"){  //noves categories
-        return null
-      }else if(this.industry_type === "beverages"){  //noves categories
-        return  null
-      }else if(this.industry_type === "textiles"){  //noves categories
-        return  null
-      }else if(this.industry_type === "wearing"){  //noves categories
-        return  null
-      }else if(this.industry_type === "leather"){  //noves categories
-        return null
-      }else if(this.industry_type === "wood"){  //noves categories
-        return  null
-      }else if(this.industry_type === "paper"){  //noves categories
-        return  null
-      }else if(this.industry_type === "printing"){  //noves categories
-        return null
-      }else if(this.industry_type === "coke"){  //noves categories
-        return  2*1e-3
-      }else if(this.industry_type === "chemicals"){  //noves categories
-        return 0.009523809523809526*1e-3
-      }else if(this.industry_type === "pharmaceutical"){  //noves categories
-        return  null
-      }else if(this.industry_type === "rubber"){  //noves categories
-        return  null
-      }else if(this.industry_type === "mineral"){  //noves categories
-        return null
-      }else if(this.industry_type === "metals"){  //noves categories
-        return  null
-      }else if(this.industry_type === "fabricated_metals"){  //noves categories
-        return null
-      }else if(this.industry_type === "computer"){  //noves categories
-        return  null
-      }else if(this.industry_type === "electrical"){  //noves categories
-        return  null
-      }else if(this.industry_type === "machinery"){  //noves categories
-        return  null
-      }else if(this.industry_type === "vehicles"){  //noves categories
-        return  null
-      }else if(this.industry_type === "transport"){  //noves categories
-        return null
-      }else if(this.industry_type === "furniture"){  //noves categories
-        return  null
-      }else if(this.industry_type === "other_manufacturing"){  //noves categories
-        return  null
-      }else if(this.industry_type === "repair"){  //noves categories
-        return  null
-      }else return null
-    },
-    ind_mercury_effl(){
-      if(this.industry_type === "food"){  //noves categories
-        return 95*1e-3
-      }else if(this.industry_type === "beverages"){  //noves categories
-        return  0.1281690140845069*1e-3
-      }else if(this.industry_type === "textiles"){  //noves categories
-        return  null
-      }else if(this.industry_type === "wearing"){  //noves categories
-        return  null
-      }else if(this.industry_type === "leather"){  //noves categories
-        return 0.2044736842105263*1e-3
-      }else if(this.industry_type === "wood"){  //noves categories
-        return 0.1636363636363636*1e-3
-      }else if(this.industry_type === "paper"){  //noves categories
-        return 0.17*1e-3
-      }else if(this.industry_type === "printing"){  //noves categories
-        return null
-      }else if(this.industry_type === "coke"){  //noves categories
-        return 105*1e-3
-      }else if(this.industry_type === "chemicals"){  //noves categories
-        return  0.19192982456140348*1e-3
-      }else if(this.industry_type === "pharmaceutical"){  //noves categories
-        return 0.2647916666666666*1e-3
-      }else if(this.industry_type === "rubber"){  //noves categories
-        return  null
-      }else if(this.industry_type === "mineral"){  //noves categories
-        return 33.48333333333333*1e-3
-      }else if(this.industry_type === "metals"){  //noves categories
-        return 0.18000000000000002*1e-3
-      }else if(this.industry_type === "fabricated_metals"){  //noves categories
-        return null
-      }else if(this.industry_type === "computer"){  //noves categories
-        return  null
-      }else if(this.industry_type === "electrical"){  //noves categories
-        return  null
-      }else if(this.industry_type === "machinery"){  //noves categories
-        return 85*1e-3
-      }else if(this.industry_type === "vehicles"){  //noves categories
-        return  null
-      }else if(this.industry_type === "transport"){  //noves categories
-        return null
-      }else if(this.industry_type === "furniture"){  //noves categories
-        return  null
-      }else if(this.industry_type === "other_manufacturing"){  //noves categories
-        return  null
-      }else if(this.industry_type === "repair"){  //noves categories
-        return  null
-      }else return null
-    },
-    ind_plomo_effl(){
-      if(this.industry_type === "food"){  //noves categories
-        return 1985*1e-3
-      }else if(this.industry_type === "beverages"){  //noves categories
-        return 12.361901408450692*1e-3
-      }else if(this.industry_type === "textiles"){  //noves categories
-        return  null
-      }else if(this.industry_type === "wearing"){  //noves categories
-        return  null
-      }else if(this.industry_type === "leather"){  //noves categories
-        return 12.063947368421049*1e-3
-      }else if(this.industry_type === "wood"){  //noves categories
-        return 11.763636363636364*1e-3
-      }else if(this.industry_type === "paper"){  //noves categories
-        return 5.36*1e-3
-      }else if(this.industry_type === "printing"){  //noves categories
-        return 3.3173076923076925*1e-3
-      }else if(this.industry_type === "coke"){  //noves categories
-        return 1.22*1e-3
-      }else if(this.industry_type === "chemicals"){  //noves categories
-        return 14.397151898734155*1e-3
-      }else if(this.industry_type === "pharmaceutical"){  //noves categories
-        return 3.4849999999999994*1e-3
-      }else if(this.industry_type === "rubber"){  //noves categories
-        return  null
-      }else if(this.industry_type === "mineral"){  //noves categories
-        return 339.66*1e-3
-      }else if(this.industry_type === "metals"){  //noves categories
-        return 35.682500000000005*1e-3
-      }else if(this.industry_type === "fabricated_metals"){  //noves categories
-        return null
-      }else if(this.industry_type === "computer"){  //noves categories
-        return  null
-      }else if(this.industry_type === "electrical"){  //noves categories
-        return  null
-      }else if(this.industry_type === "machinery"){  //noves categories
-        return 2212.8*1e-3
-      }else if(this.industry_type === "vehicles"){  //noves categories
-        return  null
-      }else if(this.industry_type === "transport"){  //noves categories
-        return null
-      }else if(this.industry_type === "furniture"){  //noves categories
-        return  null
-      }else if(this.industry_type === "other_manufacturing"){  //noves categories
-        return  null
-      }else if(this.industry_type === "repair"){  //noves categories
-        return  null
-      }else return null
-    },
-    ind_niquel_effl(){
-      if(this.industry_type === "food"){  //noves categories
-        return 4395*1e-3
-      }else if(this.industry_type === "beverages"){  //noves categories
-        return 15.111126760563366*1e-3
-      }else if(this.industry_type === "textiles"){  //noves categories
-        return  null
-      }else if(this.industry_type === "wearing"){  //noves categories
-        return  null
-      }else if(this.industry_type === "leather"){  //noves categories
-        return 24.955526315789474*1e-3
-      }else if(this.industry_type === "wood"){  //noves categories
-        return 8.272727272727272*1e-3
-      }else if(this.industry_type === "paper"){  //noves categories
-        return 7.55*1e-3
-      }else if(this.industry_type === "printing"){  //noves categories
-        return 6.599230769230768*1e-3
-      }else if(this.industry_type === "coke"){  //noves categories
-        return 8.87*1e-3
-      }else if(this.industry_type === "chemicals"){  //noves categories
-        return 92.75778481012654*1e-3
-      }else if(this.industry_type === "pharmaceutical"){  //noves categories
-        return 4.578333333333334*1e-3
-      }else if(this.industry_type === "rubber"){  //noves categories
-        return  null
-      }else if(this.industry_type === "mineral"){  //noves categories
-        return 18.505000000000003*1e-3
-      }else if(this.industry_type === "metals"){  //noves categories
-        return 619.9191666666667*1e-3
-      }else if(this.industry_type === "fabricated_metals"){  //noves categories
-        return 3854.1666666666642*1e-3
-      }else if(this.industry_type === "computer"){  //noves categories
-        return null
-      }else if(this.industry_type === "electrical"){  //noves categories
-        return 2000*1e-3
-      }else if(this.industry_type === "machinery"){  //noves categories
-        return 20.14*1e-3
-      }else if(this.industry_type === "vehicles"){  //noves categories
-        return  null
-      }else if(this.industry_type === "transport"){  //noves categories
-        return null
-      }else if(this.industry_type === "furniture"){  //noves categories
-        return  null
-      }else if(this.industry_type === "other_manufacturing"){  //noves categories
-        return  null
-      }else if(this.industry_type === "repair"){  //noves categories
-        return  null
-      }else return null
-    },
-    ind_chloro_effl(){
-      if(this.industry_type === "food"){  //noves categories
-        return null
-      }else if(this.industry_type === "beverages"){  //noves categories
-        return  null
-      }else if(this.industry_type === "textiles"){  //noves categories
-        return  null
-      }else if(this.industry_type === "wearing"){  //noves categories
-        return  null
-      }else if(this.industry_type === "leather"){  //noves categories
-        return 3.3494736842105253*1e-3
-      }else if(this.industry_type === "wood"){  //noves categories
-        return  null
-      }else if(this.industry_type === "paper"){  //noves categories
-        return  null
-      }else if(this.industry_type === "printing"){  //noves categories
-        return null
-      }else if(this.industry_type === "coke"){  //noves categories
-        return  null
-      }else if(this.industry_type === "chemicals"){  //noves categories
-        return  8.603859649122807*1e-3
-      }else if(this.industry_type === "pharmaceutical"){  //noves categories
-        return  null
-      }else if(this.industry_type === "rubber"){  //noves categories
-        return  null
-      }else if(this.industry_type === "mineral"){  //noves categories
-        return null
-      }else if(this.industry_type === "metals"){  //noves categories
-        return  5.809166666666667*1e-3
-      }else if(this.industry_type === "fabricated_metals"){  //noves categories
-        return null
-      }else if(this.industry_type === "computer"){  //noves categories
-        return  null
-      }else if(this.industry_type === "electrical"){  //noves categories
-        return  null
-      }else if(this.industry_type === "machinery"){  //noves categories
-        return  5105*1e-3
-      }else if(this.industry_type === "vehicles"){  //noves categories
-        return  null
-      }else if(this.industry_type === "transport"){  //noves categories
-        return null
-      }else if(this.industry_type === "furniture"){  //noves categories
-        return  null
-      }else if(this.industry_type === "other_manufacturing"){  //noves categories
-        return  null
-      }else if(this.industry_type === "repair"){  //noves categories
-        return  null
-      }else return null
-    },
-    ind_hexaclorobutadie_effl(){
-      if(this.industry_type === "food"){  //noves categories
-        return null
-      }else if(this.industry_type === "beverages"){  //noves categories
-        return  null
-      }else if(this.industry_type === "textiles"){  //noves categories
-        return  null
-      }else if(this.industry_type === "wearing"){  //noves categories
-        return  null
-      }else if(this.industry_type === "leather"){  //noves categories
-        return null
-      }else if(this.industry_type === "wood"){  //noves categories
-        return  null
-      }else if(this.industry_type === "paper"){  //noves categories
-        return  null
-      }else if(this.industry_type === "printing"){  //noves categories
-        return null
-      }else if(this.industry_type === "coke"){  //noves categories
-        return 2*1e-3
-      }else if(this.industry_type === "chemicals"){  //noves categories
-        return 0.009523809523809526*1e-3
-      }else if(this.industry_type === "pharmaceutical"){  //noves categories
-        return  null
-      }else if(this.industry_type === "rubber"){  //noves categories
-        return  null
-      }else if(this.industry_type === "mineral"){  //noves categories
-        return null
-      }else if(this.industry_type === "metals"){  //noves categories
-        return  null
-      }else if(this.industry_type === "fabricated_metals"){  //noves categories
-        return null
-      }else if(this.industry_type === "computer"){  //noves categories
-        return  null
-      }else if(this.industry_type === "electrical"){  //noves categories
-        return  null
-      }else if(this.industry_type === "machinery"){  //noves categories
-        return  null
-      }else if(this.industry_type === "vehicles"){  //noves categories
-        return  null
-      }else if(this.industry_type === "transport"){  //noves categories
-        return null
-      }else if(this.industry_type === "furniture"){  //noves categories
-        return  null
-      }else if(this.industry_type === "other_manufacturing"){  //noves categories
-        return  null
-      }else if(this.industry_type === "repair"){  //noves categories
-        return  null
-      }else return null
-    },
-    ind_nonilfenols_effl(){
-      if(this.industry_type === "food"){  //noves categories
-        return 0.73*1e-3
-      }else if(this.industry_type === "beverages"){  //noves categories
-        return 1.2240140845070406*1e-3
-      }else if(this.industry_type === "textiles"){  //noves categories
-        return 654.5454545454545*1e-3
-      }else if(this.industry_type === "wearing"){  //noves categories
-        return  null
-      }else if(this.industry_type === "leather"){  //noves categories
-        return 555*1e-3
-      }else if(this.industry_type === "wood"){  //noves categories
-        return 1.6727272727272728*1e-3
-      }else if(this.industry_type === "paper"){  //noves categories
-        return 441.50470588235294*1e-3
-      }else if(this.industry_type === "printing"){  //noves categories
-        return 3.326153846153846*1e-3
-      }else if(this.industry_type === "coke"){  //noves categories
-        return  null
-      }else if(this.industry_type === "chemicals"){  //noves categories
-        return  56760.85671794876*1e-3
-      }else if(this.industry_type === "pharmaceutical"){  //noves categories
-        return 1.2556249999999995*1e-3
-      }else if(this.industry_type === "rubber"){  //noves categories
-        return 1000*1e-3
-      }else if(this.industry_type === "mineral"){  //noves categories
-        return 0.96*1e-3
-      }else if(this.industry_type === "metals"){  //noves categories
-        return 1.0633333333333335*1e-3
-      }else if(this.industry_type === "fabricated_metals"){  //noves categories
-        return null
-      }else if(this.industry_type === "computer"){  //noves categories
-        return  null
-      }else if(this.industry_type === "electrical"){  //noves categories
-        return  null
-      }else if(this.industry_type === "machinery"){  //noves categories
-        return  null
-      }else if(this.industry_type === "vehicles"){  //noves categories
-        return  null
-      }else if(this.industry_type === "transport"){  //noves categories
-        return null
-      }else if(this.industry_type === "furniture"){  //noves categories
-        return  null
-      }else if(this.industry_type === "other_manufacturing"){  //noves categories
-        return  null
-      }else if(this.industry_type === "repair"){  //noves categories
-        return  null
-      }else return null
-    },
-    ind_tetracloroetile_effl(){
-      if(this.industry_type === "food"){  //noves categories
-        return null
-      }else if(this.industry_type === "beverages"){  //noves categories
-        return  null
-      }else if(this.industry_type === "textiles"){  //noves categories
-        return  null
-      }else if(this.industry_type === "wearing"){  //noves categories
-        return  null
-      }else if(this.industry_type === "leather"){  //noves categories
-        return 156.15947368421058*1e-3
-      }else if(this.industry_type === "wood"){  //noves categories
-        return null
-      }else if(this.industry_type === "paper"){  //noves categories
-        return  100*1e-3
-      }else if(this.industry_type === "printing"){  //noves categories
-        return 0.49538461538461537*1e-3
-      }else if(this.industry_type === "coke"){  //noves categories
-        return  95*1e-3
-      }else if(this.industry_type === "chemicals"){  //noves categories
-        return  5.161904761904763*1e-3
-      }else if(this.industry_type === "pharmaceutical"){  //noves categories
-        return  0.1964583333333334*1e-3
-      }else if(this.industry_type === "rubber"){  //noves categories
-        return null
-      }else if(this.industry_type === "mineral"){  //noves categories
-        return null
-      }else if(this.industry_type === "metals"){  //noves categories
-        return  0.2058333333333333*1e-3
-      }else if(this.industry_type === "fabricated_metals"){  //noves categories
-        return null
-      }else if(this.industry_type === "computer"){  //noves categories
-        return  null
-      }else if(this.industry_type === "electrical"){  //noves categories
-        return  null
-      }else if(this.industry_type === "machinery"){  //noves categories
-        return  null
-      }else if(this.industry_type === "vehicles"){  //noves categories
-        return  null
-      }else if(this.industry_type === "transport"){  //noves categories
-        return null
-      }else if(this.industry_type === "furniture"){  //noves categories
-        return  null
-      }else if(this.industry_type === "other_manufacturing"){  //noves categories
-        return  null
-      }else if(this.industry_type === "repair"){  //noves categories
-        return  null
-      }else return null
-    },
-    ind_tricloroetile_effl(){
-      if(this.industry_type === "food"){  //noves categories
-        return 75*1e-3
-      }else if(this.industry_type === "beverages"){  //noves categories
-        return 0.10253521126760569*1e-3
-      }else if(this.industry_type === "textiles"){  //noves categories
-        return  null
-      }else if(this.industry_type === "wearing"){  //noves categories
-        return  null
-      }else if(this.industry_type === "leather"){  //noves categories
-        return 0.6134210526315792*1e-3
-      }else if(this.industry_type === "wood"){  //noves categories
-        return 0.1818181818181818*1e-3
-      }else if(this.industry_type === "paper"){  //noves categories
-        return 100*1e-3
-      }else if(this.industry_type === "printing"){  //noves categories
-        return 0.26538461538461533*1e-3
-      }else if(this.industry_type === "coke"){  //noves categories
-        return null
-      }else if(this.industry_type === "chemicals"){  //noves categories
-        return  0.6655072463768117*1e-3
-      }else if(this.industry_type === "pharmaceutical"){  //noves categories
-        return  0.1879166666666667*1e-3
-      }else if(this.industry_type === "rubber"){  //noves categories
-        return  null
-      }else if(this.industry_type === "mineral"){  //noves categories
-        return null
-      }else if(this.industry_type === "metals"){  //noves categories
-        return  0.34*1e-3
-      }else if(this.industry_type === "fabricated_metals"){  //noves categories
-        return null
-      }else if(this.industry_type === "computer"){  //noves categories
-        return  null
-      }else if(this.industry_type === "electrical"){  //noves categories
-        return  null
-      }else if(this.industry_type === "machinery"){  //noves categories
-        return  null
-      }else if(this.industry_type === "vehicles"){  //noves categories
-        return  null
-      }else if(this.industry_type === "transport"){  //noves categories
-        return null
-      }else if(this.industry_type === "furniture"){  //noves categories
-        return  null
-      }else if(this.industry_type === "other_manufacturing"){  //noves categories
-        return  null
-      }else if(this.industry_type === "repair"){  //noves categories
-        return  null
-      }else return null
-    },
-
 
 
   }
@@ -2763,5 +1987,11 @@ export default {
 </script>
 
 <style>
-
+.link_to_report_hovered{
+  color: black;
+  text-decoration: underline;
+}
+.link_to_report{
+  color: black;
+}
 </style>

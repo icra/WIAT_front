@@ -9,6 +9,15 @@ import Countries from "./countries"
 //sum array of numbers
 Array.prototype.sum=function(){return this.reduce((p,c)=>(parseFloat(p)+parseFloat(c)),0)};
 
+function sumObjectsByKey(...objs) {
+    return objs.reduce((a, b) => {
+        for (let k in b) {
+            if (b.hasOwnProperty(k))
+                a[k] = (a[k] || 0) + b[k];
+        }
+        return a;
+    }, {});
+}
 /*
   ASSESSMENT: main class
 */
@@ -28,16 +37,6 @@ export class Assessment{
     /*
       methods
     */
-
-    //total emissions (all industries)
-    TotalGHG(){
-        return this.industries.map(i=>i.wwt_KPI_GHG().total).sum(); //kgCO2eq
-    }
-
-    //total energy consumed (all industries)
-    TotalNRG(){
-        return this.industries.map(i=>i.wwt_nrg_cons).sum(); //kWh
-    }
 
     //add industry
     add_industry(){
@@ -64,18 +63,18 @@ export class Industry{
     constructor(){
         this.name = "new industry";
         this.location = null
-        this.onsite_wwtp = null
-        this.has_onsite_wwtp = false
-        this.has_offsite_wwtp = false
-        this.offsite_wwtp = null
+        this.onsite_wwtp = new WWTP()
+        this.has_onsite_wwtp = 0
+        this.has_offsite_wwtp = 0
+        this.offsite_wwtp = new WWTP()
         this.offsite_wwtp_type = "Domestic" //Domestic or Industrial
         this.volume_withdrawn = 0   //Amount of water withdrawn from the wb per day(m3/day)
-        this.has_direct_discharge = false
-        this.direct_discharge = null
-        this.industry_type = null
-        this.bod_effl_concentration = 0
-        this.tn_effl_concentration = 0
-        this.tp_effl_concentration = 0
+        this.has_direct_discharge = 0
+        this.direct_discharge = new Direct_discharge()
+        this.industry_type = 0
+        this.ind_cod_effl= 0
+        this.ind_tn_effl = 0
+        this.ind_tp_effl = 0
         this.volume_used = 0
         this.operation_type = "Final product"
         this.industry_provided = null
@@ -89,18 +88,25 @@ export class Industry{
         this.product_produced = 0
 
         //Priority pollutants
-        this.diclo_effl = 0 //1,2-Dichloroethane
-        this.cadmium_effl = 0 //Cadmium
-        this.hexaclorobenzene_effl = 0 //Hexachlorobenzene
-        this.mercury_effl = 0 //mercury
-        this.plomo_effl = 0 //lead
-        this.niquel_effl = 0 //nickel
-        this.chloro_effl = 0 //chloroalkanes
-        this.hexaclorobutadie_effl = 0 //Hexachlorobutadiene
-        this.nonilfenols_effl = 0 //Nonylphenols
-        this.tetracloroetile_effl = 0 //tetrachloroethene
-        this.tricloroetile_effl = 0 //Trichloroethylene
+        this.ind_diclo_effl = 0 //1,2-Dichloroethane
+        this.ind_cadmium_effl = 0 //Cadmium
+        this.ind_hexaclorobenzene_effl = 0 //Hexachlorobenzene
+        this.ind_mercury_effl = 0 //mercury
+        this.ind_plomo_effl = 0 //lead
+        this.ind_niquel_effl = 0 //nickel
+        this.ind_chloro_effl = 0 //chloroalkanes
+        this.ind_hexaclorobutadie_effl = 0 //Hexachlorobutadiene
+        this.ind_nonilfenols_effl = 0 //Nonylphenols
+        this.ind_tetracloroetile_effl = 0 //tetrachloroethene
+        this.ind_tricloroetile_effl = 0 //Trichloroethylene
 
+    }
+
+    ghg(){
+        let onsite_wwtp = this.onsite_wwtp.wwt_KPI_GHG()
+        let offsite_wwtp = this.offsite_wwtp.wwt_KPI_GHG()
+        let direct_discharge = this.direct_discharge.wwt_KPI_GHG
+        return sumObjectsByKey(onsite_wwtp, offsite_wwtp, direct_discharge)
     }
 
     emissions_from_supply_chain(){  //kgCO2-eq for supplying materials (supply chain)
@@ -140,85 +146,191 @@ export class Industry{
 
     }
 
+    update_onsite_wwtp(){
+        let wwtp = this.onsite_wwtp
+        wwtp.location = this.location
+        wwtp.wwt_cod_infl_ind = this.ind_cod_effl
+        wwtp.wwt_tn_infl_ind = this.ind_tn_effl
+        wwtp.wwt_tp_infl_ind = this.ind_tp_effl
+        wwtp.wwt_diclo_infl_ind = this.ind_diclo_effl
+        wwtp.wwt_cadmium_infl_ind = this.ind_cadmium_effl
+        wwtp.wwt_hexaclorobenzene_infl_ind = this.ind_hexaclorobenzene_effl
+        wwtp.wwt_mercury_infl_ind = this.ind_mercury_effl
+        wwtp.wwt_plomo_infl_ind = this.ind_plomo_effl
+        wwtp.wwt_niquel_infl_ind = this.ind_niquel_effl
+        wwtp.wwt_chloro_infl_ind = this.ind_chloro_effl
+        wwtp.wwt_hexaclorobutadie_infl_ind = this.ind_hexaclorobutadie_effl
+        wwtp.wwt_nonilfenols_infl_ind = this.ind_nonilfenols_effl
+        wwtp.wwt_tetracloroetile_infl_ind = this.ind_tetracloroetile_effl
+        wwtp.wwt_tricloroetile_infl_ind = this.ind_tricloroetile_effl
+
+        if(this.has_offsite_wwtp == 0)  wwtp.wwt_vol_treated_external = 0
+
+    }   //Update onsite wwtp if industry has changed
+
+    reset_onsite_wwtp(){
+        this.onsite_wwtp = new WWTP()
+    }    //Set onsite WWTP default values
+
+    update_direct_discharge(){
+        let direct_discharge = this.direct_discharge
+        direct_discharge.wwt_cod_effl = this.ind_cod_effl
+        direct_discharge.wwt_tn_effl = this.ind_tn_effl
+        direct_discharge.wwt_tp_effl = this.ind_tp_effl
+        direct_discharge.wwt_diclo_effl = this.ind_diclo_effl
+        direct_discharge.wwt_cadmium_effl = this.ind_cadmium_effl
+        direct_discharge.wwt_hexaclorobenzene_effl = this.ind_hexaclorobenzene_effl
+        direct_discharge.wwt_mercury_effl = this.ind_mercury_effl
+        direct_discharge.wwt_plomo_effl = this.ind_plomo_effl
+        direct_discharge.wwt_niquel_effl = this.ind_niquel_effl
+        direct_discharge.wwt_chloro_effl = this.ind_chloro_effl
+        direct_discharge.wwt_hexaclorobutadie_effl = this.ind_hexaclorobutadie_effl
+        direct_discharge.wwt_nonilfenols_effl = this.ind_nonilfenols_effl
+        direct_discharge.wwt_tetracloroetile_effl = this.ind_tetracloroetile_effl
+        direct_discharge.wwt_tricloroetile_effl = this.ind_tricloroetile_effl
+    }
+
+    reset_direct_discharge(){
+        this.direct_discharge = new Direct_discharge()
+    }
+
+    update_offsite_wwtp(){
+        let wwtp = this.offsite_wwtp
+        wwtp.location = this.location
+        wwtp.wwt_cod_infl_ind = this.ind_cod_effl
+        wwtp.wwt_tn_infl_ind = this.ind_tn_effl
+        wwtp.wwt_tp_infl_ind = this.ind_tp_effl
+        wwtp.wwt_diclo_infl_ind = this.ind_diclo_effl
+        wwtp.wwt_cadmium_infl_ind = this.ind_cadmium_effl
+        wwtp.wwt_hexaclorobenzene_infl_ind = this.ind_hexaclorobenzene_effl
+        wwtp.wwt_mercury_infl_ind = this.ind_mercury_effl
+        wwtp.wwt_plomo_infl_ind = this.ind_plomo_effl
+        wwtp.wwt_niquel_infl_ind = this.ind_niquel_effl
+        wwtp.wwt_chloro_infl_ind = this.ind_chloro_effl
+        wwtp.wwt_hexaclorobutadie_infl_ind = this.ind_hexaclorobutadie_effl
+        wwtp.wwt_nonilfenols_infl_ind = this.ind_nonilfenols_effl
+        wwtp.wwt_tetracloroetile_infl_ind = this.ind_tetracloroetile_effl
+        wwtp.wwt_tricloroetile_infl_ind = this.ind_tricloroetile_effl
+
+
+        let offsite_and_onsite_inputs = [["wwt_cod_infl_wwtp", "wwt_cod_effl"],["wwt_tn_infl_wwtp", "wwt_tn_effl"], ["wwt_tp_infl_wwtp", "wwt_tp_effl"], ["wwt_diclo_infl_wwtp", "wwt_diclo_effl"], ["wwt_cadmium_infl_wwtp", "wwt_cadmium_effl"],
+            ["wwt_hexaclorobenzene_infl_wwtp", "wwt_hexaclorobenzene_effl"], ["wwt_mercury_infl_wwtp", "wwt_mercury_effl"], ["wwt_plomo_infl_wwtp", "wwt_plomo_effl"], ["wwt_niquel_infl_wwtp", "wwt_niquel_effl"], ["wwt_chloro_infl_wwtp", "wwt_chloro_effl"],
+            ["wwt_hexaclorobutadie_infl_wwtp", "wwt_hexaclorobutadie_effl"], ["wwt_nonilfenols_infl_wwtp", "wwt_nonilfenols_effl"], ["wwt_tetracloroetile_infl_wwtp", "wwt_tetracloroetile_effl"], ["wwt_tricloroetile_infl_wwtp", "wwt_tricloroetile_effl"],
+            ["wwt_vol_from_external", "wwt_vol_treated_external"]]
+
+        let onsite_wwtp = this.onsite_wwtp
+        let _this = this
+
+        offsite_and_onsite_inputs.forEach(input => {
+            let offsite_input = input[0]
+            let onsite_input = input[1]
+            wwtp[offsite_input] = _this.has_onsite_wwtp == 1 ? onsite_wwtp[onsite_input] : 0
+        })
+    }    //Update onsite wwtp if industry or connected onsite WWTP has changed
+
+    reset_offsite_wwtp(){
+        this.offsite_wwtp = new WWTP()
+    }    //Set offsite WWTP default values
+
+    effl_pollutant_load(pollutant){
+        let load = 0
+        if(this.has_onsite_wwtp == 1) {
+            load += this.onsite_wwtp[pollutant] * this.onsite_wwtp.wwt_vol_disc // g/day
+        }
+        if(this.has_direct_discharge == 1) {
+            load += this.direct_discharge[pollutant]  *  this.direct_discharge.wwt_vol_disc  // g/day
+        }
+        if(this.has_offsite_wwtp == 1){
+            load += this.offsite_wwtp[pollutant] * this.offsite_wwtp.wwt_vol_disc  // g/day
+        }
+        return load
+    }
+
+    generated_pollutant_load(pollutant){
+        let load = 0
+        let concentration = this[pollutant]
+
+        if(this.has_onsite_wwtp == 1) {
+            load += concentration * this.onsite_wwtp.wwt_vol_trea // g/day
+        }
+        if(this.has_direct_discharge == 1) {
+            load += concentration  *  this.direct_discharge.wwt_vol_disc  // g/day
+        }
+        if(this.has_offsite_wwtp == 1){
+            load += concentration * this.offsite_wwtp.wwt_vol_trea  // g/day
+        }
+        return load
+    }
+
+    filtered_pollutant_load(industry_effluent, wwtp_effluent){
+
+        let pollutant_generated = this.generated_pollutant_load(industry_effluent)
+        let pollutant_discharged = this.effl_pollutant_load(wwtp_effluent)
+
+        return pollutant_generated - pollutant_discharged
+
+    }
+
+    water_discharged(){
+        let water_discharged = 0
+        if(this.has_onsite_wwtp == 1) water_discharged += this.onsite_wwtp.wwt_vol_disc  //m3/day
+        if(this.has_direct_discharge == 1) water_discharged += this.direct_discharge.wwt_vol_disc //m3/day
+        if(this.has_offsite_wwtp == 1) water_discharged += this.offsite_wwtp.wwt_vol_disc //m3/day
+        return water_discharged
+    }
+
+    water_recycled(){
+        if(this.has_onsite_wwtp == 1) return this.onsite_wwtp.wwt_vol_reused
+        else return 0
+    }
+
+    tonnes_of_product(){
+        return this.product_produced
+    }
+
+    volume_of_water_used(){
+        return this.volume_used
+    }
+
+    volume_of_water_withdrawn(){
+        return this.volume_withdrawn
+    }
+
+    volume_of_water_treated(){
+        let water_treated = 0
+        if(this.has_onsite_wwtp == 1) {
+            water_treated += this.onsite_wwtp.wwt_vol_disc
+        }  //m3/day
+        if(this.has_offsite_wwtp == 1) {
+            water_treated += this.offsite_wwtp.wwt_vol_disc
+        }
+        return water_treated
+    }
+
+
 };
 
 export class Direct_discharge{
 
-    static info_inputs(){
-        let inputs = {}
-        inputs["None"] = {
-
-            "wwt_vol_disc" :{question:"Volume of discharged wastewater to water body every day", value: 0, unit: "m3/day"},
-
-            //emission factors (discharge)
-            "wwt_ch4_efac_dis": {
-                question: "CH4 emission factor (discharge)",
-                value: 0,
-                unit: "kgCH4/kgCOD",
-                estimation_type: "option",
-                items: Tables["type_of_water_body"],
-                estimation_based_on: null,
-                estimation_factor: "ch4_efac",
-                description: "description"
-            },  //kgCH4/kgCOD   Table 6.8
-            "wwt_n2o_efac_dis": {
-                question: "N2O emission factor (discharge)",
-                value: 0,
-                unit: "kgN2O-N/kgN",
-                estimation_type: "option",
-                items: Tables["N2O EF effluent (Table 6.8A)"],
-                estimation_based_on: null,
-                estimation_factor: "n2o_efac",
-                description: "description"
-            },  //kgN2O-N/kgN  //tAULA 6.8A
-        }
-        return inputs
-    }
-
-    get_inputs(){
-        return Direct_discharge.info_inputs()
-    }
-
-    static get_estimations(){
-        return {
-            /*wwt_bod_effl_to_wb(substage){
-                return substage.wwt_bod_infl
-            },
-
-            wwt_tn_effl_to_wb(substage){
-                return substage.wwt_tn_infl
-            },
-            wwt_tp_effl_to_wb(substage){
-                return substage.wwt_tp_infl
-            },*/
-
-        }
-    }
-
     constructor(){
-        let _this = this
-        this.wwt_tn_effl_to_wb = 0
-        this.wwt_tp_effl_to_wb = 0
-        this.wwt_bod_effl_to_wb = 0
-        this.wwt_diclo_effl_to_wb = 0 //1,2-Dichloroethane
-        this.wwt_cadmium_effl_to_wb = 0 //Cadmium
-        this.wwt_hexaclorobenzene_effl_to_wb = 0 //Hexachlorobenzene
-        this.wwt_mercury_effl_to_wb = 0 //mercury
-        this.wwt_plomo_effl_to_wb = 0 //lead
-        this.wwt_niquel_effl_to_wb = 0 //nickel
-        this.wwt_chloro_effl_to_wb = 0 //chloroalkanes
-        this.wwt_hexaclorobutadie_effl_to_wb = 0 //Hexachlorobutadiene
-        this.wwt_nonilfenols_effl_to_wb = 0 //Nonylphenols
-        this.wwt_tetracloroetile_effl_to_wb = 0 //tetrachloroethene
-        this.wwt_tricloroetile_effl_to_wb = 0 //Trichloroethylene
+        this.wwt_tn_effl = 0
+        this.wwt_tp_effl = 0
+        this.wwt_cod_effl = 0
+        this.wwt_diclo_effl = 0 //1,2-Dichloroethane
+        this.wwt_cadmium_effl = 0 //Cadmium
+        this.wwt_hexaclorobenzene_effl = 0 //Hexachlorobenzene
+        this.wwt_mercury_effl = 0 //mercury
+        this.wwt_plomo_effl = 0 //lead
+        this.wwt_niquel_effl = 0 //nickel
+        this.wwt_chloro_effl = 0 //chloroalkanes
+        this.wwt_hexaclorobutadie_effl = 0 //Hexachlorobutadiene
+        this.wwt_nonilfenols_effl = 0 //Nonylphenols
+        this.wwt_tetracloroetile_effl = 0 //tetrachloroethene
+        this.wwt_tricloroetile_effl = 0 //Trichloroethylene
+        this.wwt_vol_disc = 0
+        this.wwt_ch4_efac_dis = 0
+        this.wwt_n2o_efac_dis = 0
 
-
-
-        for(let items of Object.values(Direct_discharge.info_inputs())){
-            for(let [clau, valor] of Object.entries(items)){
-                _this[clau] = valor.value
-            }
-        }
     }
 
     /*
@@ -226,494 +338,206 @@ export class Direct_discharge{
     */
     //total GHG emissions
     wwt_KPI_GHG(){
-        let sources=[
-            this.wwt_KPI_GHG_disc(),
-        ];
+        let elec = 0
+        let fuel = 0
+        let treatment = 0
+        let biog = 0
+        let slu = 0
+        let reuse = 0
+        let disc = this.wwt_KPI_GHG_disc().total
+        let total = disc
 
-        //gases (numbers)
-        let co2 = sources.map(s=>s.co2).sum();
-        let ch4 = sources.map(s=>s.ch4).sum();
-        let n2o = sources.map(s=>s.n2o).sum();
-
-        //total
-        let total = sources.map(s=>s.total).sum();
-        return {total,co2,ch4,n2o};
+        return {elec, fuel, treatment, biog, slu, reuse, disc, total}
     }
 
     //emissions from water discharged
     wwt_KPI_GHG_disc(){
         let co2   = 0;
-        let ch4   = this.wwt_bod_effl_to_wb*this.wwt_ch4_efac_dis*Cts.ct_ch4_eq.value;    //Equacio 6.2
-        let n2o   = this.wwt_tn_effl_to_wb *this.wwt_n2o_efac_dis*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;    //Equacio 6.12
+        let ch4   = this.wwt_cod_effl*this.wwt_ch4_efac_dis*Cts.ct_ch4_eq.value;    //Equacio 6.2
+        let n2o   = this.wwt_tn_effl *this.wwt_n2o_efac_dis*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;    //Equacio 6.12
         let total = co2+ch4+n2o;
-        return {total,co2,ch4,n2o};
-    }
-
-
-    //indirect emissions from electricity consumption
-    wwt_KPI_GHG_elec(){
-        let co2   = 0
-        let ch4   = 0
-        let n2o   = 0
-        let total = 0;
-        return {total,co2,ch4,n2o};
-    }
-
-    //emissions from fuel engines
-    wwt_KPI_GHG_fuel(){
-        let co2   = 0
-        let ch4   = 0
-        let n2o   = 0
-        let total = 0;
-        return {total,co2,ch4,n2o};
-    }
-
-    //emissions from biogas (fuel used in digester)
-    wwt_KPI_GHG_biog_dig(){
-        let co2   = 0
-        let ch4   = 0
-        let n2o   = 0
-        let total = 0;
-        return {total,co2,ch4,n2o};
-    }
-
-    //emissions from biogas
-    wwt_KPI_GHG_biog(){
-        let co2   = 0
-        let ch4   = 0
-        let n2o   = 0
-        let total = 0;
-        return {total,co2,ch4,n2o};
-    }
-
-    //emissions from biogas flared
-    wwt_KPI_GHG_biog_flared(){
-        let co2   = 0
-        let ch4   = 0
-        let n2o   = 0
-        let total = 0;
-        return {total,co2,ch4,n2o};
-    }
-
-    //biogas valorized emissions
-    wwt_KPI_GHG_biog_valorized(){
-        let co2   = 0
-        let ch4   = 0
-        let n2o   = 0
-        let total = 0;
-        return {total,co2,ch4,n2o};
-    }
-
-    //biogas leaked emissions
-    wwt_KPI_GHG_biog_leaked(){
-        let co2   = 0
-        let ch4   = 0
-        let n2o   = 0
-        let total = 0;
-        return {total,co2,ch4,n2o};
-    }
-
-    //ghg from sludge management
-    wwt_KPI_GHG_slu(){
-        let co2   = 0
-        let ch4   = 0
-        let n2o   = 0
-        let total = 0;
-        return {total,co2,ch4,n2o};
-    }
-
-    //emissions from sludge storage
-    wwt_KPI_GHG_sludge_storage(){
-        let co2   = 0
-        let ch4   = 0
-        let n2o   = 0
-        let total = 0;
-        return {total,co2,ch4,n2o};
-    }
-
-    //emissions from sludge composting
-    wwt_KPI_GHG_sludge_composting(){
-        let co2   = 0
-        let ch4   = 0
-        let n2o   = 0
-        let total = 0;
-        return {total,co2,ch4,n2o};
-    }
-
-    //emissions from sludge incineration
-    wwt_KPI_GHG_sludge_incineration(){
-        let co2   = 0
-        let ch4   = 0
-        let n2o   = 0
-        let total = 0;
-        return {total,co2,ch4,n2o};
-    }
-
-    //emissions from sludge applied to land
-    wwt_KPI_GHG_sludge_land_application(){
-        let co2   = 0
-        let ch4   = 0
-        let n2o   = 0
-        let total = 0;
-        return {total,co2,ch4,n2o};
-    }
-
-    //emissions from sludge used for landfilling
-    wwt_KPI_GHG_sludge_landfilling(){
-        let co2   = 0
-        let ch4   = 0
-        let n2o   = 0
-        let total = 0;
-        return {total,co2,ch4,n2o};
-    }
-
-    //emissions from sludge stockpiled
-    wwt_KPI_GHG_sludge_stockpilling(){
-        let co2   = 0
-        let ch4   = 0
-        let n2o   = 0
-        let total = 0;
-        return {total,co2,ch4,n2o};
-    }
-
-    //emissions from sludge transport
-    wwt_KPI_GHG_sludge_transport(){
-        let co2   = 0
-        let ch4   = 0
-        let n2o   = 0
-        let total = 0;
-        return {total,co2,ch4,n2o};
-    }
-
-    //emissions from water reuse transport
-    wwt_KPI_GHG_reus_trck(){
-        let co2   = 0
-        let ch4   = 0
-        let n2o   = 0
-        let total = 0;
-        return {total,co2,ch4,n2o};
-    }
-
-    //emissions from treatment
-    wwt_KPI_GHG_tre(){
-        let co2   = 0
-        let ch4   = 0
-        let n2o   = 0
-        let total = 0;
         return {total,co2,ch4,n2o};
     }
 
 };  //Direct discharge
 
 export class WWTP{
-    static info_inputs(){
-        return {
+    constructor(){
 
-            "Fuel engines" :{
-                //fuel engines
-                "wwt_fuel_typ" :{question:"Fuel type (engines)", value: 0, type: "option", items: Tables["Fuel type options"]}, //Option | type of fuel (see Tables)
-                "wwt_vol_fuel" :{question:"Volume of fuel consumed", value: 0, unit: "L/day"}, //L of fuel
-            },
+        this.location = null
+        this.wwt_treatment_type = 0
+        this.wwt_vol_trea = 0
+        this.wwt_vol_disc = 0
+        this.wwt_vol_reused = 0
+        this.wwt_vol_treated_external = 0   //Amount of water treated in another WWTP
+        this.wwt_vol_from_external = 0   //Amount of water FROM other WWTP
 
-            "Biogas produced from anaerobic digestion" : {
-                //biogas
-                "wwt_biog_pro": {
-                    question: "Biogas produced (volume)",
-                    value: 0,
-                    unit: "Nm3/day",
-                    estimation_type: "equation",
-                    description_tooltip: "Biogas produced during the assessment period by the wastewater treatment plant managed by the undertaking",
-                    estimation_equation: true,
+        this.wwt_cod_infl_ind = 0
+        this.wwt_cod_infl_wwtp = 0
+        this.wwt_cod_effl = 0
+        this.wwt_tn_infl_ind = 0
+        this.wwt_tn_infl_wwtp = 0
+        this.wwt_tn_effl = 0
+        this.wwt_tp_infl_ind = 0
+        this.wwt_tp_infl_wwtp = 0
+        this.wwt_tp_effl = 0
+        this.wwt_diclo_infl_ind = 0
+        this.wwt_diclo_infl_wwtp = 0
+        this.wwt_diclo_effl = 0
+        this.wwt_cadmium_infl_ind = 0
+        this.wwt_cadmium_infl_wwtp = 0
+        this.wwt_cadmium_effl = 0
+        this.wwt_hexaclorobenzene_infl_ind = 0
+        this.wwt_hexaclorobenzene_infl_wwtp = 0
+        this.wwt_hexaclorobenzene_effl = 0
+        this.wwt_mercury_infl_ind = 0
+        this.wwt_mercury_infl_wwtp = 0
+        this.wwt_mercury_effl = 0
+        this.wwt_plomo_infl_ind = 0
+        this.wwt_plomo_infl_wwtp = 0
+        this.wwt_plomo_effl = 0
+        this.wwt_niquel_infl_ind = 0
+        this.wwt_niquel_infl_wwtp = 0
+        this.wwt_niquel_effl = 0
+        this.wwt_chloro_infl_ind = 0
+        this.wwt_chloro_infl_wwtp = 0
+        this.wwt_chloro_effl = 0
+        this.wwt_hexaclorobutadie_infl_ind = 0
+        this.wwt_hexaclorobutadie_infl_wwtp = 0
+        this.wwt_hexaclorobutadie_effl = 0
+        this.wwt_nonilfenols_infl_ind = 0
+        this.wwt_nonilfenols_infl_wwtp = 0
+        this.wwt_nonilfenols_effl = 0
+        this.wwt_tetracloroetile_infl_ind = 0
+        this.wwt_tetracloroetile_infl_wwtp = 0
+        this.wwt_tetracloroetile_effl = 0
+        this.wwt_tricloroetile_infl_ind = 0
+        this.wwt_tricloroetile_infl_wwtp = 0
+        this.wwt_tricloroetile_effl = 0
 
-                }, //Nm3 | total biogas produced
-                "wwt_biog_fla": {
-                    question: "% of biogas produced that is flared",
-                    value: 98,
-                    unit: "%",
-                    estimation_type: "equation",
-                    estimation_equation: true,
+        //energy
+        this.wwt_nrg_cons = 0
+        this.wwt_conv_kwh = 0
 
-                },
-                "wwt_biog_val": {
-                    question: "Biogas valorised as heat and/or electricity (% volume)",
-                    value: 0,
-                    unit: "%",
-                    estimation_type: "equation",
-                    estimation_equation: true,
-                    description_tooltip: "Biogas valorized in the treatment plant to heat the digesters or the building and/or to run a Co-generator to generate heat and electricity"
-                }, //% of biogas produced that is used for heat
-                "wwt_biog_lkd": {
-                    question: "Biogas leaked to the atmosphere (% volume)",
-                    value: 2,
-                    unit: "%",
-                    estimation_type: "equation",
-                    estimation_equation: true,
+        //emission factors (treatment)
+        this.wwt_ch4_efac_tre = 0
+        this.wwt_n2o_efac_tre = 0
 
-                }, //% of biogas produced that is leaked
-                "wwt_biog_sold": {question: "Biogas sold (% volume)", value: 0, unit: "%", estimation_type: "equation",estimation_equation: true,},
-                "wwt_ch4_biog": {question: "Percentage of methane in the biogas (% volume)", value: 59, unit: "%"}, //% of CH4 in biogas (volume)
-                "wwt_dige_typ": {
-                    question: "Fuel type (digester)",
-                    value: 0,
-                    type: "option",
-                    items: Tables["Fuel type options"]
-                }, //Option | type of fuel for digester
-                "wwt_fuel_dig": {question: "Fuel consumed for the digester", value: 0, unit: "L/day"}, //L | volume of fuel used in the digester
-                //"wwt_nrg_biog_eff" :{question:"Energy efficiency for biogas valorization with respect to the theoretical maximum", value: 43},
-                //"wwt_nrg_biog" :{question:"Electrical energy produced from biogas valorization", value: 0},
-            },
-            //Treatment performance
-            /*
-            "wwt_trea_cap" :{question:"Treatment capacity", value: 0},
-            "wwt_tst_cmpl" :{question:"Number of water quality tests complying", value: 0},
-            "wwt_tst_cond" :{question:"Number of water quality tests conducted", value: 0},*/
+        //emission factors (discharge)
+        this.wwt_ch4_efac_dis = 0
+        this.wwt_n2o_efac_dis = 0
 
-            //Pumping efficiency
-            /*
-            "wwt_nrg_pump" :{question:"Energy consumed from the grid (pumping)", value: 0},
-            "wwt_vol_pump" :{question:"Volume of pumped wastewater", value: 0},
-            "wwt_pmp_head" :{question:"Pump head", value: 0},
-            "wwt_sta_head" :{question:"Static head", value: 0},
-            "wwt_coll_len" :{question:"Collector length", value: 0},*/
+        //fuel engines
+        this.wwt_vol_fuel = 0; //L of fuel
+        this.wwt_fuel_typ = 0; //Option | type of fuel (see Tables)
 
-            //Electromechanical efficiency of pump
-            /*"wwt_pump_flow" :{question:"Measured pump flow", value: 0},
-            "wwt_pmp_volt" :{question:"Measured pump voltage", value: 0},
-            "wwt_pmp_amps" :{question:"Measured pump current", value: 0},
-            "wwt_pmp_pf" :{question:"Power factor", value: 0},
-            "wwt_pmp_exff" :{question:"Expected electromechanical efficiency of new pump", value: 0},*/
-            //fuel used in water reuse trucks
-            "Fuel used in water reuse trucks": {
-                "wwt_reus_trck_typ": {
-                    question: "Fuel type (trucks)",
-                    value: 0,
-                    type: "option",
-                    items: Tables["Fuel type options"]
-                }, //Option | type of fuel
-                "wwt_reus_vol_trck": {question: "Volume of fuel consumed (trucks)", value: 0, unit: "L/day"}, //L | volume of fuel used
+        //biogas
+        this.wwt_biog_pro = 0;  //Nm3 | total biogas produced
+        this.wwt_biog_fla = 98; //% of biogas produced that is flared
+        this.wwt_biog_val = 0;  //% of biogas produced that is used for heat
+        this.wwt_biog_lkd = 2;  //% of biogas produced that is leaked
+        this.wwt_biog_sold = 0;
+        this.wwt_ch4_biog = 59; //% of CH4 in biogas (volume)
+        this.wwt_dige_typ = 0;  //Option | type of fuel for digester
+        this.wwt_fuel_dig = 0;  //L | volume of fuel used in the digester
 
-            },
-            //GHG emissions avoided from reusing water
-            /*
-            "wwt_vol_nonp" :{question:"Volume of reused effluent", value: 0},
-            "wwt_wr_N_rec" :{question:"Total Nitrogen recovered", value: 0},
-            "wwt_wr_P_rec" :{question:"Total Phosphorus recovered", value: 0},*/
+        //fuel used in water reuse trucks
+        this.wwt_reus_trck_typ = 0; //Option | type of fuel
+        this.wwt_reus_vol_trck = 0; //L | volume of fuel used
 
-            //sludge storage
+        //SLUDGE MANAGEMENT
+        this.wwt_mass_slu = 0; //kg | raw sludge removed from wwtp as dry mass
+        this.wwt_cod_slud = 0; //kg | BOD removed as sludge
 
-            "Sludge storage in WWTP" : {
-                "wwt_mass_slu_sto": {question: "Sludge stored (dry weight)", value: 0, unit: "kg", description_tooltip: "Amount of sludge that is stored prior to disposal (dry weight)"}, //kg of sludge stored
-                "wwt_time_slu_sto": {question: "Storage time", value: 0, unit: "days", description_tooltip: "Time interval the sludge is stored for before being sent to disposal"}, //days
-                "wwt_slu_sto_TVS": {
-                    question: "Total Volatile Solids (TVS) content of sludge stored (% of dry weight)",
-                    value: 0,
-                    unit: "%",
-                    estimation_type: "option",
-                    items: Tables["Type of sludge disposed"],
-                    estimation_based_on: null,
-                    estimation_factor: "TVS",
-                    description: "description"
-                }, //%
-                "wwt_slu_sto_f_CH4": {
-                    question: "CH4 potential factor",
-                    value: 0,
-                    unit: "%",
-                    estimation_type: "option",
-                    items: Tables["Type of sludge disposed"],
-                    estimation_based_on: null,
-                    estimation_factor: "f_ch4",
-                    description: "description"
-                }, //% for CH4 potential
-                "wwt_slu_sto_EF": {
-                    question: "Emission factor due to storage (estimate with storage time)",
-                    value: 0,
-                    unit: "%"
-                }, //%
-            },
-            //sludge composting
-            "Sludge composting in WWTP" : {
+        //sludge storage
+        this.wwt_mass_slu_sto  = 0; //kg of sludge stored
+        this.wwt_time_slu_sto  = 0; //days
+        this.wwt_slu_sto_TVS   = 0; //%
+        this.wwt_slu_sto_f_CH4 = 0; //% for CH4 potential
+        this.wwt_slu_sto_EF    = 0; //%
 
-                "wwt_mass_slu_comp": {question: "Sludge composted (dry weight)", value: 0, unit: "kg/L", description_tooltip: "Amount of sludge that is sent to composting (dry weight)"}, //kg of sludge composted
-                "wwt_slu_comp_emis_treated_or_piles_covered": {
-                    question: "Are composting emissions treated and/or piles are covered",
-                    value: 0,
-                    type: "option",
-                    items: Tables["Yes/No"]
-                }, //yes/no
-                "wwt_slu_comp_solids_content": {question: "Solids content of compost", value: 0, unit: "%"}, //%
-                "wwt_slu_comp_TVS": {
-                    question: "Total Volatile Solids (TVS) content of sludge composted (% of dry weight)",
-                    value: 0,
-                    unit: "%",
-                    estimation_type: "option",
-                    items: Tables["Type of sludge disposed"],
-                    estimation_based_on: null,
-                    estimation_factor: "TVS",
-                    description: "description"
-                }, //%
-                "wwt_slu_comp_N_cont": {
-                    question: "N content of sludge stored (% of dry weight)",
-                    value: 0,
-                    unit: "%",
-                    estimation_type: "option",
-                    items: Tables["Type of sludge disposed"],
-                    estimation_based_on: null,
-                    estimation_factor: "N_cont",
-                    description: "description"
-                }, //%
-                "wwt_slu_comp_low_CN_EF": {
-                    question: "N2O emission factor for low C:N ratio",
-                    value: 0.015,
-                    unit: "kgN2O-N/kgN",
-                    description_tooltip: "N2O emission factor for low C:N ratio (1.5% from Brown et al, 2008)"
-                }, //kgN2O-N/kgN
-                "wwt_slu_comp_uncovered_pile_EF": {
-                    question: "CH4 emission factor for uncovered pile (fractor of initial C in solids)",
-                    value: 0.025,
-                    unit: "kgCH4/kgC"
-                }, //kgCH4/kgC
-                "wwt_slu_comp_seqst_rate": {question: "CO2eq sequestration rate", value: 0.25, unit: "kgCO2eq/kgSludge", description_tooltip:"Estimated C02 equivalents sequestered per kg of sludge"}, //kgCO2eq/kgSludge
-            },
-            //sludge incineration
-            "Sludge incineration" : {
+        //sludge composting
+        this.wwt_mass_slu_comp                          = 0; //kg of sludge composted
+        this.wwt_slu_comp_emis_treated_or_piles_covered = 0; //yes/no
+        this.wwt_slu_comp_solids_content                = 0; //%
+        this.wwt_slu_comp_TVS                           = 0; //%
+        this.wwt_slu_comp_N_cont                        = 0; //%
+        this.wwt_slu_comp_low_CN_EF                     = 0.015; //kgN2O-N/kgN
+        this.wwt_slu_comp_uncovered_pile_EF             = 0.025; //kgCH4/kgC
+        this.wwt_slu_comp_seqst_rate                    = 0.25; //kgCO2eq/kgSludge
 
-                "wwt_mass_slu_inc": {question: "Sludge incinerated (dry weight)", value: 0, unit: "kg/day"}, //kg of sludge incinerated
-                "wwt_temp_inc": {
-                    question: "Average highest temperature of combustion achieved in a Fluidized Bed incinerator",
-                    value: 1023,
-                    unit: "K",
-                    description_tooltip:"Incineration temperature"
-                }, //K | temperature incineration
-                "wwt_slu_inc_N_cont": {
-                    question: "N content of sludge incinerated (% of dry weight)",
-                    value: 0,
-                    unit: "%",
-                    estimation_type: "option",
-                    items: Tables["Type of sludge disposed"],
-                    estimation_based_on: null,
-                    estimation_factor: "N_cont",
-                    description: "description"
-                }, //% of N
-                "wwt_slu_inc_SNCR": {
-                    question: "Is 'SNCR air emissions technology with urea' used?",
-                    value: 0,
-                    type: "option",
-                    items: Tables["Yes/No"]
-                }, //boolean
-            },
-            //sludge LA
-            "Sludge sent to dry application" : {
+        //sludge incineration
+        this.wwt_mass_slu_inc   = 0;    //kg of sludge incinerated
+        this.wwt_temp_inc       = 1023; //K | temperature incineration
+        this.wwt_slu_inc_N_cont = 0;    //% of N
+        this.wwt_slu_inc_SNCR   = 0;    //boolean
 
-                "wwt_mass_slu_app": {question: "Sludge sent to land application (dry weight)", value: 0, unit: "kg/day"}, //kg of sludge sent to LA
-                "wwt_slu_la_solids_content": {
-                    question: "Solids content of sludge sent to land application",
-                    value: 0,
-                    unit: "%"
-                }, //%
-                "wwt_slu_la_TVS": {
-                    question: "Total Volatile Solids (TVS) content of sludge sent to land application)",
-                    value: 0,
-                    unit: "%",
-                    estimation_type: "option",
-                    items: Tables["Type of sludge disposed"],
-                    estimation_based_on: null,
-                    estimation_factor: "TVS",
-                    description: "description"
-                }, //%
-                "wwt_slu_la_N_cont": {
-                    question: "N content of sludge sent to land application (% of dry weight)",
-                    value: 0,
-                    unit: "%",
-                    estimation_type: "option",
-                    items: Tables["Type of sludge disposed"],
-                    estimation_based_on: null,
-                    estimation_factor: "N_cont",
-                    description: "description"
-                }, //%
-                "wwt_slu_la_EF": {
-                    question: "Amount of Nitrogen converted to N2O",
-                    value: 0,
-                    unit: "kgN2O-N/gN",
-                    estimation_type: "option",
-                    items: Tables["Soil type"],
-                    estimation_based_on: null,
-                    estimation_factor: "f_la",
-                    description: "description"
-                }, //kgN2O-N/gN
-                //"wwt_slu_la_seqst_rate" :{question:"CO2eq sequestration rate", value: 0}, //kgCO2eq/kgSludge
-            },
-            //sludge LF
-            "Sludge landfilling" : {
-                "wwt_mass_slu_land": {question: "Sludge sent to landfilling (dry weight)", value: 0, unit: "kg/day"}, //kg of sludge sent to LF
-                "wwt_slu_lf_TVS": {
-                    question: "Total Volatile Solids (TVS) content of sludge sent to land application",
-                    value: 0,
-                    unit: "%",
-                    estimation_type: "option",
-                    items: Tables["Type of sludge disposed"],
-                    estimation_based_on: null,
-                    estimation_factor: "TVS",
-                    description: "description"
-                }, //%
-                "wwt_slu_lf_uncertainty": {question: "Uncertainty factor (UNFCCC/CCNUC, 2008)", value: 0.9, description_tooltip:"Model uncertainty factor (default value:0.9, UNFCCC/CCNUC, 2008)"}, //adimensional
-                "wwt_slu_lf_CH4_in_gas": {question: "CH4 in landfill gas", value: 50, unit: "%", description_tooltip:"CH4 in landfill gas (50% from Clean Development Mechanism, 2008)"}, //%
-                "wwt_slu_lf_DOCf": {
-                    question: "Decomposable organic fraction of raw wastewater solids",
-                    value: 80,
-                    unit: "%",
-                    description_tooltip:"Decomposable organic fraction of raw wastewater solids (80% from Brown et al., 2008 and Metcalf & Eddy, 2003)"
-                }, //%
-                "wwt_slu_lf_decomp_3yr": {question: "Percentage decomposed in first 3 years", value: 69.9, unit: "%", description_tooltip:"Percentage decomposed in first 3 years of the decomposable organic fraction of raw wastewater solids"}, //%
-                "wwt_slu_lf_MCF": {
-                    question: "Methane correction for anaerobic managed landfills (default=1)",
-                    value: 1,
-                    unit: "ratio",
-                    estimation_type: "option",
-                    items: Tables["Type of landfill"],
-                    estimation_based_on: null,
-                    estimation_factor: "MCF",
-                    description: "description",
-                    description_tooltip:"Methane correction for anaerobic managed landfills (default=1, UNFCCC/CCNUCC, 2008)"
+        //sludge LA
+        this.wwt_mass_slu_app          = 0; //kg of sludge sent to LA
+        this.wwt_slu_la_solids_content = 0; //%
+        this.wwt_slu_la_TVS            = 0; //%
+        this.wwt_slu_la_N_cont         = 0; //%
+        this.wwt_slu_la_EF             = 0; //gN2O-N/gN
 
-                }, //ratio
-                "wwt_slu_lf_N_cont": {
-                    question: "N content of sludge sent to land application (% of dry weight)",
-                    value: 0,
-                    estimation_type: "option",
-                    items: Tables["Type of sludge disposed"],
-                    estimation_based_on: null,
-                    estimation_factor: "N_cont",
-                    description: "description",
-                    unit: "%"
-                }, //N content
-                "wwt_slu_lf_low_CN_EF": {
-                    question: "N2O emission factor for low C:N ratio",
-                    value: 0.015,
-                    unit: "kgN2O-N/kgN",
-                    description_tooltip:"N2O emission factor for low C:N ratio (1.5% from Brown et al, 2008)"
-                } //kgN2O-N/kgN
-            },
-            //sludge
-            "Sludge stockpiling" : {
-                "wwt_mass_slu_stock": {question: "Sludge stockpiled (dry weight)", value: 0, unit: "kg/day"}, //kg of sludge stockpiled
-                "wwt_slu_sp_lifespan": {question: "Stockpile lifespan", value: 0, unit: "years", description_tooltip:"Expected timespan that the biosolid stockpile (BSP) will be emitting GHGs"}, //years
-            },
-            //sludge truck transport
-            "Sludge truck transportation to disposal site" : {
+        //sludge LF
+        this.wwt_mass_slu_land      = 0;    //kg of sludge sent to LF
+        this.wwt_slu_lf_TVS         = 0;    //%
+        this.wwt_slu_lf_uncertainty = 0.9;  //adimensional
+        this.wwt_slu_lf_CH4_in_gas  = 50;   //%
+        this.wwt_slu_lf_DOCf        = 80;   //%
+        this.wwt_slu_lf_decomp_3yr  = 69.9; //%
+        this.wwt_slu_lf_MCF         = 1;    //ratio
+        this.wwt_slu_lf_N_cont      = 0;    //% N content
+        this.wwt_slu_lf_low_CN_EF   = 0.015; //kgN2O-N/kgN
 
-                "wwt_trck_typ": {
-                    question: "Fuel type (trucks)",
-                    value: 0,
-                    type: "option",
-                    items: Tables["Fuel type options"]
-                }, //Option | fuel type
-                "wwt_vol_tslu": {question: "Volume of fuel consumed (trucks)", value: 0, unit: "L/day"}, //L | volume of fuel
-            }
-        }
+        //sludge SP
+        this.wwt_mass_slu_stock = 0;  //kg of sludge stockpiled
+        this.wwt_slu_sp_lifespan = 0; //years
+
+        //sludge truck transport
+        this.wwt_trck_typ = 0; //Option | fuel type
+        this.wwt_vol_tslu = 0; //L | volume of fuel
     }
 
-    get_inputs(){
-        return WWTP.info_inputs()
+    /*
+  GHG emissions (kgCO2eq)
+*/
+    //total GHG emissions
+    wwt_KPI_GHG(){
+
+        let elec = this.wwt_KPI_GHG_elec().total
+        let fuel = this.wwt_KPI_GHG_fuel().total
+        let treatment = this.wwt_KPI_GHG_tre().total
+        let biog = this.wwt_KPI_GHG_biog().total
+        let slu = this.wwt_KPI_GHG_slu().total
+        let reuse = this.wwt_KPI_GHG_reus_trck().total
+        let disc = this.wwt_KPI_GHG_disc().total
+
+        let obj = {elec, fuel, treatment, biog, slu, reuse, disc}
+        obj["total"] = Object.values(obj).sum()
+
+        return obj
+    }
+
+    //emissions from water discharged
+    wwt_KPI_GHG_disc(){
+        let co2   = 0;
+        let ch4   = this.wwt_cod_effl*this.wwt_vol_disc*this.wwt_ch4_efac_dis*Cts.ct_ch4_eq.value;    //Equacio 6.2
+        let n2o   = this.wwt_tn_effl *this.wwt_vol_disc*this.wwt_n2o_efac_dis*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;    //Equacio 6.12
+        let total = co2+ch4+n2o;
+        return {total,co2,ch4,n2o};
+    }
+
+    //emissions from treatment
+    wwt_KPI_GHG_tre(){
+        let cod_load = this.wwt_cod_infl_ind*this.wwt_vol_trea + this.wwt_vol_from_external*this.wwt_cod_infl_wwtp
+        let tn_load = this.wwt_tn_infl_ind*this.wwt_vol_trea + this.wwt_vol_from_external*this.wwt_tp_infl_wwtp
+
+        let co2   = 0;
+        let ch4   = (cod_load-this.wwt_cod_slud)*this.wwt_ch4_efac_tre*Cts.ct_ch4_eq.value;    //Eq. 6.4
+        let n2o   = tn_load*this.wwt_n2o_efac_tre*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;  //Eq. 6.11
+        let total = co2+ch4+n2o;
+        return {total,co2,ch4,n2o};
     }
 
     //indirect emissions from electricity consumption
@@ -1071,7 +895,7 @@ export class WWTP{
     //emissions from water reuse transport
     wwt_KPI_GHG_reus_trck(){
         let vol   = this.wwt_reus_vol_trck;
-        let fuel  = Tables.get_row('Fuel type',this.wwt_reus_trck_typ);
+        let fuel  = Tables.get_row('Fuel type', this.wwt_reus_trck_typ);
         let co2   = vol*fuel.FD*fuel.NCV/1000*fuel.EFCO2;
         let ch4   = vol*fuel.FD*fuel.NCV/1000*fuel.EFCH4.vehicles*Cts.ct_ch4_eq.value;
         let n2o   = vol*fuel.FD*fuel.NCV/1000*fuel.EFN2O.vehicles*Cts.ct_n2o_eq.value;
@@ -1095,999 +919,6 @@ export class WWTP{
     }
 };  //WWTP with sludge management
 
-export class Industrial_wwtp extends WWTP{
-
-    static info_inputs(){
-        let inputs = WWTP.info_inputs()
-        inputs["None"] = {
-
-            /*"wwt_serv_pop" :{question:"Serviced population", value: 0}*/
-
-            "wwt_treatment_type" :{question:"Type of wastewater treatment", value: 0, type: "option", items: Tables["WW treatment type"]}, //Option | type of treatment (see Tables)
-
-
-            "wwt_vol_trea": {question: "Volume of water treated in the WWTP every day", value: 0, unit: "m3/day"},
-            "wwt_vol_disc" :{question:"Volume of water discharged to water body every day", value: 0, unit: "m3/day"},
-
-            //"wwt_tot_nit": {question: "Total nitrogen in untreated wastewater", value: 0, unit: "kgTN/m3"},  //kgTN/m3 | Total nitrogen in untreated wastewater
-
-            "wwt_bod_effl_to_wb": {
-                question: "Concentration of COD in the WWTP effluent",
-                value: 0,
-                unit: "g/m3",
-                estimation_equation: true
-                //depends_on: "wwt_has_local_wwt_plant"
-            }, //kgCOD   Table 6.6B and 6.10C
-
-            //"wwt_P_infl": {question: "Influent P load", value: 0, unit: "kg"}, //kgP
-
-            "wwt_tn_effl_to_wb": {
-                question: "Concentration of Total Nitrogen in the WWTP effluent",
-                value: 0,
-                unit: "g/m3",
-                estimation_equation: true
-            },  //kgN   TAULA 6.10c
-
-            "wwt_tp_effl_to_wb": {
-                question: "Concentration of Total Phosphorus in the WWTP effluent",
-                value: 0,
-                unit: "g/m3",
-                estimation_equation: true
-            },  //kgN   TAULA 6.10c
-
-
-            //Priority pollutants
-            "wwt_diclo_effl_to_wb": {
-                question: "Concentration of 1,2-Dichloroethane in the WWTP effluent",
-                value: 0,
-                unit: "g/m3",
-                estimation_equation: true
-            },
-
-            "wwt_cadmium_effl_to_wb": {
-                question: "Concentration of cadmium in the WWTP effluent",
-                value: 0,
-                unit: "g/m3",
-                estimation_equation: true
-            },
-
-            "wwt_hexaclorobenzene_effl_to_wb": {
-                question: "Concentration of hexachlorobenzene in the WWTP effluent",
-                value: 0,
-                unit: "g/m3",
-                estimation_equation: true
-            },
-
-            "wwt_mercury_effl_to_wb": {
-                question: "Concentration of mercury in the WWTP effluent",
-                value: 0,
-                unit: "g/m3",
-                estimation_equation: true
-            },
-
-            "wwt_plomo_effl_to_wb": {
-                question: "Concentration of lead in the WWTP effluent",
-                value: 0,
-                unit: "g/m3",
-                estimation_equation: true
-            },
-
-            "wwt_niquel_effl_to_wb": {
-                question: "Concentration of nickel in the WWTP effluent",
-                value: 0,
-                unit: "g/m3",
-                estimation_equation: true
-            },
-
-            "wwt_chloro_effl_to_wb": {
-                question: "Concentration of chloroalkanes in the WWTP effluent",
-                value: 0,
-                unit: "g/m3",
-                estimation_equation: true
-            },
-
-            "wwt_hexaclorobutadie_effl_to_wb": {
-                question: "Concentration of hexachlorobutadiene in the WWTP effluent",
-                value: 0,
-                unit: "g/m3",
-                estimation_equation: true
-            },
-
-            "wwt_nonilfenols_effl_to_wb": {
-                question: "Concentration of nonylphenols in the WWTP effluent",
-                value: 0,
-                unit: "g/m3",
-                estimation_equation: true
-            },
-
-            "wwt_tetracloroetile_effl_to_wb": {
-                question: "Concentration of tetrachloroethene in the WWTP effluent",
-                value: 0,
-                unit: "g/m3",
-                estimation_equation: true
-            },
-
-            "wwt_tricloroetile_effl_to_wb": {
-                question: "Concentration of trichloroethylene in the WWTP effluent",
-                value: 0,
-                unit: "g/m3",
-                estimation_equation: true
-            },
-
-
-            //energy
-            "wwt_nrg_cons": {question: "Energy consumed from the grid", value: 0, unit: "kWh", description_tooltip: "Total energy consumed during the assessment period by all wastewater treatment plants managed by the undertaking"},  //kWh | energy consumed from the grid
-            "wwt_conv_kwh": {question: "Emission factor for grid electricity", estimation_equation: true, value: 0, unit: "kgCO2eq/kWh", description_tooltip: "Emission factor for grid electricity (indirect emissions)"},  //kgCO2eq/kWh | conversion factor
-
-            //SLUDGE MANAGEMENT
-            "wwt_mass_slu": {
-                question: "Sludge removed from wastewater treatment (dry weight) every day",
-                value: 0,
-                unit: "kg/day",
-                description_tooltip: "Amount of raw sludge removed from wastewater treatment as dry mass every day"
-            },  //kg | raw sludge removed from wwtp as dry mass
-            "wwt_bod_slud": {
-                question: "COD removed as sludge every day",
-                value: 0,
-                unit: "kg/day",
-                description_tooltip: "COD (organic component) removed from wastewater (in the form of sludge) in aerobic treatment plant",
-                estimation_type: "option",
-                items: Tables["type_of_treatment_KREM"],
-                estimation_based_on: "wwt_mass_slu",
-                estimation_factor: "K_rem",
-            },  //kg | COD removed as sludge    //Taula 6.6A
-
-            //emission factors (treatment)
-            "wwt_ch4_efac_tre": {
-                question: "CH4 emission factor (treatment)",
-                value: 0,
-                unit: "kgCH4/kgCOD",
-                estimation_type: "option",
-                items: Tables["type_of_treatment"],
-                estimation_based_on: null,
-                estimation_factor: "ch4_efac",
-                description: "description",
-                description_tooltip: "Methane emission factor of selected biological wastewater aerobic treatment processes"
-
-            },  //kgCH4/kgCOD  S'obté de la taula 6.3
-            "wwt_n2o_efac_tre": {
-                question: "N2O emission factor (treatment)",
-                value: 0,
-                unit: "kgN2O-N/kgN",
-                estimation_type: "option",
-                items: Tables["N2O EF plants (Table 6.8A)"],
-                estimation_based_on: null,
-                estimation_factor: "n2o_efac",
-                description: "description"
-            },  //kgN2O-N/kgN     Taula 6.8A
-
-            //emission factors (discharge)
-            "wwt_ch4_efac_dis": {
-                question: "CH4 emission factor (discharge)",
-                value: 0,
-                unit: "kgCH4/kgCOD",
-                estimation_type: "option",
-                items: Tables["type_of_water_body"],
-                estimation_based_on: null,
-                estimation_factor: "ch4_efac",
-                description: "description"
-            },  //kgCH4/kgCOD   Table 6.8
-            "wwt_n2o_efac_dis": {
-                question: "N2O emission factor (discharge)",
-                value: 0,
-                unit: "kgN2O-N/kgN",
-                estimation_type: "option",
-                items: Tables["N2O EF effluent (Table 6.8A)"],
-                estimation_based_on: null,
-                estimation_factor: "n2o_efac",
-                description: "description"
-            },  //kgN2O-N/kgN  //tAULA 6.8A
-        }
-        return inputs
-    }
-
-    get_inputs(){
-        return Industrial_wwtp.info_inputs()
-    }
-
-    constructor(){
-        super();
-        let _this = this
-        this.location = null
-        this.wwt_bod_infl = 0
-        this.wwt_tn_infl = 0
-        this.wwt_tp_infl = 0
-        this.wwt_diclo_infl = 0 //1,2-Dichloroethane
-        this.wwt_cadmium_infl = 0 //Cadmium
-        this.wwt_hexaclorobenzene_infl = 0 //Hexachlorobenzene
-        this.wwt_mercury_infl = 0 //mercury
-        this.wwt_plomo_infl = 0 //lead
-        this.wwt_niquel_infl = 0 //nickel
-        this.wwt_chloro_infl = 0 //chloroalkanes
-        this.wwt_hexaclorobutadie_infl = 0 //Hexachlorobutadiene
-        this.wwt_nonilfenols_infl = 0 //Nonylphenols
-        this.wwt_tetracloroetile_infl = 0 //tetrachloroethene
-        this.wwt_tricloroetile_infl = 0 //Trichloroethylene
-
-        for(let items of Object.values(Industrial_wwtp.info_inputs())){
-            for(let [clau, valor] of Object.entries(items)){
-                _this[clau] = valor.value
-            }
-        }
-    }
-
-    //Estimations
-    static get_estimations(){
-        return {
-            wwt_biog_pro(substage){ //estimation for biogas produced
-                let wwt_mass_slu    = substage.wwt_mass_slu;  //kg  | mass of combined sludge to digestion
-                let VS_to_digestion = wwt_mass_slu    * 0.80; //kg  | VS to digestion: 80% of sludge mass
-                let VS_destroyed    = VS_to_digestion * 0.60; //kg  | VS destroyed: 60% of VS
-                let biogas_volume   = VS_destroyed    * 0.80; //Nm3 | biogas produced (volume)
-                return biogas_volume;
-            },
-            //wwt
-            wwt_biog_fla(substage){
-                return 100-substage.wwt_biog_val-substage.wwt_biog_lkd-substage.wwt_biog_sold;
-            },
-            wwt_biog_val(substage){
-                return 100-substage.wwt_biog_fla-substage.wwt_biog_lkd-substage.wwt_biog_sold;
-            },
-            wwt_biog_lkd(substage){
-                return 100-substage.wwt_biog_val-substage.wwt_biog_fla-substage.wwt_biog_sold;
-            },
-            wwt_biog_sold(substage){
-                return 100-substage.wwt_biog_val-substage.wwt_biog_fla-substage.wwt_biog_lkd;
-            },
-            wwt_bod_effl_to_wb(substage){
-                return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type].bod_effl*substage.wwt_bod_infl
-            },
-            wwt_tn_effl_to_wb(substage){
-                return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type].N_effl*substage.wwt_tn_infl
-            },
-            wwt_tp_effl_to_wb(substage){
-                return null
-            },
-            //Priority pollutants
-            wwt_diclo_effl_to_wb(substage) {
-                return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type].diclo_effl*substage.wwt_diclo_infl
-            },
-            wwt_cadmium_effl_to_wb(substage) {
-                return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type].cadmium_effl*substage.wwt_cadmium_infl
-            },
-            wwt_hexaclorobenzene_effl_to_wb(substage) {
-                return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type].hexaclorobenzene_effl*substage.wwt_hexaclorobenzene_infl
-            },
-            wwt_mercury_effl_to_wb(substage) {
-                return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type].mercury_effl*substage.wwt_mercury_infl
-            },
-            wwt_plomo_effl_to_wb(substage) {
-                return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type].plomo_effl*substage.wwt_plomo_infl
-            },
-            wwt_niquel_effl_to_wb(substage) {
-                return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type].niquel_effl*substage.wwt_niquel_infl
-            },
-            wwt_chloro_effl_to_wb(substage) {
-                return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type].chloro_effl*substage.wwt_chloro_infl
-            },
-            wwt_hexaclorobutadie_effl_to_wb(substage) {
-                return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type].hexaclorobutadie_effl*substage.wwt_hexaclorobutadie_infl
-            },
-            wwt_nonilfenols_effl_to_wb(substage) {
-                return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type].nonilfenols_effl*substage.wwt_nonilfenols_infl
-            },
-            wwt_tetracloroetile_effl_to_wb(substage) {
-                return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type].tetracloroetile_effl*substage.wwt_tetracloroetile_infl
-            },
-            wwt_tricloroetile_effl_to_wb(substage) {
-                return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type].tricloroetile_effl*substage.wwt_tricloroetile_infl
-            },
-            wwt_conv_kwh(substage) {
-                let location = substage.location
-                let lat = location.lat
-                let lng = location.lng
-                let code = utils.get_country_code_from_coordinates(lat, lng)
-                if(code == null) return null
-                return Countries[code].conv_kwh_co2
-            }
-        }
-    }
-
-    /*
-      GHG emissions (kgCO2eq)
-    */
-    //total GHG emissions
-    wwt_KPI_GHG(){
-        let sources=[
-            this.wwt_KPI_GHG_elec(),
-            this.wwt_KPI_GHG_fuel(),
-            this.wwt_KPI_GHG_tre(),
-            this.wwt_KPI_GHG_biog(),
-            this.wwt_KPI_GHG_slu(),
-            this.wwt_KPI_GHG_reus_trck(),
-            this.wwt_KPI_GHG_disc(),
-        ];
-
-        //gases (numbers)
-        let co2 = sources.map(s=>s.co2).sum();
-        let ch4 = sources.map(s=>s.ch4).sum();
-        let n2o = sources.map(s=>s.n2o).sum();
-
-        //total
-        let total = sources.map(s=>s.total).sum();
-        return {total,co2,ch4,n2o};
-    }
-
-    //emissions from treatment
-    wwt_KPI_GHG_tre(){
-        let co2   = 0;
-        let ch4   = (this.wwt_bod_infl*this.wwt_vol_trea-this.wwt_bod_slud)*this.wwt_ch4_efac_tre*Cts.ct_ch4_eq.value;    //Eq. 6.4
-        let n2o   = this.wwt_tn_infl*this.wwt_vol_trea*this.wwt_n2o_efac_tre*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;  //Eq. 6.11
-        let total = co2+ch4+n2o;
-        return {total,co2,ch4,n2o};
-    }
-
-    //emissions from water discharged
-    wwt_KPI_GHG_disc(){
-        let co2   = 0;
-        let ch4   = this.wwt_bod_effl_to_wb*this.wwt_vol_disc*this.wwt_ch4_efac_dis*Cts.ct_ch4_eq.value;    //Equacio 6.2
-        let n2o   = this.wwt_tn_effl_to_wb *this.wwt_vol_disc*this.wwt_n2o_efac_dis*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;    //Equacio 6.12
-        let total = co2+ch4+n2o;
-        return {total,co2,ch4,n2o};
-    }
-
-};  //Industrial WWTP
-
-export class Industrial_wwtp_onsite extends Industrial_wwtp{
-
-    static info_inputs(){
-        let inputs = Industrial_wwtp.info_inputs()
-        inputs["None"]["wwt_vol_reused"] = {question: "Volume of water reused/recycled on the WWTP every day", value: 0, unit: "m3/day"}
-        return inputs
-    }
-
-    get_inputs(){
-        return Industrial_wwtp_onsite.info_inputs()
-    }
-
-    constructor(){
-        super();
-        let _this = this
-
-        for(let items of Object.values(Industrial_wwtp_onsite.info_inputs())){
-            for(let [clau, valor] of Object.entries(items)){
-                _this[clau] = valor.value
-            }
-        }
-    }
-
-}; //Industrial onsite WWTP
-
-export class Industrial_wwtp_onsite_external_domestic extends Industrial_wwtp_onsite{  //Industrial onsite WWTP with domestic off-site WWTP
-
-    static info_inputs(){
-        let inputs = Industrial_wwtp_onsite.info_inputs()
-        inputs["None"]["wwt_vol_treated_external"] = {question: "Volume of water from the WWTP also treated in an off-site WWTP every day", value: 0, unit: "m3/day"}
-        //inputs["None"]["wwt_cod_effl_treated_external"] = {question: "Effluent BOD load leaving the WWTP to external WWTP ", value: 0, unit: "kg"}
-        //inputs["None"]["wwt_tn_effl_treated_external"] = {question: "Effluent Total Nitrogen load leaving the WWTP to external WWTP ", value: 0, unit: "kg"}
-        return inputs
-    }
-
-
-    get_inputs(){
-        return Industrial_wwtp_onsite_external_domestic.info_inputs()
-    }
-
-
-    constructor(){
-        super();
-        let _this = this
-
-        for(let items of Object.values(Industrial_wwtp_onsite_external_domestic.info_inputs())){
-            for(let [clau, valor] of Object.entries(items)){
-                _this[clau] = valor.value
-            }
-        }
-    }
-
-}; //Industrial onsite WWTP with domestic off-site WWTP
-
-export class Industrial_wwtp_onsite_external_industrial extends Industrial_wwtp_onsite{
-
-    static info_inputs(){
-        let inputs = Industrial_wwtp_onsite.info_inputs()
-        inputs["None"]["wwt_vol_treated_external"] = {question: "Volume of water from the WWTP treated in an off-site WWTP every day", value: 0, unit: "m3/day"}
-        //inputs["None"]["wwt_cod_effl_treated_external"] = {question: "Effluent COD load leaving the WWTP to external WWTP ", value: 0, unit: "kg"}
-        //inputs["None"]["wwt_tn_effl_treated_external"] = {question: "Effluent Total Nitrogen load leaving the WWTP to external WWTP ", value: 0, unit: "kg"}
-        return inputs
-    }
-
-    get_inputs(){
-        return Industrial_wwtp_onsite_external_industrial.info_inputs()
-    }
-
-
-    constructor(){
-        super();
-        let _this = this
-
-        for(let items of Object.values(Industrial_wwtp_onsite_external_industrial.info_inputs())){
-            for(let [clau, valor] of Object.entries(items)){
-                _this[clau] = valor.value
-            }
-        }
-    }
-
-}; //Industrial onsite WWTP with industrial off-site WWTP
-
-export class Industrial_wwtp_offsite extends Industrial_wwtp{
-
-    static info_inputs(){
-        let inputs = Industrial_wwtp.info_inputs()
-        return inputs
-    }
-
-    get_inputs(){
-        return Industrial_wwtp_offsite.info_inputs()
-    }
-
-    constructor(){
-        super();
-        let _this = this
-
-        for(let items of Object.values(Industrial_wwtp_offsite.info_inputs())){
-            for(let [clau, valor] of Object.entries(items)){
-                _this[clau] = valor.value
-            }
-        }
-
-        //Water received from local WWTP
-        this.vol_infl_wwtp = 0
-        this.bod_infl_wwtp = 0
-        this.tn_infl_wwtp = 0
-        this.tp_infl_wwtp = 0
-        this.diclo_infl_wwtp = 0 //1,2-Dichloroethane
-        this.cadmium_infl_wwtp = 0 //Cadmium
-        this.hexaclorobenzene_infl_wwtp = 0 //Hexachlorobenzene
-        this.mercury_infl_wwtp = 0 //mercury
-        this.plomo_infl_wwtp = 0 //lead
-        this.niquel_infl_wwtp = 0 //nickel
-        this.chloro_infl_wwtp = 0 //chloroalkanes
-        this.hexaclorobutadie_infl_wwtp = 0 //Hexachlorobutadiene
-        this.nonilfenols_infl_wwtp = 0 //Nonylphenols
-        this.tetracloroetile_infl_wwtp = 0 //tetrachloroethene
-        this.tricloroetile_infl_wwtp = 0 //Trichloroethylene
-
-    }
-
-    static get_estimations(){
-        return {
-            wwt_biog_pro(substage){ //estimation for biogas produced
-                let wwt_mass_slu    = substage.wwt_mass_slu;  //kg  | mass of combined sludge to digestion
-                let VS_to_digestion = wwt_mass_slu    * 0.80; //kg  | VS to digestion: 80% of sludge mass
-                let VS_destroyed    = VS_to_digestion * 0.60; //kg  | VS destroyed: 60% of VS
-                let biogas_volume   = VS_destroyed    * 0.80; //Nm3 | biogas produced (volume)
-                return biogas_volume;
-            },
-            //wwt
-            wwt_biog_fla(substage){
-                return 100-substage.wwt_biog_val-substage.wwt_biog_lkd-substage.wwt_biog_sold;
-            },
-            wwt_biog_val(substage){
-                return 100-substage.wwt_biog_fla-substage.wwt_biog_lkd-substage.wwt_biog_sold;
-            },
-            wwt_biog_lkd(substage){
-                return 100-substage.wwt_biog_val-substage.wwt_biog_fla-substage.wwt_biog_sold;
-            },
-            wwt_biog_sold(substage){
-                return 100-substage.wwt_biog_val-substage.wwt_biog_fla-substage.wwt_biog_lkd;
-            },
-            wwt_concentration_effl_to_wb(substage, influent_wwtp, influent_industry, table_effluent){
-                let vol_treated_from_wwtp = Number(substage.vol_infl_wwtp)
-                let concentration_from_wwtp = Number(substage[influent_wwtp])
-                let vol_treated_from_ind = Number(substage.wwt_vol_trea)
-                let concentration_from_ind = Number(substage[influent_industry])
-                let concentration_effluent = (vol_treated_from_wwtp*concentration_from_wwtp + vol_treated_from_ind*concentration_from_ind) / (vol_treated_from_wwtp+vol_treated_from_ind)
-
-                if(isNaN(concentration_effluent)) {
-                    return null
-                }
-                else return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type][table_effluent]*concentration_effluent
-            },
-            wwt_bod_effl_to_wb(substage){
-                return this.wwt_concentration_effl_to_wb(substage, "bod_infl_wwtp", "wwt_bod_infl", "bod_effl")
-            },
-
-            wwt_tn_effl_to_wb(substage){
-                return this.wwt_concentration_effl_to_wb(substage, "tn_infl_wwtp", "wwt_tn_infl", "N_effl")
-            },
-            wwt_tp_effl_to_wb(substage){
-                return null
-            },
-            wwt_diclo_effl_to_wb(substage){
-                return this.wwt_concentration_effl_to_wb(substage, "diclo_infl_wwtp", "wwt_diclo_infl", "diclo_effl")
-            },
-
-            wwt_cadmium_effl_to_wb(substage){
-                return this.wwt_concentration_effl_to_wb(substage, "cadmium_infl_wwtp", "wwt_cadmium_infl", "cadmium_effl")
-            },
-
-            wwt_hexaclorobenzene_effl_to_wb(substage){
-                return this.wwt_concentration_effl_to_wb(substage, "hexaclorobenzene_infl_wwtp", "wwt_hexaclorobenzene_infl", "hexaclorobenzene_effl")
-            },
-
-            wwt_mercury_effl_to_wb(substage){
-                return this.wwt_concentration_effl_to_wb(substage, "mercury_infl_wwtp", "wwt_mercury_infl", "mercury_effl")
-            },
-
-            wwt_plomo_effl_to_wb(substage){
-                return this.wwt_concentration_effl_to_wb(substage, "plomo_infl_wwtp", "wwt_plomo_infl", "plomo_effl")
-            },
-
-            wwt_niquel_effl_to_wb(substage){
-                return this.wwt_concentration_effl_to_wb(substage, "niquel_infl_wwtp", "wwt_niquel_infl", "niquel_effl")
-            },
-
-            wwt_chloro_effl_to_wb(substage){
-                return this.wwt_concentration_effl_to_wb(substage, "chloro_infl_wwtp", "wwt_chloro_infl", "chloro_effl")
-            },
-
-            wwt_hexaclorobutadie_effl_to_wb(substage){
-                return this.wwt_concentration_effl_to_wb(substage, "hexaclorobutadie_infl_wwtp", "wwt_hexaclorobutadie_infl", "hexaclorobutadie_effl")
-            },
-
-            wwt_nonilfenols_effl_to_wb(substage){
-                return this.wwt_concentration_effl_to_wb(substage, "nonilfenols_infl_wwtp", "wwt_nonilfenols_infl", "nonilfenols_effl")
-            },
-
-            wwt_tetracloroetile_effl_to_wb(substage){
-                return this.wwt_concentration_effl_to_wb(substage, "tetracloroetile_infl_wwtp", "wwt_tetracloroetile_infl", "tetracloroetile_effl")
-            },
-
-            wwt_tricloroetile_effl_to_wb(substage){
-                return this.wwt_concentration_effl_to_wb(substage, "tricloroetile_infl_wwtp", "wwt_tricloroetile_infl", "tricloroetile_effl")
-            },
-            wwt_conv_kwh(substage) {
-                let location = substage.location
-                let lat = location.lat
-                let lng = location.lng
-                let code = utils.get_country_code_from_coordinates(lat, lng)
-                if(code == null) return null
-                return Countries[code].conv_kwh_co2
-            }
-
-
-        }
-    }
-
-
-    get_load_influent(influent_wwtp, influent_industry){
-        let vol_treated_from_wwtp = Number(this.vol_infl_wwtp)
-        let concentration_from_wwtp = Number(this[influent_wwtp])
-        let vol_treated_from_ind = Number(this.wwt_vol_trea)
-        let concentration_from_ind = Number(this[influent_industry])
-        return vol_treated_from_wwtp*concentration_from_wwtp + vol_treated_from_ind*concentration_from_ind
-    }
-
-    bod_load_infl(){
-        return this.get_load_influent("bod_infl_wwtp", "wwt_bod_infl")
-    }
-    tn_load_infl(){
-        return this.get_load_influent("tn_infl_wwtp", "wwt_tn_infl")
-    }
-
-    //emissions from treatment
-    wwt_KPI_GHG_tre(){
-
-        let co2   = 0;
-        let ch4   = (this.bod_load_infl()-this.wwt_bod_slud)*this.wwt_ch4_efac_tre*Cts.ct_ch4_eq.value;    //Eq. 6.4
-        let n2o   = (this.tn_load_infl())*this.wwt_n2o_efac_tre*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;  //Eq. 6.11
-        let total = co2+ch4+n2o;
-        return {total,co2,ch4,n2o};
-    }
-}; //Industrial offsite WWTP
-
-export class Domestic_wwtp extends WWTP{
-
-    static info_inputs(){
-        let inputs = WWTP.info_inputs()
-        inputs["None"] = {
-
-            /*"wwt_serv_pop" :{question:"Serviced population", value: 0}*/
-
-            "wwt_treatment_type" :{question:"Type of wastewater treatment", value: 0, type: "option", items: Tables["WW treatment type"]}, //Option | type of treatment (see Tables)
-
-            "wwt_vol_trea": {question: "Volume of wastewater discharged from the industry treated in the WWTP every day", value: 0, unit: "m3/day"},
-            "wwt_vol_disc" :{question:"Volume of discharged effluent to water body every day", value: 0, unit: "m3/day"},
-
-            //"wwt_tot_nit": {question: "Total nitrogen in untreated wastewater", value: 0, unit: "kgTN/m3"},  //kgTN/m3 | Total nitrogen in untreated wastewater
-
-            "wwt_bod_effl_to_wb": {
-                question: "Concentration of BOD in the WWTP effluent",
-                value: 0,
-                unit: "g/m3",
-                estimation_equation: true
-            }, //kgBOD   Table 6.6B and 6.10C
-
-            //"wwt_P_infl": {question: "Influent P load", value: 0, unit: "kg"}, //kgP
-
-            "wwt_tn_effl_to_wb": {
-                question: "Concentration of Total Nitrogen in the WWTP effluent",
-                value: 0,
-                unit: "g/m3",
-                estimation_equation: true
-
-            },  //kgN   TAULA 6.10c
-
-            "wwt_tp_effl_to_wb": {
-                question: "Concentration of Total Phosphorus in the WWTP effluent",
-                value: 0,
-                unit: "g/m3",
-                estimation_equation: true
-
-            },
-            //Priority pollutants
-            "wwt_diclo_effl_to_wb": {
-                question: "Concentration of 1,2-Dichloroethane in the WWTP effluent",
-                value: 0,
-                unit: "g/m3",
-                estimation_equation: true
-            },
-
-            "wwt_cadmium_effl_to_wb": {
-                question: "Concentration of cadmium in the WWTP effluent",
-                value: 0,
-                unit: "g/m3",
-                estimation_equation: true
-            },
-
-            "wwt_hexaclorobenzene_effl_to_wb": {
-                question: "Concentration of hexachlorobenzene in the WWTP effluent",
-                value: 0,
-                unit: "g/m3",
-                estimation_equation: true
-            },
-
-            "wwt_mercury_effl_to_wb": {
-                question: "Concentration of mercury in the WWTP effluent",
-                value: 0,
-                unit: "g/m3",
-                estimation_equation: true
-            },
-
-            "wwt_plomo_effl_to_wb": {
-                question: "Concentration of lead in the WWTP effluent",
-                value: 0,
-                unit: "g/m3",
-                estimation_equation: true
-            },
-
-            "wwt_niquel_effl_to_wb": {
-                question: "Concentration of nickel in the WWTP effluent",
-                value: 0,
-                unit: "g/m3",
-                estimation_equation: true
-            },
-
-            "wwt_chloro_effl_to_wb": {
-                question: "Concentration of chloroalkanes in the WWTP effluent",
-                value: 0,
-                unit: "g/m3",
-                estimation_equation: true
-            },
-
-            "wwt_hexaclorobutadie_effl_to_wb": {
-                question: "Concentration of hexachlorobutadiene in the WWTP effluent",
-                value: 0,
-                unit: "g/m3",
-                estimation_equation: true
-            },
-
-            "wwt_nonilfenols_effl_to_wb": {
-                question: "Concentration of nonylphenols in the WWTP effluent",
-                value: 0,
-                unit: "g/m3",
-                estimation_equation: true
-            },
-
-            "wwt_tetracloroetile_effl_to_wb": {
-                question: "Concentration of tetrachloroethene in the WWTP effluent",
-                value: 0,
-                unit: "g/m3",
-                estimation_equation: true
-            },
-
-            "wwt_tricloroetile_effl_to_wb": {
-                question: "Concentration of trichloroethylene in the WWTP effluent",
-                value: 0,
-                unit: "g/m3",
-                estimation_equation: true
-            },
-
-
-            //energy
-            "wwt_nrg_cons": {question: "Energy consumed from the grid", value: 0, unit: "kWh", description_tooltip: "Total energy consumed during the assessment period by all wastewater treatment plants managed by the undertaking"},  //kWh | energy consumed from the grid
-            "wwt_conv_kwh": {question: "Emission factor for grid electricity", estimation_equation: true, value: 0, unit: "kgCO2eq/kWh", description_tooltip: "Emission factor for grid electricity (indirect emissions)"},  //kgCO2eq/kWh | conversion factor
-
-            //SLUDGE MANAGEMENT
-            "wwt_mass_slu": {
-                question: "Sludge removed from wastewater treatment (dry weight)",
-                value: 0,
-                unit: "kg",
-                description_tooltip: "Amount of raw sludge removed from wastewater treatment as dry mass during the assessment period"
-            },  //kg | raw sludge removed from wwtp as dry mass
-            "wwt_bod_slud": {
-                question: "BOD removed as sludge every day",
-                value: 0,
-                unit: "kg/day",
-                description_tooltip: "BOD (organic component) removed from wastewater (in the form of sludge) in aerobic treatment plant",
-                estimation_type: "option",
-                items: Tables["type_of_treatment_KREM"],
-                estimation_based_on: "wwt_mass_slu",
-                estimation_factor: "K_rem_bod",
-
-            },  //kg | BOD removed as sludge    //Taula 6.6A
-
-            //emission factors (treatment)
-            "wwt_ch4_efac_tre": {
-                question: "CH4 emission factor (treatment)",
-                value: 0,
-                unit: "kgCH4/kgBOD",
-                estimation_type: "option",
-                items: Tables["type_of_treatment"],
-                estimation_based_on: null,
-                estimation_factor: "ch4_efac_bod",
-                description: "description",
-                description_tooltip: "Methane emission factor of selected biological wastewater aerobic treatment processes"
-
-            },  //kgCH4/kgCOD  S'obté de la taula 6.3
-            "wwt_n2o_efac_tre": {
-                question: "N2O emission factor (treatment)",
-                value: 0,
-                unit: "kgN2O-N/kgN",
-                estimation_type: "option",
-                items: Tables["N2O EF plants (Table 6.8A)"],
-                estimation_based_on: null,
-                estimation_factor: "n2o_efac",
-                description: "description"
-            },  //kgN2O-N/kgN     Taula 6.8A
-
-            //emission factors (discharge)
-            "wwt_ch4_efac_dis": {
-                question: "CH4 emission factor (discharge)",
-                value: 0,
-                unit: "kgCH4/kgBOD",
-                estimation_type: "option",
-                items: Tables["type_of_water_body"],
-                estimation_based_on: null,
-                estimation_factor: "ch4_efac_bod",
-                description: "description"
-            },  //kgCH4/kgBOD   Table 6.8
-            "wwt_n2o_efac_dis": {
-                question: "N2O emission factor (discharge)",
-                value: 0,
-                unit: "kgN2O-N/kgN",
-                estimation_type: "option",
-                items: Tables["N2O EF effluent (Table 6.8A)"],
-                estimation_based_on: null,
-                estimation_factor: "n2o_efac",
-                description: "description"
-            },  //kgN2O-N/kgN  //tAULA 6.8A
-        }
-        return inputs
-    }
-
-    get_inputs(){
-        return Domestic_wwtp.info_inputs()
-    }
-
-    constructor(){
-        super();
-        let _this = this
-
-        for(let items of Object.values(Domestic_wwtp.info_inputs())){
-            for(let [clau, valor] of Object.entries(items)){
-                _this[clau] = valor.value
-            }
-        }
-
-        //Water received from local WWTP
-        this.location = null
-        this.vol_infl_wwtp = 0
-        this.bod_infl_wwtp = 0
-        this.tn_infl_wwtp = 0
-        this.tp_infl_wwtp = 0
-        this.diclo_infl_wwtp = 0 //1,2-Dichloroethane
-        this.cadmium_infl_wwtp = 0 //Cadmium
-        this.hexaclorobenzene_infl_wwtp = 0 //Hexachlorobenzene
-        this.mercury_infl_wwtp = 0 //mercury
-        this.plomo_infl_wwtp = 0 //lead
-        this.niquel_infl_wwtp = 0 //nickel
-        this.chloro_infl_wwtp = 0 //chloroalkanes
-        this.hexaclorobutadie_infl_wwtp = 0 //Hexachlorobutadiene
-        this.nonilfenols_infl_wwtp = 0 //Nonylphenols
-        this.tetracloroetile_infl_wwtp = 0 //tetrachloroethene
-        this.tricloroetile_infl_wwtp = 0 //Trichloroethylene
-
-        //Water received from industry
-        this.wwt_bod_infl = 0
-        this.wwt_tn_infl = 0
-        this.wwt_tp_infl = 0
-        this.wwt_diclo_infl = 0 //1,2-Dichloroethane
-        this.wwt_cadmium_infl = 0 //Cadmium
-        this.wwt_hexaclorobenzene_infl = 0 //Hexachlorobenzene
-        this.wwt_mercury_infl = 0 //mercury
-        this.wwt_plomo_infl = 0 //lead
-        this.wwt_niquel_infl = 0 //nickel
-        this.wwt_chloro_infl = 0 //chloroalkanes
-        this.wwt_hexaclorobutadie_infl = 0 //Hexachlorobutadiene
-        this.wwt_nonilfenols_infl = 0 //Nonylphenols
-        this.wwt_tetracloroetile_infl = 0 //tetrachloroethene
-        this.wwt_tricloroetile_infl = 0 //Trichloroethylene
-
-
-    }
-
-    static get_estimations(){
-        return {
-            wwt_biog_pro(substage){ //estimation for biogas produced
-                let wwt_mass_slu    = substage.wwt_mass_slu;  //kg  | mass of combined sludge to digestion
-                let VS_to_digestion = wwt_mass_slu    * 0.80; //kg  | VS to digestion: 80% of sludge mass
-                let VS_destroyed    = VS_to_digestion * 0.60; //kg  | VS destroyed: 60% of VS
-                let biogas_volume   = VS_destroyed    * 0.80; //Nm3 | biogas produced (volume)
-                return biogas_volume;
-            },
-            //wwt
-            wwt_biog_fla(substage){
-                return 100-substage.wwt_biog_val-substage.wwt_biog_lkd-substage.wwt_biog_sold;
-            },
-            wwt_biog_val(substage){
-                return 100-substage.wwt_biog_fla-substage.wwt_biog_lkd-substage.wwt_biog_sold;
-            },
-            wwt_biog_lkd(substage){
-                return 100-substage.wwt_biog_val-substage.wwt_biog_fla-substage.wwt_biog_sold;
-            },
-            wwt_biog_sold(substage){
-                return 100-substage.wwt_biog_val-substage.wwt_biog_fla-substage.wwt_biog_lkd;
-            },
-            wwt_concentration_effl_to_wb(substage, influent_wwtp, influent_industry, table_effluent){
-                let vol_treated_from_wwtp = Number(substage.vol_infl_wwtp)
-                let concentration_from_wwtp = Number(substage[influent_wwtp])
-                let vol_treated_from_ind = Number(substage.wwt_vol_trea)
-                let concentration_from_ind = Number(substage[influent_industry])
-                let concentration_effluent = (vol_treated_from_wwtp*concentration_from_wwtp + vol_treated_from_ind*concentration_from_ind) / (vol_treated_from_wwtp+vol_treated_from_ind)
-
-                if(isNaN(concentration_effluent)) {
-                    return null
-                }
-                else return Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][substage.wwt_treatment_type][table_effluent]*concentration_effluent
-            },
-            wwt_bod_effl_to_wb(substage){
-                return this.wwt_concentration_effl_to_wb(substage, "bod_infl_wwtp", "wwt_bod_infl", "bod_effl")
-            },
-
-            wwt_tn_effl_to_wb(substage){
-                return this.wwt_concentration_effl_to_wb(substage, "tn_infl_wwtp", "wwt_tn_infl", "N_effl")
-            },
-            wwt_tp_effl_to_wb(substage){
-                return null
-            },
-
-            wwt_diclo_effl_to_wb(substage){
-                return this.wwt_concentration_effl_to_wb(substage, "diclo_infl_wwtp", "wwt_diclo_infl", "diclo_effl")
-            },
-
-            wwt_cadmium_effl_to_wb(substage){
-                return this.wwt_concentration_effl_to_wb(substage, "cadmium_infl_wwtp", "wwt_cadmium_infl", "cadmium_effl")
-            },
-
-            wwt_hexaclorobenzene_effl_to_wb(substage){
-                return this.wwt_concentration_effl_to_wb(substage, "hexaclorobenzene_infl_wwtp", "wwt_hexaclorobenzene_infl", "hexaclorobenzene_effl")
-            },
-
-            wwt_mercury_effl_to_wb(substage){
-                return this.wwt_concentration_effl_to_wb(substage, "mercury_infl_wwtp", "wwt_mercury_infl", "mercury_effl")
-            },
-
-            wwt_plomo_effl_to_wb(substage){
-                return this.wwt_concentration_effl_to_wb(substage, "plomo_infl_wwtp", "wwt_plomo_infl", "plomo_effl")
-            },
-
-            wwt_niquel_effl_to_wb(substage){
-                return this.wwt_concentration_effl_to_wb(substage, "niquel_infl_wwtp", "wwt_niquel_infl", "niquel_effl")
-            },
-
-            wwt_chloro_effl_to_wb(substage){
-                return this.wwt_concentration_effl_to_wb(substage, "chloro_infl_wwtp", "wwt_chloro_infl", "chloro_effl")
-            },
-
-            wwt_hexaclorobutadie_effl_to_wb(substage){
-                return this.wwt_concentration_effl_to_wb(substage, "hexaclorobutadie_infl_wwtp", "wwt_hexaclorobutadie_infl", "hexaclorobutadie_effl")
-            },
-
-            wwt_nonilfenols_effl_to_wb(substage){
-                return this.wwt_concentration_effl_to_wb(substage, "nonilfenols_infl_wwtp", "wwt_nonilfenols_infl", "nonilfenols_effl")
-            },
-
-            wwt_tetracloroetile_effl_to_wb(substage){
-                return this.wwt_concentration_effl_to_wb(substage, "tetracloroetile_infl_wwtp", "wwt_tetracloroetile_infl", "tetracloroetile_effl")
-            },
-
-            wwt_tricloroetile_effl_to_wb(substage){
-                return this.wwt_concentration_effl_to_wb(substage, "tricloroetile_infl_wwtp", "wwt_tricloroetile_infl", "tricloroetile_effl")
-            },
-            wwt_conv_kwh(substage) {
-                let location = substage.location
-                let lat = location.lat
-                let lng = location.lng
-                let code = utils.get_country_code_from_coordinates(lat, lng)
-                if(code == null) return null
-                return Countries[code].conv_kwh_co2
-            }
-        }
-    }
-
-    /*
-      GHG emissions (kgCO2eq)
-    */
-    //total GHG emissions
-    wwt_KPI_GHG(){
-        let sources=[
-            this.wwt_KPI_GHG_elec(),
-            this.wwt_KPI_GHG_fuel(),
-            this.wwt_KPI_GHG_tre(),
-            this.wwt_KPI_GHG_biog(),
-            this.wwt_KPI_GHG_slu(),
-            this.wwt_KPI_GHG_reus_trck(),
-            this.wwt_KPI_GHG_disc(),
-        ];
-
-        //gases (numbers)
-        let co2 = sources.map(s=>s.co2).sum();
-        let ch4 = sources.map(s=>s.ch4).sum();
-        let n2o = sources.map(s=>s.n2o).sum();
-
-        //total
-        let total = sources.map(s=>s.total).sum();
-        return {total,co2,ch4,n2o};
-    }
-
-    get_load_influent(influent_wwtp, influent_industry){
-        let vol_treated_from_wwtp = Number(this.vol_infl_wwtp)
-        let concentration_from_wwtp = Number(this[influent_wwtp])
-        let vol_treated_from_ind = Number(this.wwt_vol_trea)
-        let concentration_from_ind = Number(this[influent_industry])
-        return vol_treated_from_wwtp*concentration_from_wwtp + vol_treated_from_ind*concentration_from_ind
-    }
-
-    bod_load_infl(){
-        return this.get_load_influent("bod_infl_wwtp", "wwt_bod_infl")
-    }
-    tn_load_infl(){
-        return this.get_load_influent("tn_infl_wwtp", "wwt_tn_infl")
-    }
-
-
-    //emissions from treatment
-    wwt_KPI_GHG_tre(){
-        let co2   = 0;
-        let ch4   = (this.bod_load_infl()-this.wwt_bod_slud)*this.wwt_ch4_efac_tre*Cts.ct_ch4_eq.value;    //Eq. 6.4
-        let n2o   = this.tn_load_infl()*this.wwt_n2o_efac_tre*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;  //Eq. 6.11
-        let total = co2+ch4+n2o;
-        return {total,co2,ch4,n2o};
-    }
-
-    //emissions from water discharged
-    wwt_KPI_GHG_disc(){
-        let co2   = 0;
-        let ch4   = this.wwt_bod_effl_to_wb*this.wwt_vol_disc*this.wwt_ch4_efac_dis*Cts.ct_ch4_eq.value;    //Equacio 6.2
-        let n2o   = this.wwt_tn_effl_to_wb *this.wwt_vol_disc*this.wwt_n2o_efac_dis*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;    //Equacio 6.12
-        let total = co2+ch4+n2o;
-        return {total,co2,ch4,n2o};
-    }
-
-};  //Domestic WWTP
-
 
 /*
   TABLES
@@ -2096,7 +927,7 @@ export class Domestic_wwtp extends WWTP{
    1. nominal variables (strings) with magnitude==Option
    2. numeric variables inside Exceptions
 */
-let Tables={
+export let Tables={
 
     "Fuel type":[//            EF (kg/TJ)                                                                      FD (kg/L) NCV (TJ/Gg)
         {name:"Diesel",          EFCH4:{engines: 3,vehicles:3.9}, EFN2O:{engines:0.6,vehicles:3.9}, EFCO2:74100, FD:0.84,  NCV:43.0},
@@ -2131,7 +962,7 @@ let Tables={
     //ipcc 2019, table 6.3 (updated) EF (kgCH4/kgCOD)           C
     "type_of_treatment":[
         {name:"Type of treatment undefined",                                  ch4_efac:0,  ch4_efac_bod: 0, description: ""   },
-        {name:"Centralised, aerobic, treatment plant",                        ch4_efac:0, ch4_efac_bod:0.018, description: ""},
+        {name:"Centralised, aerobic, treatment plant",                        ch4_efac:0.0075, ch4_efac_bod:0.018, description: ""},
         {name:"Anaerobic Reactor - CH4 recovery not considered",              ch4_efac:0.2, ch4_efac_bod:0.48, description: ""},
         //{name:"Anaerobic Reactor - CH4 recovery considered",                  ch4_efac:0.14,  description: ""},
         {name:"Anaerobic shallow lagoon and facultative lagoons (<2m depth)", ch4_efac:0.05,  ch4_efac_bod:0.12,description: ""},
@@ -2173,10 +1004,10 @@ let Tables={
     ],
 
     "WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)":[
-        {name:"Untreated systems",                                                     bod_effl:1,  bod_effl_table:"[100%]",    N_effl:1.00,   N_effl_table:"[100%]", diclo_effl:1,  diclo_effl_table:"[100%]", cadmium_effl:1,  cadmium_effl_table:"[100%]",hexaclorobenzene_effl:1,  hexaclorobenzene_effl_table:"[100%]",mercury_effl:1,  mercury_effl_table:"[100%]",plomo_effl:1,  plomo_effl_table:"[100%]",niquel_effl:1,  niquel_effl_table:"[100%]",chloro_effl:1,  chloro_effl_table:"[100%]", hexaclorobutadie_effl:1,  hexaclorobutadie_effl_table:"[100%]", nonilfenols_effl:1,  nonilfenols_effl_table:"[100%]", tetracloroetile_effl:1,  tetracloroetile_effl_table:"[100%]",tricloroetile_effl:1, tricloroetile_effl_table:"[100%]",},
-        {name:"Primary (mechanical treatment plants)",                                 bod_effl:0.60, bod_effl_table:"[60%]", N_effl:0.90, N_effl_table:"[90%]", diclo_effl:0.7875,  diclo_effl_table:"[78.75%]", cadmium_effl:0.785,  cadmium_effl_table:"[78.5%]", hexaclorobenzene_effl:1,  hexaclorobenzene_effl_table:"[100%]",mercury_effl:0.64,  mercury_effl_table:"[64%]",plomo_effl:0.585,  plomo_effl_table:"[58.5%]",niquel_effl:0.83,  niquel_effl_table:"[83%]",chloro_effl:0.9,  chloro_effl_table:"[90%]", hexaclorobutadie_effl:0.95,  hexaclorobutadie_effl_table:"[95%]", nonilfenols_effl:0.57,  nonilfenols_effl_table:"[57%]", tetracloroetile_effl:0.765,  tetracloroetile_effl_table:"[76.5%]",tricloroetile_effl:0.9, tricloroetile_effl_table:"[90%]"},
-        {name:"Primary + Secondary (biological treatment plants)",                     bod_effl:0.15, bod_effl_table:"[15%]", N_effl:0.60, N_effl_table:"[60%]", diclo_effl:0.3268125,  diclo_effl_table:"[32.68%]", cadmium_effl:0.42785,  cadmium_effl_table:"[42.785%]", hexaclorobenzene_effl:1,  hexaclorobenzene_effl_table:"[100%]",mercury_effl:0.53312,  mercury_effl_table:"[53.312%]",plomo_effl:0.2720835,  plomo_effl_table:"[27.20835%]",niquel_effl:0.41417,  niquel_effl_table:"[41.417%]",chloro_effl:0.54,  chloro_effl_table:"[54%]", hexaclorobutadie_effl:0.19,  hexaclorobutadie_effl_table:"[19%]", nonilfenols_effl:0.1197,  nonilfenols_effl_table:"[11.97%]", tetracloroetile_effl:0.153,  tetracloroetile_effl_table:"[15.3%]",tricloroetile_effl:0.222, tricloroetile_effl_table:"[22.2%]"},
-        {name:"Primary + Secondary + Tertiary (advanced biological treatment plants)", bod_effl:0.10, bod_effl_table:"[10%]", N_effl:0.20, N_effl_table:"[20%]", diclo_effl:0.0653625,  diclo_effl_table:"[65.36%]", cadmium_effl:0.15829525,  cadmium_effl_table:"[15.83%]", hexaclorobenzene_effl:0.4275,  hexaclorobenzene_effl_table:"[42.75%]",mercury_effl:0.53312,  mercury_effl_table:"[53.312%]",plomo_effl:0.087746929,  plomo_effl_table:"[8.77%]",niquel_effl:0.256437,  niquel_effl_table:"[25.64%]",chloro_effl:0.54,  chloro_effl_table:"[54%]", hexaclorobutadie_effl:0.19,  hexaclorobutadie_effl_table:"[19%]", nonilfenols_effl:0.005985,  nonilfenols_effl_table:"[0.59%]", tetracloroetile_effl:0.00918,  tetracloroetile_effl_table:"[0.918%]",tricloroetile_effl:0.01332, tricloroetile_effl_table:"[1.33%]"},
+        {name:"Untreated systems",                                                     cod_effl:1,  bod_effl_table:"[100%]",    N_effl:1.00,   N_effl_table:"[100%]", diclo_effl:1,  diclo_effl_table:"[100%]", cadmium_effl:1,  cadmium_effl_table:"[100%]",hexaclorobenzene_effl:1,  hexaclorobenzene_effl_table:"[100%]",mercury_effl:1,  mercury_effl_table:"[100%]",plomo_effl:1,  plomo_effl_table:"[100%]",niquel_effl:1,  niquel_effl_table:"[100%]",chloro_effl:1,  chloro_effl_table:"[100%]", hexaclorobutadie_effl:1,  hexaclorobutadie_effl_table:"[100%]", nonilfenols_effl:1,  nonilfenols_effl_table:"[100%]", tetracloroetile_effl:1,  tetracloroetile_effl_table:"[100%]",tricloroetile_effl:1, tricloroetile_effl_table:"[100%]",},
+        {name:"Primary (mechanical treatment plants)",                                 cod_effl:0.60, bod_effl_table:"[60%]", N_effl:0.90, N_effl_table:"[90%]", diclo_effl:0.7875,  diclo_effl_table:"[78.75%]", cadmium_effl:0.785,  cadmium_effl_table:"[78.5%]", hexaclorobenzene_effl:1,  hexaclorobenzene_effl_table:"[100%]",mercury_effl:0.64,  mercury_effl_table:"[64%]",plomo_effl:0.585,  plomo_effl_table:"[58.5%]",niquel_effl:0.83,  niquel_effl_table:"[83%]",chloro_effl:0.9,  chloro_effl_table:"[90%]", hexaclorobutadie_effl:0.95,  hexaclorobutadie_effl_table:"[95%]", nonilfenols_effl:0.57,  nonilfenols_effl_table:"[57%]", tetracloroetile_effl:0.765,  tetracloroetile_effl_table:"[76.5%]",tricloroetile_effl:0.9, tricloroetile_effl_table:"[90%]"},
+        {name:"Primary + Secondary (biological treatment plants)",                     cod_effl:0.15, bod_effl_table:"[15%]", N_effl:0.60, N_effl_table:"[60%]", diclo_effl:0.3268125,  diclo_effl_table:"[32.68%]", cadmium_effl:0.42785,  cadmium_effl_table:"[42.785%]", hexaclorobenzene_effl:1,  hexaclorobenzene_effl_table:"[100%]",mercury_effl:0.53312,  mercury_effl_table:"[53.312%]",plomo_effl:0.2720835,  plomo_effl_table:"[27.20835%]",niquel_effl:0.41417,  niquel_effl_table:"[41.417%]",chloro_effl:0.54,  chloro_effl_table:"[54%]", hexaclorobutadie_effl:0.19,  hexaclorobutadie_effl_table:"[19%]", nonilfenols_effl:0.1197,  nonilfenols_effl_table:"[11.97%]", tetracloroetile_effl:0.153,  tetracloroetile_effl_table:"[15.3%]",tricloroetile_effl:0.222, tricloroetile_effl_table:"[22.2%]"},
+        {name:"Primary + Secondary + Tertiary (advanced biological treatment plants)", cod_effl:0.10, bod_effl_table:"[10%]", N_effl:0.20, N_effl_table:"[20%]", diclo_effl:0.0653625,  diclo_effl_table:"[65.36%]", cadmium_effl:0.15829525,  cadmium_effl_table:"[15.83%]", hexaclorobenzene_effl:0.4275,  hexaclorobenzene_effl_table:"[42.75%]",mercury_effl:0.53312,  mercury_effl_table:"[53.312%]",plomo_effl:0.087746929,  plomo_effl_table:"[8.77%]",niquel_effl:0.256437,  niquel_effl_table:"[25.64%]",chloro_effl:0.54,  chloro_effl_table:"[54%]", hexaclorobutadie_effl:0.19,  hexaclorobutadie_effl_table:"[19%]", nonilfenols_effl:0.005985,  nonilfenols_effl_table:"[0.59%]", tetracloroetile_effl:0.00918,  tetracloroetile_effl_table:"[0.918%]",tricloroetile_effl:0.01332, tricloroetile_effl_table:"[1.33%]"},
     ],
 
     "WW treatment type":[
@@ -2185,8 +1016,6 @@ let Tables={
         {text:"Primary + Secondary (biological treatment plants)",                     value: 2,},
         {text:"Primary + Secondary + Tertiary (advanced biological treatment plants)", value: 3,},
     ],
-
-
 
     "Type of sludge disposed":[
         {name:"Type of sludge disposed", f_ch4:0,  N_cont:0, TVS:0, description:"" },
@@ -2274,12 +1103,10 @@ let Cts={
 };
 
 
-
-
-
 export default {
     Assessment,
     Industry,
+    Tables
 }
 
 /*
