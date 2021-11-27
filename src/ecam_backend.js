@@ -75,17 +75,6 @@ export class Industry{
         this.ind_cod_effl= 0
         this.ind_tn_effl = 0
         this.ind_tp_effl = 0
-        this.volume_used = 0
-        this.operation_type = "Final product"
-        this.industry_provided = null
-        this.km_air = 0
-        this.km_barge = 0
-        this.km_ocean = 0
-        this.km_rail = 0
-        this.km_truck = 0
-        this.volume_cargo = 0
-        this.weight_cargo = 0
-        this.product_produced = 0
 
         //Priority pollutants
         this.ind_diclo_effl = 0 //1,2-Dichloroethane
@@ -288,10 +277,6 @@ export class Industry{
         return this.product_produced
     }
 
-    volume_of_water_used(){
-        return this.volume_used
-    }
-
     volume_of_water_withdrawn(){
         return this.volume_withdrawn
     }
@@ -299,14 +284,27 @@ export class Industry{
     volume_of_water_treated(){
         let water_treated = 0
         if(this.has_onsite_wwtp == 1) {
-            water_treated += this.onsite_wwtp.wwt_vol_disc
+            water_treated += this.onsite_wwtp.wwt_vol_trea
         }  //m3/day
         if(this.has_offsite_wwtp == 1) {
-            water_treated += this.offsite_wwtp.wwt_vol_disc
+            water_treated += this.offsite_wwtp.wwt_vol_trea
         }
         return water_treated
     }
 
+    water_generated(){
+        let volume = 0
+        if(this.has_onsite_wwtp == 1) {
+            volume += this.onsite_wwtp.wwt_vol_trea
+        }
+        if(this.has_direct_discharge == 1) {
+            volume += this.direct_discharge.wwt_vol_disc
+        }
+        if(this.has_offsite_wwtp == 1){
+            volume += this.offsite_wwtp.wwt_vol_trea
+        }
+        return volume
+    }
 
 };
 
@@ -330,7 +328,6 @@ export class Direct_discharge{
         this.wwt_vol_disc = 0
         this.wwt_ch4_efac_dis = 0
         this.wwt_n2o_efac_dis = 0
-
     }
 
     /*

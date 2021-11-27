@@ -1,6 +1,5 @@
 /* List of countries, with: - Conversion factor - Protein consumption - Bod per day (IPCC TABLE 6.4)
    UPDATED TABLE (20/5/2021)
-   1: http://www.fao.org/faostat/en/#data/FBS/visualize
    2: https://www.eib.org/attachments/strategies/eib_project_carbon_footprint_methodologies_en.pdf
    3: IPCC, 2006, Guidelines for National Greenhouse Gas Inventories Volume 5 Waste
    4: currencies: https://www.countries-ofthe-world.com/world-currencies.html (checked on 2020-12-10)

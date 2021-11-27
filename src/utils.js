@@ -89,7 +89,6 @@ async function discharged_factor(industries, global_layers){
     return factor.toFixed(3)
 }
 
-/*------------------------------------------*/
 
 function calculate_effluent_load(industries, pollutant_effl){
     let load = industries.map(industry => industry.effl_pollutant_load(pollutant_effl)).sum()
@@ -98,7 +97,6 @@ function calculate_effluent_load(industries, pollutant_effl){
 
 function effl_concentration(industries, pollutant_effl){
     let load = calculate_effluent_load(industries, pollutant_effl)
-
     let discharged = calculate_water_discharged(industries)
 
     return load/discharged
@@ -122,10 +120,6 @@ function calculate_water_recycled(industries){
 
 function calculate_product_produced(industries){
     return industries.map(industry => industry.tonnes_of_product()).sum()
-}
-
-function calculate_volume_used(industries){
-    return industries.map(industry => industry.volume_of_water_used()).sum()
 }
 
 async function effl_delta(industries, effl, global_layers){
@@ -169,6 +163,10 @@ function effl_efficiency(industries, industry_effluent, wwtp_effluent){   //Amou
     else return (eff*100).toFixed(3)
 }
 
+function calculate_water_generated(industries){
+    return industries.map(industry => industry.water_generated()).sum()
+}
+
 let metrics = {
 
     emissions_and_descriptions(industries, days_factor){
@@ -210,11 +208,11 @@ let metrics = {
     },
 
     recycled_water_factor(industries){
-        let water_withdrawn = calculate_water_withdrawn(industries)
+        let water_generated = calculate_water_generated(industries)
         let recycled_water = calculate_water_recycled(industries)
 
-        if(water_withdrawn > 0) {
-            let recycled_water_factor = recycled_water / water_withdrawn
+        if(water_generated > 0) {
+            let recycled_water_factor = recycled_water / water_generated
             return (recycled_water_factor*100).toFixed(3)
         }
         return (0).toFixed(3)
@@ -222,7 +220,7 @@ let metrics = {
 
     treated_water_factor(industries){
 
-        let water_discharged = calculate_water_discharged(industries)    // m3/day
+        let water_discharged = calculate_water_generated(industries)    // m3/day
         let water_treated = calculate_water_treated(industries)
 
         if (water_discharged == 0) return (0).toFixed(3)
@@ -231,8 +229,8 @@ let metrics = {
 
     efficiency_factor(industries){
         let product_produced = calculate_product_produced(industries)
-        let vol_used = calculate_volume_used(industries)
-        if (vol_used>0) return (product_produced/vol_used).toExponential(3)
+        let vol_withdrawn = calculate_water_withdrawn(industries)
+        if (vol_withdrawn>0) return (product_produced/vol_withdrawn).toExponential(3)
         return (0).toFixed(3)
     },
 
@@ -259,6 +257,32 @@ let metrics = {
 
         //Porcentage of pollutants which concentration is above the permission
         return (100*pollutant_above_law_factor/11).toFixed(3)
+    },
+
+    environmental_quality_standards(industries){
+
+        let obj = {
+            diclo: effl_concentration(industries, "wwt_diclo_effl")/0.01,
+            cadmium: effl_concentration(industries, "wwt_cadmium_effl")/0.001,
+            hexaclorobenzene: effl_concentration(industries, "wwt_hexaclorobenzene_effl")/0.0005,
+            mercury: effl_concentration(industries, "wwt_mercury_effl")/0.00007,
+            lead: effl_concentration(industries, "wwt_plomo_effl")/0.0072,
+            nickel: effl_concentration(industries, "wwt_niquel_effl")/0.02,
+            chloroalkanes: effl_concentration(industries, "wwt_chloro_effl")/0.0014,
+            hexaclorobutadie: effl_concentration(industries, "wwt_hexaclorobutadie_effl")/0.0006,
+            nonylphenols: effl_concentration(industries, "wwt_nonilfenols_effl")/0.002,
+            tetracloroetile: effl_concentration(industries, "wwt_tetracloroetile_effl")/0.01,
+            tricloroetile: effl_concentration(industries, "wwt_tricloroetile_effl")/0.01,
+        }
+
+        Object.keys(obj).forEach(pollutant => {
+            let value = obj[pollutant]
+            if(!isNaN(value)) obj[pollutant] = value.toFixed(3)
+            else obj[pollutant] = (0).toFixed(3)
+        })
+
+        return obj
+
     },
 
 
@@ -399,7 +423,7 @@ let metrics = {
             "g4-en9": withdrawn_factor_value,   //mes gran que 5% mal
             "g4-en10": _this.recycled_water_factor(industries),
             "g4-en22": calculate_water_discharged(industries)*365,
-            "g4.en26": discharged_factor_value,
+            "g4-en26": discharged_factor_value,
             "wd": 365*0.001*calculate_water_withdrawn(industries), //Water withdrawn
             "dis": 365*0.001*calculate_water_discharged(industries),  //water discharged
             "re": 365*0.001*calculate_water_recycled(industries) //water reused
@@ -414,14 +438,14 @@ let metrics = {
         return reporting_metrics
     },
 
-    ecotoxicity_potential_tu(industries){ //concentration of tu (tu/day)
+    ecotoxicity_potential_tu(industries) { //concentration of tu (tu/day)
         let toxic_units = {
             diclo: effl_concentration(industries, "wwt_diclo_effl")/150,
             cadmium: effl_concentration(industries, "wwt_cadmium_effl")/0.0095,
             hexaclorobenzene: effl_concentration(industries, "wwt_hexaclorobenzene_effl")/0.03,
             mercury: effl_concentration(industries, "wwt_mercury_effl")/0.0014,
             lead: effl_concentration(industries, "wwt_plomo_effl")/0.44,
-            nickel: effl_concentration(industries, "wwt_niquel_effl")/1.41775,
+            nickel: effl_concentration(industries, "wwt_niquel_effl")/1,
             chloroalkanes: effl_concentration(industries, "wwt_chloro_effl")/65,
             hexaclorobutadie: effl_concentration(industries, "wwt_hexaclorobutadie_effl")/0.5,
             nonylphenols: effl_concentration(industries, "wwt_nonilfenols_effl")/0.15,
@@ -439,8 +463,57 @@ let metrics = {
 
         return toxic_units
     },
+    async delta_tu(industries, global_layers){ //concentration of tu (tu/day)
+        let toxic_units = {
+            diclo: await effl_delta(industries, "wwt_diclo_effl", global_layers)/150,
+            cadmium: await effl_delta(industries, "wwt_cadmium_effl", global_layers)/0.0095,
+            hexaclorobenzene: await effl_delta(industries, "wwt_hexaclorobenzene_effl", global_layers)/0.03,
+            mercury: await effl_delta(industries, "wwt_mercury_effl", global_layers)/0.0014,
+            lead: await effl_delta(industries, "wwt_plomo_effl", global_layers)/0.44,
+            nickel: await effl_delta(industries, "wwt_niquel_effl", global_layers)/1,
+            chloroalkanes: await effl_delta(industries, "wwt_chloro_effl", global_layers)/65,
+            hexaclorobutadie: await effl_delta(industries, "wwt_hexaclorobutadie_effl", global_layers)/0.5,
+            nonylphenols: await effl_delta(industries, "wwt_nonilfenols_effl", global_layers)/0.15,
+            tetracloroetile: await effl_delta(industries, "wwt_tetracloroetile_effl", global_layers)/3.2,
+            tricloroetile: await effl_delta(industries, "wwt_tricloroetile_effl", global_layers)/76,
+        }
+        let total_toxic_units = Object.values(toxic_units).sum()
+        toxic_units["total"] = total_toxic_units
 
-    async delta_toxic_units(industries, global_layers){
+        Object.keys(toxic_units).forEach(key => {
+            let value = toxic_units[key]
+            if(Number.isFinite(value)) toxic_units[key] = value.toExponential(3)
+            else toxic_units[key] = (0).toExponential(3)
+        })
+
+        return toxic_units
+    },
+    async delta_eqs(industries, global_layers){ //concentration of tu (tu/day)
+        let toxic_units = {
+            diclo: await effl_delta(industries, "wwt_diclo_effl", global_layers)/0.01,
+            cadmium: await effl_delta(industries, "wwt_cadmium_effl", global_layers)/0.001,
+            hexaclorobenzene: await effl_delta(industries, "wwt_hexaclorobenzene_effl", global_layers)/0.0005,
+            mercury: await effl_delta(industries, "wwt_mercury_effl", global_layers)/0.00007,
+            lead: await effl_delta(industries, "wwt_plomo_effl", global_layers)/0.0072,
+            nickel: await effl_delta(industries, "wwt_niquel_effl", global_layers)/0.02,
+            chloroalkanes: await effl_delta(industries, "wwt_chloro_effl", global_layers)/0.0014,
+            hexaclorobutadie: await effl_delta(industries, "wwt_hexaclorobutadie_effl", global_layers)/0.0006,
+            nonylphenols: await effl_delta(industries, "wwt_nonilfenols_effl", global_layers)/0.002,
+            tetracloroetile: await effl_delta(industries, "wwt_tetracloroetile_effl", global_layers)/0.01,
+            tricloroetile: await effl_delta(industries, "wwt_tricloroetile_effl", global_layers)/0.01,
+        }
+
+        Object.keys(toxic_units).forEach(key => {
+            let value = toxic_units[key]
+            if(Number.isFinite(value)) toxic_units[key] = value.toExponential(3)
+            else toxic_units[key] = (0).toExponential(3)
+        })
+
+        return toxic_units
+    },
+
+
+    /*async delta_toxic_units(industries, global_layers){
         let total_tu = this.ecotoxicity_potential_tu(industries).total
         let water_discharged = calculate_water_discharged(industries)
         let streamflow_value = await streamflow(industries, global_layers) //streamflow (m3/day)
@@ -448,7 +521,7 @@ let metrics = {
         let delta = total_tu/(streamflow_value - water_withdrawn + water_discharged)
         if(isNaN(delta)) return (0).toExponential(3)
         return delta.toExponential(3)
-    },
+    },*/
 
     eutrophication_potential(industries){
         let eutrophication = {

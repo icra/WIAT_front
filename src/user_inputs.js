@@ -368,7 +368,6 @@ export let user_inputs = {
 
     //INDUSTRY INPUTS
     "volume_withdrawn": {question: "Amount of water withdrawn from the water body every day", value: 0, unit: "m3/day"},
-    "volume_used": {question: "Amount of water used in the industry every day", value: 0, unit: "m3/day"},
     "has_onsite_wwtp": {question: "Has the industry an on-site treatment wastewater plant?", value: false,},
     "has_direct_discharge": {question: "Does the industry directly discharge wastewater into the water body?", value: false, description_tooltip: "Untreated water"},
     "has_offsite_wwtp": {question: "Has the industry an off-site treatment wastewater plant?", value: false,},
@@ -392,7 +391,7 @@ export let user_inputs = {
 
 }
 
-export let industry_inputs = ["volume_withdrawn", "volume_used", "has_onsite_wwtp", "has_direct_discharge", "has_offsite_wwtp", "industry_type", "product_produced", "ind_cod_effl", "ind_tn_effl", "ind_tp_effl", "ind_diclo_effl", "ind_cadmium_effl", "ind_hexaclorobenzene_effl", "ind_mercury_effl", "ind_plomo_effl", "ind_niquel_effl", "ind_chloro_effl", "ind_hexaclorobutadie_effl", "ind_nonilfenols_effl", "ind_tetracloroetile_effl", "ind_tricloroetile_effl" ]
+export let industry_inputs = ["volume_withdrawn", "has_onsite_wwtp", "has_direct_discharge", "has_offsite_wwtp", "industry_type", "product_produced", "ind_cod_effl", "ind_tn_effl", "ind_tp_effl", "ind_diclo_effl", "ind_cadmium_effl", "ind_hexaclorobenzene_effl", "ind_mercury_effl", "ind_plomo_effl", "ind_niquel_effl", "ind_chloro_effl", "ind_hexaclorobutadie_effl", "ind_nonilfenols_effl", "ind_tetracloroetile_effl", "ind_tricloroetile_effl" ]
 
 
 export let onsite_wwtp_no_offsite = ["wwt_treatment_type", "wwt_vol_trea", "wwt_vol_disc", "wwt_vol_reused", "wwt_cod_effl", "wwt_tn_effl", "wwt_tp_effl", "wwt_diclo_effl", "wwt_cadmium_effl", "wwt_hexaclorobenzene_effl", "wwt_mercury_effl", "wwt_plomo_effl", "wwt_niquel_effl", "wwt_chloro_effl", "wwt_hexaclorobutadie_effl", "wwt_nonilfenols_effl", "wwt_tetracloroetile_effl", "wwt_tricloroetile_effl", "wwt_nrg_cons", "wwt_conv_kwh", "wwt_mass_slu", "wwt_cod_slud", "wwt_ch4_efac_tre", "wwt_n2o_efac_tre", "wwt_ch4_efac_dis", "wwt_n2o_efac_dis", "wwt_fuel_typ", "wwt_vol_fuel",

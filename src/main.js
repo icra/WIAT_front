@@ -333,7 +333,8 @@ Vue.prototype.$layers_description = [
     children: [
       {
         name: "Pollution",
-        children: [{
+        children: [
+            {
           name: 'Coastal Eutrophication Potential',
           layer: {
             layers: {
@@ -371,7 +372,6 @@ Vue.prototype.$layers_description = [
               info: "Surface Water Pharmaceutical Pollution Indicates the concentration of the Diclofenac on the rivers from domestic uses, it takes in count the population consumption, the in-stream attenuation, excretion, and the removal at sanitation facilities."
             }
           },
-
           {
             name: 'Coastal Pharmaceutical Pollution',
             layer: {
@@ -389,6 +389,44 @@ Vue.prototype.$layers_description = [
               monthly: false,
               future: false,
               info: "Coastal Pharmaceutical Pollution Indicates the amount of Diclofenac exported by the rivers to the ocean."
+            }
+          },
+          {
+            name: 'Unimproved/No Drinking Water',
+            layer: {
+              layers: {
+                baseline: {
+                  annual: {
+                    layer: null
+                  },
+                  monthly: []
+                },
+                future: {
+                  layer: null
+                },
+              },
+              monthly: false,
+              future: false,
+              info: "Unimproved/no drinking water reflects the percentage of the population collecting drinking water from an unprotected dug well or spring, or directly from a river, dam, lake, pond, stream, canal, or irrigation canal."
+            }
+          },
+          {
+            name: 'Unimproved/No Sanitation',
+            layer: {
+              layers: {
+                baseline: {
+                  annual: {
+                    layer: null
+                  },
+                  monthly: []
+                },
+                future: {
+                  layer: null
+                },
+              },
+              monthly: false,
+              future: false,
+              info: "Unimproved/no sanitation reflects the percentage of the population using pit latrines without a slab or platform, hanging/bucket latrines, or directly disposing human waste in fields, forests, bushes, open bodies of water, beaches, other open spaces, or with solid waste."
             }
           },
         ]
@@ -416,44 +454,6 @@ Vue.prototype.$layers_description = [
           future: false,
           info: "The Peak RepRisk country ESG risk index quantifies business conduct risk exposure related to environmental, social, and governance (ESG) issues in the corresponding country. The index provides insights into potential financial, reputational, and compliance risks, such as human rights violations and environmental destruction."
 
-        }
-      },
-      {
-        name: 'Unimproved/No Drinking Water',
-        layer: {
-          layers: {
-            baseline: {
-              annual: {
-                layer: null
-              },
-              monthly: []
-            },
-            future: {
-              layer: null
-            },
-          },
-          monthly: false,
-          future: false,
-          info: "Unimproved/no drinking water reflects the percentage of the population collecting drinking water from an unprotected dug well or spring, or directly from a river, dam, lake, pond, stream, canal, or irrigation canal."
-        }
-      },
-      {
-        name: 'Unimproved/No Sanitation',
-        layer: {
-          layers: {
-            baseline: {
-              annual: {
-                layer: null
-              },
-              monthly: []
-            },
-            future: {
-              layer: null
-            },
-          },
-          monthly: false,
-          future: false,
-          info: "Unimproved/no sanitation reflects the percentage of the population using pit latrines without a slab or platform, hanging/bucket latrines, or directly disposing human waste in fields, forests, bushes, open bodies of water, beaches, other open spaces, or with solid waste."
         }
       },
     ]
