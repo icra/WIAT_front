@@ -854,7 +854,7 @@ export default {
         this.$router.push('/')
       }
 
-      document.getElementsByClassName('outer').forEach(div => {
+      [...document.getElementsByClassName('outer')].forEach(div => {
         div.scrollTo(0, 0)
       })
 
@@ -1853,7 +1853,7 @@ export default {
     },
 
     tab_4_continue(){
-      document.getElementsByClassName('outer').forEach(div => {
+      [...document.getElementsByClassName('outer')].forEach(div => {
         div.scrollTo(0, 0)
       })
 
@@ -1864,7 +1864,7 @@ export default {
     },
 
     tab_3_continue(){
-      document.getElementsByClassName('outer').forEach(div => {
+      [...document.getElementsByClassName('outer')].forEach(div => {
         div.scrollTo(0, 0)
       })
       for(let input of this.direct_discharge_inputs){
@@ -1878,7 +1878,7 @@ export default {
     },
 
     tab_2_continue(){
-      document.getElementsByClassName('outer').forEach(div => {
+      [...document.getElementsByClassName('outer')].forEach(div => {
         div.scrollTo(0, 0)
       })
 
@@ -1898,7 +1898,7 @@ export default {
     },
 
     tab_1_continue(){
-      document.getElementsByClassName('outer').forEach(div => {
+      [...document.getElementsByClassName('outer')].forEach(div => {
         div.scrollTo(0, 0)
       })
 
