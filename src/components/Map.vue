@@ -69,7 +69,7 @@
       <v-container
         style="background-color: white"
       >
-        <b>Search a location by address, decimal degrees or in DMS (degrees, minutes and seconds) :</b>
+        <b>Search a location by address, decimal degrees or in DMS (degrees, minutes and seconds):</b>
         <v-radio-group v-model="searchAddressModel" row>
           <v-radio
               label="Address"
@@ -249,6 +249,12 @@
     </v-dialog>
 
 
+
+
+
+    </v-dialog>
+
+
   </div>
 
 
@@ -288,7 +294,7 @@ export default {
   components: {
     L,
   },
-  props: ["selected_layer", "selected_assessment"],
+  props: ["selected_layer", "selected_assessment", "selected_industry"],
   data() {
     return {
       center: [41.9672203,2.8385181],
@@ -420,7 +426,8 @@ export default {
       longitude_direction: ["East", "West"],
       east_west_model: "East",
       coordinates_valid: false,
-      listenToWatch: true
+      listenToWatch: true,
+      adding_supply_chain: false,
 
     };
   },
@@ -516,6 +523,15 @@ export default {
 },
   methods: {
 
+
+    close_supply_chain_mode(){
+      this.adding_supply_chain = false
+    },
+    enter_supply_chain_mode(){
+      this.adding_supply_chain = true
+    },
+
+
     pan_location(location){
       this.mapDiv.panTo(location)
     },
@@ -554,7 +570,12 @@ export default {
       }
 
       $('#map').on('click', '.trigger', function() {
-        _this.$emit('createIndustry', latlng)
+        if(_this.adding_supply_chain){
+          _this.$emit('createSupplyChain', latlng)
+        }else{
+          _this.$emit('createIndustry', latlng)
+        }
+
       });
     },
 
@@ -602,7 +623,6 @@ export default {
     },
 
     toggle_layer_selection_menu(){
-      console.log('aa')
       this.$emit('selectLayer');
     },
     industry_created(){ //Delete clicked marker and add industry marker
@@ -643,7 +663,9 @@ export default {
     },
     toggle_popup(text, add_industry=true){  //if add_industry, adds button for adding industry on clicked point
       if(this.popup_info===null) this.popup_info=this.clicked_marker.bindPopup()
-      if(add_industry) text += ('<br><br><button class="trigger">ADD INDUSTRY</button>')
+
+      if(this.adding_supply_chain) text += ('<br><br><button class="trigger">ADD SUPPLY CHAIN INDUSTRY</button>')
+      else if(add_industry) text += ('<br><br><button class="trigger">ADD INDUSTRY</button>')
 
       this.popup_info.setPopupContent(text)
       this.popup_info.openPopup()

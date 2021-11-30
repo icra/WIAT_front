@@ -75,6 +75,7 @@ export class Industry{
         this.ind_cod_effl= 0
         this.ind_tn_effl = 0
         this.ind_tp_effl = 0
+        this.product_produced = 0
 
         //Priority pollutants
         this.ind_diclo_effl = 0 //1,2-Dichloroethane
@@ -89,6 +90,12 @@ export class Industry{
         this.ind_tetracloroetile_effl = 0 //tetrachloroethene
         this.ind_tricloroetile_effl = 0 //Trichloroethylene
 
+        this.supply_chain = []
+
+    }
+
+    add_industry_to_supply_chain(industry){
+        this.supply_chain.push(industry)
     }
 
     ghg(){

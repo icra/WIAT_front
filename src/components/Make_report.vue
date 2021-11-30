@@ -1,5 +1,5 @@
 <template>
-  <div class="outer" style="overflow-y: hidden">
+  <div class="outer" >
     <h1>Report</h1>
     <div v-if="is_there_any_industry_created" style="height: 100%;">
       <div style="height: 100%; padding-top: 10px">
@@ -26,7 +26,7 @@
             <template class="report" >
 
               <div style="width: 100%; height: 100%">
-                <v-tabs-items v-model="tab">
+                <v-tabs-items v-model="tab" style="padding-bottom: 50px">
                   <v-tab-item
                       v-for="(assessment_name, idx) in assessment_names"
                       :key="assessment_name"
@@ -176,6 +176,7 @@
                                             :key="value"
                                             v-bind="attrs"
                                             v-on="on"
+                                            text-color="black"
                                         >
                                           {{ item[value] }}
                                         </v-chip>
@@ -280,7 +281,23 @@
                                   :hide-default-footer="true"
                               ></v-data-table>
                               <br>
-                              <b> Environmental Quality Standards </b>
+                              <b> Effluent concentration with respect to EQS </b>
+                              <v-tooltip bottom max-width="700px">
+                                <template v-slot:activator="{ on, attrs }">
+                                  <v-icon
+                                      color='#1C195B'
+                                      style="padding-right: 10px"
+                                      v-bind="attrs"
+                                      v-on="on"
+                                  >
+                                    mdi-information-outline
+                                  </v-icon>
+                                </template>
+                                <span>
+                                  Index reflecting how large the load of each pollutant in the effluent is with respect to the EQS. The larger it is, the worse.
+                                </span>
+                              </v-tooltip>
+
                               <v-data-table
                                   :headers="eqs_table.header"
                                   :items="eqs_table.value"
@@ -289,8 +306,7 @@
                                   class="elevation-1"
                               ></v-data-table>
                               <br>
-                              <b> Delta / ECOTOX </b>
-
+                              <b> Toxic Units in the receiving water body (assuming an initial concentration of 0) </b>
                               <v-data-table
                                     :headers="delta_ecotox_table.header"
                                     :items="delta_ecotox_table.value"
@@ -313,6 +329,7 @@
                                               :key="value"
                                               v-bind="attrs"
                                               v-on="on"
+                                              text-color="black"
                                           >
                                             {{ item[value] }}
                                           </v-chip>
@@ -328,7 +345,8 @@
 
 
                               <br>
-                              <b> Delta / EQS </b>
+                              <b>Final concentration in the receiving water body with respect to EQS (assuming an initial concentration of 0) </b>
+
                               <v-data-table
                                   :headers="delta_eqs_table.header"
                                   :items="delta_eqs_table.value"
@@ -350,6 +368,7 @@
                                             :key="value"
                                             v-bind="attrs"
                                             v-on="on"
+                                            text-color="black"
                                         >
                                           {{ item[value] }}
                                         </v-chip>
@@ -464,7 +483,6 @@
                                             :key="value"
                                             v-bind="attrs"
                                             v-on="on"
-                                            outlined
                                             text-color="black"
                                         >
                                           {{ item[value] }}
@@ -886,6 +904,11 @@ export default {
   },
   methods: {
 
+    industries_deleted(){ //An industry or assessment has been deleted, if it's the current one return to map
+      this.selected_assessments.splice(0, this.selected_assessments.length)
+
+    },
+
     getAvailabilityColor (item, value) {
       if (item.value == this.table_title.availability_quantity.dilution_factor){
         return risk_categories["dilution_factor"](item[value])
@@ -940,6 +963,16 @@ export default {
         return risk_categories.reprisk(item[value])
       }else if (equals(item.layer, "Unimproved/No Sanitation")){
         return risk_categories.no_sanitation(item[value])
+      } else if (equals(item.layer, "Unimproved/No Drinking Water")){
+        return risk_categories.no_drinking(item[value])
+      }
+    },
+
+    getReportingColor(item, value) {
+      if (item.value == "Effect of water withdrawal on the water body (GRI 303-2)"){
+        return risk_categories["withdrawal_effect"](item[value])
+      } else if (item.value == "Effect of water discharges on the water body (GRI 306-5)"){
+        return risk_categories["discharge_effect"](item[value])
       }
     },
 
@@ -1466,15 +1499,12 @@ export default {
           }
         }
 
-
         _this.ecotoxicity_chart = {
           chartData: data_chart,
           options: options
         }
 
-
         pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
-
         pollutants_table.value.push(dichloroethane)
         pollutants_table.value.push(cadmium)
         pollutants_table.value.push(hexachlorobenzene)
@@ -2084,17 +2114,32 @@ export default {
         let assessment = Object.values(groupedByAssessments)[_this.tab][0].assessment
         let assessment_days = utils.daysBetween(assessment.assessment_period_start, assessment.assessment_period_end)
 
-        let days_factor = 1
-        if(this.period_model === "annual") days_factor = 365
-        else if(this.period_model === "assessment") days_factor = assessment_days
 
         let layer_table = {
           header: [{text: "Layer", value: "layer", sortable: false}],
           value: []
         }
 
-        for (const industryAux of Object.values(groupedByAssessments)[_this.tab]) {
+        let industries_and_supply_chain = []
+        Object.values(groupedByAssessments)[_this.tab].forEach(industryAux => {
           let industry = industryAux.industry
+
+          industries_and_supply_chain.push({
+            name: industry.name,
+            location: industry.location
+          })
+
+          industry.supply_chain.forEach(sc => {
+            industries_and_supply_chain.push({
+              name: sc.name + " (Supply chain of "+industry.name+")",
+              location: sc.location
+            })
+          })
+        })
+
+
+
+        for (const industry of industries_and_supply_chain) {
           layer_table.header.push({text: industry.name, value: industry.name})
         }
         layer_table.header.push({text: "Unit", value: "unit"})
@@ -2102,8 +2147,10 @@ export default {
         for (let [layer_name, info] of selected_layers_formatted) {
           let current_layer = {layer: layer_name}
           let future_layer = {layer: layer_name + " (BAU 2030)"}
-          for (const industryAux of Object.values(groupedByAssessments)[_this.tab]) {
-            let industry = industryAux.industry
+
+
+          for (let industry of industries_and_supply_chain) {
+            console.log(industry)
             let lat = industry.location.lat
             let lng = industry.location.lng
 
@@ -3734,6 +3781,15 @@ export default {
 </script>
 
 <style>
+  .style-1 {
+    font-weight: bold;
+  }
+  .style-2 {
+    font-weight: normal;
+  }
+</style>
+
+<style scoped>
 
 .outer{
   overflow: hidden;
@@ -3777,13 +3833,6 @@ export default {
   color: #F2F4F3
 }
 
-.style-1 {
-  font-weight: bold;
-}
-.style-2 {
-  font-weight: normal;
-}
-
 .table_title {
   font-size: 140%;
   font-weight: bold;
@@ -3792,8 +3841,12 @@ export default {
 b {
   padding-left: 10px;
 }
-
 .v-chip {
   margin-left: -11px !important;
 }
+
+table {
+  padding: 15px;
+}
+
 </style>

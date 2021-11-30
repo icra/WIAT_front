@@ -581,96 +581,39 @@ export default {
                     new_industry.offsite_wwtp.wwt_slu_sp_lifespan = !isNaN(industry_input[182]) ? industry_input[182] : 0
                     new_industry.offsite_wwtp.wwt_trck_typ = industry_input[183] == "Yes"  ? 1 : 0
                     new_industry.offsite_wwtp.wwt_vol_tslu = !isNaN(industry_input[184]) ? industry_input[184] : 0
-
                   }
-
-
 
                   assessment.industries.push(new_industry)
                 } catch (error) {
                   console.log(error)
                 }
-
               }
-
 
             }
           })
         })
       }
     },
-    copy_wwtp(wwtp, type, industry_type){
-
-      const classes = {
-        Industrial_wwtp_onsite,
-        Industrial_wwtp_onsite_external_domestic,
-        Industrial_wwtp_onsite_external_industrial,
-        Direct_discharge,
-        Industrial_wwtp_offsite,
-        Domestic_wwtp
-      };
-
-      let new_wwtp = new classes[type];
-      for (let key of Object.keys(new_wwtp)){
-        if(typeof wwtp[key] !== "function") new_wwtp[key] = wwtp[key]
-      }
-      //new_wwtp.industry_type = industry_type
-      return new_wwtp
-    },
 
     copyIndustry(industry){
       let new_industry = new Industry()
-      new_industry.name = industry.name
-      new_industry.location = industry.location
-      new_industry.has_onsite_wwtp = industry.has_onsite_wwtp
-      new_industry.has_offsite_wwtp = industry.has_offsite_wwtp
-      new_industry.offsite_wwtp_type = industry.offsite_wwtp_type
-      new_industry.volume_withdrawn = industry.volume_withdrawn
-      new_industry.has_direct_discharge = industry.has_direct_discharge
-      new_industry.industry_type = industry.industry_type
-      new_industry.tn_effl_concentration = industry.tn_effl_concentration
-      new_industry.tp_effl_concentration = industry.tp_effl_concentration
-      new_industry.bod_effl_concentration = industry.bod_effl_concentration
-      new_industry.volume_used = industry.volume_used
-      new_industry.product_produced = industry.product_produced
 
-      new_industry.diclo_effl= industry.diclo_effl //1,2-Dichloroethane
-      new_industry.cadmium_effl= industry.cadmium_effl //Cadmium
-      new_industry.hexaclorobenzene_effl= industry.hexaclorobenzene_effl //Hexachlorobenzene
-      new_industry.mercury_effl= industry.mercury_effl //mercury
-      new_industry.plomo_effl= industry.plomo_effl //lead
-      new_industry.niquel_effl= industry.niquel_effl //nickel
-      new_industry.chloro_effl= industry.chloro_effl //chloroalkanes
-      new_industry.hexaclorobutadie_effl= industry.hexaclorobutadie_effl //Hexachlorobutadiene
-      new_industry.nonilfenols_effl= industry.nonilfenols_effl //Nonylphenols
-      new_industry.tetracloroetile_effl= industry.tetracloroetile_effl //tetrachloroethene
-      new_industry.tricloroetile_effl= industry.tricloroetile_effl //Trichloroethylene
+      Object.keys(new_industry).forEach(key => {
+        if (key != "onsite_wwtp" && key != "offsite_wwtp" && key!="direct_discharge"){
+          new_industry[key] = industry[key]
+        }
+      })
 
-      new_industry.operation_type = industry.operation_type
-      new_industry.industry_provided = industry.industry_provided
-      new_industry.km_air = industry.km_air
-      new_industry.km_barge = industry.km_barge
-      new_industry.km_ocean = industry.km_ocean
-      new_industry.km_rail = industry.km_rail
-      new_industry.km_truck = industry.km_truck
-      new_industry.volume_cargo = industry.volume_cargo
-      new_industry.weight_cargo = industry.weight_cargo
+      Object.keys(new_industry.onsite_wwtp).forEach(key => {
+        new_industry.onsite_wwtp[key] = industry.onsite_wwtp[key]
+      })
+      Object.keys(new_industry.offsite_wwtp).forEach(key => {
+        new_industry.offsite_wwtp[key] = industry.offsite_wwtp[key]
+      })
+      Object.keys(new_industry.direct_discharge).forEach(key => {
+        new_industry.direct_discharge[key] = industry.direct_discharge[key]
+      })
 
-      if(new_industry.has_onsite_wwtp)
-        if(new_industry.has_offsite_wwtp){
-          if(new_industry.offsite_wwtp_type === "Domestic") new_industry.onsite_wwtp = this.copy_wwtp(industry.onsite_wwtp, "Industrial_wwtp_onsite_external_domestic", new_industry.industry_type)
-          else new_industry.onsite_wwtp = this.copy_wwtp(industry.onsite_wwtp, "Industrial_wwtp_onsite_external_industrial", new_industry.industry_type) //Industrial
-        } else new_industry.onsite_wwtp = this.copy_wwtp(industry.onsite_wwtp, "Industrial_wwtp_onsite", new_industry.industry_type)
-      else new_industry.onsite_wwtp = null
-
-      if(new_industry.has_offsite_wwtp){
-        if(new_industry.offsite_wwtp_type === "Industrial") new_industry.offsite_wwtp_type = this.copy_wwtp(industry.offsite_wwtp, "Industrial_wwtp_offsite", new_industry.industry_type)
-        else new_industry.offsite_wwtp_type = this.copy_wwtp(industry.offsite_wwtp, "Domestic_wwtp",new_industry.industry_type)
-      }
-      else new_industry.offsite_wwtp = null
-
-      if(new_industry.has_direct_discharge) new_industry.direct_discharge = this.copy_wwtp(industry.direct_discharge, "Direct_discharge", new_industry.industry_type)
-      else new_industry.direct_discharge = null
 
       return new_industry
 

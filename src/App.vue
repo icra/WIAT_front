@@ -174,7 +174,7 @@
       <!-- Main content -->
     <div style="position: absolute; height: 100%; width: 100%">
       <div class="content" :class="manageContentClass">
-        <router-view :selected_assessment="assessment_expansion_panel" :selected_layer="selected_layer" @createIndustry="createNewIndustry" @editIndustry="open_edit_industry_tab" @selectLayer="toggleLayerSelection" @closeRightMenu="closeRightMenu" @closeLayer="applyLayer(selected_layer)" ref="reference"></router-view>
+        <router-view :selected_assessment="assessment_expansion_panel" :selected_layer="selected_layer" :selected_industry="selected_industry" @createIndustry="createNewIndustry" @createSupplyChain="create_supply_chain" @editIndustry="open_edit_industry_tab" @selectLayer="toggleLayerSelection" @closeRightMenu="closeRightMenu" @closeLayer="applyLayer(selected_layer)" ref="reference"></router-view>
       </div>
     </div>
 
@@ -354,15 +354,29 @@
               >
                 Rename
               </v-btn>
+
+              <br>
             </v-form>
           </div>
           <div style="margin: 7px; padding: 7px;">
+
             <v-btn :to="{ name: 'edit_industry', params: {assessment_id: selected_assessment, industry_id: selected_industry}}" small outlined block @click="icon_selected = -1; selected_layer=null; secondMenu=false; rightMenu=false">
               Advanced INPUTS
             </v-btn>
             <v-btn @click="delete_industry" small outlined block>
               Delete
             </v-btn>
+            <v-btn
+                block
+                outlined
+                small
+                @click="add_supply_chain_industry"
+                :disabled="icon_selected != 0"
+
+            >
+              PLACE SUPPLY CHAIN ON THE MAP
+            </v-btn>
+
             <!--<v-btn block small outlined :to="{ name: 'statistics_industry', params: {assessment_id: selected_assessment, industry_id: selected_industry}}" @click="icon_selected = -1; selected_layer=null; secondMenu=false; rightMenu=false">
               SHOW RESULTS
             </v-btn>-->
@@ -502,6 +516,34 @@
           </div>
 
         </div>
+        <!-- Create supply chain industry -->
+        <div v-else-if="right_sidebar_content === 7">
+          <div style="margin: 7px; padding: 7px; background-color: white">
+            <h1>Supply chain industry</h1>
+            <v-form
+                v-model="new_supply_chain_valid"
+            >
+              <v-text-field
+                  v-model="supply_chain_name"
+                  label="Supply chain industry name"
+                  :rules="[new_supply_chain_rules_name, rules_required]"
+
+              ></v-text-field>
+              <v-btn
+                  :disabled="!new_supply_chain_valid"
+                  @click="add_supply_chain"
+                  small
+                  outlined
+                  block
+              >
+                Add supply chain industry
+              </v-btn>
+            </v-form>
+
+          </div>
+
+        </div>
+
       </div>
     </v-navigation-drawer>
 
@@ -558,6 +600,8 @@ export default {
         delete_industry: {v_model: false, text: "Industry deleted correctly", },
         assessment_not_selected: {v_model: false, text: "Can't create industry, please select and assessment first", },
         create_industry_not_in_map: {v_model: false, text: "Can't create industry, please return to the map tab and try again", },
+        place_supply_chain: {v_model: false, text: "Please, indicate the location of the supply chain industry on the map"},
+        new_supply_chain: {v_model: false, text: "Supply chain industry added", },
       },
       map_content_info: {}, //Info to show when the map is clicked
       assessment_expansion_panel: undefined, //Selected assessment in expansion panel
@@ -571,7 +615,11 @@ export default {
       start_date_modal: false,
       end_date_model_assessment: new Date(new Date().setFullYear((new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).getFullYear() + 1)).toISOString().substr(0, 10),
       end_date_modal: false,
-      actived_layers: []
+      actived_layers: [],
+      new_supply_chain_valid: false,
+      supply_chain_name: null,
+      supply_chain_marker: null
+
 
     }
   },
@@ -579,8 +627,50 @@ export default {
     window.addEventListener('beforeunload', e => this.beforeunloadFn(e))
   },
 
+  watch: {
+    assessment_expansion_panel: function(assessment){
+      try {
+        this.$refs.reference.close_supply_chain_mode()
+        this.$refs.reference.industry_created()
+
+      } catch (error) {}
+    }
+  },
+
   methods: {
 
+    add_supply_chain_industry(){
+      try {
+        this.$refs.reference.enter_supply_chain_mode()
+        this.rightMenu = false
+        this.snackbars.place_supply_chain.v_model = true
+      } catch (error) {}
+    },
+
+    create_supply_chain(latlng){
+      this.supply_chain_marker = latlng
+      this.right_sidebar_content = 7
+      this.supply_chain_name = null
+      this.rightMenu = true
+
+    },
+
+    add_supply_chain(){
+      let _this = this
+      let supply_chain = {
+        name: _this.supply_chain_name,
+        location: _this.supply_chain_marker
+      }
+      this.created_assessments[this.assessment_expansion_panel].industries[this.selected_industry].add_industry_to_supply_chain(supply_chain)
+      this.rightMenu = false
+      this.snackbars.new_supply_chain.v_model = true
+
+      try {
+        this.$refs.reference.close_supply_chain_mode()
+        this.$refs.reference.industry_created()
+
+      } catch (error) {}
+    },
 
     beforeunloadFn(){
       event.preventDefault()
@@ -694,6 +784,10 @@ export default {
       this.rightMenu = !this.rightMenu
       this.snackbars.new_assessment.v_model = true
       this.assessment_active.push(true)
+      try {
+        this.$refs.reference.close_supply_chain_mode()
+      }catch (error) {}
+
 
     },
     open_create_assessment_tab(){
@@ -711,6 +805,10 @@ export default {
       this.assessment_name = this.created_assessments[assessment_index].name
       this.start_date_model_assessment = this.created_assessments[assessment_index].assessment_period_start
       this.end_date_model_assessment = this.created_assessments[assessment_index].assessment_period_end
+      try {
+        this.$refs.reference.close_supply_chain_mode()
+      }catch (error) {}
+
     },
     edit_assessment(){
       this.rightMenu = false
@@ -745,7 +843,6 @@ export default {
           industry: assessment.industries.length,
           latlng: this.latlng_selected
         }
-        console.log(marker)
         this.$location_markers.push(marker)
         assessment.add_industry(industry)
         this.snackbars.new_industry.v_model = true
@@ -767,7 +864,9 @@ export default {
 
       try {
         this.$refs.reference.pan_location(this.created_assessments[assessment_index].industries[industry_index].location)
+        this.$refs.reference.close_supply_chain_mode()
       } catch (error) {}
+
 
 
 
@@ -782,13 +881,6 @@ export default {
       this.rightMenu = false
       this.snackbars.delete_industry.v_model = true
 
-      //If any industry belong to the supply chain of this industry, change it to final product industry
-      this.created_assessments[this.selected_assessment].industries.forEach(industry => {
-        if (industry.operation_type == 'Supply chain' && industry.industry_provided == this.created_assessments[this.selected_assessment].industries[this.selected_industry].name){
-          industry.operation_type = 'Final product'
-          industry.industry_provided = null
-        }
-      })
 
       this.$assessments[this.selected_assessment].delete_industry(this.selected_industry)
       this.update_markers()
@@ -802,6 +894,12 @@ export default {
       })
       if (factories_with_same_name.length === 0) return true
       else return 'An industry with same name already exists. '
+    },
+    new_supply_chain_rules_name(value){
+      return this.created_assessments[this.assessment_expansion_panel].industries[this.selected_industry].supply_chain.filter(industry => {
+        return industry.name == value
+      }).length == 0
+
     },
     rules_required(value) {  //Rules for creating new factory
       if(!!value) return true
@@ -842,6 +940,9 @@ export default {
           }
         }
       }
+      try {
+        this.$refs.reference.close_supply_chain_mode()
+      }catch (error) {}
     },
     assessment_date_rules(finish_date){
       if(finish_date>this.start_date_model_assessment) return true

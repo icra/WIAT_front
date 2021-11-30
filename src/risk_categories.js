@@ -2,7 +2,7 @@
 let blue = ['blue', "Low impact"]
 let red = ['red', "Very high impact"]
 let orange = ['orange', "High impact"]
-let yellow = ['yellow', "Low impact"]
+let yellow = ['yellow', "Medium impact"]
 
 let layers = {
     l: ['#f6f600', "Low"],
@@ -159,6 +159,17 @@ let risk_category = {
         else if (value >= 20) return layers.eh
         return null
     },
+    withdrawal_effect: function(value){
+        if(value <= 5) return blue
+        else if(value > 5) return red
+        return null
+    },
+    discharge_effect: function(value){
+        if(value <= 5) return blue
+        else if(value > 5) return red
+        return null
+    }
+
 
 
 
