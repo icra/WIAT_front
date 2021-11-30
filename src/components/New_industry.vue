@@ -1990,7 +1990,7 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
 .link_to_report_hovered{
   color: black;
   text-decoration: underline;
