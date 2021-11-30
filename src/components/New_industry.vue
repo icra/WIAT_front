@@ -241,13 +241,23 @@
           </v-expansion-panels>
 
           <br>
-          <v-btn
-              @click="tab_1_continue"
-              :disabled="tab_1_disabled"
-              outlined
-          >
-            SAVE AND CONTINUE
-          </v-btn>
+
+          <v-tooltip bottom :disabled="!tab_1_disabled">
+            <template v-slot:activator="{ on }">
+              <div v-on="on" class="d-inline-block">
+                <v-btn
+                    @click="tab_1_continue"
+                    :disabled="tab_1_disabled"
+                    outlined
+                >
+                  SAVE AND CONTINUE
+                </v-btn>
+              </div>
+            </template>
+            <span>Fill in the amount of water withdrawn and the amount of product produced.</span>
+          </v-tooltip>
+
+
         </v-stepper-content>  <!-- Industry -->
 
         <v-stepper-content step="2" >
