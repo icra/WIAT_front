@@ -179,15 +179,11 @@
 </template>
 
 <script>
+
 import {
   Assessment,
   Industry,
-  Industrial_wwtp_onsite,
-  Industrial_wwtp_onsite_external_domestic,
-  Industrial_wwtp_onsite_external_industrial,
   Direct_discharge,
-  Industrial_wwtp_offsite,
-  Domestic_wwtp
 } from "../ecam_backend";
 
 import * as Excel from "exceljs";

@@ -413,6 +413,19 @@ let metrics = {
         return value
     },
 
+    avg_treatment_efficiency(industries){
+        let treatment_efficiency = [this.bod_efficiency(industries), this.tn_efficiency(industries),
+            this.tp_efficiency(industries), this.dichloroethane_efficiency(industries), this.cadmium_efficiency(industries),
+            this.hexaclorobenzene_efficiency(industries), this.mercury_efficiency(industries), this.lead_efficiency(industries),
+            this.nickel_efficiency(industries), this.chloroalkanes_efficiency(industries), this.hexaclorobutadie_efficiency(industries),
+            this.nonylphenols_efficiency(industries), this.tetrachloroethene_efficiency(industries), this.tricloroetile_efficiency(industries)
+        ]
+
+        let avg = treatment_efficiency.sum() / treatment_efficiency.length
+        if(Number.isFinite(avg)) return avg.toExponential(3)
+        else return (0).toExponential(3)
+    },
+
     async reporting_metrics(industries, global_layers){
         let _this = this
         let withdrawn_factor_value = await withdrawn_factor(industries, global_layers)
@@ -510,6 +523,15 @@ let metrics = {
         })
 
         return toxic_units
+    },
+    async delta_eqs_avg(industries, global_layers){ //concentration of tu (tu/day)
+        let eqs = await this.delta_eqs(industries, global_layers)
+
+        let avg = Object.values(eqs).sum() / Object.values(eqs).length
+
+        if(Number.isFinite(avg)) return avg.toExponential(3)
+        else return (0).toExponential(3)
+
     },
 
 
