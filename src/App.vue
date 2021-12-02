@@ -661,9 +661,18 @@ export default {
         name: _this.supply_chain_name,
         location: _this.supply_chain_marker
       }
-      this.created_assessments[this.assessment_expansion_panel].industries[this.selected_industry].add_industry_to_supply_chain(supply_chain)
+      let industry = this.created_assessments[this.assessment_expansion_panel].industries[this.selected_industry]
+      industry.add_industry_to_supply_chain(supply_chain)
       this.rightMenu = false
       this.snackbars.new_supply_chain.v_model = true
+
+      let marker = {
+        isSupplyChain: true,
+        latlng: _this.supply_chain_marker,
+        name: "<b>"+_this.supply_chain_name+"</b> (supply chain of "+industry.name+")",
+      }
+
+      _this.$location_markers.push(marker)
 
       try {
         this.$refs.reference.close_supply_chain_mode()
@@ -742,6 +751,24 @@ export default {
               latlng: _this.$assessments[assessment].industries[industry].location
             }
             _this.$location_markers.push(marker)
+
+            //Adding supply chain
+            let _industry = _this.$assessments[assessment].industries[industry]
+            _industry.supply_chain.forEach(sp => {
+              marker = {
+                isSupplyChain: true,
+                latlng: sp.location,
+                name: "<b>"+sp.name+"</b> (supply chain of "+_industry.name+")",
+              }
+              _this.$location_markers.push(marker)
+
+
+            })
+
+
+
+
+
           }
         }
       }

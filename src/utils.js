@@ -174,8 +174,8 @@ let metrics = {
         let aggregated = sumObjectsByKey(...industries_emissions)
         Object.keys(aggregated).forEach(key => {
             let value = aggregated[key]*days_factor
-            if(Number.isFinite(value)) aggregated[key] = value.toExponential(3)
-            else aggregated[key] = (0).toFixed(3)
+            if(Number.isFinite(value)) aggregated[key] = value.toExponential(2)
+            else aggregated[key] = (0).toExponential(2)
         })
         return aggregated
     },
@@ -184,14 +184,14 @@ let metrics = {
 
         let water_discharged = calculate_water_discharged(industries)    // m3/day
 
-        if(water_discharged == 0) return (0).toFixed(3)
+        if(water_discharged == 0) return (0).toFixed(2)
 
         let streamflow_value = await streamflow(industries, global_layers) //streamflow (m3/day)
 
         //let dilution_factor = water_discharged/(water_discharged + flow_acc_value)
         let dilution_factor = (water_discharged + streamflow_value)/water_discharged
 
-        return dilution_factor.toExponential(3)
+        return dilution_factor.toExponential(2)
 
     },
 
@@ -202,8 +202,8 @@ let metrics = {
 
 
         let available_ratio = water_withdrawn / streamflow_value
-        if (isNaN(available_ratio)) return (0).toFixed(3)
-        else return (available_ratio*100).toFixed(3)
+        if (isNaN(available_ratio)) return (0).toFixed(2)
+        else return (available_ratio*100).toFixed(2)
 
     },
 
@@ -213,9 +213,9 @@ let metrics = {
 
         if(water_generated > 0) {
             let recycled_water_factor = recycled_water / water_generated
-            return (recycled_water_factor*100).toFixed(3)
+            return (recycled_water_factor*100).toFixed(2)
         }
-        return (0).toFixed(3)
+        return (0).toFixed(2)
     },
 
     treated_water_factor(industries){
@@ -223,15 +223,15 @@ let metrics = {
         let water_discharged = calculate_water_generated(industries)    // m3/day
         let water_treated = calculate_water_treated(industries)
 
-        if (water_discharged == 0) return (0).toFixed(3)
-        else return (100*water_treated/water_discharged).toFixed(3)
+        if (water_discharged == 0) return (0).toFixed(2)
+        else return (100*water_treated/water_discharged).toFixed(2)
     },
 
     efficiency_factor(industries){
         let product_produced = calculate_product_produced(industries)
         let vol_withdrawn = calculate_water_withdrawn(industries)
-        if (vol_withdrawn>0) return (product_produced/vol_withdrawn).toExponential(3)
-        return (0).toFixed(3)
+        if (vol_withdrawn>0) return (product_produced/vol_withdrawn).toExponential(2)
+        return (0).toFixed(2)
     },
 
     nqa(industries){
@@ -277,8 +277,8 @@ let metrics = {
 
         Object.keys(obj).forEach(pollutant => {
             let value = obj[pollutant]
-            if(!isNaN(value)) obj[pollutant] = value.toFixed(3)
-            else obj[pollutant] = (0).toFixed(3)
+            if(!isNaN(value)) obj[pollutant] = value.toFixed(2)
+            else obj[pollutant] = (0).toFixed(2)
         })
 
         return obj
@@ -444,8 +444,8 @@ let metrics = {
 
         Object.keys(reporting_metrics).forEach(key => {
             let value = reporting_metrics[key]
-            if(Number.isFinite(value)) reporting_metrics[key] = value.toExponential(3)
-            else reporting_metrics[key] = (0).toExponential(3)
+            if(Number.isFinite(value)) reporting_metrics[key] = value.toExponential(2)
+            else reporting_metrics[key] = (0).toExponential(2)
         })
 
         return reporting_metrics
@@ -470,8 +470,8 @@ let metrics = {
 
         Object.keys(toxic_units).forEach(key => {
             let value = toxic_units[key]
-            if(Number.isFinite(value)) toxic_units[key] = value.toExponential(3)
-            else toxic_units[key] = (0).toExponential(3)
+            if(Number.isFinite(value)) toxic_units[key] = value.toExponential(2)
+            else toxic_units[key] = (0).toExponential(2)
         })
 
         return toxic_units
@@ -495,8 +495,8 @@ let metrics = {
 
         Object.keys(toxic_units).forEach(key => {
             let value = toxic_units[key]
-            if(Number.isFinite(value)) toxic_units[key] = value.toExponential(3)
-            else toxic_units[key] = (0).toExponential(3)
+            if(Number.isFinite(value)) toxic_units[key] = value.toExponential(2)
+            else toxic_units[key] = (0).toExponential(2)
         })
 
         return toxic_units
@@ -518,8 +518,8 @@ let metrics = {
 
         Object.keys(toxic_units).forEach(key => {
             let value = toxic_units[key]
-            if(Number.isFinite(value)) toxic_units[key] = value.toExponential(3)
-            else toxic_units[key] = (0).toExponential(3)
+            if(Number.isFinite(value)) toxic_units[key] = value.toExponential(2)
+            else toxic_units[key] = (0).toExponential(2)
         })
 
         return toxic_units
@@ -557,8 +557,8 @@ let metrics = {
 
         Object.keys(eutrophication).forEach(key => {
             let value = eutrophication[key]
-            if(Number.isFinite(value)) eutrophication[key] = value.toExponential(3)
-            else eutrophication[key] = (0).toExponential(3)
+            if(Number.isFinite(value)) eutrophication[key] = value.toExponential(2)
+            else eutrophication[key] = (0).toExponential(2)
         })
 
         return eutrophication

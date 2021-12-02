@@ -421,6 +421,7 @@ export default {
       coordinates_valid: false,
       listenToWatch: true,
       adding_supply_chain: false,
+      supply_chain_name: null
 
     };
   },
@@ -468,6 +469,7 @@ export default {
       this.delete_markers()
       this.place_markers(markers)
     },
+
     selected_layer: function (new_layer, old_layer) {
 
       this.delete_layer(old_layer, this.baseline_future_model, this.annual_monthly_model, this.months_model)
@@ -655,10 +657,14 @@ export default {
       }
     },
     toggle_popup(text, add_industry=true){  //if add_industry, adds button for adding industry on clicked point
-      if(this.popup_info===null) this.popup_info=this.clicked_marker.bindPopup()
+      if(this.popup_info===null) {
+        this.popup_info=this.clicked_marker.bindPopup()
+      }
 
       if(this.adding_supply_chain) text += ('<br><br><button class="trigger">ADD SUPPLY CHAIN INDUSTRY</button>')
-      else if(add_industry) text += ('<br><br><button class="trigger">ADD INDUSTRY</button>')
+      else if(add_industry === true) text += ('<br><br><button class="trigger">ADD INDUSTRY</button>')
+      else if(add_industry === "supply_chain") text += ('<br><br>'+this.supply_chain_name)
+
 
       this.popup_info.setPopupContent(text)
       this.popup_info.openPopup()
@@ -999,18 +1005,50 @@ export default {
       let _this = this
       _this.markers = []
       markers.forEach(marker =>{
-        let new_marker = L.marker(marker.latlng).addTo(_this.mapDiv).on('click', function(e) {
-          _this.mapDiv.panTo(marker.latlng)
-          _this.$emit('editIndustry', marker.assessment, marker.industry)
 
-          if(_this.selected_layer!==null) {
-            _this.popup_info=new_marker.bindPopup()
-            let current_layer = _this.get_layer(_this.selected_layer, _this.baseline_future_model, _this.annual_monthly_model, _this.months_model)
-            current_layer.click(marker.latlng, false)
-          }else{
-          }
+        let new_marker = null
+        if(marker.isSupplyChain){
 
-        });
+          let smallIcon = new L.Icon({
+            iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-blue.png',
+            shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+            iconSize: [12, 20],
+            iconAnchor: [6, 20],
+            popupAnchor: [1, -17],
+            shadowSize: [20, 20]
+          });
+
+          new_marker = L.marker(marker.latlng, {icon: smallIcon}).addTo(_this.mapDiv)
+
+          new_marker.on('click', function(e) {
+            _this.mapDiv.panTo(marker.latlng)
+            if(_this.selected_layer!==null) {
+              _this.popup_info=new_marker.bindPopup()
+              _this.supply_chain_name = marker.name
+              //_this.toggle_popup(marker.name, false)
+              let current_layer = _this.get_layer(_this.selected_layer, _this.baseline_future_model, _this.annual_monthly_model, _this.months_model)
+              current_layer.click(marker.latlng, "supply_chain")
+            }else{
+              new_marker.unbindPopup()
+              _this.popup_info=new_marker.bindPopup()
+              _this.toggle_popup(marker.name, false)
+            }
+          })
+
+        }
+        else {
+          new_marker = L.marker(marker.latlng).addTo(_this.mapDiv).on('click', function(e) {
+            _this.mapDiv.panTo(marker.latlng)
+            _this.$emit('editIndustry', marker.assessment, marker.industry)
+
+            if(_this.selected_layer!==null) {
+              _this.popup_info=new_marker.bindPopup()
+              let current_layer = _this.get_layer(_this.selected_layer, _this.baseline_future_model, _this.annual_monthly_model, _this.months_model)
+              current_layer.click(marker.latlng, false)
+            }else{
+            }
+          });
+        }
 
         _this.markers.push(new_marker)
       })

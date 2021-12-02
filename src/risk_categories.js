@@ -1,5 +1,5 @@
 
-let blue = ['blue', "Low impact"]
+let blue = ['#529fee', "Low impact"]
 let red = ['red', "Very high impact"]
 let orange = ['orange', "High impact"]
 let yellow = ['yellow', "Medium impact"]

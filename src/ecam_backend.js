@@ -437,11 +437,11 @@ export class WWTP{
 
         //biogas
         this.wwt_biog_pro = 0;  //Nm3 | total biogas produced
-        this.wwt_biog_fla = 98; //% of biogas produced that is flared
+        this.wwt_biog_fla = 0; //% of biogas produced that is flared
         this.wwt_biog_val = 0;  //% of biogas produced that is used for heat
-        this.wwt_biog_lkd = 2;  //% of biogas produced that is leaked
+        this.wwt_biog_lkd = 0;  //% of biogas produced that is leaked
         this.wwt_biog_sold = 0;
-        this.wwt_ch4_biog = 59; //% of CH4 in biogas (volume)
+        this.wwt_ch4_biog = 0; //% of CH4 in biogas (volume)
         this.wwt_dige_typ = 0;  //Option | type of fuel for digester
         this.wwt_fuel_dig = 0;  //L | volume of fuel used in the digester
 
@@ -466,13 +466,13 @@ export class WWTP{
         this.wwt_slu_comp_solids_content                = 0; //%
         this.wwt_slu_comp_TVS                           = 0; //%
         this.wwt_slu_comp_N_cont                        = 0; //%
-        this.wwt_slu_comp_low_CN_EF                     = 0.015; //kgN2O-N/kgN
-        this.wwt_slu_comp_uncovered_pile_EF             = 0.025; //kgCH4/kgC
-        this.wwt_slu_comp_seqst_rate                    = 0.25; //kgCO2eq/kgSludge
+        this.wwt_slu_comp_low_CN_EF                     = 0; //kgN2O-N/kgN
+        this.wwt_slu_comp_uncovered_pile_EF             = 0; //kgCH4/kgC
+        this.wwt_slu_comp_seqst_rate                    = 0; //kgCO2eq/kgSludge
 
         //sludge incineration
         this.wwt_mass_slu_inc   = 0;    //kg of sludge incinerated
-        this.wwt_temp_inc       = 1023; //K | temperature incineration
+        this.wwt_temp_inc       = 0; //K | temperature incineration
         this.wwt_slu_inc_N_cont = 0;    //% of N
         this.wwt_slu_inc_SNCR   = 0;    //boolean
 
@@ -486,13 +486,13 @@ export class WWTP{
         //sludge LF
         this.wwt_mass_slu_land      = 0;    //kg of sludge sent to LF
         this.wwt_slu_lf_TVS         = 0;    //%
-        this.wwt_slu_lf_uncertainty = 0.9;  //adimensional
-        this.wwt_slu_lf_CH4_in_gas  = 50;   //%
-        this.wwt_slu_lf_DOCf        = 80;   //%
-        this.wwt_slu_lf_decomp_3yr  = 69.9; //%
-        this.wwt_slu_lf_MCF         = 1;    //ratio
+        this.wwt_slu_lf_uncertainty = 0;  //adimensional
+        this.wwt_slu_lf_CH4_in_gas  = 0;   //%
+        this.wwt_slu_lf_DOCf        = 0;   //%
+        this.wwt_slu_lf_decomp_3yr  = 0; //%
+        this.wwt_slu_lf_MCF         = 0;    //ratio
         this.wwt_slu_lf_N_cont      = 0;    //% N content
-        this.wwt_slu_lf_low_CN_EF   = 0.015; //kgN2O-N/kgN
+        this.wwt_slu_lf_low_CN_EF   = 0; //kgN2O-N/kgN
 
         //sludge SP
         this.wwt_mass_slu_stock = 0;  //kg of sludge stockpiled
@@ -1011,7 +1011,7 @@ export let Tables={
         {name:"Untreated systems",                                                     cod_effl:1,  bod_effl_table:"[100%]",    N_effl:1.00,   N_effl_table:"[100%]", diclo_effl:1,  diclo_effl_table:"[100%]", cadmium_effl:1,  cadmium_effl_table:"[100%]",hexaclorobenzene_effl:1,  hexaclorobenzene_effl_table:"[100%]",mercury_effl:1,  mercury_effl_table:"[100%]",plomo_effl:1,  plomo_effl_table:"[100%]",niquel_effl:1,  niquel_effl_table:"[100%]",chloro_effl:1,  chloro_effl_table:"[100%]", hexaclorobutadie_effl:1,  hexaclorobutadie_effl_table:"[100%]", nonilfenols_effl:1,  nonilfenols_effl_table:"[100%]", tetracloroetile_effl:1,  tetracloroetile_effl_table:"[100%]",tricloroetile_effl:1, tricloroetile_effl_table:"[100%]",},
         {name:"Primary (mechanical treatment plants)",                                 cod_effl:0.60, bod_effl_table:"[60%]", N_effl:0.90, N_effl_table:"[90%]", diclo_effl:0.7875,  diclo_effl_table:"[78.75%]", cadmium_effl:0.785,  cadmium_effl_table:"[78.5%]", hexaclorobenzene_effl:1,  hexaclorobenzene_effl_table:"[100%]",mercury_effl:0.64,  mercury_effl_table:"[64%]",plomo_effl:0.585,  plomo_effl_table:"[58.5%]",niquel_effl:0.83,  niquel_effl_table:"[83%]",chloro_effl:0.9,  chloro_effl_table:"[90%]", hexaclorobutadie_effl:0.95,  hexaclorobutadie_effl_table:"[95%]", nonilfenols_effl:0.57,  nonilfenols_effl_table:"[57%]", tetracloroetile_effl:0.765,  tetracloroetile_effl_table:"[76.5%]",tricloroetile_effl:0.9, tricloroetile_effl_table:"[90%]"},
         {name:"Primary + Secondary (biological treatment plants)",                     cod_effl:0.15, bod_effl_table:"[15%]", N_effl:0.60, N_effl_table:"[60%]", diclo_effl:0.3268125,  diclo_effl_table:"[32.68%]", cadmium_effl:0.42785,  cadmium_effl_table:"[42.785%]", hexaclorobenzene_effl:1,  hexaclorobenzene_effl_table:"[100%]",mercury_effl:0.53312,  mercury_effl_table:"[53.312%]",plomo_effl:0.2720835,  plomo_effl_table:"[27.20835%]",niquel_effl:0.41417,  niquel_effl_table:"[41.417%]",chloro_effl:0.54,  chloro_effl_table:"[54%]", hexaclorobutadie_effl:0.19,  hexaclorobutadie_effl_table:"[19%]", nonilfenols_effl:0.1197,  nonilfenols_effl_table:"[11.97%]", tetracloroetile_effl:0.153,  tetracloroetile_effl_table:"[15.3%]",tricloroetile_effl:0.222, tricloroetile_effl_table:"[22.2%]"},
-        {name:"Primary + Secondary + Tertiary (advanced biological treatment plants)", cod_effl:0.10, bod_effl_table:"[10%]", N_effl:0.20, N_effl_table:"[20%]", diclo_effl:0.0653625,  diclo_effl_table:"[65.36%]", cadmium_effl:0.15829525,  cadmium_effl_table:"[15.83%]", hexaclorobenzene_effl:0.4275,  hexaclorobenzene_effl_table:"[42.75%]",mercury_effl:0.53312,  mercury_effl_table:"[53.312%]",plomo_effl:0.087746929,  plomo_effl_table:"[8.77%]",niquel_effl:0.256437,  niquel_effl_table:"[25.64%]",chloro_effl:0.54,  chloro_effl_table:"[54%]", hexaclorobutadie_effl:0.19,  hexaclorobutadie_effl_table:"[19%]", nonilfenols_effl:0.005985,  nonilfenols_effl_table:"[0.59%]", tetracloroetile_effl:0.00918,  tetracloroetile_effl_table:"[0.918%]",tricloroetile_effl:0.01332, tricloroetile_effl_table:"[1.33%]"},
+        {name:"Primary + Secondary + Tertiary (advanced biological treatment plants)", cod_effl:0.10, bod_effl_table:"[10%]", N_effl:0.20, N_effl_table:"[20%]", diclo_effl:0.0653625,  diclo_effl_table:"[6.53%]", cadmium_effl:0.15829525,  cadmium_effl_table:"[15.83%]", hexaclorobenzene_effl:0.4275,  hexaclorobenzene_effl_table:"[42.75%]",mercury_effl:0.53312,  mercury_effl_table:"[53.312%]",plomo_effl:0.087746929,  plomo_effl_table:"[8.77%]",niquel_effl:0.256437,  niquel_effl_table:"[25.64%]",chloro_effl:0.54,  chloro_effl_table:"[54%]", hexaclorobutadie_effl:0.19,  hexaclorobutadie_effl_table:"[19%]", nonilfenols_effl:0.005985,  nonilfenols_effl_table:"[0.59%]", tetracloroetile_effl:0.00918,  tetracloroetile_effl_table:"[0.918%]",tricloroetile_effl:0.01332, tricloroetile_effl_table:"[1.33%]"},
     ],
 
     "WW treatment type":[
