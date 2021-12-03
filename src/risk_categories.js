@@ -5,11 +5,11 @@ let orange = ['orange', "High impact"]
 let yellow = ['yellow', "Medium impact"]
 
 let layers = {
-    l: ['#f6f600', "Low"],
-    lm: ['#f6cc00', "Low-medium"],
-    mh: ['#ff9900', "Medium-high"],
-    h: ['#ff1900', "High"],
-    eh: ['#990000', "Extremely high"],
+    l: ['#f6f600', "Low risk"],
+    lm: ['#f6cc00', "Low-medium risk"],
+    mh: ['#ff9900', "Medium-high risk"],
+    h: ['#ff1900', "High risk"],
+    eh: ['#990000', "Extremely high risk"],
 }
 
 let risk_category = {
@@ -168,7 +168,52 @@ let risk_category = {
         if(value <= 5) return blue
         else if(value > 5) return red
         return null
-    }
+    },
+
+    legend_impact_pdf: function(dd){
+        dd.content.push({
+            style: 'legend',
+            layout: 'noBorders',
+            table: {
+                widths: [10, 'auto', 10, 'auto', 10, 'auto', 10, 'auto'],
+                body: [
+                    [{text: " ", fillColor: blue[0]},
+                        {text: blue[1]},
+                        {text: " ", fillColor: yellow[0]},
+                        {text: yellow[1],},
+                        {text: " ", fillColor: orange[0]},
+                        {text: orange[1]},
+                        {text: " ", fillColor: red[0]},
+                        {text: red[1]},
+                    ]
+                ]
+            }
+        })
+
+    },
+    legend_risk_pdf: function(dd){
+        dd.content.push({
+            style: 'legend',
+            layout: 'noBorders',
+            table: {
+                widths: [10, 'auto', 10, 'auto', 10, 'auto', 10, 'auto', 10, 'auto'],
+                body: [
+                    [{text: " ", fillColor: layers.l[0]},
+                        {text: layers.l[1]},
+                        {text: " ", fillColor: layers.lm[0]},
+                        {text: layers.lm[1],},
+                        {text: " ", fillColor: layers.mh[0]},
+                        {text: layers.mh[1]},
+                        {text: " ", fillColor: layers.h[0]},
+                        {text: layers.h[1]},
+                        {text: " ", fillColor: layers.eh[0]},
+                        {text: layers.eh[1]},
+                    ]
+                ]
+            }
+        })
+
+    },
 
 
 

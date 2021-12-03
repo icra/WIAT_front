@@ -323,7 +323,7 @@
                           <v-expansion-panel>
                             <v-expansion-panel-header>
                               <div class = table_descriptor>
-                                <span class="table_title"> Chemical pollution </span>
+                                <span class="table_title"> Impact on biodiversity and ecosystems </span>
                               </div>
 
                             </v-expansion-panel-header>
@@ -2449,6 +2449,11 @@ export default {
 
           dd.content.push(layers_description)
 
+          dd.content.push("\n")
+          risk_categories.legend_risk_pdf(dd)
+          dd.content.push("\n\n")
+
+
         }
 
       }
@@ -2551,6 +2556,8 @@ export default {
 
       dd.content.push(industriesEmission)
       dd.content.push("\n\n")
+
+
       dd.content.push({
         image: chart.toBase64Image(),
         fit: [500, 500]
@@ -2644,6 +2651,8 @@ export default {
       });
 
       dd.content.push(industriesIndicator)
+      dd.content.push("\n")
+      risk_categories.legend_impact_pdf(dd)
       dd.content.push("\n\n")
       dd.content.push({
         image: chart.toBase64Image(),
@@ -2730,6 +2739,8 @@ export default {
       dd.content.push(industriesIndicator)
       dd.content.push("\n\n")
       dd.content.push(industriesIndicator_1)
+      dd.content.push("\n")
+      risk_categories.legend_impact_pdf(dd)
       dd.content.push("\n\n")
 
 
@@ -2845,7 +2856,7 @@ export default {
       else if(this.period_model === "assessment") days_factor = assessment_days
 
       dd.content.push({
-        text: "Chemical pollution\n\n",
+        text: "Impact on biodiversity and ecosystems\n\n",
         style: 'subheader'
       })
 
@@ -2984,6 +2995,9 @@ export default {
       });
 
       dd.content.push(industriesEcotoxicity)
+      dd.content.push("\n")
+      dd.content.push("\n")
+      risk_categories.legend_impact_pdf(dd)
       dd.content.push("\n")
       dd.content.push([
         {text: [{text: "1", sup: true, style: "asterisk"}, {text:"1,2-Dichloroethane, "},
@@ -3356,6 +3370,8 @@ export default {
 
       dd.content.push(industriesEcotoxicity)
       dd.content.push("\n")
+      risk_categories.legend_impact_pdf(dd)
+      dd.content.push("\n")
       dd.content.push([
         {text: [{text: "1", sup: true, style: "asterisk"}, {text:"1,2-Dichloroethane, "},
             {text: [{text: "2", sup: true, style: "asterisk"}, {text:"Hexachlorobenzene, "}]},
@@ -3462,6 +3478,9 @@ export default {
 
       dd.content.push(industriesEcotoxicity)
       dd.content.push("\n")
+      risk_categories.legend_impact_pdf(dd)
+
+      dd.content.push("\n")
       dd.content.push([
         {text: [{text: "1", sup: true, style: "asterisk"}, {text:"1,2-Dichloroethane, "},
             {text: [{text: "2", sup: true, style: "asterisk"}, {text:"Hexachlorobenzene, "}]},
@@ -3471,6 +3490,7 @@ export default {
             {text: [{text: "6", sup: true, style: "asterisk"}, {text:"Trichloroethylene"}]},
           ]},
       ])
+      dd.content.push("\n\n\n")
 
 
     },
@@ -3705,6 +3725,8 @@ export default {
       }
 
       dd.content.push(industriesIndicator)
+      dd.content.push("\n")
+      risk_categories.legend_impact_pdf(dd)
       dd.content.push("\n\n")
 
     },
@@ -3879,6 +3901,10 @@ export default {
             fontSize: 12,
             bold: true
           },
+          legend: {
+            fontSize: 8,
+          },
+
           tableHeader: {
             bold: true,
             fontSize: 12,
@@ -3969,7 +3995,6 @@ export default {
           await this.reporting_pdf(dd, industries, assessment_days)
           dd.content.push("\n\n")
         }
-
 
 
         await this.layers_table_pdf(dd, industries, assessment_days)

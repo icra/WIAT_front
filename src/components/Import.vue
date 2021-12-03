@@ -5,7 +5,7 @@
 
     <h1>Load and save file</h1>
     <div style="display: flex; padding-top: 30px">
-      <div class= "load_and_save" style="width: 48%">
+      <div class= "load_and_save" style="width: 65%">
         <div style="padding-top: 15px; padding-left: 16px">
           <b>Import session</b>
         </div>
@@ -116,6 +116,7 @@
       </div>
     </div>
 
+    <!--
     <div style="padding-top: 15px">
       <h1>Load from Excel file</h1>
     </div>
@@ -157,7 +158,7 @@
         </v-col>
       </v-row>
     </div>
-
+    -->
 
     <v-snackbar
         v-model="snackbar_imported_file"

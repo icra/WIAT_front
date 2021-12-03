@@ -174,7 +174,7 @@
       <!-- Main content -->
     <div style="position: absolute; height: 100%; width: 100%">
       <div class="content" :class="manageContentClass">
-        <router-view :selected_assessment="assessment_expansion_panel" :selected_layer="selected_layer" :selected_industry="selected_industry" @createIndustry="createNewIndustry" @createSupplyChain="create_supply_chain" @editIndustry="open_edit_industry_tab" @selectLayer="toggleLayerSelection" @closeRightMenu="closeRightMenu" @closeLayer="applyLayer(selected_layer)" ref="reference"></router-view>
+        <router-view :selected_assessment="assessment_expansion_panel" :selected_layer="selected_layer" :selected_industry="selected_industry" @createIndustry="createNewIndustry" @createSupplyChain="create_supply_chain" @editIndustry="open_edit_industry_tab" @selectLayer="toggleLayerSelection" @closeRightMenu="closeRightMenu" @closeLayer="applyLayer(selected_layer)" @changeFirstMenuTab="changeFirstMenuTab" ref="reference"></router-view>
       </div>
     </div>
 
@@ -639,6 +639,9 @@ export default {
 
   methods: {
 
+    changeFirstMenuTab(tab){
+      this.icon_selected = tab
+    },
     add_supply_chain_industry(){
       try {
         this.$refs.reference.enter_supply_chain_mode()

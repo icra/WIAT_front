@@ -351,71 +351,750 @@
                   </template>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content style="padding: 30px">
-                  <v-row
-                      align="center"
-                      v-for = "input in array_difference(onsite_wwtp_inputs, basic_inputs)"
-                      :key="input"
 
-                  >
-                    <v-col cols="8" >
-                      <div style="width: 100%;">
-                        <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                  <v-expansion-panels style="padding-top: 20px">
+                    <v-expansion-panel>
+                      <v-expansion-panel-header >
+                        <h3>Effluent pollution</h3>
+                      </v-expansion-panel-header>
+                      <v-expansion-panel-content style="padding: 30px">
+                        <v-row
+                            align="center"
+                            v-for = "input in advanced_pollution_effluent"
+                            :key="input"
+
+                        >
+                          <v-col cols="8" >
+                            <div style="width: 100%;">
+                              <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                     <span>
                       {{user_inputs[input].question}}
                     </span>
-                          <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
-                                 outlined
-                                 x-small
-                                 @click="onsite_wwtp_model[input] = button_estimations(input)"
-                          >
-                            Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
-                          </v-btn>
-                        </div>
-                        <div v-if="select_estimation.includes(input)" style="width: 100%">
-                          <select v-model = "onsite_wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
-                            <option
-                                v-for="item in select_estimations(input)"
-                                :value="item.value"
-                            >
-                              <!--Desplegable amb estimació-->
-                              {{item.name}} ({{item.value.toFixed(3)}})
-                            </option>
-                            <option :value="onsite_wwtp_model[input]">Custom value</option>
-                          </select>
-                        </div>
+                                <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
+                                       outlined
+                                       x-small
+                                       @click="onsite_wwtp_model[input] = button_estimations(input)"
+                                >
+                                  Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
+                                </v-btn>
+                              </div>
+                              <div v-if="select_estimation.includes(input)" style="width: 100%">
+                                <select v-model = "onsite_wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                                  <option
+                                      v-for="item in select_estimations(input)"
+                                      :value="item.value"
+                                  >
+                                    <!--Desplegable amb estimació-->
+                                    {{item.name}} ({{item.value.toFixed(3)}})
+                                  </option>
+                                  <option :value="onsite_wwtp_model[input]">Custom value</option>
+                                </select>
+                              </div>
 
-                      </div>
-                    </v-col>
-                    <v-col cols="4">
-                      <div>
-                        <div>
-                          <v-select
-                              v-if="type_option[input]"
-                              v-model="onsite_wwtp_model[input]"
-                              item-text="text"
-                              item-value="value"
-                              :items="type_option[input].items"
-                              label="Select"
-                          >
-                          </v-select>
-                          <v-text-field
-                              v-else
-                              v-model="onsite_wwtp_model[input]"
-                              :suffix=user_inputs[input].unit
-                              type="number"
-                          ></v-text-field>
+                            </div>
+                          </v-col>
+                          <v-col cols="4">
+                            <div>
+                              <div>
+                                <v-select
+                                    v-if="type_option[input]"
+                                    v-model="onsite_wwtp_model[input]"
+                                    item-text="text"
+                                    item-value="value"
+                                    :items="type_option[input].items"
+                                    label="Select"
+                                >
+                                </v-select>
+                                <v-text-field
+                                    v-else
+                                    v-model="onsite_wwtp_model[input]"
+                                    :suffix=user_inputs[input].unit
+                                    type="number"
+                                ></v-text-field>
 
-                        </div>
-                      </div>
+                              </div>
+                            </div>
 
-                    </v-col>
+                          </v-col>
 
-                  </v-row>
+                        </v-row>
+                      </v-expansion-panel-content>
+                    </v-expansion-panel>
+                    <v-expansion-panel>
+                      <v-expansion-panel-header >
+                        <h3>Fuel engines</h3>
+                      </v-expansion-panel-header>
+                      <v-expansion-panel-content style="padding: 30px">
+                        <v-row
+                            align="center"
+                            v-for = "input in advanced_fuel_engines"
+                            :key="input"
 
+                        >
+                          <v-col cols="8" >
+                            <div style="width: 100%;">
+                              <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                    <span>
+                      {{user_inputs[input].question}}
+                    </span>
+                                <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
+                                       outlined
+                                       x-small
+                                       @click="onsite_wwtp_model[input] = button_estimations(input)"
+                                >
+                                  Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
+                                </v-btn>
+                              </div>
+                              <div v-if="select_estimation.includes(input)" style="width: 100%">
+                                <select v-model = "onsite_wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                                  <option
+                                      v-for="item in select_estimations(input)"
+                                      :value="item.value"
+                                  >
+                                    <!--Desplegable amb estimació-->
+                                    {{item.name}} ({{item.value.toFixed(3)}})
+                                  </option>
+                                  <option :value="onsite_wwtp_model[input]">Custom value</option>
+                                </select>
+                              </div>
+
+                            </div>
+                          </v-col>
+                          <v-col cols="4">
+                            <div>
+                              <div>
+                                <v-select
+                                    v-if="type_option[input]"
+                                    v-model="onsite_wwtp_model[input]"
+                                    item-text="text"
+                                    item-value="value"
+                                    :items="type_option[input].items"
+                                    label="Select"
+                                >
+                                </v-select>
+                                <v-text-field
+                                    v-else
+                                    v-model="onsite_wwtp_model[input]"
+                                    :suffix=user_inputs[input].unit
+                                    type="number"
+                                ></v-text-field>
+
+                              </div>
+                            </div>
+
+                          </v-col>
+
+                        </v-row>
+                      </v-expansion-panel-content>
+                    </v-expansion-panel>
+                    <v-expansion-panel>
+                      <v-expansion-panel-header >
+                        <h3>Biogas produced from anaerobic digestion</h3>
+                      </v-expansion-panel-header>
+                      <v-expansion-panel-content style="padding: 30px">
+                        <v-row
+                            align="center"
+                            v-for = "input in advanced_biogas_from_anaerobic"
+                            :key="input"
+
+                        >
+                          <v-col cols="8" >
+                            <div style="width: 100%;">
+                              <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                    <span>
+                      {{user_inputs[input].question}}
+                    </span>
+                                <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
+                                       outlined
+                                       x-small
+                                       @click="onsite_wwtp_model[input] = button_estimations(input)"
+                                >
+                                  Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
+                                </v-btn>
+                              </div>
+                              <div v-if="select_estimation.includes(input)" style="width: 100%">
+                                <select v-model = "onsite_wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                                  <option
+                                      v-for="item in select_estimations(input)"
+                                      :value="item.value"
+                                  >
+                                    <!--Desplegable amb estimació-->
+                                    {{item.name}} ({{item.value.toFixed(3)}})
+                                  </option>
+                                  <option :value="onsite_wwtp_model[input]">Custom value</option>
+                                </select>
+                              </div>
+
+                            </div>
+                          </v-col>
+                          <v-col cols="4">
+                            <div>
+                              <div>
+                                <v-select
+                                    v-if="type_option[input]"
+                                    v-model="onsite_wwtp_model[input]"
+                                    item-text="text"
+                                    item-value="value"
+                                    :items="type_option[input].items"
+                                    label="Select"
+                                >
+                                </v-select>
+                                <v-text-field
+                                    v-else
+                                    v-model="onsite_wwtp_model[input]"
+                                    :suffix=user_inputs[input].unit
+                                    type="number"
+                                ></v-text-field>
+
+                              </div>
+                            </div>
+
+                          </v-col>
+
+                        </v-row>
+                      </v-expansion-panel-content>
+                    </v-expansion-panel>
+                    <v-expansion-panel>
+                      <v-expansion-panel-header >
+                        <h3>Fuel used in water reuse trucks</h3>
+                      </v-expansion-panel-header>
+                      <v-expansion-panel-content style="padding: 30px">
+                        <v-row
+                            align="center"
+                            v-for = "input in advanced_water_reuse_trucks"
+                            :key="input"
+
+                        >
+                          <v-col cols="8" >
+                            <div style="width: 100%;">
+                              <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                    <span>
+                      {{user_inputs[input].question}}
+                    </span>
+                                <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
+                                       outlined
+                                       x-small
+                                       @click="onsite_wwtp_model[input] = button_estimations(input)"
+                                >
+                                  Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
+                                </v-btn>
+                              </div>
+                              <div v-if="select_estimation.includes(input)" style="width: 100%">
+                                <select v-model = "onsite_wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                                  <option
+                                      v-for="item in select_estimations(input)"
+                                      :value="item.value"
+                                  >
+                                    <!--Desplegable amb estimació-->
+                                    {{item.name}} ({{item.value.toFixed(3)}})
+                                  </option>
+                                  <option :value="onsite_wwtp_model[input]">Custom value</option>
+                                </select>
+                              </div>
+
+                            </div>
+                          </v-col>
+                          <v-col cols="4">
+                            <div>
+                              <div>
+                                <v-select
+                                    v-if="type_option[input]"
+                                    v-model="onsite_wwtp_model[input]"
+                                    item-text="text"
+                                    item-value="value"
+                                    :items="type_option[input].items"
+                                    label="Select"
+                                >
+                                </v-select>
+                                <v-text-field
+                                    v-else
+                                    v-model="onsite_wwtp_model[input]"
+                                    :suffix=user_inputs[input].unit
+                                    type="number"
+                                ></v-text-field>
+
+                              </div>
+                            </div>
+
+                          </v-col>
+
+                        </v-row>
+                      </v-expansion-panel-content>
+                    </v-expansion-panel>
+                    <v-expansion-panel>
+                      <v-expansion-panel-header >
+                        <h3>Sludge storage in WWTP</h3>
+                      </v-expansion-panel-header>
+                      <v-expansion-panel-content style="padding: 30px">
+                        <v-row
+                            align="center"
+                            v-for = "input in advanced_sludge_Storage"
+                            :key="input"
+
+                        >
+                          <v-col cols="8" >
+                            <div style="width: 100%;">
+                              <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                    <span>
+                      {{user_inputs[input].question}}
+                    </span>
+                                <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
+                                       outlined
+                                       x-small
+                                       @click="onsite_wwtp_model[input] = button_estimations(input)"
+                                >
+                                  Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
+                                </v-btn>
+                              </div>
+                              <div v-if="select_estimation.includes(input)" style="width: 100%">
+                                <select v-model = "onsite_wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                                  <option
+                                      v-for="item in select_estimations(input)"
+                                      :value="item.value"
+                                  >
+                                    <!--Desplegable amb estimació-->
+                                    {{item.name}} ({{item.value.toFixed(3)}})
+                                  </option>
+                                  <option :value="onsite_wwtp_model[input]">Custom value</option>
+                                </select>
+                              </div>
+
+                            </div>
+                          </v-col>
+                          <v-col cols="4">
+                            <div>
+                              <div>
+                                <v-select
+                                    v-if="type_option[input]"
+                                    v-model="onsite_wwtp_model[input]"
+                                    item-text="text"
+                                    item-value="value"
+                                    :items="type_option[input].items"
+                                    label="Select"
+                                >
+                                </v-select>
+                                <v-text-field
+                                    v-else
+                                    v-model="onsite_wwtp_model[input]"
+                                    :suffix=user_inputs[input].unit
+                                    type="number"
+                                ></v-text-field>
+
+                              </div>
+                            </div>
+
+                          </v-col>
+
+                        </v-row>
+                      </v-expansion-panel-content>
+                    </v-expansion-panel>
+                    <v-expansion-panel>
+                      <v-expansion-panel-header >
+                        <h3>Sludge composting in WWTP</h3>
+                      </v-expansion-panel-header>
+                      <v-expansion-panel-content style="padding: 30px">
+                        <v-row
+                            align="center"
+                            v-for = "input in advanced_sludge_composting"
+                            :key="input"
+
+                        >
+                          <v-col cols="8" >
+                            <div style="width: 100%;">
+                              <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                    <span>
+                      {{user_inputs[input].question}}
+                    </span>
+                                <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
+                                       outlined
+                                       x-small
+                                       @click="onsite_wwtp_model[input] = button_estimations(input)"
+                                >
+                                  Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
+                                </v-btn>
+                              </div>
+                              <div v-if="select_estimation.includes(input)" style="width: 100%">
+                                <select v-model = "onsite_wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                                  <option
+                                      v-for="item in select_estimations(input)"
+                                      :value="item.value"
+                                  >
+                                    <!--Desplegable amb estimació-->
+                                    {{item.name}} ({{item.value.toFixed(3)}})
+                                  </option>
+                                  <option :value="onsite_wwtp_model[input]">Custom value</option>
+                                </select>
+                              </div>
+
+                            </div>
+                          </v-col>
+                          <v-col cols="4">
+                            <div>
+                              <div>
+                                <v-select
+                                    v-if="type_option[input]"
+                                    v-model="onsite_wwtp_model[input]"
+                                    item-text="text"
+                                    item-value="value"
+                                    :items="type_option[input].items"
+                                    label="Select"
+                                >
+                                </v-select>
+                                <v-text-field
+                                    v-else
+                                    v-model="onsite_wwtp_model[input]"
+                                    :suffix=user_inputs[input].unit
+                                    type="number"
+                                ></v-text-field>
+
+                              </div>
+                            </div>
+
+                          </v-col>
+
+                        </v-row>
+                      </v-expansion-panel-content>
+                    </v-expansion-panel>
+                    <v-expansion-panel>
+                      <v-expansion-panel-header >
+                        <h3>Sludge incineration</h3>
+                      </v-expansion-panel-header>
+                      <v-expansion-panel-content style="padding: 30px">
+                        <v-row
+                            align="center"
+                            v-for = "input in advanced_sludge_incineration"
+                            :key="input"
+
+                        >
+                          <v-col cols="8" >
+                            <div style="width: 100%;">
+                              <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                    <span>
+                      {{user_inputs[input].question}}
+                    </span>
+                                <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
+                                       outlined
+                                       x-small
+                                       @click="onsite_wwtp_model[input] = button_estimations(input)"
+                                >
+                                  Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
+                                </v-btn>
+                              </div>
+                              <div v-if="select_estimation.includes(input)" style="width: 100%">
+                                <select v-model = "onsite_wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                                  <option
+                                      v-for="item in select_estimations(input)"
+                                      :value="item.value"
+                                  >
+                                    <!--Desplegable amb estimació-->
+                                    {{item.name}} ({{item.value.toFixed(3)}})
+                                  </option>
+                                  <option :value="onsite_wwtp_model[input]">Custom value</option>
+                                </select>
+                              </div>
+
+                            </div>
+                          </v-col>
+                          <v-col cols="4">
+                            <div>
+                              <div>
+                                <v-select
+                                    v-if="type_option[input]"
+                                    v-model="onsite_wwtp_model[input]"
+                                    item-text="text"
+                                    item-value="value"
+                                    :items="type_option[input].items"
+                                    label="Select"
+                                >
+                                </v-select>
+                                <v-text-field
+                                    v-else
+                                    v-model="onsite_wwtp_model[input]"
+                                    :suffix=user_inputs[input].unit
+                                    type="number"
+                                ></v-text-field>
+
+                              </div>
+                            </div>
+
+                          </v-col>
+
+                        </v-row>
+                      </v-expansion-panel-content>
+                    </v-expansion-panel>
+                    <v-expansion-panel>
+                      <v-expansion-panel-header >
+                        <h3>Sludge sent to dry application</h3>
+                      </v-expansion-panel-header>
+                      <v-expansion-panel-content style="padding: 30px">
+                        <v-row
+                            align="center"
+                            v-for = "input in advanced_application"
+                            :key="input"
+
+                        >
+                          <v-col cols="8" >
+                            <div style="width: 100%;">
+                              <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                    <span>
+                      {{user_inputs[input].question}}
+                    </span>
+                                <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
+                                       outlined
+                                       x-small
+                                       @click="onsite_wwtp_model[input] = button_estimations(input)"
+                                >
+                                  Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
+                                </v-btn>
+                              </div>
+                              <div v-if="select_estimation.includes(input)" style="width: 100%">
+                                <select v-model = "onsite_wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                                  <option
+                                      v-for="item in select_estimations(input)"
+                                      :value="item.value"
+                                  >
+                                    <!--Desplegable amb estimació-->
+                                    {{item.name}} ({{item.value.toFixed(3)}})
+                                  </option>
+                                  <option :value="onsite_wwtp_model[input]">Custom value</option>
+                                </select>
+                              </div>
+
+                            </div>
+                          </v-col>
+                          <v-col cols="4">
+                            <div>
+                              <div>
+                                <v-select
+                                    v-if="type_option[input]"
+                                    v-model="onsite_wwtp_model[input]"
+                                    item-text="text"
+                                    item-value="value"
+                                    :items="type_option[input].items"
+                                    label="Select"
+                                >
+                                </v-select>
+                                <v-text-field
+                                    v-else
+                                    v-model="onsite_wwtp_model[input]"
+                                    :suffix=user_inputs[input].unit
+                                    type="number"
+                                ></v-text-field>
+
+                              </div>
+                            </div>
+
+                          </v-col>
+
+                        </v-row>
+                      </v-expansion-panel-content>
+                    </v-expansion-panel>
+                    <v-expansion-panel>
+                      <v-expansion-panel-header >
+                        <h3>Sludge landfilling</h3>
+                      </v-expansion-panel-header>
+                      <v-expansion-panel-content style="padding: 30px">
+                        <v-row
+                            align="center"
+                            v-for = "input in advanced_landfilling"
+                            :key="input"
+
+                        >
+                          <v-col cols="8" >
+                            <div style="width: 100%;">
+                              <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                    <span>
+                      {{user_inputs[input].question}}
+                    </span>
+                                <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
+                                       outlined
+                                       x-small
+                                       @click="onsite_wwtp_model[input] = button_estimations(input)"
+                                >
+                                  Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
+                                </v-btn>
+                              </div>
+                              <div v-if="select_estimation.includes(input)" style="width: 100%">
+                                <select v-model = "onsite_wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                                  <option
+                                      v-for="item in select_estimations(input)"
+                                      :value="item.value"
+                                  >
+                                    <!--Desplegable amb estimació-->
+                                    {{item.name}} ({{item.value.toFixed(3)}})
+                                  </option>
+                                  <option :value="onsite_wwtp_model[input]">Custom value</option>
+                                </select>
+                              </div>
+
+                            </div>
+                          </v-col>
+                          <v-col cols="4">
+                            <div>
+                              <div>
+                                <v-select
+                                    v-if="type_option[input]"
+                                    v-model="onsite_wwtp_model[input]"
+                                    item-text="text"
+                                    item-value="value"
+                                    :items="type_option[input].items"
+                                    label="Select"
+                                >
+                                </v-select>
+                                <v-text-field
+                                    v-else
+                                    v-model="onsite_wwtp_model[input]"
+                                    :suffix=user_inputs[input].unit
+                                    type="number"
+                                ></v-text-field>
+
+                              </div>
+                            </div>
+
+                          </v-col>
+
+                        </v-row>
+                      </v-expansion-panel-content>
+                    </v-expansion-panel>
+                    <v-expansion-panel>
+                      <v-expansion-panel-header >
+                        <h3>Sludge stockpiling</h3>
+                      </v-expansion-panel-header>
+                      <v-expansion-panel-content style="padding: 30px">
+                        <v-row
+                            align="center"
+                            v-for = "input in advanced_stockpiling"
+                            :key="input"
+
+                        >
+                          <v-col cols="8" >
+                            <div style="width: 100%;">
+                              <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                    <span>
+                      {{user_inputs[input].question}}
+                    </span>
+                                <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
+                                       outlined
+                                       x-small
+                                       @click="onsite_wwtp_model[input] = button_estimations(input)"
+                                >
+                                  Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
+                                </v-btn>
+                              </div>
+                              <div v-if="select_estimation.includes(input)" style="width: 100%">
+                                <select v-model = "onsite_wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                                  <option
+                                      v-for="item in select_estimations(input)"
+                                      :value="item.value"
+                                  >
+                                    <!--Desplegable amb estimació-->
+                                    {{item.name}} ({{item.value.toFixed(3)}})
+                                  </option>
+                                  <option :value="onsite_wwtp_model[input]">Custom value</option>
+                                </select>
+                              </div>
+
+                            </div>
+                          </v-col>
+                          <v-col cols="4">
+                            <div>
+                              <div>
+                                <v-select
+                                    v-if="type_option[input]"
+                                    v-model="onsite_wwtp_model[input]"
+                                    item-text="text"
+                                    item-value="value"
+                                    :items="type_option[input].items"
+                                    label="Select"
+                                >
+                                </v-select>
+                                <v-text-field
+                                    v-else
+                                    v-model="onsite_wwtp_model[input]"
+                                    :suffix=user_inputs[input].unit
+                                    type="number"
+                                ></v-text-field>
+
+                              </div>
+                            </div>
+
+                          </v-col>
+
+                        </v-row>
+                      </v-expansion-panel-content>
+                    </v-expansion-panel>
+                    <v-expansion-panel>
+                      <v-expansion-panel-header >
+                        <h3>Sludge truck transportation to disposal site</h3>
+                      </v-expansion-panel-header>
+                      <v-expansion-panel-content style="padding: 30px">
+                        <v-row
+                            align="center"
+                            v-for = "input in advanced_truck_transportation"
+                            :key="input"
+
+                        >
+                          <v-col cols="8" >
+                            <div style="width: 100%;">
+                              <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                    <span>
+                      {{user_inputs[input].question}}
+                    </span>
+                                <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
+                                       outlined
+                                       x-small
+                                       @click="onsite_wwtp_model[input] = button_estimations(input)"
+                                >
+                                  Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
+                                </v-btn>
+                              </div>
+                              <div v-if="select_estimation.includes(input)" style="width: 100%">
+                                <select v-model = "onsite_wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                                  <option
+                                      v-for="item in select_estimations(input)"
+                                      :value="item.value"
+                                  >
+                                    <!--Desplegable amb estimació-->
+                                    {{item.name}} ({{item.value.toFixed(3)}})
+                                  </option>
+                                  <option :value="onsite_wwtp_model[input]">Custom value</option>
+                                </select>
+                              </div>
+
+                            </div>
+                          </v-col>
+                          <v-col cols="4">
+                            <div>
+                              <div>
+                                <v-select
+                                    v-if="type_option[input]"
+                                    v-model="onsite_wwtp_model[input]"
+                                    item-text="text"
+                                    item-value="value"
+                                    :items="type_option[input].items"
+                                    label="Select"
+                                >
+                                </v-select>
+                                <v-text-field
+                                    v-else
+                                    v-model="onsite_wwtp_model[input]"
+                                    :suffix=user_inputs[input].unit
+                                    type="number"
+                                ></v-text-field>
+
+                              </div>
+                            </div>
+
+                          </v-col>
+
+                        </v-row>
+                      </v-expansion-panel-content>
+                    </v-expansion-panel>
+
+                  </v-expansion-panels>
                 </v-expansion-panel-content>
               </v-expansion-panel>
             </v-expansion-panels>
-
 
 
           </div>
@@ -610,66 +1289,745 @@
                   </template>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content style="padding: 30px">
-                  <v-row
-                      align="center"
-                      v-for = "input in array_difference(offsite_wwtp_inputs, basic_inputs)"
-                      :key="input"
+                  <v-expansion-panels style="padding-top: 20px">
+                    <v-expansion-panel>
+                      <v-expansion-panel-header >
+                        <h3>Effluent pollution</h3>
+                      </v-expansion-panel-header>
+                      <v-expansion-panel-content style="padding: 30px">
+                        <v-row
+                            align="center"
+                            v-for = "input in advanced_pollution_effluent"
+                            :key="input"
 
-                  >
-                    <v-col cols="8" >
-                      <div style="width: 100%;">
-                        <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                        >
+                          <v-col cols="8" >
+                            <div style="width: 100%;">
+                              <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                     <span>
                       {{user_inputs[input].question}}
                     </span>
-                          <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
-                                 outlined
-                                 x-small
-                                 @click="offsite_wwtp_model[input] = button_estimations(input)"
-                          >
-                            Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
-                          </v-btn>
-                        </div>
-                        <div v-if="select_estimation.includes(input)" style="width: 100%">
-                          <select v-model = "offsite_wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
-                            <option
-                                v-for="item in select_estimations(input)"
-                                :value="item.value"
-                            >
-                              <!--Desplegable amb estimació-->
-                              {{item.name}} ({{item.value.toFixed(3)}})
-                            </option>
-                            <option :value="offsite_wwtp_model[input]">Custom value</option>
-                          </select>
-                        </div>
+                                <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
+                                       outlined
+                                       x-small
+                                       @click="offsite_wwtp_model[input] = button_estimations(input)"
+                                >
+                                  Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
+                                </v-btn>
+                              </div>
+                              <div v-if="select_estimation.includes(input)" style="width: 100%">
+                                <select v-model = "offsite_wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                                  <option
+                                      v-for="item in select_estimations(input)"
+                                      :value="item.value"
+                                  >
+                                    <!--Desplegable amb estimació-->
+                                    {{item.name}} ({{item.value.toFixed(3)}})
+                                  </option>
+                                  <option :value="offsite_wwtp_model[input]">Custom value</option>
+                                </select>
+                              </div>
 
-                      </div>
-                    </v-col>
-                    <v-col cols="4">
-                      <div>
-                        <div>
-                          <v-select
-                              v-if="type_option[input]"
-                              v-model="offsite_wwtp_model[input]"
-                              item-text="text"
-                              item-value="value"
-                              :items="type_option[input].items"
-                              label="Select"
-                          >
-                          </v-select>
-                          <v-text-field
-                              v-else
-                              v-model="offsite_wwtp_model[input]"
-                              :suffix=user_inputs[input].unit
-                              type="number"
-                          ></v-text-field>
+                            </div>
+                          </v-col>
+                          <v-col cols="4">
+                            <div>
+                              <div>
+                                <v-select
+                                    v-if="type_option[input]"
+                                    v-model="offsite_wwtp_model[input]"
+                                    item-text="text"
+                                    item-value="value"
+                                    :items="type_option[input].items"
+                                    label="Select"
+                                >
+                                </v-select>
+                                <v-text-field
+                                    v-else
+                                    v-model="offsite_wwtp_model[input]"
+                                    :suffix=user_inputs[input].unit
+                                    type="number"
+                                ></v-text-field>
 
-                        </div>
-                      </div>
+                              </div>
+                            </div>
 
-                    </v-col>
+                          </v-col>
 
-                  </v-row>
+                        </v-row>
+                      </v-expansion-panel-content>
+                    </v-expansion-panel>
+                    <v-expansion-panel>
+                      <v-expansion-panel-header >
+                        <h3>Fuel engines</h3>
+                      </v-expansion-panel-header>
+                      <v-expansion-panel-content style="padding: 30px">
+                        <v-row
+                            align="center"
+                            v-for = "input in advanced_fuel_engines"
+                            :key="input"
+
+                        >
+                          <v-col cols="8" >
+                            <div style="width: 100%;">
+                              <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                    <span>
+                      {{user_inputs[input].question}}
+                    </span>
+                                <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
+                                       outlined
+                                       x-small
+                                       @click="offsite_wwtp_model[input] = button_estimations(input)"
+                                >
+                                  Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
+                                </v-btn>
+                              </div>
+                              <div v-if="select_estimation.includes(input)" style="width: 100%">
+                                <select v-model = "offsite_wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                                  <option
+                                      v-for="item in select_estimations(input)"
+                                      :value="item.value"
+                                  >
+                                    <!--Desplegable amb estimació-->
+                                    {{item.name}} ({{item.value.toFixed(3)}})
+                                  </option>
+                                  <option :value="offsite_wwtp_model[input]">Custom value</option>
+                                </select>
+                              </div>
+
+                            </div>
+                          </v-col>
+                          <v-col cols="4">
+                            <div>
+                              <div>
+                                <v-select
+                                    v-if="type_option[input]"
+                                    v-model="offsite_wwtp_model[input]"
+                                    item-text="text"
+                                    item-value="value"
+                                    :items="type_option[input].items"
+                                    label="Select"
+                                >
+                                </v-select>
+                                <v-text-field
+                                    v-else
+                                    v-model="offsite_wwtp_model[input]"
+                                    :suffix=user_inputs[input].unit
+                                    type="number"
+                                ></v-text-field>
+
+                              </div>
+                            </div>
+
+                          </v-col>
+
+                        </v-row>
+                      </v-expansion-panel-content>
+                    </v-expansion-panel>
+                    <v-expansion-panel>
+                      <v-expansion-panel-header >
+                        <h3>Biogas produced from anaerobic digestion</h3>
+                      </v-expansion-panel-header>
+                      <v-expansion-panel-content style="padding: 30px">
+                        <v-row
+                            align="center"
+                            v-for = "input in advanced_biogas_from_anaerobic"
+                            :key="input"
+
+                        >
+                          <v-col cols="8" >
+                            <div style="width: 100%;">
+                              <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                    <span>
+                      {{user_inputs[input].question}}
+                    </span>
+                                <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
+                                       outlined
+                                       x-small
+                                       @click="offsite_wwtp_model[input] = button_estimations(input)"
+                                >
+                                  Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
+                                </v-btn>
+                              </div>
+                              <div v-if="select_estimation.includes(input)" style="width: 100%">
+                                <select v-model = "offsite_wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                                  <option
+                                      v-for="item in select_estimations(input)"
+                                      :value="item.value"
+                                  >
+                                    <!--Desplegable amb estimació-->
+                                    {{item.name}} ({{item.value.toFixed(3)}})
+                                  </option>
+                                  <option :value="offsite_wwtp_model[input]">Custom value</option>
+                                </select>
+                              </div>
+
+                            </div>
+                          </v-col>
+                          <v-col cols="4">
+                            <div>
+                              <div>
+                                <v-select
+                                    v-if="type_option[input]"
+                                    v-model="offsite_wwtp_model[input]"
+                                    item-text="text"
+                                    item-value="value"
+                                    :items="type_option[input].items"
+                                    label="Select"
+                                >
+                                </v-select>
+                                <v-text-field
+                                    v-else
+                                    v-model="offsite_wwtp_model[input]"
+                                    :suffix=user_inputs[input].unit
+                                    type="number"
+                                ></v-text-field>
+
+                              </div>
+                            </div>
+
+                          </v-col>
+
+                        </v-row>
+                      </v-expansion-panel-content>
+                    </v-expansion-panel>
+                    <v-expansion-panel>
+                      <v-expansion-panel-header >
+                        <h3>Fuel used in water reuse trucks</h3>
+                      </v-expansion-panel-header>
+                      <v-expansion-panel-content style="padding: 30px">
+                        <v-row
+                            align="center"
+                            v-for = "input in advanced_water_reuse_trucks"
+                            :key="input"
+
+                        >
+                          <v-col cols="8" >
+                            <div style="width: 100%;">
+                              <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                    <span>
+                      {{user_inputs[input].question}}
+                    </span>
+                                <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
+                                       outlined
+                                       x-small
+                                       @click="offsite_wwtp_model[input] = button_estimations(input)"
+                                >
+                                  Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
+                                </v-btn>
+                              </div>
+                              <div v-if="select_estimation.includes(input)" style="width: 100%">
+                                <select v-model = "offsite_wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                                  <option
+                                      v-for="item in select_estimations(input)"
+                                      :value="item.value"
+                                  >
+                                    <!--Desplegable amb estimació-->
+                                    {{item.name}} ({{item.value.toFixed(3)}})
+                                  </option>
+                                  <option :value="offsite_wwtp_model[input]">Custom value</option>
+                                </select>
+                              </div>
+
+                            </div>
+                          </v-col>
+                          <v-col cols="4">
+                            <div>
+                              <div>
+                                <v-select
+                                    v-if="type_option[input]"
+                                    v-model="offsite_wwtp_model[input]"
+                                    item-text="text"
+                                    item-value="value"
+                                    :items="type_option[input].items"
+                                    label="Select"
+                                >
+                                </v-select>
+                                <v-text-field
+                                    v-else
+                                    v-model="offsite_wwtp_model[input]"
+                                    :suffix=user_inputs[input].unit
+                                    type="number"
+                                ></v-text-field>
+
+                              </div>
+                            </div>
+
+                          </v-col>
+
+                        </v-row>
+                      </v-expansion-panel-content>
+                    </v-expansion-panel>
+                    <v-expansion-panel>
+                      <v-expansion-panel-header >
+                        <h3>Sludge storage in WWTP</h3>
+                      </v-expansion-panel-header>
+                      <v-expansion-panel-content style="padding: 30px">
+                        <v-row
+                            align="center"
+                            v-for = "input in advanced_sludge_Storage"
+                            :key="input"
+
+                        >
+                          <v-col cols="8" >
+                            <div style="width: 100%;">
+                              <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                    <span>
+                      {{user_inputs[input].question}}
+                    </span>
+                                <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
+                                       outlined
+                                       x-small
+                                       @click="offsite_wwtp_model[input] = button_estimations(input)"
+                                >
+                                  Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
+                                </v-btn>
+                              </div>
+                              <div v-if="select_estimation.includes(input)" style="width: 100%">
+                                <select v-model = "offsite_wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                                  <option
+                                      v-for="item in select_estimations(input)"
+                                      :value="item.value"
+                                  >
+                                    <!--Desplegable amb estimació-->
+                                    {{item.name}} ({{item.value.toFixed(3)}})
+                                  </option>
+                                  <option :value="offsite_wwtp_model[input]">Custom value</option>
+                                </select>
+                              </div>
+
+                            </div>
+                          </v-col>
+                          <v-col cols="4">
+                            <div>
+                              <div>
+                                <v-select
+                                    v-if="type_option[input]"
+                                    v-model="offsite_wwtp_model[input]"
+                                    item-text="text"
+                                    item-value="value"
+                                    :items="type_option[input].items"
+                                    label="Select"
+                                >
+                                </v-select>
+                                <v-text-field
+                                    v-else
+                                    v-model="offsite_wwtp_model[input]"
+                                    :suffix=user_inputs[input].unit
+                                    type="number"
+                                ></v-text-field>
+
+                              </div>
+                            </div>
+
+                          </v-col>
+
+                        </v-row>
+                      </v-expansion-panel-content>
+                    </v-expansion-panel>
+                    <v-expansion-panel>
+                      <v-expansion-panel-header >
+                        <h3>Sludge composting in WWTP</h3>
+                      </v-expansion-panel-header>
+                      <v-expansion-panel-content style="padding: 30px">
+                        <v-row
+                            align="center"
+                            v-for = "input in advanced_sludge_composting"
+                            :key="input"
+
+                        >
+                          <v-col cols="8" >
+                            <div style="width: 100%;">
+                              <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                    <span>
+                      {{user_inputs[input].question}}
+                    </span>
+                                <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
+                                       outlined
+                                       x-small
+                                       @click="offsite_wwtp_model[input] = button_estimations(input)"
+                                >
+                                  Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
+                                </v-btn>
+                              </div>
+                              <div v-if="select_estimation.includes(input)" style="width: 100%">
+                                <select v-model = "offsite_wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                                  <option
+                                      v-for="item in select_estimations(input)"
+                                      :value="item.value"
+                                  >
+                                    <!--Desplegable amb estimació-->
+                                    {{item.name}} ({{item.value.toFixed(3)}})
+                                  </option>
+                                  <option :value="offsite_wwtp_model[input]">Custom value</option>
+                                </select>
+                              </div>
+
+                            </div>
+                          </v-col>
+                          <v-col cols="4">
+                            <div>
+                              <div>
+                                <v-select
+                                    v-if="type_option[input]"
+                                    v-model="offsite_wwtp_model[input]"
+                                    item-text="text"
+                                    item-value="value"
+                                    :items="type_option[input].items"
+                                    label="Select"
+                                >
+                                </v-select>
+                                <v-text-field
+                                    v-else
+                                    v-model="offsite_wwtp_model[input]"
+                                    :suffix=user_inputs[input].unit
+                                    type="number"
+                                ></v-text-field>
+
+                              </div>
+                            </div>
+
+                          </v-col>
+
+                        </v-row>
+                      </v-expansion-panel-content>
+                    </v-expansion-panel>
+                    <v-expansion-panel>
+                      <v-expansion-panel-header >
+                        <h3>Sludge incineration</h3>
+                      </v-expansion-panel-header>
+                      <v-expansion-panel-content style="padding: 30px">
+                        <v-row
+                            align="center"
+                            v-for = "input in advanced_sludge_incineration"
+                            :key="input"
+
+                        >
+                          <v-col cols="8" >
+                            <div style="width: 100%;">
+                              <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                    <span>
+                      {{user_inputs[input].question}}
+                    </span>
+                                <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
+                                       outlined
+                                       x-small
+                                       @click="offsite_wwtp_model[input] = button_estimations(input)"
+                                >
+                                  Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
+                                </v-btn>
+                              </div>
+                              <div v-if="select_estimation.includes(input)" style="width: 100%">
+                                <select v-model = "offsite_wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                                  <option
+                                      v-for="item in select_estimations(input)"
+                                      :value="item.value"
+                                  >
+                                    <!--Desplegable amb estimació-->
+                                    {{item.name}} ({{item.value.toFixed(3)}})
+                                  </option>
+                                  <option :value="offsite_wwtp_model[input]">Custom value</option>
+                                </select>
+                              </div>
+
+                            </div>
+                          </v-col>
+                          <v-col cols="4">
+                            <div>
+                              <div>
+                                <v-select
+                                    v-if="type_option[input]"
+                                    v-model="offsite_wwtp_model[input]"
+                                    item-text="text"
+                                    item-value="value"
+                                    :items="type_option[input].items"
+                                    label="Select"
+                                >
+                                </v-select>
+                                <v-text-field
+                                    v-else
+                                    v-model="offsite_wwtp_model[input]"
+                                    :suffix=user_inputs[input].unit
+                                    type="number"
+                                ></v-text-field>
+
+                              </div>
+                            </div>
+
+                          </v-col>
+
+                        </v-row>
+                      </v-expansion-panel-content>
+                    </v-expansion-panel>
+                    <v-expansion-panel>
+                      <v-expansion-panel-header >
+                        <h3>Sludge sent to dry application</h3>
+                      </v-expansion-panel-header>
+                      <v-expansion-panel-content style="padding: 30px">
+                        <v-row
+                            align="center"
+                            v-for = "input in advanced_application"
+                            :key="input"
+
+                        >
+                          <v-col cols="8" >
+                            <div style="width: 100%;">
+                              <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                    <span>
+                      {{user_inputs[input].question}}
+                    </span>
+                                <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
+                                       outlined
+                                       x-small
+                                       @click="offsite_wwtp_model[input] = button_estimations(input)"
+                                >
+                                  Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
+                                </v-btn>
+                              </div>
+                              <div v-if="select_estimation.includes(input)" style="width: 100%">
+                                <select v-model = "offsite_wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                                  <option
+                                      v-for="item in select_estimations(input)"
+                                      :value="item.value"
+                                  >
+                                    <!--Desplegable amb estimació-->
+                                    {{item.name}} ({{item.value.toFixed(3)}})
+                                  </option>
+                                  <option :value="offsite_wwtp_model[input]">Custom value</option>
+                                </select>
+                              </div>
+
+                            </div>
+                          </v-col>
+                          <v-col cols="4">
+                            <div>
+                              <div>
+                                <v-select
+                                    v-if="type_option[input]"
+                                    v-model="offsite_wwtp_model[input]"
+                                    item-text="text"
+                                    item-value="value"
+                                    :items="type_option[input].items"
+                                    label="Select"
+                                >
+                                </v-select>
+                                <v-text-field
+                                    v-else
+                                    v-model="offsite_wwtp_model[input]"
+                                    :suffix=user_inputs[input].unit
+                                    type="number"
+                                ></v-text-field>
+
+                              </div>
+                            </div>
+
+                          </v-col>
+
+                        </v-row>
+                      </v-expansion-panel-content>
+                    </v-expansion-panel>
+                    <v-expansion-panel>
+                      <v-expansion-panel-header >
+                        <h3>Sludge landfilling</h3>
+                      </v-expansion-panel-header>
+                      <v-expansion-panel-content style="padding: 30px">
+                        <v-row
+                            align="center"
+                            v-for = "input in advanced_landfilling"
+                            :key="input"
+
+                        >
+                          <v-col cols="8" >
+                            <div style="width: 100%;">
+                              <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                    <span>
+                      {{user_inputs[input].question}}
+                    </span>
+                                <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
+                                       outlined
+                                       x-small
+                                       @click="offsite_wwtp_model[input] = button_estimations(input)"
+                                >
+                                  Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
+                                </v-btn>
+                              </div>
+                              <div v-if="select_estimation.includes(input)" style="width: 100%">
+                                <select v-model = "offsite_wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                                  <option
+                                      v-for="item in select_estimations(input)"
+                                      :value="item.value"
+                                  >
+                                    <!--Desplegable amb estimació-->
+                                    {{item.name}} ({{item.value.toFixed(3)}})
+                                  </option>
+                                  <option :value="offsite_wwtp_model[input]">Custom value</option>
+                                </select>
+                              </div>
+
+                            </div>
+                          </v-col>
+                          <v-col cols="4">
+                            <div>
+                              <div>
+                                <v-select
+                                    v-if="type_option[input]"
+                                    v-model="offsite_wwtp_model[input]"
+                                    item-text="text"
+                                    item-value="value"
+                                    :items="type_option[input].items"
+                                    label="Select"
+                                >
+                                </v-select>
+                                <v-text-field
+                                    v-else
+                                    v-model="offsite_wwtp_model[input]"
+                                    :suffix=user_inputs[input].unit
+                                    type="number"
+                                ></v-text-field>
+
+                              </div>
+                            </div>
+
+                          </v-col>
+
+                        </v-row>
+                      </v-expansion-panel-content>
+                    </v-expansion-panel>
+                    <v-expansion-panel>
+                      <v-expansion-panel-header >
+                        <h3>Sludge stockpiling</h3>
+                      </v-expansion-panel-header>
+                      <v-expansion-panel-content style="padding: 30px">
+                        <v-row
+                            align="center"
+                            v-for = "input in advanced_stockpiling"
+                            :key="input"
+
+                        >
+                          <v-col cols="8" >
+                            <div style="width: 100%;">
+                              <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                    <span>
+                      {{user_inputs[input].question}}
+                    </span>
+                                <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
+                                       outlined
+                                       x-small
+                                       @click="offsite_wwtp_model[input] = button_estimations(input)"
+                                >
+                                  Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
+                                </v-btn>
+                              </div>
+                              <div v-if="select_estimation.includes(input)" style="width: 100%">
+                                <select v-model = "offsite_wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                                  <option
+                                      v-for="item in select_estimations(input)"
+                                      :value="item.value"
+                                  >
+                                    <!--Desplegable amb estimació-->
+                                    {{item.name}} ({{item.value.toFixed(3)}})
+                                  </option>
+                                  <option :value="offsite_wwtp_model[input]">Custom value</option>
+                                </select>
+                              </div>
+
+                            </div>
+                          </v-col>
+                          <v-col cols="4">
+                            <div>
+                              <div>
+                                <v-select
+                                    v-if="type_option[input]"
+                                    v-model="offsite_wwtp_model[input]"
+                                    item-text="text"
+                                    item-value="value"
+                                    :items="type_option[input].items"
+                                    label="Select"
+                                >
+                                </v-select>
+                                <v-text-field
+                                    v-else
+                                    v-model="offsite_wwtp_model[input]"
+                                    :suffix=user_inputs[input].unit
+                                    type="number"
+                                ></v-text-field>
+
+                              </div>
+                            </div>
+
+                          </v-col>
+
+                        </v-row>
+                      </v-expansion-panel-content>
+                    </v-expansion-panel>
+                    <v-expansion-panel>
+                      <v-expansion-panel-header >
+                        <h3>Sludge truck transportation to disposal site</h3>
+                      </v-expansion-panel-header>
+                      <v-expansion-panel-content style="padding: 30px">
+                        <v-row
+                            align="center"
+                            v-for = "input in advanced_truck_transportation"
+                            :key="input"
+
+                        >
+                          <v-col cols="8" >
+                            <div style="width: 100%;">
+                              <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                    <span>
+                      {{user_inputs[input].question}}
+                    </span>
+                                <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
+                                       outlined
+                                       x-small
+                                       @click="offsite_wwtp_model[input] = button_estimations(input)"
+                                >
+                                  Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
+                                </v-btn>
+                              </div>
+                              <div v-if="select_estimation.includes(input)" style="width: 100%">
+                                <select v-model = "offsite_wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                                  <option
+                                      v-for="item in select_estimations(input)"
+                                      :value="item.value"
+                                  >
+                                    <!--Desplegable amb estimació-->
+                                    {{item.name}} ({{item.value.toFixed(3)}})
+                                  </option>
+                                  <option :value="offsite_wwtp_model[input]">Custom value</option>
+                                </select>
+                              </div>
+
+                            </div>
+                          </v-col>
+                          <v-col cols="4">
+                            <div>
+                              <div>
+                                <v-select
+                                    v-if="type_option[input]"
+                                    v-model="offsite_wwtp_model[input]"
+                                    item-text="text"
+                                    item-value="value"
+                                    :items="type_option[input].items"
+                                    label="Select"
+                                >
+                                </v-select>
+                                <v-text-field
+                                    v-else
+                                    v-model="offsite_wwtp_model[input]"
+                                    :suffix=user_inputs[input].unit
+                                    type="number"
+                                ></v-text-field>
+
+                              </div>
+                            </div>
+
+                          </v-col>
+
+                        </v-row>
+                      </v-expansion-panel-content>
+                    </v-expansion-panel>
+                  </v-expansion-panels>
 
                 </v-expansion-panel-content>
               </v-expansion-panel>
@@ -700,7 +2058,7 @@
                 v-slot="{ hover }"
                 open-delay="200"
             >
-              <h3 :class="`${hover? 'link_to_report_hovered': 'link_to_report'}`">
+              <h3 :class="`${hover? 'link_to_report_hovered': 'link_to_report'}`"  @click="changeTab">
                 Click here to see the generated report
               </h3>
 
@@ -794,7 +2152,20 @@ export default {
       button_estimation: ["ind_cod_effl", "ind_tn_effl", "ind_tp_effl", "ind_diclo_effl", "ind_cadmium_effl", "ind_hexaclorobenzene_effl", "ind_mercury_effl", "ind_plomo_effl", "ind_niquel_effl", "ind_chloro_effl", "ind_hexaclorobutadie_effl", "ind_nonilfenols_effl", "ind_tetracloroetile_effl", "ind_tricloroetile_effl", "wwt_cod_effl", "wwt_tn_effl", "wwt_tp_effl", "wwt_diclo_effl", "wwt_cadmium_effl", "wwt_hexaclorobenzene_effl", "wwt_mercury_effl", "wwt_plomo_effl", "wwt_niquel_effl", "wwt_chloro_effl", "wwt_hexaclorobutadie_effl", "wwt_nonilfenols_effl", "wwt_tetracloroetile_effl", "wwt_tricloroetile_effl", "wwt_conv_kwh",
         "wwt_biog_pro", "wwt_biog_fla", "wwt_biog_val", "wwt_biog_lkd", "wwt_biog_sold", "wwt_ch4_biog", "wwt_slu_comp_low_CN_EF", "wwt_slu_comp_seqst_rate", "wwt_slu_comp_uncovered_pile_EF", "wwt_temp_inc", "wwt_slu_lf_uncertainty", "wwt_slu_lf_CH4_in_gas", "wwt_slu_lf_DOCf", "wwt_slu_lf_decomp_3yr", "wwt_slu_lf_low_CN_EF" ],
       select_estimation: ["wwt_cod_slud", "wwt_ch4_efac_dis", "wwt_ch4_efac_tre", "wwt_n2o_efac_tre", "wwt_n2o_efac_dis", "wwt_slu_sto_TVS", "wwt_slu_sto_f_CH4", "wwt_slu_sto_f_CH4", "wwt_slu_comp_N_cont", "wwt_slu_comp_TVS", "wwt_slu_inc_N_cont", "wwt_slu_la_TVS", "wwt_slu_la_N_cont", "wwt_slu_la_EF", "wwt_slu_lf_TVS", "wwt_slu_lf_MCF", "wwt_slu_lf_N_cont"],
-      basic_inputs: ["wwt_treatment_type", "wwt_vol_trea", "wwt_vol_disc", "wwt_vol_reused", "wwt_vol_treated_external", "wwt_cod_effl", "wwt_tn_effl", "wwt_tp_effl", "wwt_ch4_efac_tre", "wwt_n2o_efac_tre", "wwt_ch4_efac_dis", "wwt_n2o_efac_dis", "volume_withdrawn", "has_onsite_wwtp", "has_direct_discharge", "has_offsite_wwtp", "industry_type", "product_produced", "ind_cod_effl", "ind_tn_effl", "ind_tp_effl"],
+      basic_inputs: ["wwt_treatment_type", "wwt_vol_trea", "wwt_vol_disc", "wwt_vol_reused", "wwt_vol_treated_external", "wwt_cod_effl", "wwt_tn_effl", "wwt_tp_effl", "wwt_ch4_efac_tre", "wwt_n2o_efac_tre", "wwt_ch4_efac_dis", "wwt_n2o_efac_dis", "volume_withdrawn", "has_onsite_wwtp", "has_direct_discharge", "has_offsite_wwtp", "industry_type", "product_produced", "ind_cod_effl", "ind_tn_effl", "ind_tp_effl", "wwt_nrg_cons", "wwt_conv_kwh"],
+      advanced_pollution_effluent: ["wwt_diclo_effl", "wwt_cadmium_effl", "wwt_hexaclorobenzene_effl", "wwt_mercury_effl", "wwt_plomo_effl", "wwt_niquel_effl", "wwt_chloro_effl", "wwt_hexaclorobutadie_effl", "wwt_nonilfenols_effl", "wwt_tetracloroetile_effl", "wwt_tricloroetile_effl"],
+      advanced_fuel_engines: ["wwt_fuel_typ", "wwt_vol_fuel"],
+      advanced_biogas_from_anaerobic: ["wwt_biog_pro", "wwt_biog_fla", "wwt_biog_val", "wwt_biog_lkd", "wwt_biog_sold", "wwt_ch4_biog", "wwt_dige_typ", "wwt_fuel_dig"],
+      advanced_water_reuse_trucks: ["wwt_reus_trck_typ", "wwt_reus_vol_trck"],
+      advanced_sludge_Storage: ["wwt_mass_slu_sto", "wwt_time_slu_sto", "wwt_slu_sto_TVS", "wwt_slu_sto_f_CH4", "wwt_slu_sto_EF",],
+      advanced_sludge_composting: ["wwt_mass_slu_comp", "wwt_slu_comp_emis_treated_or_piles_covered", "wwt_slu_comp_solids_content", "wwt_slu_comp_TVS", "wwt_slu_comp_N_cont", "wwt_slu_comp_low_CN_EF", "wwt_slu_comp_uncovered_pile_EF", "wwt_slu_comp_seqst_rate",],
+      advanced_sludge_incineration: ["wwt_mass_slu_inc", "wwt_temp_inc", "wwt_slu_inc_N_cont", "wwt_slu_inc_SNCR"],
+      advanced_application: ["wwt_mass_slu_app", "wwt_slu_la_solids_content", "wwt_slu_la_TVS", "wwt_slu_la_N_cont", "wwt_slu_la_EF",],
+      advanced_landfilling: ["wwt_mass_slu_land", "wwt_slu_lf_TVS", "wwt_slu_lf_uncertainty", "wwt_slu_lf_CH4_in_gas", "wwt_slu_lf_DOCf", "wwt_slu_lf_decomp_3yr", "wwt_slu_lf_MCF", "wwt_slu_lf_N_cont", "wwt_slu_lf_low_CN_EF"],
+      advanced_stockpiling: ["wwt_mass_slu_stock", "wwt_slu_sp_lifespan"],
+      advanced_truck_transportation: ["wwt_trck_typ", "wwt_vol_tslu"],
+
+
       required: ["volume_withdrawn", "product_produced" ],
       industry_model: {},
       onsite_wwtp_model: {},
@@ -876,6 +2247,10 @@ export default {
     },
   },
   methods: {
+
+    changeTab(){
+      this.$emit('changeFirstMenuTab', 2)
+    },
 
     array_intersection(arrA, arrB){
       let intersection = arrA.filter(x => arrB.includes(x));
@@ -1664,13 +3039,13 @@ export default {
           return biogas_volume;
         },
         wwt_biog_fla: function(){
-          return 100-wwtp_model.wwt_biog_val-wwtp_model.wwt_biog_lkd-wwtp_model.wwt_biog_sold;
+          return 98
         },
         wwt_biog_val: function(){
           return 100-wwtp_model.wwt_biog_fla-wwtp_model.wwt_biog_lkd-wwtp_model.wwt_biog_sold;
         },
         wwt_biog_lkd: function(){
-          return 100-wwtp_model.wwt_biog_val-wwtp_model.wwt_biog_fla-wwtp_model.wwt_biog_sold
+          return 2
         },
         wwt_biog_sold: function() {
           return 100-wwtp_model.wwt_biog_val-wwtp_model.wwt_biog_fla-wwtp_model.wwt_biog_lkd;
@@ -1694,7 +3069,7 @@ export default {
           return 0.9
         },
         wwt_slu_lf_CH4_in_gas: function(){
-          return 0.5
+          return 50
         },
         wwt_slu_lf_DOCf: function(){
           return 80
