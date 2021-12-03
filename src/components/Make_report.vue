@@ -2337,7 +2337,6 @@ export default {
 
 
           for (let industry of industries_and_supply_chain) {
-            console.log(industry)
             let lat = industry.location.lat
             let lng = industry.location.lng
 
@@ -4026,7 +4025,6 @@ export default {
           const groupedByCountry = _.groupBy(industriesOfassessment, function(industry) {
             return utils.get_country_code_from_coordinates(industry.location.lat, industry.location.lng)
           }) //Array of arrays of industries
-          console.log(groupedByCountry)
           return groupedByCountry
         }
         else if(_this.aggregation_level == "industry"){
