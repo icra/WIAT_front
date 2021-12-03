@@ -155,7 +155,7 @@ function water_filtered(industries, industry_effluent, wwtp_effluent){
 function effl_efficiency(industries, industry_effluent, wwtp_effluent){   //Amount of pollutant filtered
 
     let filtered = water_filtered(industries, industry_effluent, wwtp_effluent)
-    let discharged = calculate_water_discharged(industries)
+    let discharged = calculate_effluent_load(industries, wwtp_effluent)
 
     let eff = filtered / discharged
 

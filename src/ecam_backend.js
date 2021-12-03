@@ -101,7 +101,7 @@ export class Industry{
     ghg(){
         let onsite_wwtp = this.onsite_wwtp.wwt_KPI_GHG()
         let offsite_wwtp = this.offsite_wwtp.wwt_KPI_GHG()
-        let direct_discharge = this.direct_discharge.wwt_KPI_GHG
+        let direct_discharge = this.direct_discharge.wwt_KPI_GHG()
         return sumObjectsByKey(onsite_wwtp, offsite_wwtp, direct_discharge)
     }
 
