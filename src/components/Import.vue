@@ -68,7 +68,6 @@
                 v-model="imported_file"
                 @change="onUpload"
             ></v-file-input>
-
           </v-col>
         </v-row>
 
@@ -116,11 +115,11 @@
       </div>
     </div>
 
-    <!--
+
     <div style="padding-top: 15px">
       <h1>Load from Excel file</h1>
     </div>
-    <div style="padding-top: 20px">
+    <div style="padding: 20px 30px 0px 20px; margin-top: 30px" class="load_and_save">
       <v-row>
         <v-col cols="5"> <b>1)</b>
           <a href="/wiat_template.xlsx" download >
@@ -158,7 +157,7 @@
         </v-col>
       </v-row>
     </div>
-    -->
+
 
     <v-snackbar
         v-model="snackbar_imported_file"
@@ -190,6 +189,7 @@ import {
 import * as Excel from "exceljs";
 import * as moment from 'moment'
 import standard_industries_classification from "../standard_industrial_classification"
+import {utils} from "../utils"
 
 export default {
   name: "import_assessments",
@@ -243,10 +243,15 @@ export default {
                 _this.created_assessments.push(new_assessment)
                 _this.$assessment_active.push(true)
 
-              } catch (error) {
-                console.log(error)
-              }
+                this.snackbar_text = "FILE IMPORTED CORRECTLY"
+                this.snackbar_imported_file = true
 
+
+              } catch (error) {
+                this.snackbar_text = "ERROR IMPORTING FILE"
+                this.snackbar_imported_file = true
+
+              }
 
             }
 
@@ -256,335 +261,388 @@ export default {
             if(rowIndex > 3 ){
               let industry_input = row.values
 
-
               let assessment = _this.created_assessments.find(assessment => {
                 return industry_input[1] == assessment.name
               })
 
-              //MIRAR SI HI HA CELES OBLIGATORIES BUIDES
 
-              if (assessment != undefined){
-                //If there is an assessment with the same name like the one we are adding, delete the older one
-                let industry_to_delete = assessment.industries.findIndex(i => i.name === industry_input[2])
-                if (industry_to_delete > -1) assessment.industries.splice(industry_to_delete,1);
+              if(industry_input[1]!=undefined && industry_input[2]!=undefined && industry_input[3]!=undefined && industry_input[4]!=undefined){
+                if (assessment != undefined){
 
-                try {
-                  let new_industry = new Industry()
-                  new_industry.name = industry_input[2]
-                  new_industry.location = {
-                    lat: industry_input[3],
-                    lng: industry_input[4]
+                  //If there is an assessment with the same name like the one we are adding, delete the older one
+                  let industry_to_delete = assessment.industries.findIndex(i => i.name === industry_input[2])
+                  if (industry_to_delete > -1) assessment.industries.splice(industry_to_delete,1);
+
+                  try {
+                    let new_industry = new Industry()
+                    new_industry.name = industry_input[2]
+                    new_industry.location = {
+                      lat: !isNaN(industry_input[3]) ? parseFloat(industry_input[3]) : 0,
+                      lng: !isNaN(industry_input[4]) ? parseFloat(industry_input[4]) : 0
+                    }
+
+                    if(utils.get_country_code_from_coordinates(new_industry.location.lat, new_industry.location.lng) == null) throw new Error('Coordinates of industry not valid')
+
+                    new_industry.volume_withdrawn = !isNaN(industry_input[5]) ? parseFloat(industry_input[5]) : 0
+
+                    new_industry.has_onsite_wwtp = industry_input[6] == "Yes"  ? 1 : 0
+                    new_industry.has_direct_discharge = industry_input[7] == "Yes"  ? 1 : 0
+                    new_industry.has_offsite_wwtp = industry_input[8] == "Yes"  ? 1 : 0
+
+
+                    new_industry.industry_type = standard_industries_classification.find(classification => {
+                      return classification.text == industry_input[9]
+                    }).value
+
+                    new_industry.product_produced = !isNaN(industry_input[10]) ? parseFloat(industry_input[10]) : 0
+
+                    new_industry.ind_cod_effl = !isNaN(industry_input[11]) ? parseFloat(industry_input[11]) : 0
+                    new_industry.ind_tn_effl = !isNaN(industry_input[12]) ? parseFloat(industry_input[12]) : 0
+                    new_industry.ind_tp_effl = !isNaN(industry_input[13]) ? parseFloat(industry_input[13]) : 0
+                    new_industry.ind_diclo_effl = !isNaN(industry_input[14]) ? parseFloat(industry_input[14]) : 0
+                    new_industry.ind_cadmium_effl = !isNaN(industry_input[15]) ? parseFloat(industry_input[15]) : 0
+                    new_industry.ind_hexaclorobenzene_effl = !isNaN(industry_input[16]) ? parseFloat(industry_input[16]) : 0
+                    new_industry.ind_mercury_effl = !isNaN(industry_input[17]) ? parseFloat(industry_input[17]) : 0
+                    new_industry.ind_plomo_effl = !isNaN(industry_input[18]) ? parseFloat(industry_input[18]) : 0
+                    new_industry.ind_niquel_effl = !isNaN(industry_input[19]) ? parseFloat(industry_input[19]) : 0
+                    new_industry.ind_chloro_effl = !isNaN(industry_input[20]) ? parseFloat(industry_input[20]) : 0
+                    new_industry.ind_hexaclorobutadie_effl = !isNaN(industry_input[21]) ? parseFloat(industry_input[21]) : 0
+                    new_industry.ind_nonilfenols_effl = !isNaN(industry_input[22]) ? parseFloat(industry_input[22]) : 0
+                    new_industry.ind_tetracloroetile_effl = !isNaN(industry_input[23]) ? parseFloat(industry_input[23]) : 0
+                    new_industry.ind_tricloroetile_effl = !isNaN(industry_input[24]) ? parseFloat(industry_input[24]) : 0
+
+                    if (new_industry.has_onsite_wwtp == 1){
+
+                      new_industry.onsite_wwtp.location = new_industry.location
+                      new_industry.onsite_wwtp.wwt_cod_infl_ind = new_industry.ind_cod_effl
+                      new_industry.onsite_wwtp.wwt_tn_infl_ind = new_industry.ind_tn_effl
+                      new_industry.onsite_wwtp.wwt_tp_infl_ind = new_industry.ind_tp_effl
+                      new_industry.onsite_wwtp.wwt_diclo_infl_ind = new_industry.ind_diclo_effl //1,2-Dichloroethane
+                      new_industry.onsite_wwtp.wwt_cadmium_infl_ind = new_industry.ind_cadmium_effl //Cadmium
+                      new_industry.onsite_wwtp.wwt_hexaclorobenzene_infl_ind = new_industry.ind_hexaclorobenzene_effl //Hexachlorobenzene
+                      new_industry.onsite_wwtp.wwt_mercury_infl_ind = new_industry.ind_mercury_effl //mercury
+                      new_industry.onsite_wwtp.wwt_plomo_infl_ind = new_industry.ind_plomo_effl //lead
+                      new_industry.onsite_wwtp.wwt_niquel_infl_ind = new_industry.ind_niquel_effl //nickel
+                      new_industry.onsite_wwtp.wwt_chloro_infl_ind = new_industry.ind_chloro_effl //chloroalkanes
+                      new_industry.onsite_wwtp.wwt_hexaclorobutadie_infl_ind = new_industry.ind_hexaclorobutadie_effl //Hexachlorobutadiene
+                      new_industry.onsite_wwtp.wwt_nonilfenols_infl_ind = new_industry.ind_nonilfenols_effl //Nonylphenols
+                      new_industry.onsite_wwtp.wwt_tetracloroetile_infl_ind = new_industry.ind_tetracloroetile_effl //tetrachloroethene
+                      new_industry.onsite_wwtp.wwt_tricloroetile_infl_ind = new_industry.ind_tricloroetile_effl //Trichloroethylene
+
+                      if(industry_input[25] == "Untreated systems") new_industry.onsite_wwtp.wwt_treatment_type = 0
+                      else if(industry_input[25] == "Primary") new_industry.onsite_wwtp.wwt_treatment_type = 1
+                      else if(industry_input[25] == "Primary+Secondary") new_industry.onsite_wwtp.wwt_treatment_type = 2
+                      else if(industry_input[25] == "Primary+Secondary+Tertiary") new_industry.onsite_wwtp.wwt_treatment_type = 3
+                      else new_industry.onsite_wwtp.wwt_treatment_type = 0
+
+
+                      new_industry.onsite_wwtp.wwt_vol_trea = !isNaN(industry_input[26]) ? parseFloat(industry_input[26]) : 0
+                      new_industry.onsite_wwtp.wwt_vol_disc = !isNaN(industry_input[27]) ? parseFloat(industry_input[27]) : 0
+                      new_industry.onsite_wwtp.wwt_cod_effl = !isNaN(industry_input[28]) ? parseFloat(industry_input[28]) : 0
+                      new_industry.onsite_wwtp.wwt_tn_effl = !isNaN(industry_input[29]) ? parseFloat(industry_input[29]) : 0
+                      new_industry.onsite_wwtp.wwt_tp_effl = !isNaN(industry_input[30]) ? parseFloat(industry_input[30]) : 0
+                      new_industry.onsite_wwtp.wwt_diclo_effl = !isNaN(industry_input[31]) ? parseFloat(industry_input[31]) : 0
+                      new_industry.onsite_wwtp.wwt_cadmium_effl = !isNaN(industry_input[32]) ? parseFloat(industry_input[32]) : 0
+                      new_industry.onsite_wwtp.wwt_hexaclorobenzene_effl = !isNaN(industry_input[33]) ? parseFloat(industry_input[33]) : 0
+                      new_industry.onsite_wwtp.wwt_mercury_effl = !isNaN(industry_input[34]) ? parseFloat(industry_input[34]) : 0
+                      new_industry.onsite_wwtp.wwt_plomo_effl = !isNaN(industry_input[35]) ? parseFloat(industry_input[35]) : 0
+                      new_industry.onsite_wwtp.wwt_niquel_effl = !isNaN(industry_input[36]) ? parseFloat(industry_input[36]) : 0
+                      new_industry.onsite_wwtp.wwt_chloro_effl = !isNaN(industry_input[37]) ? parseFloat(industry_input[37]) : 0
+                      new_industry.onsite_wwtp.wwt_hexaclorobutadie_effl = !isNaN(industry_input[38]) ? parseFloat(industry_input[38]) : 0
+                      new_industry.onsite_wwtp.wwt_nonilfenols_effl = !isNaN(industry_input[39]) ? parseFloat(industry_input[39]) : 0
+                      new_industry.onsite_wwtp.wwt_tetracloroetile_effl = !isNaN(industry_input[40]) ? parseFloat(industry_input[40]) : 0
+                      new_industry.onsite_wwtp.wwt_tricloroetile_effl = !isNaN(industry_input[41]) ? parseFloat(industry_input[41]) : 0
+
+                      new_industry.onsite_wwtp.wwt_nrg_cons = !isNaN(industry_input[42]) ? parseFloat(industry_input[42]) : 0
+                      new_industry.onsite_wwtp.wwt_conv_kwh = !isNaN(industry_input[43]) ? parseFloat(industry_input[43]) : 0
+                      new_industry.onsite_wwtp.wwt_mass_slu = !isNaN(industry_input[44]) ? parseFloat(industry_input[44]) : 0
+                      new_industry.onsite_wwtp.wwt_cod_slud = !isNaN(industry_input[45]) ? parseFloat(industry_input[45]) : 0
+                      new_industry.onsite_wwtp.wwt_ch4_efac_tre = !isNaN(industry_input[46]) ? parseFloat(industry_input[46]) : 0
+                      new_industry.onsite_wwtp.wwt_n2o_efac_tre = !isNaN(industry_input[47]) ? parseFloat(industry_input[47]) : 0
+                      new_industry.onsite_wwtp.wwt_ch4_efac_dis = !isNaN(industry_input[48]) ? parseFloat(industry_input[48]) : 0
+                      new_industry.onsite_wwtp.wwt_n2o_efac_dis = !isNaN(industry_input[49]) ? parseFloat(industry_input[49]) : 0
+
+                      new_industry.onsite_wwtp.wwt_vol_reused = !isNaN(industry_input[50]) ? parseFloat(industry_input[50]) : 0
+                      if (new_industry.has_offsite_wwtp == 1) new_industry.onsite_wwtp.wwt_vol_treated_external = !isNaN(industry_input[51]) ? parseFloat(industry_input[51]) : 0
+
+                      if(industry_input[52] == "Diesel") new_industry.onsite_wwtp.wwt_fuel_typ = 0
+                      else if(industry_input[52] == "Gasoline") new_industry.onsite_wwtp.wwt_fuel_typ = 1
+                      else if(industry_input[52] == "Natural gas") new_industry.onsite_wwtp.wwt_fuel_typ = 2
+                      else new_industry.onsite_wwtp.wwt_fuel_typ = 0
+
+                      new_industry.onsite_wwtp.wwt_vol_fuel = !isNaN(industry_input[53]) ? parseFloat(industry_input[53]) : 0
+                      new_industry.onsite_wwtp.wwt_biog_pro = !isNaN(industry_input[54]) ? parseFloat(industry_input[54]) : 0
+                      new_industry.onsite_wwtp.wwt_biog_fla = !isNaN(industry_input[55]) ? parseFloat(industry_input[55]) : 0
+                      new_industry.onsite_wwtp.wwt_biog_val = !isNaN(industry_input[56]) ? parseFloat(industry_input[56]) : 0
+                      new_industry.onsite_wwtp.wwt_biog_lkd = !isNaN(industry_input[57]) ? parseFloat(industry_input[57]) : 0
+                      new_industry.onsite_wwtp.wwt_biog_sold = !isNaN(industry_input[58]) ? parseFloat(industry_input[58]) : 0
+                      new_industry.onsite_wwtp.wwt_ch4_biog = !isNaN(industry_input[59]) ? parseFloat(industry_input[59]) : 0
+
+                      if(industry_input[60] == "Diesel") new_industry.onsite_wwtp.wwt_dige_typ = 0
+                      else if(industry_input[60] == "Gasoline") new_industry.onsite_wwtp.wwt_dige_typ = 1
+                      else if(industry_input[60] == "Natural gas") new_industry.onsite_wwtp.wwt_dige_typ = 2
+                      else new_industry.onsite_wwtp.wwt_dige_typ = 0
+
+
+                      new_industry.onsite_wwtp.wwt_fuel_dig = !isNaN(industry_input[61]) ? parseFloat(industry_input[61]) : 0
+
+                      if(industry_input[62] == "Diesel") new_industry.onsite_wwtp.wwt_reus_trck_typ = 0
+                      else if(industry_input[62] == "Gasoline") new_industry.onsite_wwtp.wwt_reus_trck_typ = 1
+                      else if(industry_input[62] == "Natural gas") new_industry.onsite_wwtp.wwt_reus_trck_typ = 2
+                      else new_industry.onsite_wwtp.wwt_reus_trck_typ = 0
+
+                      new_industry.onsite_wwtp.wwt_reus_vol_trck = !isNaN(industry_input[63]) ? parseFloat(industry_input[63]) : 0
+                      new_industry.onsite_wwtp.wwt_mass_slu_sto = !isNaN(industry_input[64]) ? parseFloat(industry_input[64]) : 0
+                      new_industry.onsite_wwtp.wwt_time_slu_sto = !isNaN(industry_input[65]) ? parseFloat(industry_input[65]) : 0
+                      new_industry.onsite_wwtp.wwt_slu_sto_TVS = !isNaN(industry_input[66]) ? parseFloat(industry_input[66]) : 0
+                      new_industry.onsite_wwtp.wwt_slu_sto_f_CH4 = !isNaN(industry_input[67]) ? parseFloat(industry_input[67]) : 0
+                      new_industry.onsite_wwtp.wwt_slu_sto_EF = !isNaN(industry_input[68]) ? parseFloat(industry_input[68]) : 0
+                      new_industry.onsite_wwtp.wwt_mass_slu_comp = !isNaN(industry_input[69]) ? parseFloat(industry_input[69]) : 0
+                      new_industry.onsite_wwtp.wwt_slu_comp_emis_treated_or_piles_covered = industry_input[70] == "Yes"  ? 1 : 0
+                      new_industry.onsite_wwtp.wwt_slu_comp_solids_content = !isNaN(industry_input[71]) ? parseFloat(industry_input[71]) : 0
+                      new_industry.onsite_wwtp.wwt_slu_comp_TVS = !isNaN(industry_input[72]) ? parseFloat(industry_input[72]) : 0
+                      new_industry.onsite_wwtp.wwt_slu_comp_N_cont = !isNaN(industry_input[73]) ? parseFloat(industry_input[73]) : 0
+                      new_industry.onsite_wwtp.wwt_slu_comp_low_CN_EF = !isNaN(industry_input[74]) ? parseFloat(industry_input[74]) : 0
+                      new_industry.onsite_wwtp.wwt_slu_comp_uncovered_pile_EF = !isNaN(industry_input[75]) ? parseFloat(industry_input[75]) : 0
+                      new_industry.onsite_wwtp.wwt_slu_comp_seqst_rate = !isNaN(industry_input[76]) ? parseFloat(industry_input[76]) : 0
+                      new_industry.onsite_wwtp.wwt_mass_slu_inc = !isNaN(industry_input[77]) ? parseFloat(industry_input[77]) : 0
+                      new_industry.onsite_wwtp.wwt_temp_inc = !isNaN(industry_input[78]) ? parseFloat(industry_input[78]) : 0
+                      new_industry.onsite_wwtp.wwt_slu_inc_N_cont = !isNaN(industry_input[79]) ? parseFloat(industry_input[79]) : 0
+                      new_industry.onsite_wwtp.wwt_slu_inc_SNCR = industry_input[80] == "Yes"  ? 1 : 0
+
+                      new_industry.onsite_wwtp.wwt_mass_slu_app = !isNaN(industry_input[81]) ? parseFloat(industry_input[81]) : 0
+                      new_industry.onsite_wwtp.wwt_slu_la_solids_content = !isNaN(industry_input[82]) ? parseFloat(industry_input[82]) : 0
+                      new_industry.onsite_wwtp.wwt_slu_la_TVS = !isNaN(industry_input[83]) ? parseFloat(industry_input[83]) : 0
+                      new_industry.onsite_wwtp.wwt_slu_la_N_cont = !isNaN(industry_input[84]) ? parseFloat(industry_input[84]) : 0
+                      new_industry.onsite_wwtp.wwt_slu_la_EF = !isNaN(industry_input[85]) ? parseFloat(industry_input[85]) : 0
+
+                      new_industry.onsite_wwtp.wwt_mass_slu_land = !isNaN(industry_input[86]) ? parseFloat(industry_input[86]) : 0
+                      new_industry.onsite_wwtp.wwt_slu_lf_TVS = !isNaN(industry_input[87]) ? parseFloat(industry_input[87]) : 0
+                      new_industry.onsite_wwtp.wwt_slu_lf_uncertainty = !isNaN(industry_input[88]) ? parseFloat(industry_input[88]) : 0
+                      new_industry.onsite_wwtp.wwt_slu_lf_CH4_in_gas = !isNaN(industry_input[89]) ? parseFloat(industry_input[89]) : 0
+                      new_industry.onsite_wwtp.wwt_slu_lf_DOCf = !isNaN(industry_input[90]) ? parseFloat(industry_input[90]) : 0
+                      new_industry.onsite_wwtp.wwt_slu_lf_decomp_3yr = !isNaN(industry_input[91]) ? parseFloat(industry_input[91]) : 0
+                      new_industry.onsite_wwtp.wwt_slu_lf_MCF = !isNaN(industry_input[92]) ? parseFloat(industry_input[92]) : 0
+                      new_industry.onsite_wwtp.wwt_slu_lf_N_cont = !isNaN(industry_input[93]) ? parseFloat(industry_input[93]) : 0
+                      new_industry.onsite_wwtp.wwt_slu_lf_low_CN_EF = !isNaN(industry_input[94]) ? parseFloat(industry_input[94]) : 0
+                      new_industry.onsite_wwtp.wwt_mass_slu_stock = !isNaN(industry_input[95]) ? parseFloat(industry_input[95]) : 0
+                      new_industry.onsite_wwtp.wwt_slu_sp_lifespan = !isNaN(industry_input[96]) ? parseFloat(industry_input[96]) : 0
+                      new_industry.onsite_wwtp.wwt_trck_typ = industry_input[97] == "Yes"  ? 1 : 0
+                      new_industry.onsite_wwtp.wwt_vol_tslu = !isNaN(industry_input[98]) ? parseFloat(industry_input[98]) : 0
+                    }
+
+
+                    if (new_industry.has_direct_discharge) {
+
+                      new_industry.direct_discharge.location = new_industry.location
+                      new_industry.direct_discharge.wwt_cod_effl = new_industry.ind_cod_effl
+                      new_industry.direct_discharge.wwt_tn_effl = new_industry.ind_tn_effl
+                      new_industry.direct_discharge.wwt_tp_effl = new_industry.ind_tp_effl
+                      new_industry.direct_discharge.wwt_diclo_effl = new_industry.ind_diclo_effl //1,2-Dichloroethane
+                      new_industry.direct_discharge.wwt_cadmium_effl = new_industry.ind_cadmium_effl //Cadmium
+                      new_industry.direct_discharge.wwt_hexaclorobenzene_effl = new_industry.ind_hexaclorobenzene_effl //Hexachlorobenzene
+                      new_industry.direct_discharge.wwt_mercury_effl = new_industry.ind_mercury_effl //mercury
+                      new_industry.direct_discharge.wwt_plomo_effl = new_industry.ind_plomo_effl //lead
+                      new_industry.direct_discharge.wwt_niquel_effl = new_industry.ind_niquel_effl //nickel
+                      new_industry.direct_discharge.wwt_chloro_effl = new_industry.ind_chloro_effl //chloroalkanes
+                      new_industry.direct_discharge.wwt_hexaclorobutadie_effl = new_industry.ind_hexaclorobutadie_effl //Hexachlorobutadiene
+                      new_industry.direct_discharge.wwt_nonilfenols_effl = new_industry.ind_nonilfenols_effl //Nonylphenols
+                      new_industry.direct_discharge.wwt_tetracloroetile_effl = new_industry.ind_tetracloroetile_effl //tetrachloroethene
+                      new_industry.direct_discharge.wwt_tricloroetile_effl = new_industry.ind_tricloroetile_effl //Trichloroethylene
+
+                      new_industry.direct_discharge.dd_vol_disc = !isNaN(industry_input[99]) ? parseFloat(industry_input[99]) : 0
+                      new_industry.direct_discharge.wwt_ch4_efac_dis = !isNaN(industry_input[100]) ? parseFloat(industry_input[100]) : 0
+                      new_industry.direct_discharge.wwt_n2o_efac_dis = !isNaN(industry_input[101]) ? parseFloat(industry_input[101]) : 0
+
+                    }
+
+                    if(new_industry.has_offsite_wwtp == 1){
+
+                      new_industry.offsite_wwtp.location = new_industry.location
+
+                      new_industry.offsite_wwtp.wwt_cod_infl_ind = new_industry.ind_cod_effl
+                      new_industry.offsite_wwtp.wwt_tn_infl_ind = new_industry.ind_tn_effl
+                      new_industry.offsite_wwtp.wwt_tp_infl_ind = new_industry.ind_tp_effl
+                      new_industry.offsite_wwtp.wwt_diclo_infl_ind = new_industry.ind_diclo_effl //1,2-Dichloroethane
+                      new_industry.offsite_wwtp.wwt_cadmium_infl_ind = new_industry.ind_cadmium_effl //Cadmium
+                      new_industry.offsite_wwtp.wwt_hexaclorobenzene_infl_ind = new_industry.ind_hexaclorobenzene_effl //Hexachlorobenzene
+                      new_industry.offsite_wwtp.wwt_mercury_infl_ind = new_industry.ind_mercury_effl //mercury
+                      new_industry.offsite_wwtp.wwt_plomo_infl_ind = new_industry.ind_plomo_effl //lead
+                      new_industry.offsite_wwtp.wwt_niquel_infl_ind = new_industry.ind_niquel_effl //nickel
+                      new_industry.offsite_wwtp.wwt_chloro_infl_ind = new_industry.ind_chloro_effl //chloroalkanes
+                      new_industry.offsite_wwtp.wwt_hexaclorobutadie_infl_ind = new_industry.ind_hexaclorobutadie_effl //Hexachlorobutadiene
+                      new_industry.offsite_wwtp.wwt_nonilfenols_infl_ind = new_industry.ind_nonilfenols_effl //Nonylphenols
+                      new_industry.offsite_wwtp.wwt_tetracloroetile_infl_ind = new_industry.ind_tetracloroetile_effl //tetrachloroethene
+                      new_industry.offsite_wwtp.wwt_tricloroetile_infl_ind = new_industry.ind_tricloroetile_effl //Trichloroethylene
+
+                      if(new_industry.has_onsite_wwtp == 1){
+                        new_industry.offsite_wwtp.wwt_cod_infl_wwtp = new_industry.onsite_wwtp.wwt_cod_effl
+                        new_industry.offsite_wwtp.wwt_tn_infl_wwtp = new_industry.onsite_wwtp.wwt_tn_effl
+                        new_industry.offsite_wwtp.wwt_tp_infl_wwtp = new_industry.onsite_wwtp.wwt_tp_effl
+                        new_industry.offsite_wwtp.wwt_diclo_infl_wwtp = new_industry.onsite_wwtp.wwt_diclo_effl //1,2-Dichloroethane
+                        new_industry.offsite_wwtp.wwt_cadmium_infl_wwtp = new_industry.onsite_wwtp.wwt_cadmium_effl //Cadmium
+                        new_industry.offsite_wwtp.wwt_hexaclorobenzene_infl_wwtp = new_industry.onsite_wwtp.wwt_hexaclorobenzene_effl //Hexachlorobenzene
+                        new_industry.offsite_wwtp.wwt_mercury_infl_wwtp = new_industry.onsite_wwtp.wwt_mercury_effl //mercury
+                        new_industry.offsite_wwtp.wwt_plomo_infl_wwtp = new_industry.onsite_wwtp.wwt_plomo_effl //lead
+                        new_industry.offsite_wwtp.wwt_niquel_infl_wwtp = new_industry.onsite_wwtp.wwt_niquel_effl //nickel
+                        new_industry.offsite_wwtp.wwt_chloro_infl_wwtp = new_industry.onsite_wwtp.wwt_chloro_effl //chloroalkanes
+                        new_industry.offsite_wwtp.wwt_hexaclorobutadie_infl_wwtp = new_industry.onsite_wwtp.wwt_hexaclorobutadie_effl //Hexachlorobutadiene
+                        new_industry.offsite_wwtp.wwt_nonilfenols_infl_wwtp = new_industry.onsite_wwtp.wwt_nonilfenols_effl //Nonylphenols
+                        new_industry.offsite_wwtp.wwt_tetracloroetile_infl_wwtp = new_industry.onsite_wwtp.wwt_tetracloroetile_effl //tetrachloroethene
+                        new_industry.offsite_wwtp.wwt_tricloroetile_infl_wwtp = new_industry.onsite_wwtp.wwt_tricloroetile_effl //Trichloroethylene
+                      }
+
+                      if(industry_input[102] == "Untreated systems") new_industry.offsite_wwtp.wwt_treatment_type = 0
+                      else if(industry_input[102] == "Primary") new_industry.offsite_wwtp.wwt_treatment_type = 1
+                      else if(industry_input[102] == "Primary+Secondary") new_industry.offsite_wwtp.wwt_treatment_type = 2
+                      else if(industry_input[102] == "Primary+Secondary+Tertiary") new_industry.offsite_wwtp.wwt_treatment_type = 3
+                      else new_industry.offsite_wwtp.wwt_treatment_type = 0
+
+                      new_industry.offsite_wwtp.wwt_vol_trea = !isNaN(industry_input[103]) ? parseFloat(industry_input[103]) : 0
+                      new_industry.offsite_wwtp.wwt_vol_disc = !isNaN(industry_input[104]) ? parseFloat(industry_input[104]) : 0
+                      new_industry.offsite_wwtp.wwt_cod_effl = !isNaN(industry_input[105]) ? parseFloat(industry_input[105]) : 0
+                      new_industry.offsite_wwtp.wwt_tn_effl = !isNaN(industry_input[106]) ? parseFloat(industry_input[106]) : 0
+                      new_industry.offsite_wwtp.wwt_tp_effl = !isNaN(industry_input[107]) ? parseFloat(industry_input[107]) : 0
+                      new_industry.offsite_wwtp.wwt_diclo_effl = !isNaN(industry_input[108]) ? parseFloat(industry_input[108]) : 0
+                      new_industry.offsite_wwtp.wwt_cadmium_effl = !isNaN(industry_input[109]) ? parseFloat(industry_input[109]) : 0
+                      new_industry.offsite_wwtp.wwt_hexaclorobenzene_effl = !isNaN(industry_input[110]) ? parseFloat(industry_input[110]) : 0
+                      new_industry.offsite_wwtp.wwt_mercury_effl = !isNaN(industry_input[111]) ? parseFloat(industry_input[111]) : 0
+                      new_industry.offsite_wwtp.wwt_plomo_effl = !isNaN(industry_input[112]) ? parseFloat(industry_input[112]) : 0
+                      new_industry.offsite_wwtp.wwt_niquel_effl = !isNaN(industry_input[113]) ? parseFloat(industry_input[113]) : 0
+                      new_industry.offsite_wwtp.wwt_chloro_effl = !isNaN(industry_input[114]) ? parseFloat(industry_input[114]) : 0
+                      new_industry.offsite_wwtp.wwt_hexaclorobutadie_effl = !isNaN(industry_input[115]) ? parseFloat(industry_input[115]) : 0
+                      new_industry.offsite_wwtp.wwt_nonilfenols_effl = !isNaN(industry_input[116]) ? parseFloat(industry_input[116]) : 0
+                      new_industry.offsite_wwtp.wwt_tetracloroetile_effl = !isNaN(industry_input[117]) ? parseFloat(industry_input[117]) : 0
+                      new_industry.offsite_wwtp.wwt_tricloroetile_effl = !isNaN(industry_input[118]) ? parseFloat(industry_input[118]) : 0
+
+                      new_industry.offsite_wwtp.wwt_nrg_cons = !isNaN(industry_input[119]) ? parseFloat(industry_input[119]) : 0
+                      new_industry.offsite_wwtp.wwt_conv_kwh = !isNaN(industry_input[120]) ? parseFloat(industry_input[120]) : 0
+                      new_industry.offsite_wwtp.wwt_mass_slu = !isNaN(industry_input[121]) ? parseFloat(industry_input[121]) : 0
+                      new_industry.offsite_wwtp.wwt_cod_slud = !isNaN(industry_input[122]) ? parseFloat(industry_input[122]) : 0
+                      new_industry.offsite_wwtp.wwt_ch4_efac_tre = !isNaN(industry_input[123]) ? parseFloat(industry_input[123]) : 0
+                      new_industry.offsite_wwtp.wwt_n2o_efac_tre = !isNaN(industry_input[124]) ? parseFloat(industry_input[124]) : 0
+                      new_industry.offsite_wwtp.wwt_ch4_efac_dis = !isNaN(industry_input[125]) ? parseFloat(industry_input[125]) : 0
+                      new_industry.offsite_wwtp.wwt_n2o_efac_dis = !isNaN(industry_input[126]) ? parseFloat(industry_input[126]) : 0
+
+
+                      if(industry_input[127] == "Diesel") new_industry.offsite_wwtp.wwt_fuel_typ = 0
+                      else if(industry_input[127] == "Gasoline") new_industry.offsite_wwtp.wwt_fuel_typ = 1
+                      else if(industry_input[127] == "Natural gas") new_industry.offsite_wwtp.wwt_fuel_typ = 2
+                      else new_industry.offsite_wwtp.wwt_fuel_typ = 0
+
+
+                      new_industry.offsite_wwtp.wwt_vol_fuel = !isNaN(industry_input[128]) ? parseFloat(industry_input[128]) : 0
+                      new_industry.offsite_wwtp.wwt_biog_pro = !isNaN(industry_input[129]) ? parseFloat(industry_input[129]) : 0
+                      new_industry.offsite_wwtp.wwt_biog_fla = !isNaN(industry_input[130]) ? parseFloat(industry_input[130]) : 0
+                      new_industry.offsite_wwtp.wwt_biog_val = !isNaN(industry_input[131]) ? parseFloat(industry_input[131]) : 0
+                      new_industry.offsite_wwtp.wwt_biog_lkd = !isNaN(industry_input[132]) ? parseFloat(industry_input[132]) : 0
+                      new_industry.offsite_wwtp.wwt_biog_sold = !isNaN(industry_input[133]) ? parseFloat(industry_input[133]) : 0
+                      new_industry.offsite_wwtp.wwt_ch4_biog = !isNaN(industry_input[134]) ? parseFloat(industry_input[134]) : 0
+
+                      if(industry_input[135] == "Diesel") new_industry.offsite_wwtp.wwt_dige_typ = 0
+                      else if(industry_input[135] == "Gasoline") new_industry.offsite_wwtp.wwt_dige_typ = 1
+                      else if(industry_input[135] == "Natural gas") new_industry.offsite_wwtp.wwt_dige_typ = 2
+                      else new_industry.offsite_wwtp.wwt_dige_typ = 0
+
+                      new_industry.offsite_wwtp.wwt_fuel_dig = !isNaN(industry_input[136]) ? parseFloat(industry_input[136]) : 0
+
+                      if(industry_input[137] == "Diesel") new_industry.offsite_wwtp.wwt_reus_trck_typ = 0
+                      else if(industry_input[137] == "Gasoline") new_industry.offsite_wwtp.wwt_reus_trck_typ = 1
+                      else if(industry_input[137] == "Natural gas") new_industry.offsite_wwtp.wwt_reus_trck_typ = 2
+                      else new_industry.offsite_wwtp.wwt_reus_trck_typ = 0
+
+
+                      new_industry.offsite_wwtp.wwt_reus_vol_trck = !isNaN(industry_input[138]) ? parseFloat(industry_input[138]) : 0
+                      new_industry.offsite_wwtp.wwt_mass_slu_sto = !isNaN(industry_input[139]) ? parseFloat(industry_input[139]) : 0
+                      new_industry.offsite_wwtp.wwt_time_slu_sto = !isNaN(industry_input[140]) ? parseFloat(industry_input[140]) : 0
+                      new_industry.offsite_wwtp.wwt_slu_sto_TVS = !isNaN(industry_input[141]) ? parseFloat(industry_input[141]) : 0
+                      new_industry.offsite_wwtp.wwt_slu_sto_f_CH4 = !isNaN(industry_input[142]) ? parseFloat(industry_input[142]) : 0
+                      new_industry.offsite_wwtp.wwt_slu_sto_EF = !isNaN(industry_input[143]) ? parseFloat(industry_input[143]) : 0
+                      new_industry.offsite_wwtp.wwt_mass_slu_comp = !isNaN(industry_input[144]) ? parseFloat(industry_input[144]) : 0
+                      new_industry.offsite_wwtp.wwt_slu_comp_emis_treated_or_piles_covered = industry_input[145] == "Yes"  ? 1 : 0
+                      new_industry.offsite_wwtp.wwt_slu_comp_solids_content = !isNaN(industry_input[146]) ? parseFloat(industry_input[146]) : 0
+                      new_industry.offsite_wwtp.wwt_slu_comp_TVS = !isNaN(industry_input[147]) ? parseFloat(industry_input[147]) : 0
+                      new_industry.offsite_wwtp.wwt_slu_comp_N_cont = !isNaN(industry_input[148]) ? parseFloat(industry_input[148]) : 0
+                      new_industry.offsite_wwtp.wwt_slu_comp_low_CN_EF = !isNaN(industry_input[149]) ? parseFloat(industry_input[149]) : 0
+                      new_industry.offsite_wwtp.wwt_slu_comp_uncovered_pile_EF = !isNaN(industry_input[150]) ? parseFloat(industry_input[150]) : 0
+                      new_industry.offsite_wwtp.wwt_slu_comp_seqst_rate = !isNaN(industry_input[151]) ? parseFloat(industry_input[151]) : 0
+                      new_industry.offsite_wwtp.wwt_mass_slu_inc = !isNaN(industry_input[152]) ? parseFloat(industry_input[152]) : 0
+                      new_industry.offsite_wwtp.wwt_temp_inc = !isNaN(industry_input[153]) ? parseFloat(industry_input[153]) : 0
+                      new_industry.offsite_wwtp.wwt_slu_inc_N_cont = !isNaN(industry_input[154]) ? parseFloat(industry_input[154]) : 0
+                      new_industry.offsite_wwtp.wwt_slu_inc_SNCR = industry_input[155] == "Yes"  ? 1 : 0
+
+                      new_industry.offsite_wwtp.wwt_mass_slu_app = !isNaN(industry_input[156]) ? parseFloat(industry_input[156]) : 0
+                      new_industry.offsite_wwtp.wwt_slu_la_solids_content = !isNaN(industry_input[157]) ? parseFloat(industry_input[157]) : 0
+                      new_industry.offsite_wwtp.wwt_slu_la_TVS = !isNaN(industry_input[158]) ? parseFloat(industry_input[158]) : 0
+                      new_industry.offsite_wwtp.wwt_slu_la_N_cont = !isNaN(industry_input[159]) ? parseFloat(industry_input[159]) : 0
+                      new_industry.offsite_wwtp.wwt_slu_la_EF = !isNaN(industry_input[160]) ? parseFloat(industry_input[160]) : 0
+
+                      new_industry.offsite_wwtp.wwt_mass_slu_land = !isNaN(industry_input[161]) ? parseFloat(industry_input[161]) : 0
+                      new_industry.offsite_wwtp.wwt_slu_lf_TVS = !isNaN(industry_input[162]) ? parseFloat(industry_input[162]) : 0
+                      new_industry.offsite_wwtp.wwt_slu_lf_uncertainty = !isNaN(industry_input[163]) ? parseFloat(industry_input[163]) : 0
+                      new_industry.offsite_wwtp.wwt_slu_lf_CH4_in_gas = !isNaN(industry_input[164]) ? parseFloat(industry_input[164]) : 0
+                      new_industry.offsite_wwtp.wwt_slu_lf_DOCf = !isNaN(industry_input[165]) ? parseFloat(industry_input[165]) : 0
+                      new_industry.offsite_wwtp.wwt_slu_lf_decomp_3yr = !isNaN(industry_input[166]) ? parseFloat(industry_input[166]) : 0
+                      new_industry.offsite_wwtp.wwt_slu_lf_MCF = !isNaN(industry_input[167]) ? parseFloat(industry_input[167]) : 0
+                      new_industry.offsite_wwtp.wwt_slu_lf_N_cont = !isNaN(industry_input[168]) ? parseFloat(industry_input[168]) : 0
+                      new_industry.offsite_wwtp.wwt_slu_lf_low_CN_EF = !isNaN(industry_input[169]) ? parseFloat(industry_input[169]) : 0
+                      new_industry.offsite_wwtp.wwt_mass_slu_stock = !isNaN(industry_input[170]) ? parseFloat(industry_input[170]) : 0
+                      new_industry.offsite_wwtp.wwt_slu_sp_lifespan = !isNaN(industry_input[171]) ? parseFloat(industry_input[171]) : 0
+                      new_industry.offsite_wwtp.wwt_trck_typ = industry_input[172] == "Yes"  ? 1 : 0
+                      new_industry.offsite_wwtp.wwt_vol_tslu = !isNaN(industry_input[173]) ? parseFloat(industry_input[173]) : 0
+
+                      industry_input[174].replace(" ", "").replace('[', '').split("],").map(stringNameCoord => {
+                        let [name, coordString] = stringNameCoord.replace(" ", "").split(",(")
+                        let [lat, lng] = coordString.replace(')]', '').replace(' ', '').split(",").map(str => parseFloat(str))
+                        if(utils.get_country_code_from_coordinates(lat, lng) != null) {
+
+                          let supply_chain = {
+                            name: name,
+                            location: {
+                              lat: lat,
+                              lng: lng
+                            }
+                          }
+
+                          new_industry.supply_chain.push(supply_chain)
+
+                          let marker = {
+                            isSupplyChain: true,
+                            latlng: supply_chain.location,
+                            name: "<b>"+name+"</b> (supply chain of "+new_industry.name+")",
+                          }
+                          _this.$location_markers.push(marker)
+
+                        }
+                      })
+
+
+                      /*split('),').map(stringCoord => {
+                        let str = stringCoord.replace('(', '').replace(')', '').replace(' ', '').replace(", ", ",")
+                        let [lat, lng] = str.split(",").map(str => parseFloat(str))
+                        if(utils.get_country_code_from_coordinates(lat, lng) != null) {
+                          console.log(lat, lng)
+                        }
+
+
+                      })*/
+
+
+                    }
+
+                    assessment.industries.push(new_industry)
+
+                    this.snackbar_text = "FILE IMPORTED CORRECTLY"
+                    this.snackbar_imported_file = true
+
+                  } catch (error) {
+                    this.snackbar_text = "ERROR IMPORTING FILE"
+                    this.snackbar_imported_file = true
                   }
-                  new_industry.volume_withdrawn = !isNaN(industry_input[5]) ? industry_input[5] : 0
-                  new_industry.volume_used = !isNaN(industry_input[6]) ? industry_input[6] : 0
-                  new_industry.has_onsite_wwtp = industry_input[7] == "Yes"  ? true : false
-                  new_industry.has_direct_discharge = industry_input[8] == "Yes"  ? true : false
-                  new_industry.has_offsite_wwtp = industry_input[9] == "Yes"  ? true : false
-                  new_industry.offsite_wwtp_type = industry_input[10] == "Domestic"  ? "Domestic" : "Industrial"
-                  new_industry.industry_type = standard_industries_classification.find(classification => {
-                    return classification.text == industry_input[11]
-                  }).value
-
-
-                  new_industry.product_produced = !isNaN(industry_input[12]) ? industry_input[12] : 0
-                  new_industry.operation_type = industry_input[13]
-
-                  if(new_industry.operation_type == "Supply chain"){
-                    let final_product_industry = assessment.industries.find(industry => {
-                      return industry.name == industry[14]
-                    })
-                    if(final_product_industry != undefined && final_product_industry.operation_type == "Final Product") final_product_industry.industry_provided = industry[14]
-                    else new_industry.operation_type ="Final product"
-
-                    new_industry.weight_cargo = !isNaN(industry_input[15]) ? industry_input[15] : 0
-                    new_industry.volume_cargo = !isNaN(industry_input[16]) ? industry_input[16] : 0
-                    new_industry.km_air = !isNaN(industry_input[17]) ? industry_input[17] : 0
-                    new_industry.km_barge = !isNaN(industry_input[18]) ? industry_input[18] : 0
-                    new_industry.km_ocean = !isNaN(industry_input[19]) ? industry_input[19] : 0
-                    new_industry.km_rail = !isNaN(industry_input[20]) ? industry_input[20] : 0
-                    new_industry.km_truck = !isNaN(industry_input[21]) ? industry_input[21] : 0
-                  }
-
-                  new_industry.bod_effl_concentration = !isNaN(industry_input[22]) ? industry_input[22] : 0
-                  new_industry.tn_effl_concentration = !isNaN(industry_input[23]) ? industry_input[23] : 0
-                  new_industry.tp_effl_concentration = !isNaN(industry_input[24]) ? industry_input[24] : 0
-                  new_industry.diclo_effl = !isNaN(industry_input[25]) ? industry_input[25] : 0
-                  new_industry.cadmium_effl = !isNaN(industry_input[26]) ? industry_input[26] : 0
-                  new_industry.hexaclorobenzene_effl = !isNaN(industry_input[27]) ? industry_input[27] : 0
-                  new_industry.mercury_effl = !isNaN(industry_input[28]) ? industry_input[28] : 0
-                  new_industry.plomo_effl = !isNaN(industry_input[29]) ? industry_input[29] : 0
-                  new_industry.niquel_effl = !isNaN(industry_input[30]) ? industry_input[30] : 0
-                  new_industry.chloro_effl = !isNaN(industry_input[31]) ? industry_input[31] : 0
-                  new_industry.hexaclorobutadie_effl = !isNaN(industry_input[32]) ? industry_input[32] : 0
-                  new_industry.nonilfenols_effl = !isNaN(industry_input[33]) ? industry_input[33] : 0
-                  new_industry.tetracloroetile_effl = !isNaN(industry_input[34]) ? industry_input[34] : 0
-                  new_industry.tricloroetile_effl = !isNaN(industry_input[35]) ? industry_input[35] : 0
-
-
-                  if (new_industry.has_onsite_wwtp){
-                    if (new_industry.has_offsite_wwtp && new_industry.offsite_wwtp_type == "Domestic") new_industry.onsite_wwtp = new Industrial_wwtp_onsite_external_domestic()
-                    else if (new_industry.has_offsite_wwtp && new_industry.offsite_wwtp_type == "Industrial") new_industry.onsite_wwtp = new Industrial_wwtp_onsite_external_industrial()
-                    else new_industry.onsite_wwtp = new Industrial_wwtp_onsite()
-
-                    new_industry.onsite_wwtp.location = new_industry.location
-                    new_industry.onsite_wwtp.wwt_bod_infl = new_industry.bod_effl_concentration
-                    new_industry.onsite_wwtp.wwt_tn_infl = new_industry.tn_effl_concentration
-                    new_industry.onsite_wwtp.wwt_tp_infl = new_industry.tp_effl_concentration
-                    new_industry.onsite_wwtp.wwt_diclo_infl = new_industry.diclo_effl //1,2-Dichloroethane
-                    new_industry.onsite_wwtp.wwt_cadmium_infl = new_industry.cadmium_effl //Cadmium
-                    new_industry.onsite_wwtp.wwt_hexaclorobenzene_infl = new_industry.hexaclorobenzene_effl //Hexachlorobenzene
-                    new_industry.onsite_wwtp.wwt_mercury_infl = new_industry.mercury_effl //mercury
-                    new_industry.onsite_wwtp.wwt_plomo_infl = new_industry.plomo_effl //lead
-                    new_industry.onsite_wwtp.wwt_niquel_infl = new_industry.niquel_effl //nickel
-                    new_industry.onsite_wwtp.wwt_chloro_infl = new_industry.chloro_effl //chloroalkanes
-                    new_industry.onsite_wwtp.wwt_hexaclorobutadie_infl = new_industry.hexaclorobutadie_effl //Hexachlorobutadiene
-                    new_industry.onsite_wwtp.wwt_nonilfenols_infl = new_industry.nonilfenols_effl //Nonylphenols
-                    new_industry.onsite_wwtp.wwt_tetracloroetile_infl = new_industry.tetracloroetile_effl //tetrachloroethene
-                    new_industry.onsite_wwtp.wwt_tricloroetile_infl = new_industry.tricloroetile_effl //Trichloroethylene
-
-                    if(industry_input[36] == "Untreated systems") new_industry.onsite_wwtp.wwt_treatment_type = 0
-                    else if(industry_input[36] == "Primary") new_industry.onsite_wwtp.wwt_treatment_type = 1
-                    else if(industry_input[36] == "Primary+Secondary") new_industry.onsite_wwtp.wwt_treatment_type = 2
-                    else if(industry_input[36] == "Primary+Secondary+Tertiary") new_industry.onsite_wwtp.wwt_treatment_type = 3
-
-                    new_industry.onsite_wwtp.wwt_vol_trea = !isNaN(industry_input[37]) ? industry_input[37] : 0
-                    new_industry.onsite_wwtp.wwt_vol_disc = !isNaN(industry_input[38]) ? industry_input[38] : 0
-                    new_industry.onsite_wwtp.wwt_bod_effl_to_wb = !isNaN(industry_input[39]) ? industry_input[39] : 0
-                    new_industry.onsite_wwtp.wwt_tn_effl_to_wb = !isNaN(industry_input[40]) ? industry_input[40] : 0
-                    new_industry.onsite_wwtp.wwt_tp_effl_to_wb = !isNaN(industry_input[41]) ? industry_input[41] : 0
-                    new_industry.onsite_wwtp.wwt_diclo_effl_to_wb = !isNaN(industry_input[42]) ? industry_input[42] : 0
-                    new_industry.onsite_wwtp.wwt_cadmium_effl_to_wb = !isNaN(industry_input[43]) ? industry_input[43] : 0
-                    new_industry.onsite_wwtp.wwt_hexaclorobenzene_effl_to_wb = !isNaN(industry_input[44]) ? industry_input[44] : 0
-                    new_industry.onsite_wwtp.wwt_mercury_effl_to_wb = !isNaN(industry_input[45]) ? industry_input[45] : 0
-                    new_industry.onsite_wwtp.wwt_plomo_effl_to_wb = !isNaN(industry_input[46]) ? industry_input[46] : 0
-                    new_industry.onsite_wwtp.wwt_niquel_effl_to_wb = !isNaN(industry_input[47]) ? industry_input[47] : 0
-                    new_industry.onsite_wwtp.wwt_chloro_effl_to_wb = !isNaN(industry_input[48]) ? industry_input[48] : 0
-                    new_industry.onsite_wwtp.wwt_hexaclorobutadie_effl_to_wb = !isNaN(industry_input[49]) ? industry_input[49] : 0
-                    new_industry.onsite_wwtp.wwt_nonilfenols_effl_to_wb = !isNaN(industry_input[50]) ? industry_input[50] : 0
-                    new_industry.onsite_wwtp.wwt_tetracloroetile_effl_to_wb = !isNaN(industry_input[51]) ? industry_input[51] : 0
-                    new_industry.onsite_wwtp.wwt_tricloroetile_effl_to_wb = !isNaN(industry_input[52]) ? industry_input[52] : 0
-
-                    new_industry.onsite_wwtp.wwt_nrg_cons = !isNaN(industry_input[53]) ? industry_input[53] : 0
-                    new_industry.onsite_wwtp.wwt_conv_kwh = !isNaN(industry_input[54]) ? industry_input[54] : 0
-                    new_industry.onsite_wwtp.wwt_mass_slu = !isNaN(industry_input[55]) ? industry_input[55] : 0
-                    new_industry.onsite_wwtp.wwt_bod_slud = !isNaN(industry_input[56]) ? industry_input[56] : 0
-                    new_industry.onsite_wwtp.wwt_ch4_efac_tre = !isNaN(industry_input[57]) ? industry_input[57] : 0
-                    new_industry.onsite_wwtp.wwt_n2o_efac_tre = !isNaN(industry_input[58]) ? industry_input[58] : 0
-                    new_industry.onsite_wwtp.wwt_ch4_efac_dis = !isNaN(industry_input[59]) ? industry_input[59] : 0
-                    new_industry.onsite_wwtp.wwt_n2o_efac_dis = !isNaN(industry_input[60]) ? industry_input[60] : 0
-
-                    new_industry.onsite_wwtp.wwt_vol_reused = !isNaN(industry_input[61]) ? industry_input[61] : 0
-                    if (new_industry.has_offsite_wwtp) new_industry.onsite_wwtp.wwt_vol_treated_external = !isNaN(industry_input[62]) ? industry_input[62] : 0
-
-                    if(industry_input[63] == "Diesel") new_industry.onsite_wwtp.wwt_fuel_typ = 0
-                    else if(industry_input[63] == "Gasoline") new_industry.onsite_wwtp.wwt_fuel_typ = 1
-                    else if(industry_input[63] == "Natural gas") new_industry.onsite_wwtp.wwt_fuel_typ = 2
-
-                    new_industry.onsite_wwtp.wwt_vol_fuel = !isNaN(industry_input[64]) ? industry_input[64] : 0
-                    new_industry.onsite_wwtp.wwt_biog_pro = !isNaN(industry_input[65]) ? industry_input[65] : 0
-                    new_industry.onsite_wwtp.wwt_biog_fla = !isNaN(industry_input[66]) ? industry_input[66] : 98
-                    new_industry.onsite_wwtp.wwt_biog_val = !isNaN(industry_input[67]) ? industry_input[67] : 0
-                    new_industry.onsite_wwtp.wwt_biog_lkd = !isNaN(industry_input[68]) ? industry_input[68] : 2
-                    new_industry.onsite_wwtp.wwt_biog_sold = !isNaN(industry_input[69]) ? industry_input[69] : 0
-                    new_industry.onsite_wwtp.wwt_ch4_biog = !isNaN(industry_input[70]) ? industry_input[70] : 59
-
-                    if(industry_input[71] == "Diesel") new_industry.onsite_wwtp.wwt_dige_typ = 0
-                    else if(industry_input[71] == "Gasoline") new_industry.onsite_wwtp.wwt_dige_typ = 1
-                    else if(industry_input[71] == "Natural gas") new_industry.onsite_wwtp.wwt_dige_typ = 2
-
-                    new_industry.onsite_wwtp.wwt_fuel_dig = !isNaN(industry_input[72]) ? industry_input[72] : 0
-
-                    if(industry_input[73] == "Diesel") new_industry.onsite_wwtp.wwt_reus_trck_typ = 0
-                    else if(industry_input[73] == "Gasoline") new_industry.onsite_wwtp.wwt_reus_trck_typ = 1
-                    else if(industry_input[73] == "Natural gas") new_industry.onsite_wwtp.wwt_reus_trck_typ = 2
-                    new_industry.onsite_wwtp.wwt_reus_vol_trck = !isNaN(industry_input[74]) ? industry_input[74] : 0
-                    new_industry.onsite_wwtp.wwt_mass_slu_sto = !isNaN(industry_input[75]) ? industry_input[75] : 0
-                    new_industry.onsite_wwtp.wwt_time_slu_sto = !isNaN(industry_input[76]) ? industry_input[76] : 0
-                    new_industry.onsite_wwtp.wwt_slu_sto_TVS = !isNaN(industry_input[77]) ? industry_input[77] : 0
-                    new_industry.onsite_wwtp.wwt_slu_sto_f_CH4 = !isNaN(industry_input[78]) ? industry_input[78] : 0
-                    new_industry.onsite_wwtp.wwt_slu_sto_EF = !isNaN(industry_input[79]) ? industry_input[79] : 0
-                    new_industry.onsite_wwtp.wwt_mass_slu_comp = !isNaN(industry_input[80]) ? industry_input[80] : 0
-                    new_industry.onsite_wwtp.wwt_slu_comp_emis_treated_or_piles_covered = industry_input[81] == "Yes"  ? 1 : 0
-                    new_industry.onsite_wwtp.wwt_slu_comp_solids_content = !isNaN(industry_input[82]) ? industry_input[82] : 0
-                    new_industry.onsite_wwtp.wwt_slu_comp_TVS = !isNaN(industry_input[83]) ? industry_input[83] : 0
-                    new_industry.onsite_wwtp.wwt_slu_comp_N_cont = !isNaN(industry_input[84]) ? industry_input[84] : 0
-                    new_industry.onsite_wwtp.wwt_slu_comp_low_CN_EF = !isNaN(industry_input[85]) ? industry_input[85] : 0.015
-                    new_industry.onsite_wwtp.wwt_slu_comp_uncovered_pile_EF = !isNaN(industry_input[86]) ? industry_input[86] : 0.025
-                    new_industry.onsite_wwtp.wwt_slu_comp_seqst_rate = !isNaN(industry_input[87]) ? industry_input[87] : 0.25
-                    new_industry.onsite_wwtp.wwt_mass_slu_inc = !isNaN(industry_input[88]) ? industry_input[88] : 0
-                    new_industry.onsite_wwtp.wwt_temp_inc = !isNaN(industry_input[89]) ? industry_input[89] : 1023
-                    new_industry.onsite_wwtp.wwt_slu_inc_N_cont = !isNaN(industry_input[90]) ? industry_input[90] : 0
-                    new_industry.onsite_wwtp.wwt_slu_inc_SNCR = industry_input[91] == "Yes"  ? 1 : 0
-
-                    new_industry.onsite_wwtp.wwt_mass_slu_app = !isNaN(industry_input[92]) ? industry_input[92] : 0
-                    new_industry.onsite_wwtp.wwt_slu_la_solids_content = !isNaN(industry_input[93]) ? industry_input[93] : 0
-                    new_industry.onsite_wwtp.wwt_slu_la_TVS = !isNaN(industry_input[94]) ? industry_input[94] : 0
-                    new_industry.onsite_wwtp.wwt_slu_la_N_cont = !isNaN(industry_input[95]) ? industry_input[95] : 0
-                    new_industry.onsite_wwtp.wwt_slu_la_EF = !isNaN(industry_input[96]) ? industry_input[96] : 0
-
-                    new_industry.onsite_wwtp.wwt_mass_slu_land = !isNaN(industry_input[97]) ? industry_input[97] : 0
-                    new_industry.onsite_wwtp.wwt_slu_lf_TVS = !isNaN(industry_input[98]) ? industry_input[98] : 0
-                    new_industry.onsite_wwtp.wwt_slu_lf_uncertainty = !isNaN(industry_input[90]) ? industry_input[99] : 0.9
-                    new_industry.onsite_wwtp.wwt_slu_lf_CH4_in_gas = !isNaN(industry_input[100]) ? industry_input[100] : 50
-                    new_industry.onsite_wwtp.wwt_slu_lf_DOCf = !isNaN(industry_input[101]) ? industry_input[101] : 80
-                    new_industry.onsite_wwtp.wwt_slu_lf_decomp_3yr = !isNaN(industry_input[102]) ? industry_input[102] : 69.9
-                    new_industry.onsite_wwtp.wwt_slu_lf_MCF = !isNaN(industry_input[103]) ? industry_input[103] : 1
-                    new_industry.onsite_wwtp.wwt_slu_lf_N_cont = !isNaN(industry_input[104]) ? industry_input[104] : 0
-                    new_industry.onsite_wwtp.wwt_slu_lf_low_CN_EF = !isNaN(industry_input[105]) ? industry_input[105] : 0.015
-                    new_industry.onsite_wwtp.wwt_mass_slu_stock = !isNaN(industry_input[106]) ? industry_input[106] : 0
-                    new_industry.onsite_wwtp.wwt_slu_sp_lifespan = !isNaN(industry_input[107]) ? industry_input[107] : 0
-                    new_industry.onsite_wwtp.wwt_trck_typ = industry_input[108] == "Yes"  ? 1 : 0
-                    new_industry.onsite_wwtp.wwt_vol_tslu = !isNaN(industry_input[109]) ? industry_input[109] : 0
-                  }
-
-                  if (new_industry.has_direct_discharge) {
-                    new_industry.direct_discharge =  new Direct_discharge()
-
-                    new_industry.direct_discharge.location = new_industry.location
-                    new_industry.direct_discharge.wwt_bod_effl_to_wb = new_industry.bod_effl_concentration
-                    new_industry.direct_discharge.wwt_tn_effl_to_wb = new_industry.tn_effl_concentration
-                    new_industry.direct_discharge.wwt_tp_effl_to_wb = new_industry.tp_effl_concentration
-                    new_industry.direct_discharge.wwt_diclo_effl_to_wb = new_industry.diclo_effl //1,2-Dichloroethane
-                    new_industry.direct_discharge.wwt_cadmium_effl_to_wb = new_industry.cadmium_effl //Cadmium
-                    new_industry.direct_discharge.wwt_hexaclorobenzene_effl_to_wb = new_industry.hexaclorobenzene_effl //Hexachlorobenzene
-                    new_industry.direct_discharge.wwt_mercury_effl_to_wb = new_industry.mercury_effl //mercury
-                    new_industry.direct_discharge.wwt_plomo_effl_to_wb = new_industry.plomo_effl //lead
-                    new_industry.direct_discharge.wwt_niquel_effl_to_wb = new_industry.niquel_effl //nickel
-                    new_industry.direct_discharge.wwt_chloro_effl_to_wb = new_industry.chloro_effl //chloroalkanes
-                    new_industry.direct_discharge.wwt_hexaclorobutadie_effl_to_wb = new_industry.hexaclorobutadie_effl //Hexachlorobutadiene
-                    new_industry.direct_discharge.wwt_nonilfenols_effl_to_wb = new_industry.nonilfenols_effl //Nonylphenols
-                    new_industry.direct_discharge.wwt_tetracloroetile_effl_to_wb = new_industry.tetracloroetile_effl //tetrachloroethene
-                    new_industry.direct_discharge.wwt_tricloroetile_effl_to_wb = new_industry.tricloroetile_effl //Trichloroethylene
-
-                    new_industry.direct_discharge.wwt_vol_disc = !isNaN(industry_input[110]) ? industry_input[110] : 0
-                    new_industry.direct_discharge.wwt_ch4_efac_dis = !isNaN(industry_input[111]) ? industry_input[111] : 0
-                    new_industry.direct_discharge.wwt_n2o_efac_dis = !isNaN(industry_input[112]) ? industry_input[112] : 0
-
-                  }
-
-                  if(new_industry.has_offsite_wwtp){
-                    if (new_industry.offsite_wwtp_type == "Domestic") new_industry.offsite_wwtp = new Domestic_wwtp()
-                    else new_industry.offsite_wwtp = new Industrial_wwtp_offsite()
-
-                    new_industry.offsite_wwtp.location = new_industry.location
-
-                    /*Passar a BOD si es domestic*/
-                    if (new_industry.offsite_wwtp_type == "Domestic") new_industry.offsite_wwtp.wwt_bod_infl = new_industry.bod_effl_concentration * 2.4
-                    else new_industry.offsite_wwtp.wwt_bod_infl = new_industry.bod_effl_concentration
-
-                    new_industry.offsite_wwtp.wwt_tn_infl = new_industry.tn_effl_concentration
-                    new_industry.offsite_wwtp.wwt_tp_infl = new_industry.tp_effl_concentration
-                    new_industry.offsite_wwtp.wwt_diclo_infl = new_industry.diclo_effl //1,2-Dichloroethane
-                    new_industry.offsite_wwtp.wwt_cadmium_infl = new_industry.cadmium_effl //Cadmium
-                    new_industry.offsite_wwtp.wwt_hexaclorobenzene_infl = new_industry.hexaclorobenzene_effl //Hexachlorobenzene
-                    new_industry.offsite_wwtp.wwt_mercury_infl = new_industry.mercury_effl //mercury
-                    new_industry.offsite_wwtp.wwt_plomo_infl = new_industry.plomo_effl //lead
-                    new_industry.offsite_wwtp.wwt_niquel_infl = new_industry.niquel_effl //nickel
-                    new_industry.offsite_wwtp.wwt_chloro_infl = new_industry.chloro_effl //chloroalkanes
-                    new_industry.offsite_wwtp.wwt_hexaclorobutadie_infl = new_industry.hexaclorobutadie_effl //Hexachlorobutadiene
-                    new_industry.offsite_wwtp.wwt_nonilfenols_infl = new_industry.nonilfenols_effl //Nonylphenols
-                    new_industry.offsite_wwtp.wwt_tetracloroetile_infl = new_industry.tetracloroetile_effl //tetrachloroethene
-                    new_industry.offsite_wwtp.wwt_tricloroetile_infl = new_industry.tricloroetile_effl //Trichloroethylene
-
-
-                    if(industry_input[113] == "Untreated systems") new_industry.offsite_wwtp.wwt_treatment_type = 0
-                    else if(industry_input[113] == "Primary") new_industry.offsite_wwtp.wwt_treatment_type = 1
-                    else if(industry_input[113] == "Primary+Secondary") new_industry.offsite_wwtp.wwt_treatment_type = 2
-                    else if(industry_input[113] == "Primary+Secondary+Tertiary") new_industry.offsite_wwtp.wwt_treatment_type = 3
-
-                    new_industry.offsite_wwtp.wwt_vol_trea = !isNaN(industry_input[114]) ? industry_input[114] : 0
-                    new_industry.offsite_wwtp.wwt_vol_disc = !isNaN(industry_input[115]) ? industry_input[115] : 0
-                    new_industry.offsite_wwtp.wwt_bod_effl_to_wb = !isNaN(industry_input[116]) ? industry_input[116] : 0
-                    new_industry.offsite_wwtp.wwt_tn_effl_to_wb = !isNaN(industry_input[117]) ? industry_input[117] : 0
-                    new_industry.offsite_wwtp.wwt_tp_effl_to_wb = !isNaN(industry_input[118]) ? industry_input[118] : 0
-                    new_industry.offsite_wwtp.wwt_diclo_effl_to_wb = !isNaN(industry_input[119]) ? industry_input[119] : 0
-                    new_industry.offsite_wwtp.wwt_cadmium_effl_to_wb = !isNaN(industry_input[120]) ? industry_input[120] : 0
-                    new_industry.offsite_wwtp.wwt_hexaclorobenzene_effl_to_wb = !isNaN(industry_input[121]) ? industry_input[121] : 0
-                    new_industry.offsite_wwtp.wwt_mercury_effl_to_wb = !isNaN(industry_input[122]) ? industry_input[122] : 0
-                    new_industry.offsite_wwtp.wwt_plomo_effl_to_wb = !isNaN(industry_input[123]) ? industry_input[123] : 0
-                    new_industry.offsite_wwtp.wwt_niquel_effl_to_wb = !isNaN(industry_input[124]) ? industry_input[124] : 0
-                    new_industry.offsite_wwtp.wwt_chloro_effl_to_wb = !isNaN(industry_input[125]) ? industry_input[125] : 0
-                    new_industry.offsite_wwtp.wwt_hexaclorobutadie_effl_to_wb = !isNaN(industry_input[126]) ? industry_input[126] : 0
-                    new_industry.offsite_wwtp.wwt_nonilfenols_effl_to_wb = !isNaN(industry_input[127]) ? industry_input[127] : 0
-                    new_industry.offsite_wwtp.wwt_tetracloroetile_effl_to_wb = !isNaN(industry_input[128]) ? industry_input[128] : 0
-                    new_industry.offsite_wwtp.wwt_tricloroetile_effl_to_wb = !isNaN(industry_input[129]) ? industry_input[129] : 0
-
-                    new_industry.offsite_wwtp.wwt_nrg_cons = !isNaN(industry_input[130]) ? industry_input[130] : 0
-                    new_industry.offsite_wwtp.wwt_conv_kwh = !isNaN(industry_input[131]) ? industry_input[131] : 0
-                    new_industry.offsite_wwtp.wwt_mass_slu = !isNaN(industry_input[132]) ? industry_input[132] : 0
-                    new_industry.offsite_wwtp.wwt_bod_slud = !isNaN(industry_input[133]) ? industry_input[133] : 0
-                    new_industry.offsite_wwtp.wwt_ch4_efac_tre = !isNaN(industry_input[134]) ? industry_input[134] : 0
-                    new_industry.offsite_wwtp.wwt_n2o_efac_tre = !isNaN(industry_input[135]) ? industry_input[135] : 0
-                    new_industry.offsite_wwtp.wwt_ch4_efac_dis = !isNaN(industry_input[136]) ? industry_input[136] : 0
-                    new_industry.offsite_wwtp.wwt_n2o_efac_dis = !isNaN(industry_input[137]) ? industry_input[137] : 0
-
-
-                    if(industry_input[138] == "Diesel") new_industry.offsite_wwtp.wwt_fuel_typ = 0
-                    else if(industry_input[138] == "Gasoline") new_industry.offsite_wwtp.wwt_fuel_typ = 1
-                    else if(industry_input[138] == "Natural gas") new_industry.offsite_wwtp.wwt_fuel_typ = 2
-
-                    new_industry.offsite_wwtp.wwt_vol_fuel = !isNaN(industry_input[139]) ? industry_input[139] : 0
-                    new_industry.offsite_wwtp.wwt_biog_pro = !isNaN(industry_input[140]) ? industry_input[140] : 0
-                    new_industry.offsite_wwtp.wwt_biog_fla = !isNaN(industry_input[141]) ? industry_input[141] : 98
-                    new_industry.offsite_wwtp.wwt_biog_val = !isNaN(industry_input[142]) ? industry_input[142] : 0
-                    new_industry.offsite_wwtp.wwt_biog_lkd = !isNaN(industry_input[143]) ? industry_input[143] : 2
-                    new_industry.offsite_wwtp.wwt_biog_sold = !isNaN(industry_input[144]) ? industry_input[144] : 0
-                    new_industry.offsite_wwtp.wwt_ch4_biog = !isNaN(industry_input[145]) ? industry_input[145] : 59
-
-                    if(industry_input[146] == "Diesel") new_industry.offsite_wwtp.wwt_dige_typ = 0
-                    else if(industry_input[146] == "Gasoline") new_industry.offsite_wwtp.wwt_dige_typ = 1
-                    else if(industry_input[146] == "Natural gas") new_industry.offsite_wwtp.wwt_dige_typ = 2
-
-                    new_industry.offsite_wwtp.wwt_fuel_dig = !isNaN(industry_input[147]) ? industry_input[147] : 0
-
-                    if(industry_input[148] == "Diesel") new_industry.offsite_wwtp.wwt_reus_trck_typ = 0
-                    else if(industry_input[148] == "Gasoline") new_industry.offsite_wwtp.wwt_reus_trck_typ = 1
-                    else if(industry_input[148] == "Natural gas") new_industry.offsite_wwtp.wwt_reus_trck_typ = 2
-                    new_industry.offsite_wwtp.wwt_reus_vol_trck = !isNaN(industry_input[149]) ? industry_input[149] : 0
-                    new_industry.offsite_wwtp.wwt_mass_slu_sto = !isNaN(industry_input[150]) ? industry_input[150] : 0
-                    new_industry.offsite_wwtp.wwt_time_slu_sto = !isNaN(industry_input[151]) ? industry_input[151] : 0
-                    new_industry.offsite_wwtp.wwt_slu_sto_TVS = !isNaN(industry_input[152]) ? industry_input[152] : 0
-                    new_industry.offsite_wwtp.wwt_slu_sto_f_CH4 = !isNaN(industry_input[153]) ? industry_input[153] : 0
-                    new_industry.offsite_wwtp.wwt_slu_sto_EF = !isNaN(industry_input[154]) ? industry_input[154] : 0
-                    new_industry.offsite_wwtp.wwt_mass_slu_comp = !isNaN(industry_input[155]) ? industry_input[155] : 0
-                    new_industry.offsite_wwtp.wwt_slu_comp_emis_treated_or_piles_covered = industry_input[156] == "Yes"  ? 1 : 0
-                    new_industry.offsite_wwtp.wwt_slu_comp_solids_content = !isNaN(industry_input[157]) ? industry_input[157] : 0
-                    new_industry.offsite_wwtp.wwt_slu_comp_TVS = !isNaN(industry_input[158]) ? industry_input[158] : 0
-                    new_industry.offsite_wwtp.wwt_slu_comp_N_cont = !isNaN(industry_input[159]) ? industry_input[159] : 0
-                    new_industry.offsite_wwtp.wwt_slu_comp_low_CN_EF = !isNaN(industry_input[160]) ? industry_input[160] : 0.015
-                    new_industry.offsite_wwtp.wwt_slu_comp_uncovered_pile_EF = !isNaN(industry_input[161]) ? industry_input[161] : 0.025
-                    new_industry.offsite_wwtp.wwt_slu_comp_seqst_rate = !isNaN(industry_input[162]) ? industry_input[162] : 0.25
-                    new_industry.offsite_wwtp.wwt_mass_slu_inc = !isNaN(industry_input[163]) ? industry_input[163] : 0
-                    new_industry.offsite_wwtp.wwt_temp_inc = !isNaN(industry_input[164]) ? industry_input[164] : 1023
-                    new_industry.offsite_wwtp.wwt_slu_inc_N_cont = !isNaN(industry_input[165]) ? industry_input[165] : 0
-                    new_industry.offsite_wwtp.wwt_slu_inc_SNCR = industry_input[166] == "Yes"  ? 1 : 0
-
-                    new_industry.offsite_wwtp.wwt_mass_slu_app = !isNaN(industry_input[167]) ? industry_input[167] : 0
-                    new_industry.offsite_wwtp.wwt_slu_la_solids_content = !isNaN(industry_input[168]) ? industry_input[168] : 0
-                    new_industry.offsite_wwtp.wwt_slu_la_TVS = !isNaN(industry_input[169]) ? industry_input[169] : 0
-                    new_industry.offsite_wwtp.wwt_slu_la_N_cont = !isNaN(industry_input[170]) ? industry_input[170] : 0
-                    new_industry.offsite_wwtp.wwt_slu_la_EF = !isNaN(industry_input[171]) ? industry_input[171] : 0
-
-                    new_industry.offsite_wwtp.wwt_mass_slu_land = !isNaN(industry_input[172]) ? industry_input[172] : 0
-                    new_industry.offsite_wwtp.wwt_slu_lf_TVS = !isNaN(industry_input[173]) ? industry_input[173] : 0
-                    new_industry.offsite_wwtp.wwt_slu_lf_uncertainty = !isNaN(industry_input[174]) ? industry_input[174] : 0.9
-                    new_industry.offsite_wwtp.wwt_slu_lf_CH4_in_gas = !isNaN(industry_input[175]) ? industry_input[175] : 50
-                    new_industry.offsite_wwtp.wwt_slu_lf_DOCf = !isNaN(industry_input[176]) ? industry_input[176] : 80
-                    new_industry.offsite_wwtp.wwt_slu_lf_decomp_3yr = !isNaN(industry_input[177]) ? industry_input[177] : 69.9
-                    new_industry.offsite_wwtp.wwt_slu_lf_MCF = !isNaN(industry_input[178]) ? industry_input[178] : 1
-                    new_industry.offsite_wwtp.wwt_slu_lf_N_cont = !isNaN(industry_input[179]) ? industry_input[179] : 0
-                    new_industry.offsite_wwtp.wwt_slu_lf_low_CN_EF = !isNaN(industry_input[180]) ? industry_input[180] : 0.015
-                    new_industry.offsite_wwtp.wwt_mass_slu_stock = !isNaN(industry_input[181]) ? industry_input[181] : 0
-                    new_industry.offsite_wwtp.wwt_slu_sp_lifespan = !isNaN(industry_input[182]) ? industry_input[182] : 0
-                    new_industry.offsite_wwtp.wwt_trck_typ = industry_input[183] == "Yes"  ? 1 : 0
-                    new_industry.offsite_wwtp.wwt_vol_tslu = !isNaN(industry_input[184]) ? industry_input[184] : 0
-                  }
-
-                  assessment.industries.push(new_industry)
-                } catch (error) {
-                  console.log(error)
                 }
+
               }
+
 
             }
           })
@@ -772,6 +830,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
+  max-width: 50%;
 
 }
 

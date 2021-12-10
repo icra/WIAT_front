@@ -64,18 +64,18 @@ export class Industry{
         this.name = "new industry";
         this.location = null
         this.onsite_wwtp = new WWTP()
-        this.has_onsite_wwtp = 0
-        this.has_offsite_wwtp = 0
+        this.has_onsite_wwtp = null
+        this.has_offsite_wwtp = null
         this.offsite_wwtp = new WWTP()
         this.offsite_wwtp_type = "Domestic" //Domestic or Industrial
-        this.volume_withdrawn = 0   //Amount of water withdrawn from the wb per day(m3/day)
-        this.has_direct_discharge = 0
+        this.volume_withdrawn = null   //Amount of water withdrawn from the wb per day(m3/day)
+        this.has_direct_discharge = null
         this.direct_discharge = new Direct_discharge()
-        this.industry_type = 0
+        this.industry_type = null
         this.ind_cod_effl= 0
         this.ind_tn_effl = 0
         this.ind_tp_effl = 0
-        this.product_produced = 0
+        this.product_produced = null
 
         //Priority pollutants
         this.ind_diclo_effl = 0 //1,2-Dichloroethane
@@ -160,7 +160,7 @@ export class Industry{
         wwtp.wwt_tetracloroetile_infl_ind = this.ind_tetracloroetile_effl
         wwtp.wwt_tricloroetile_infl_ind = this.ind_tricloroetile_effl
 
-        if(this.has_offsite_wwtp == 0)  wwtp.wwt_vol_treated_external = 0
+        if(this.has_offsite_wwtp != 1)  wwtp.wwt_vol_treated_external = 0
 
     }   //Update onsite wwtp if industry has changed
 
@@ -234,7 +234,7 @@ export class Industry{
             load += this.onsite_wwtp[pollutant] * this.onsite_wwtp.wwt_vol_disc // g/day
         }
         if(this.has_direct_discharge == 1) {
-            load += this.direct_discharge[pollutant]  *  this.direct_discharge.wwt_vol_disc  // g/day
+            load += this.direct_discharge[pollutant]  *  this.direct_discharge.dd_vol_disc  // g/day
         }
         if(this.has_offsite_wwtp == 1){
             load += this.offsite_wwtp[pollutant] * this.offsite_wwtp.wwt_vol_disc  // g/day
@@ -270,7 +270,7 @@ export class Industry{
     water_discharged(){
         let water_discharged = 0
         if(this.has_onsite_wwtp == 1) water_discharged += this.onsite_wwtp.wwt_vol_disc  //m3/day
-        if(this.has_direct_discharge == 1) water_discharged += this.direct_discharge.wwt_vol_disc //m3/day
+        if(this.has_direct_discharge == 1) water_discharged += this.direct_discharge.dd_vol_disc //m3/day
         if(this.has_offsite_wwtp == 1) water_discharged += this.offsite_wwtp.wwt_vol_disc //m3/day
         return water_discharged
     }
@@ -281,11 +281,11 @@ export class Industry{
     }
 
     tonnes_of_product(){
-        return this.product_produced
+        return this.product_produced == null ? 0 : this.product_produced
     }
 
     volume_of_water_withdrawn(){
-        return this.volume_withdrawn
+        return this.volume_withdrawn == null ? 0 : this.volume_withdrawn
     }
 
     volume_of_water_treated(){
@@ -305,7 +305,7 @@ export class Industry{
             volume += this.onsite_wwtp.wwt_vol_trea
         }
         if(this.has_direct_discharge == 1) {
-            volume += this.direct_discharge.wwt_vol_disc
+            volume += this.direct_discharge.dd_vol_disc
         }
         if(this.has_offsite_wwtp == 1){
             volume += this.offsite_wwtp.wwt_vol_trea
@@ -332,7 +332,7 @@ export class Direct_discharge{
         this.wwt_nonilfenols_effl = 0 //Nonylphenols
         this.wwt_tetracloroetile_effl = 0 //tetrachloroethene
         this.wwt_tricloroetile_effl = 0 //Trichloroethylene
-        this.wwt_vol_disc = 0
+        this.dd_vol_disc = 0
         this.wwt_ch4_efac_dis = 0
         this.wwt_n2o_efac_dis = 0
     }
@@ -1041,11 +1041,11 @@ export let Tables={
         {name:"Coarse-Textured (<30% clay)", f_la:0.005, description: ""},
     ],
 
-
     "Yes/No":[
         {text:"No", value: 0},
         {text:"Yes", value: 1},
     ],
+
 };
 
 //get row object by "table" (string) and "index" (integer)

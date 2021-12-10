@@ -17,6 +17,7 @@ let utils = {
     get_country_code_from_coordinates(lat, lng){
         let crg = require('country-reverse-geocoding').country_reverse_geocoding();
         let country = crg.get_country(lat, lng);
+        if(country == null) return null
         let code = country.code
         return code
     },
@@ -155,9 +156,9 @@ function water_filtered(industries, industry_effluent, wwtp_effluent){
 function effl_efficiency(industries, industry_effluent, wwtp_effluent){   //Amount of pollutant filtered
 
     let filtered = water_filtered(industries, industry_effluent, wwtp_effluent)
-    let discharged = calculate_effluent_load(industries, wwtp_effluent)
+    let generated = calculate_pollutant_generated(industries, industry_effluent)
 
-    let eff = filtered / discharged
+    let eff = filtered / generated
 
     if(isNaN(eff)) return (0).toFixed(3)
     else return (eff*100).toFixed(3)
@@ -166,6 +167,11 @@ function effl_efficiency(industries, industry_effluent, wwtp_effluent){   //Amou
 function calculate_water_generated(industries){
     return industries.map(industry => industry.water_generated()).sum()
 }
+
+function calculate_pollutant_generated(industries, pollutant){
+    return industries.map(industry => industry.generated_pollutant_load(pollutant)).sum()
+}
+
 
 let metrics = {
 

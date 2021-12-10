@@ -3,7 +3,6 @@
 
 
 let standard_industries_classification = [
-            {text: "Undefined", value: 0},
             {text: "C10 -- Manufacture of food products", value: 1},
             {text: "C11 -- Manufacture of beverages", value: 2},
             {text: "C12 -- Manufacture of tobacco products", value: 3},
@@ -27,8 +26,10 @@ let standard_industries_classification = [
             {text: "C30 -- Manufacture of other transport equipment", value: 21},
             {text: "C31 -- Manufacture of furniture", value: 22},
             {text: "C32 -- Other manufacturing", value: 23},
-            {text: "C33 -- Repair and installation of machinery and equipment", value: 24}
-        ]
+            {text: "C33 -- Repair and installation of machinery and equipment", value: 24},
+            {text: "Other", value: 0},
+
+]
 
 
 module.exports = standard_industries_classification

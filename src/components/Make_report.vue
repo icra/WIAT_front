@@ -1841,7 +1841,7 @@ export default {
 
           wd[key] = indicators["wd"]
           dis[key] = indicators["dis"]
-          re[key] = indicators["dis"]
+          re[key] = indicators["re"]
 
         }
 

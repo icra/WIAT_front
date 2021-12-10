@@ -976,7 +976,7 @@ export default {
     },
     assessment_date_rules(finish_date){
       if(finish_date>this.start_date_model_assessment) return true
-      else return "End date is after beginning date"
+      else return "End date must be after beginning date"
     }
   },
   computed: {

@@ -548,30 +548,34 @@ export default {
 
       let latlng = e.latlng
 
-      this.mapDiv.setView([latlng.lat, latlng.lng]);
+      if(utils.get_country_code_from_coordinates(latlng.lat, latlng.lng) != null){
+        this.mapDiv.setView([latlng.lat, latlng.lng]);
 
-      if(_this.clicked_marker !== null) _this.mapDiv.removeLayer(_this.clicked_marker);
-      _this.clicked_marker = L.marker(latlng, {icon: greenIcon}).addTo(_this.mapDiv)
+        if(_this.clicked_marker !== null) _this.mapDiv.removeLayer(_this.clicked_marker);
+        _this.clicked_marker = L.marker(latlng, {icon: greenIcon}).addTo(_this.mapDiv)
 
-      if(_this.selected_assessment!==undefined || _this.selected_layer!==null) {
-        _this.popup_info=_this.clicked_marker.bindPopup()
-      }
-
-      if(_this.selected_layer !== null){
-        let current_layer = _this.get_layer(_this.selected_layer, _this.baseline_future_model, _this.annual_monthly_model, _this.months_model)
-        current_layer.click(latlng)
-      }else if(_this.selected_assessment!==undefined){
-        _this.toggle_popup("")
-      }
-
-      $('#map').on('click', '.trigger', function() {
-        if(_this.adding_supply_chain){
-          _this.$emit('createSupplyChain', latlng)
-        }else{
-          _this.$emit('createIndustry', latlng)
+        if(_this.selected_assessment!==undefined || _this.selected_layer!==null) {
+          _this.popup_info=_this.clicked_marker.bindPopup()
         }
 
-      });
+        if(_this.selected_layer !== null){
+          let current_layer = _this.get_layer(_this.selected_layer, _this.baseline_future_model, _this.annual_monthly_model, _this.months_model)
+          current_layer.click(latlng)
+        }else if(_this.selected_assessment!==undefined){
+          _this.toggle_popup("")
+        }
+
+        $('#map').on('click', '.trigger', function() {
+          if(_this.adding_supply_chain){
+            _this.$emit('createSupplyChain', latlng)
+          }else{
+            _this.$emit('createIndustry', latlng)
+          }
+        });
+      }
+
+
+
     },
 
     searchCoordinates(){
