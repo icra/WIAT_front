@@ -14,6 +14,7 @@ Vue.prototype.$location_markers = []    //Location of the industries of the asse
 Vue.prototype.$clicked_point = null    //Location of the point clicked on the map
 Vue.prototype.$assessment_active = []    //active assessments shown on map
 Vue.prototype.$selected_layer = "None"
+Vue.prototype.$last_location = [41.9672203,2.8385181]
 
 Vue.prototype.$layers_description = [
   {

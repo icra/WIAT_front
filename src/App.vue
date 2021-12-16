@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app class="app">
 
     <!-- Header -->
     <!--<v-app-bar
@@ -26,11 +26,11 @@
           absolute
       >
 
-        <div class="icon_sidebar_container">
+        <div class="icon_sidebar_container" style="overflow: hidden">
           <v-list height="100%">
             <div class="icon_sidebar_list">
               <v-hover v-slot:default="{ hover }">
-                <v-list-item :class="hover ? 'icon_hovered_pressed' : ''" @click="secondMenu = !secondMenu" style="height: 75px">
+                <v-list-item :class="hover ? 'icon_hovered_pressed' : ''" @click="secondMenu = !secondMenu" style="height: 75px; margin-top: 25px">
                   <v-list-item-icon>
                     <v-icon color = "#F2F4F3" v-if="secondMenu">
                       mdi-arrow-left
@@ -55,14 +55,159 @@
                       style="height: 75px" :value="index"
                   >
                     <v-list-item-icon>
-                      <v-icon color = "#F2F4F3">
+                      <v-icon color = "#F2F4F3" style="display: inline-block; position: relative; left: 50%; top: 50%; transform: translate(-50%, 25%);">
                         {{ item.icon }}
                       </v-icon>
                     </v-list-item-icon>
                     <v-list-item-content></v-list-item-content>
                   </v-list-item>
                 </v-hover>
+
+                <v-dialog
+                    v-model="dialog"
+                    width="700"
+                    scrollable
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-hover v-slot:default="{ hover }">
+                      <div :class="hover ? 'icon_hovered_pressed' : ''" style="height: 75px; width: 100%;" @click="dialog=true" >
+                        <div style="display: inline-block; position: relative; left: 50%; top: 50%; transform: translate(-60%, -50%);">
+                          <v-icon color = "#F2F4F3">mdi-frequently-asked-questions</v-icon>
+                        </div>
+                      </div>
+                    </v-hover>
+
+                  </template>
+                  <div style="background-color: white; overflow: hidden">
+                    <v-tabs v-model="tab" fixed-tabs>
+                      <v-tab>Tour</v-tab>
+                      <v-tab>About</v-tab>
+                      <v-tab>Documents</v-tab>
+                      <v-tab>Contact</v-tab>
+                      <v-tab>LEGAL DISCLAIMER</v-tab>
+
+                    </v-tabs>
+
+                    <v-tabs-items v-model="tab" style="padding: 40px; height: 100%">
+                      <v-tab-item
+                      >
+                        <v-card flat>
+                          TOUR
+                        </v-card>
+                      </v-tab-item>
+
+                      <v-tab-item
+                      >
+                        <v-card flat>
+                          WIAT (Wastewater Impact Assessment Tool) v1.0  is a tool that allows users to understand which aspects of wastewater treatment and industry management cause major impacts related to climate, biodiversity and water security, as well as to help identify water risks and prioritize their water management interventions.
+                          <br>
+
+                          This project is part of the <a href="https://wbcsdpublications.org/wastewater-zero/" target="_blank" rel="noopener noreferrer">Wastewater Zero Commitment</a> initiative developed by the WBCSD.
+                          <br>
+                          <br>
+                          <b>
+                            Developed by
+                          </b>
+                          <v-img
+                              max-width="400"
+                              src="/developers/developers.PNG"
+                          ></v-img>
+                          <a href="https://www.wbcsd.org/" target="_blank" rel="noopener noreferrer">WBCSD</a> | <a href="https://www.icra.cat/" target="_blank" rel="noopener noreferrer">ICRA</a> | <a href="https://www.earthgenome.org/" target="_blank" rel="noopener noreferrer">The Earth Genome</a> | <a href="https://futureh2o.asu.edu/" target="_blank" rel="noopener noreferrer">Future H2O</a>
+
+                          <br>
+                          <br>
+                          <b>
+                            Working group
+                          </b>
+                          <v-img
+                              max-width="400"
+                              src="/developers/user_group.PNG"
+                          ></v-img>
+                          <br>
+                          <a href="https://www.adityabirla.com/" target="_blank" rel="noopener noreferrer">Aditya Birla Group</a> | <a href="https://www.chevron.com/" target="_blank" rel="noopener noreferrer">Chevron Corporation</a> | <a href="https://www.dow.com/en-us.html" target="_blank" rel="noopener noreferrer">Dow Chemical Company</a> | <a href="https://www.holcim.com/" target="_blank" rel="noopener noreferrer">Holcim Group</a>
+
+
+                        </v-card>
+
+                      </v-tab-item>
+
+                      <v-tab-item
+                      >
+                        <v-card flat>
+
+                          <div style="padding: 0px 50px 0px 50px">
+                            <a class="button-link" href="/WIAT science and methods.pdf" download >
+                              <v-btn small tile block color="#b62373">
+                                Download methodology
+                                <v-icon right>
+                                  mdi-cloud-download
+                                </v-icon>
+                              </v-btn>
+                            </a>
+
+                            <br>
+
+                            <a class="button-link" href="/WIAT science and methods.pdf" download >
+                              <v-btn small tile block color="#b62373">
+                                DOWNLOAD USER MANUAL - NOT IMPLEMENTED
+                                <v-icon right>
+                                  mdi-cloud-download
+                                </v-icon>
+                              </v-btn>
+                            </a>
+
+                          </div>
+
+
+
+
+                        </v-card>
+
+                      </v-tab-item>
+                      <v-tab-item style="height: 700px"
+                      >
+                        <v-card flat >
+                          <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfaBsOylgrbD-NUOVAlTNYhUDJBbBUiWbVIncD0nkdANNotbA/viewform?embedded=true" width="640" height="520" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+                        </v-card>
+
+                      </v-tab-item>
+                      <v-tab-item
+                      >
+                        <v-card flat>
+                          <v-row>
+                            <v-col>
+                              This tool has been developed in the name of WBCSD. It is the result of a collaborative effort by members of WBCSD and external agencies involved as advisory during the development of the tool. Input and feedback from stakeholders were incorporated in a balanced way. Use of and/or reliance on any data and/or information included on the WIAT tool is at User’s discretion. WBCSD and others involved in development of the tool or the sources from which data is collected make no claim, representation or warranty of any kind on the accuracy of the data/information included on the tool and shall not be held liable for incidental or consequential damages with or arising out of the furnishing, use or performance of this tool. By assessing, downloading and/or using this data/information in any manner the User agrees to assume any/all-risk with respect to use of such information.
+                            </v-col>
+                          </v-row>
+                          <br>
+                          <br>
+                          <v-row justify="center">
+                            <v-col style="text-align: center">
+                              Copyright ©WBCSD, January 2022
+                            </v-col>
+                            <v-col style="text-align: center">
+                              All rights reserved
+                            </v-col>
+                            <v-col style="text-align: center">
+                              <a href="https://www.wbcsd.org/Overview/Privacy-Policy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+                            </v-col>
+                          </v-row>
+
+                        </v-card>
+
+                      </v-tab-item>
+
+
+
+
+                    </v-tabs-items>
+
+                  </div>
+                </v-dialog>
+
               </v-list-item-group>
+
+
 
 
               <v-hover v-slot:default="{ hover }">
@@ -74,7 +219,6 @@
                   </a>
                 </div>
               </v-hover>
-
 
             </div>
           </v-list>
@@ -89,84 +233,89 @@
         app
         clipped
     >
-      <div style=" height: 100%; display: flex; flex-flow: column; width: 100%; padding: 10px; overflow: hidden">
-        <div style="display: flex; justify-content: flex-end; padding: 7px ">
-          <v-icon @click="secondMenu = !secondMenu">mdi-close</v-icon>
+      <div style="height: 100%; display: flex; flex-flow: column; width: 100%;  overflow: hidden;  border-bottom-width: 10px">
+        <div style="display: flex; justify-content: flex-end;  background-color: #1C195B; width: 100%">
+          <v-icon style="margin: 5px 10px 5px 0px" color="white" @click="secondMenu = !secondMenu">mdi-close</v-icon>
         </div>
 
-        <h1>Assessment list</h1>
-        <!-- <div style = "overflow-y: auto; height: 75%; max-height: 75%; width: 100%"> -->
-        <div style="flex: 2; overflow-y: auto; width: 100%; position: relative; height: 100%" >
+        <div style="padding: 10px; height: 95%;  display: flex; flex-flow: column; background-color: white">
+          <h3 style="padding-bottom: 10px; color: #b62373">Assessment list</h3>
+          <!-- <div style = "overflow-y: auto; height: 75%; max-height: 75%; width: 100%"> -->
+          <div style="flex: 2; overflow-y: auto; width: 100%; position: relative; height: 100%" >
 
-          <v-expansion-panels focusable v-model="assessment_expansion_panel">
-            <v-expansion-panel
-                v-for="(assessment, assessment_index ) in created_assessments"
-                :key="assessment.name"
-                @click.native.stop
+            <v-expansion-panels focusable v-model="assessment_expansion_panel">
+              <v-expansion-panel
+                  v-for="(assessment, assessment_index ) in created_assessments"
+                  :key="assessment.name"
+                  @click.native.stop
+              >
+                <v-expansion-panel-header disable-icon-rotate style="background-color: #c4c4d4">
+                  <b>{{ assessment.name }}</b>
+                  <template v-slot:actions>
+                    <v-hover v-slot:default="{ hover }" style="margin-right: 10px">
+                      <v-icon v-if="assessment_active[assessment_index]" :color="hover ? '#555283' : '#1C195B'" @click="hide_show_industries(assessment_index)" @click.native.stop>
+                        mdi-eye
+                      </v-icon>
+                      <v-icon v-else :color="hover ? '#555283' : '#1C195B'" @click="hide_show_industries(assessment_index)" @click.native.stop>
+                        mdi-eye-off
+                      </v-icon>
+
+                    </v-hover>
+
+                    <v-hover v-slot:default="{ hover }">
+                      <v-icon :color="hover ? '#555283' : '#1C195B'" @click="open_edit_assessment_tab(assessment_index)" @click.native.stop>
+                        mdi-cog
+                      </v-icon>
+                    </v-hover>
+
+                  </template>
+                </v-expansion-panel-header>
+                <v-expansion-panel-content v-if="created_assessments[assessment_index].industries.length > 0" >
+
+                  <div
+                      v-for="(industry,industry_index ) in created_assessments[assessment_index].industries"
+                      :key="industry.name"
+                      style="width: 100%;"
+                      @click = "open_edit_industry_tab(assessment_index, industry_index)"
+
+                  >
+                    <v-hover v-slot:default="{ hover }">
+                      <div style="padding: 7px 26px 7px 35px; display: flex; align-items: flex-end; width: 100%;" :class="{ 'hover_industry': hover }">
+                        <div >
+                          {{industry.name}}
+                        </div>
+                        <div style="flex-grow: 1; display: block;">
+                          <v-icon
+                              style="float: right; margin-right: 3px; padding-bottom: 3px"
+                              color="#1C195B"
+                              size="18px"
+                          >
+                            mdi-circle-edit-outline
+                          </v-icon>
+                        </div>
+                      </div>
+                    </v-hover>
+
+
+                  </div>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+            </v-expansion-panels>
+
+
+          </div>
+          <div style="padding-bottom: 20px; min-width: 100px; margin-top: 10px">
+            <v-btn
+                style="width: 100%; "
+                @click="open_create_assessment_tab"
+                small block tile
+                color="#b62373"
             >
-              <v-expansion-panel-header disable-icon-rotate>
-                <b>{{ assessment.name }}</b>
-                <template v-slot:actions>
-                  <v-hover v-slot:default="{ hover }" style="margin-right: 10px">
-                    <v-icon v-if="assessment_active[assessment_index]" :color="hover ? '#463FCA' : '#1C195B'" @click="hide_show_industries(assessment_index)" @click.native.stop>
-                      mdi-eye
-                    </v-icon>
-                    <v-icon v-else :color="hover ? '#463FCA' : '#1C195B'" @click="hide_show_industries(assessment_index)" @click.native.stop>
-                      mdi-eye-off
-                    </v-icon>
-
-                  </v-hover>
-
-                  <v-hover v-slot:default="{ hover }">
-                    <v-icon :color="hover ? '#463FCA' : '#1C195B'" @click="open_edit_assessment_tab(assessment_index)" @click.native.stop>
-                      mdi-cog
-                    </v-icon>
-                  </v-hover>
-
-                </template>
-              </v-expansion-panel-header>
-              <v-expansion-panel-content v-if="created_assessments[assessment_index].industries.length > 0" >
-
-                <div
-                    v-for="(industry,industry_index ) in created_assessments[assessment_index].industries"
-                    :key="industry.name"
-                    style="width: 100%;"
-                    @click = "open_edit_industry_tab(assessment_index, industry_index)"
-
-                >
-                  <v-hover v-slot:default="{ hover }">
-                    <div style="padding: 7px 26px 7px 35px; display: flex; align-items: flex-end; width: 100%;" :class="{ 'hover_industry': hover }">
-                      <div >
-                        {{industry.name}}
-                      </div>
-                      <div style="flex-grow: 1; display: block;">
-                        <v-icon
-                            style="float: right; margin-right: 3px; padding-bottom: 3px"
-                            color="#1C195B"
-                            size="18px"
-                        >
-                          mdi-circle-edit-outline
-                        </v-icon>
-                      </div>
-                    </div>
-                  </v-hover>
-
-
-                </div>
-              </v-expansion-panel-content>
-            </v-expansion-panel>
-          </v-expansion-panels>
-
-
+              Create assessment
+            </v-btn>
+          </div>
         </div>
-        <div style="padding-bottom: 20px; min-width: 100px; margin-top: 10px">
-          <v-btn
-              style="width: 100%; "
-              @click="open_create_assessment_tab"
-              small outlined block>
-            Create assessment
-          </v-btn>
-        </div>
+
       </div>
     </v-navigation-drawer>
 
@@ -179,7 +328,7 @@
     </div>
 
     <v-navigation-drawer
-        style="background-color: #F2F4F3;"
+        style="background-color: white;"
         v-model="rightMenu"
         :width="rightMenu ? '20rem' : '0rem'"
         flat
@@ -187,90 +336,27 @@
         right
         clipped
     >
-      <div style=" height: 100%; overflow: hidden">
-        <div style="padding: 17px; height: fit-content">
-          <v-icon @click="rightMenu = !rightMenu">mdi-close</v-icon>
+
+      <div style="height: 100%">
+        <div style="height: 34px;  background-color: #1C195B; width: 100%" >
+          <v-icon style="margin: 5px 0px 5px 10px" color="white" @click="rightMenu = !rightMenu">mdi-close</v-icon>
         </div>
-        <!-- Assessment creation -->
-        <div v-if="right_sidebar_content === 1" style="margin: 7px; padding: 7px; background-color: white">
-          <h1>Create assessment</h1>
-          <v-form
-              ref="create_assessment_ref"
-              v-model="new_assessment_valid"
-          >
-            <v-text-field
-                v-model="assessment_name"
-                label="Assessment name"
-                :rules="[new_assessment_rules_name, rules_required]"
-            ></v-text-field>
+        <div style=" height: 95%; overflow: hidden">
 
-
-
-            <v-menu
-                v-model="start_date_modal"
-                :close-on-content-click="false"
-                transition="scale-transition"
-                offset-y
-                min-width="auto"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-text-field
-                    v-model="start_date_model_assessment"
-                    label="Beginning of assessment period"
-                    readonly
-                    v-bind="attrs"
-                    v-on="on"
-                ></v-text-field>
-              </template>
-              <v-date-picker
-                  v-model="start_date_model_assessment"
-                  @input="start_date_modal = false"
-              ></v-date-picker>
-            </v-menu>
-            <v-menu
-                v-model="end_date_modal"
-                :close-on-content-click="false"
-                transition="scale-transition"
-                offset-y
-                min-width="auto"
-            >
-              <template v-slot:activator="{ on, attrs }">
-                <v-text-field
-                    v-model="end_date_model_assessment"
-                    label="End of assessment period"
-                    readonly
-                    v-bind="attrs"
-                    v-on="on"
-                    :rules="[assessment_date_rules]"
-                ></v-text-field>
-              </template>
-              <v-date-picker
-                  v-model="end_date_model_assessment"
-                  @input="end_date_modal = false"
-              ></v-date-picker>
-            </v-menu>
-            <v-btn
-                :disabled="!new_assessment_valid"
-                @click="create_assessment"
-                small
-                outlined
-                block
-            >
-              Create assessment
-            </v-btn>
-          </v-form>
-        </div>
-        <!-- Edit assessment -->
-        <div v-else-if="right_sidebar_content === 2" >
-          <div style="margin: 7px; padding: 7px; background-color: white">
-            <h1>Edit assessment</h1>
+          <!-- Assessment creation -->
+          <div v-if="right_sidebar_content === 1" style="margin: 7px; padding: 7px; background-color: white">
+            <h3 style="color: #b62373">Create assessment</h3>
             <v-form
+                ref="create_assessment_ref"
                 v-model="new_assessment_valid"
             >
               <v-text-field
                   v-model="assessment_name"
-                  :rules="[edit_assessment_rules, rules_required]"
+                  label="Assessment name"
+                  :rules="[new_assessment_rules_name, rules_required]"
               ></v-text-field>
+
+
 
               <v-menu
                   v-model="start_date_modal"
@@ -315,230 +401,297 @@
                     @input="end_date_modal = false"
                 ></v-date-picker>
               </v-menu>
-
-
               <v-btn
                   :disabled="!new_assessment_valid"
-                  @click="edit_assessment"
+                  @click="create_assessment"
                   small
-                  outlined
+                  tile
                   block
+                  color="#b62373"
               >
-                Edit
+                Create assessment
               </v-btn>
             </v-form>
           </div>
-          <div style="margin: 7px; padding: 7px;">
-            <v-btn @click = "delete_assessment" small outlined block>
-              Delete
-            </v-btn>
+          <!-- Edit assessment -->
+          <div v-else-if="right_sidebar_content === 2" >
+            <div style="margin: 7px; padding: 7px; background-color: white">
+              <h3 style="color: #b62373">Edit assessment</h3>
+              <v-form
+                  v-model="new_assessment_valid"
+              >
+                <v-text-field
+                    v-model="assessment_name"
+                    :rules="[edit_assessment_rules, rules_required]"
+                ></v-text-field>
+
+                <v-menu
+                    v-model="start_date_modal"
+                    :close-on-content-click="false"
+                    transition="scale-transition"
+                    offset-y
+                    min-width="auto"
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-text-field
+                        v-model="start_date_model_assessment"
+                        label="Beginning of assessment period"
+                        readonly
+                        v-bind="attrs"
+                        v-on="on"
+                    ></v-text-field>
+                  </template>
+                  <v-date-picker
+                      v-model="start_date_model_assessment"
+                      @input="start_date_modal = false"
+                  ></v-date-picker>
+                </v-menu>
+                <v-menu
+                    v-model="end_date_modal"
+                    :close-on-content-click="false"
+                    transition="scale-transition"
+                    offset-y
+                    min-width="auto"
+                >
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-text-field
+                        v-model="end_date_model_assessment"
+                        label="End of assessment period"
+                        readonly
+                        v-bind="attrs"
+                        v-on="on"
+                        :rules="[assessment_date_rules]"
+                    ></v-text-field>
+                  </template>
+                  <v-date-picker
+                      v-model="end_date_model_assessment"
+                      @input="end_date_modal = false"
+                  ></v-date-picker>
+                </v-menu>
+
+
+                <v-btn
+                    :disabled="!new_assessment_valid"
+                    @click="edit_assessment"
+                    small
+                    tile
+                    block
+                    color="#b62373"
+                >
+                  Edit
+                </v-btn>
+              </v-form>
+            </div>
+            <div style="margin: 7px; padding: 7px;">
+              <v-btn @click = "delete_assessment" small tile block color="#b62373">
+                Delete
+              </v-btn>
+            </div>
           </div>
-        </div>
-        <!-- edit industry -->
-        <div v-else-if="right_sidebar_content === 3">
-          <div style="margin: 7px; padding: 7px; background-color: white">
-            <h1>Edit industry</h1>
-            <v-form
-                v-model="new_factory_valid"
-            >
-              <v-text-field
-                  v-model="factory_name"
-                  :rules="[edit_industry_rules_name, rules_required]"
-              ></v-text-field>
+          <!-- edit industry -->
+          <div v-else-if="right_sidebar_content === 3">
+            <div style="margin: 7px; padding: 7px; background-color: white">
+              <h3 style="color: #b62373">Edit industry</h3>
+              <v-form
+                  v-model="new_factory_valid"
+              >
+                <v-text-field
+                    v-model="factory_name"
+                    :rules="[edit_industry_rules_name, rules_required]"
+                ></v-text-field>
+                <v-btn
+                    :disabled="!new_factory_valid"
+                    @click="edit_industry"
+                    small
+                    tile
+                    block
+                    color="#b62373"
+                >
+                  Rename
+                </v-btn>
+
+                <br>
+              </v-form>
+              <v-btn :to="{ name: 'edit_industry', params: {assessment_id: selected_assessment, industry_id: selected_industry}}" small tile block @click="icon_selected = -1; selected_layer=null; secondMenu=false; rightMenu=false" color="#b62373">
+                Advanced INPUTS
+              </v-btn>
+              <v-btn @click="delete_industry" small tile block color="#b62373">
+                Delete
+              </v-btn>
               <v-btn
-                  :disabled="!new_factory_valid"
-                  @click="edit_industry"
-                  small
-                  outlined
                   block
+                  tile
+                  small
+                  @click="add_supply_chain_industry"
+                  :disabled="icon_selected != 0"
+                  color="#b62373"
+
               >
-                Rename
+                PLACE SUPPLY CHAIN ON THE MAP
               </v-btn>
+            </div>
+            <div style="margin: 7px; padding: 7px;">
 
-              <br>
-            </v-form>
+
+
+              <!--<v-btn block small outlined :to="{ name: 'statistics_industry', params: {assessment_id: selected_assessment, industry_id: selected_industry}}" @click="icon_selected = -1; selected_layer=null; secondMenu=false; rightMenu=false">
+                SHOW RESULTS
+              </v-btn>-->
+
+            </div>
           </div>
-          <div style="margin: 7px; padding: 7px;">
 
-            <v-btn :to="{ name: 'edit_industry', params: {assessment_id: selected_assessment, industry_id: selected_industry}}" small outlined block @click="icon_selected = -1; selected_layer=null; secondMenu=false; rightMenu=false">
-              Advanced INPUTS
-            </v-btn>
-            <v-btn @click="delete_industry" small outlined block>
-              Delete
-            </v-btn>
-            <v-btn
-                block
-                outlined
-                small
-                @click="add_supply_chain_industry"
-                :disabled="icon_selected != 0"
-
-            >
-              PLACE SUPPLY CHAIN ON THE MAP
-            </v-btn>
-
-            <!--<v-btn block small outlined :to="{ name: 'statistics_industry', params: {assessment_id: selected_assessment, industry_id: selected_industry}}" @click="icon_selected = -1; selected_layer=null; secondMenu=false; rightMenu=false">
-              SHOW RESULTS
-            </v-btn>-->
-
-          </div>
-        </div>
-
-        <!-- map info -->
-        <!--
-        <div v-else-if="right_sidebar_content === 4">
-          <div style="margin: 7px; padding: 7px; background-color: white">
-            <h1>Map info</h1>
-            <span
-                v-for="[key, value] in Object.entries(map_content_info)"
-                :key="key"
-            >
-              <b>{{key}}</b>: <p>{{value}}</p>
-            </span>
-          </div>
-          <div style="margin: 7px; padding:7px">
-            <v-btn
-                :disabled="assessment_expansion_panel === undefined"
-                @click="right_sidebar_content = 5; factory_name = null"
-                small
-                outlined
-            >
-              ADD NEW INDUSTRY
-            </v-btn>
-          </div>
-        </div>
-        -->
-        <!-- Create industry -->
-        <div v-else-if="right_sidebar_content === 5">
-          <div style="margin: 7px; padding: 7px; background-color: white">
-            <h1>New industry</h1>
-            <v-form
-                v-model="new_factory_valid"
-            >
-              <v-text-field
-                  v-model="factory_name"
-                  label="Industry name"
-                  :rules="[new_factory_rules_name, rules_required]"
-
-              ></v-text-field>
+          <!-- map info -->
+          <!--
+          <div v-else-if="right_sidebar_content === 4">
+            <div style="margin: 7px; padding: 7px; background-color: white">
+              <h1>Map info</h1>
+              <span
+                  v-for="[key, value] in Object.entries(map_content_info)"
+                  :key="key"
+              >
+                <b>{{key}}</b>: <p>{{value}}</p>
+              </span>
+            </div>
+            <div style="margin: 7px; padding:7px">
               <v-btn
-                  :disabled="!new_factory_valid"
-                  @click="add_factory"
+                  :disabled="assessment_expansion_panel === undefined"
+                  @click="right_sidebar_content = 5; factory_name = null"
                   small
                   outlined
-                  block
               >
-                Add industry
+                ADD NEW INDUSTRY
               </v-btn>
-            </v-form>
-
+            </div>
           </div>
-
-        </div>
-        <div v-else-if="right_sidebar_content === 6" style=" height: 100%; display: flex; flex-flow: column; width: 100%; padding: 10px; overflow: hidden">
-          <div>
-            <v-row dense>
-              <v-col cols="12">
-                <v-sheet class="pa-4 search_box">
-                  <v-text-field
-                      v-model="search_layer_model"
-                      label="Search layer"
-                      dark
-                      flat
-                      solo-inverted
-                      hide-details
-                      clearable
-                  ></v-text-field>
-
-                </v-sheet>
-
-              </v-col>
-            </v-row>
-          </div>
-          <!-- <div style = "overflow-y: auto; height: 75%; max-height: 75%; width: 100%"> -->
-          <div style="flex: 2; overflow-y: auto; overflow-x: hidden; width: 100%; position: relative; height: 100%" >
-            <v-row dense style="background-color: white">
-              <v-col cols="12">
-                <div class="layer_list" style=" width: 100%;">
-                  <v-treeview
-                      :items="layer_tree"
-                      dense
-                      hoverable
-                      activatable
-                      selection-type="leaf"
-                      return-object
-                      open-on-click
-                      color="#1C195B"
-                      clear-icon="mdi-close-circle-outline"
-                      :search="search_layer_model"
-                      :active.sync = "actived_layers"
-                      @update:active="layerTreeSelected"
-                  >
-                    <template v-slot:append="{ item }">
-                      <v-tooltip bottom v-if="item.layer && item.layer.info" max-width="700px">
-                        <template v-slot:activator="{ on, attrs }">
-                          <v-icon
-                              color='#1C195B'
-                              style="padding-right: 10px"
-                              v-bind="attrs"
-                              v-on="on"
-                          >
-                            mdi-information-outline
-                          </v-icon>
-                        </template>
-                        <span>{{item.layer.info}}</span>
-                      </v-tooltip>
-
-                      <v-icon v-if="selected_layer === item.name && item.layer" color='#1C195B'>
-                        mdi-layers-remove
-                      </v-icon>
-                      <v-icon v-else-if="item.layer" color='#1C195B'>
-                        mdi-layers-plus
-                      </v-icon>
-
-                    </template>
-                  </v-treeview>
-
-
-                </div>
-
-              </v-col>
-            </v-row>
-
-          </div>
-          <div style="padding-bottom: 20px; min-width: 100px; margin-top: 10px">
-            <v-btn
-                style="width: 100%; "
-                @click="open_create_assessment_tab"
-                small outlined block>
-              Create assessment
-            </v-btn>
-          </div>
-
-        </div>
-        <!-- Create supply chain industry -->
-        <div v-else-if="right_sidebar_content === 7">
-          <div style="margin: 7px; padding: 7px; background-color: white">
-            <h1>Supply chain industry</h1>
-            <v-form
-                v-model="new_supply_chain_valid"
-            >
-              <v-text-field
-                  v-model="supply_chain_name"
-                  label="Supply chain industry name"
-                  :rules="[new_supply_chain_rules_name, rules_required]"
-
-              ></v-text-field>
-              <v-btn
-                  :disabled="!new_supply_chain_valid"
-                  @click="add_supply_chain"
-                  small
-                  outlined
-                  block
+          -->
+          <!-- Create industry -->
+          <div v-else-if="right_sidebar_content === 5">
+            <div style="margin: 7px; padding: 7px; background-color: white">
+              <h1>New industry</h1>
+              <v-form
+                  v-model="new_factory_valid"
               >
-                Add supply chain industry
-              </v-btn>
-            </v-form>
+                <v-text-field
+                    v-model="factory_name"
+                    label="Industry name"
+                    :rules="[new_factory_rules_name, rules_required]"
+
+                ></v-text-field>
+                <v-btn
+                    :disabled="!new_factory_valid"
+                    @click="add_factory"
+                    small
+                    tile
+                    block
+                    color="#b62373"
+                >
+                  Add industry
+                </v-btn>
+              </v-form>
+
+            </div>
+
+          </div>
+          <div v-else-if="right_sidebar_content === 6" style=" height: 100%; display: flex; flex-flow: column; width: 100%; padding: 10px; overflow: hidden">
+            <div>
+              <v-row dense>
+                <v-col cols="12">
+                  <v-sheet class="pa-4 search_box">
+                    <v-text-field
+                        v-model="search_layer_model"
+                        label="Search layer"
+                        dark
+                        flat
+                        solo-inverted
+                        hide-details
+                        clearable
+                    ></v-text-field>
+
+                  </v-sheet>
+
+                </v-col>
+              </v-row>
+            </div>
+            <!-- <div style = "overflow-y: auto; height: 75%; max-height: 75%; width: 100%"> -->
+            <div style="flex: 2; overflow-y: auto; overflow-x: hidden; width: 100%; position: relative; height: 100%" >
+              <v-row dense style="background-color: white">
+                <v-col cols="12">
+                  <div class="layer_list" style=" width: 100%;">
+                    <v-treeview
+                        :items="layer_tree"
+                        dense
+                        hoverable
+                        activatable
+                        selection-type="leaf"
+                        return-object
+                        open-on-click
+                        color="#1C195B"
+                        clear-icon="mdi-close-circle-outline"
+                        :search="search_layer_model"
+                        :active.sync = "actived_layers"
+                        @update:active="layerTreeSelected"
+                    >
+                      <template v-slot:append="{ item }">
+                        <v-tooltip bottom v-if="item.layer && item.layer.info" max-width="700px">
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-icon
+                                color='#1C195B'
+                                style="padding-right: 10px"
+                                v-bind="attrs"
+                                v-on="on"
+                            >
+                              mdi-information-outline
+                            </v-icon>
+                          </template>
+                          <span>{{item.layer.info}}</span>
+                        </v-tooltip>
+
+                        <v-icon v-if="selected_layer === item.name && item.layer" color='#1C195B'>
+                          mdi-layers-remove
+                        </v-icon>
+                        <v-icon v-else-if="item.layer" color='#1C195B'>
+                          mdi-layers-plus
+                        </v-icon>
+
+                      </template>
+                    </v-treeview>
+
+                  </div>
+
+                </v-col>
+              </v-row>
+
+            </div>
+
+
+          </div>
+          <!-- Create supply chain industry -->
+          <div v-else-if="right_sidebar_content === 7">
+            <div style="margin: 7px; padding: 7px; background-color: white">
+              <h3 style="color: #b62373">Supply chain industry</h3>
+              <v-form
+                  v-model="new_supply_chain_valid"
+              >
+                <v-text-field
+                    v-model="supply_chain_name"
+                    label="Supply chain industry name"
+                    :rules="[new_supply_chain_rules_name, rules_required]"
+
+                ></v-text-field>
+                <v-btn
+                    :disabled="!new_supply_chain_valid"
+                    @click="add_supply_chain"
+                    small
+                    tile
+                    block
+                    color="#b62373"
+                >
+                  Add supply chain industry
+                </v-btn>
+              </v-form>
+
+            </div>
 
           </div>
 
@@ -576,12 +729,15 @@ import Vue from "vue";
 export default {
   data () {
     return {
+      tab: null,
+      dialog: false,
       secondMenu: true, //Assessment/factory sidebar
       rightMenu: false, //Assessment/Company creation sidebar
       items: [  //Icons for the main sidebar
         { title: "Maps and Datasets", icon: 'mdi-map', to:"map" },
         { title: "Import assessment", icon: 'mdi-import', to:"import"},
         { title: "Report", icon: 'mdi-file-chart', to:"report" },
+
       ],
       created_assessments: this.$assessments,  //Created assessments
       assessment_name: null,     //V-model name for creating/editing an assessment
@@ -673,6 +829,7 @@ export default {
         isSupplyChain: true,
         latlng: _this.supply_chain_marker,
         name: "<b>"+_this.supply_chain_name+"</b> (supply chain of "+industry.name+")",
+        industry_coords: industry.location
       }
 
       _this.$location_markers.push(marker)
@@ -762,6 +919,7 @@ export default {
                 isSupplyChain: true,
                 latlng: sp.location,
                 name: "<b>"+sp.name+"</b> (supply chain of "+_industry.name+")",
+                industry_coords: _industry.location
               }
               _this.$location_markers.push(marker)
 
@@ -1111,7 +1269,7 @@ html::-webkit-scrollbar {
 
 }
 .icon_hovered_pressed{
-  background-color: #463FCA;
+  background-color: #555283;
 }
 #app {
   background-color: #F2F4F3;
@@ -1150,5 +1308,32 @@ html::-webkit-scrollbar {
   background-color: #f0f2f1;
   transition: 0.3s;
 }
+
+.app{
+  font-family: "Aktiv Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+}
+
+.button-link{
+  text-decoration: none;
+}
+
+.v-tab{
+  border-color: #1C195B;
+  border-width: 0px;
+  border-bottom-width: 2px;
+  border-style: solid;
+}
+.v-tab.v-tab--active{
+  background-color: #1C195B;
+  color: #F2F4F3 !important;
+}
+
+.v-btn__content{
+  color: white !important;
+}
+v-btn--disabled{
+  color: rgba(0, 0, 0, 0.12) !important
+}
+
 
 </style>

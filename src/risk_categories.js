@@ -13,6 +13,9 @@ let layers = {
 }
 
 let risk_category = {
+    global_warming: function(value){
+        return null
+    },
     dilution_factor: function(value){
         if (value < 2) return red
         else if (value < 10) return orange
@@ -41,6 +44,25 @@ let risk_category = {
         else if (value >= 20) return red
         return null
     },
+    specific_water_consumption: function(){
+        return null
+    },
+    eutrophication: function(value){
+        return null
+    },
+
+    ecotoxicity: function(){
+        return null
+    },
+
+    delta: function(){
+        return null
+    },
+
+    eqs: function(){
+        return null
+    },
+
     delta_eqs: function(value){
         if (value < 0.2) return blue
         else if (value < 1) return yellow
@@ -54,6 +76,9 @@ let risk_category = {
         else if (value < 2) return orange
         else if (value >= 2) return red
         return null
+    },
+    treatment_efficiency: function(){
+      return null
     },
     seasonal_variability: function(value){
         if(value < 0.33) return layers.l
@@ -173,18 +198,20 @@ let risk_category = {
     legend_impact_pdf: function(dd){
         dd.content.push({
             style: 'legend',
-            layout: 'noBorders',
             table: {
-                widths: [10, 'auto', 10, 'auto', 10, 'auto', 10, 'auto'],
+                widths: [10, 'auto', 10, 'auto', 10, 'auto', 10, 'auto', 10, 'auto'],
                 body: [
-                    [{text: " ", fillColor: blue[0]},
-                        {text: blue[1]},
-                        {text: " ", fillColor: yellow[0]},
-                        {text: yellow[1],},
-                        {text: " ", fillColor: orange[0]},
-                        {text: orange[1]},
-                        {text: " ", fillColor: red[0]},
-                        {text: red[1]},
+                    [
+                        {text: " ", fillColor: "white", border: [true, true, true, true],},
+                        {text: "Unknown", border: [false, false, false, false]},
+                        {text: " ", fillColor: blue[0], border: [false, false, false, false]},
+                        {text: blue[1], border: [false, false, false, false]},
+                        {text: " ", fillColor: yellow[0], border: [false, false, false, false]},
+                        {text: yellow[1], border: [false, false, false, false]},
+                        {text: " ", fillColor: orange[0], border: [false, false, false, false]},
+                        {text: orange[1], border: [false, false, false, false]},
+                        {text: " ", fillColor: red[0], border: [false, false, false, false]},
+                        {text: red[1], border: [false, false, false, false]},
                     ]
                 ]
             }
@@ -194,20 +221,21 @@ let risk_category = {
     legend_risk_pdf: function(dd){
         dd.content.push({
             style: 'legend',
-            layout: 'noBorders',
             table: {
-                widths: [10, 'auto', 10, 'auto', 10, 'auto', 10, 'auto', 10, 'auto'],
+                widths: [10, 'auto', 10, 'auto', 10, 'auto', 10, 'auto', 10, 'auto', 10, 'auto'],
                 body: [
-                    [{text: " ", fillColor: layers.l[0]},
-                        {text: layers.l[1]},
-                        {text: " ", fillColor: layers.lm[0]},
-                        {text: layers.lm[1],},
-                        {text: " ", fillColor: layers.mh[0]},
-                        {text: layers.mh[1]},
-                        {text: " ", fillColor: layers.h[0]},
-                        {text: layers.h[1]},
-                        {text: " ", fillColor: layers.eh[0]},
-                        {text: layers.eh[1]},
+                    [
+
+                        {text: " ", fillColor: layers.l[0], border: [true, true, true, true]},
+                        {text: "Unknown", border: [false, false, false, false]},
+                        {text: " ", fillColor: layers.lm[0], border: [false, false, false, false]},
+                        {text: layers.lm[1], border: [false, false, false, false]},
+                        {text: " ", fillColor: layers.mh[0], border: [false, false, false, false]},
+                        {text: layers.mh[1], border: [false, false, false, false]},
+                        {text: " ", fillColor: layers.h[0], border: [false, false, false, false]},
+                        {text: layers.h[1], border: [false, false, false, false]},
+                        {text: " ", fillColor: layers.eh[0], border: [false, false, false, false]},
+                        {text: layers.eh[1], border: [false, false, false, false]},
                     ]
                 ]
             }

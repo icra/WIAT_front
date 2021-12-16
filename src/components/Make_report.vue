@@ -1,6 +1,6 @@
 <template>
-  <div class="outer" >
-    <h1>Report</h1>
+  <div class="outer">
+    <h1 style="color: #b62373">Report</h1>
     <div v-if="is_there_any_industry_created" style="height: 100%;">
       <div style="height: 100%; padding-top: 10px">
         <v-row>
@@ -16,7 +16,7 @@
           </v-col>
         </v-row>
         <v-row style="height: 85%" class = "border_report">
-          <v-col v-show="selected_industries.length === 0" cols="9" style="height: 100%">
+          <v-col v-show="selected_industries.length === 0" cols="9" style="height: 100%" class="side_menu_title">
             Please, select at least an industry to make the report
 
           </v-col>
@@ -48,6 +48,9 @@
                                   :headers="industry_table.header"
                                   :items="industry_table.industries"
                                   class="elevation-1"
+                                  disable-pagination
+                                  :hide-default-footer="true"
+                                  dense
                               ></v-data-table>
                             </v-expansion-panel-content>
                           </v-expansion-panel>
@@ -63,6 +66,9 @@
                                   :items="simple_report_table.value"
                                   class="elevation-1"
                                   :item-class="itemRowBold"
+                                  disable-pagination
+                                  :hide-default-footer="true"
+                                  dense
                               >
                                 <template v-slot:item.value="{ item }">
                                   <v-tooltip bottom max-width="700px" v-if="item.info">
@@ -98,7 +104,7 @@
                                             :key="value"
                                             v-bind="attrs"
                                             v-on="on"
-                                            text-color="black"
+                                            text-color="#1c1c1b"
                                         >
                                           {{ item[value] }}
                                         </v-chip>
@@ -126,6 +132,9 @@
                                   :headers="layers_table.header"
                                   :items="layers_table.value"
                                   class="elevation-1"
+                                  disable-pagination
+                                  :hide-default-footer="true"
+                                  dense
                               >
                                 <template
                                     v-for="value in selected_industries.map(industry => industry.name)"
@@ -141,7 +150,7 @@
                                             :key="value"
                                             v-bind="attrs"
                                             v-on="on"
-                                            text-color="black"
+                                            text-color="#1c1c1b"
                                         >
                                           {{ item[value] }}
                                         </v-chip>
@@ -178,6 +187,9 @@
                                   :headers="industry_table.header"
                                   :items="industry_table.industries"
                                   class="elevation-1"
+                                  disable-pagination
+                                  :hide-default-footer="true"
+                                  dense
                               ></v-data-table>
                             </v-expansion-panel-content>
                           </v-expansion-panel>
@@ -209,8 +221,39 @@
                                   :items="emissions_table.emissions"
                                   class="elevation-1"
                                   :item-class="itemRowBold"
+                                  disable-pagination
+                                  :hide-default-footer="true"
+                                  dense
+                              >
+                                <template
+                                    v-for="value in Object.keys(industries_aggregated)"
+                                    v-slot:[`item.${value}`]="{ item }"
+                                >
 
-                              ></v-data-table>
+                                  <template v-if="getGlobalWarming(item, value) != null">
+                                    <v-tooltip bottom>
+                                      <template v-slot:activator="{ on, attrs }">
+                                        <v-chip
+                                            :color="getGlobalWarming(item, value)[0]"
+                                            dark
+                                            :key="value"
+                                            v-bind="attrs"
+                                            v-on="on"
+                                            text-color="#1c1c1b"
+                                        >
+                                          {{ item[value] }}
+                                        </v-chip>
+                                      </template>
+                                      <span>{{ getGlobalWarming(item, value)[1] }}</span>
+                                    </v-tooltip>
+                                  </template>
+                                  <template v-else>
+                                    {{ item[value] }}
+                                  </template>
+                                </template>
+
+
+                              </v-data-table>
                               <div id="global_warming_chart_wrapper" style="width:500px; margin: 20px auto 20px auto;">
                                 <BarChart :chartdata="ghg_emission_chart.chartData" :options="ghg_emission_chart.options"></BarChart>
                                 <!--<canvas :id="'global_warming_potential_chart_tab_'+index"> </canvas>-->
@@ -230,6 +273,9 @@
                                   :headers="water_quantity.header"
                                   :items="water_quantity.value"
                                   class="elevation-1"
+                                  disable-pagination
+                                  :hide-default-footer="true"
+                                  dense
                               >
                                 <template v-slot:item.value="{ item }">
                                   <v-tooltip bottom max-width="700px" v-if="item.info">
@@ -264,7 +310,7 @@
                                             :key="value"
                                             v-bind="attrs"
                                             v-on="on"
-                                            text-color="black"
+                                            text-color="#1c1c1b"
                                         >
                                           {{ item[value] }}
                                         </v-chip>
@@ -312,7 +358,37 @@
                                   :items="eutrophication_table.value"
                                   :item-class="itemRowBold"
                                   class="elevation-1"
+                                  disable-pagination
+                                  :hide-default-footer="true"
+                                  dense
                               >
+                                <template
+                                    v-for="value in Object.keys(industries_aggregated)"
+                                    v-slot:[`item.${value}`]="{ item }"
+                                >
+
+                                  <template v-if="getEutrophicationColor(item, value) != null">
+                                    <v-tooltip bottom>
+                                      <template v-slot:activator="{ on, attrs }">
+                                        <v-chip
+                                            :color="getEutrophicationColor(item, value)[0]"
+                                            dark
+                                            :key="value"
+                                            v-bind="attrs"
+                                            v-on="on"
+                                            text-color="#1c1c1b"
+                                        >
+                                          {{ item[value] }}
+                                        </v-chip>
+                                      </template>
+                                      <span>{{ getEutrophicationColor(item, value)[1] }}</span>
+                                    </v-tooltip>
+                                  </template>
+                                  <template v-else>
+                                    {{ item[value] }}
+                                  </template>
+                                </template>
+
                               </v-data-table>
                               <div style="width:500px; margin: 20px auto 20px auto;">
                                 <BarChart :chartdata="eutrophication_chart.chartData" :options="eutrophication_chart.options"></BarChart>
@@ -328,150 +404,300 @@
 
                             </v-expansion-panel-header>
                             <v-expansion-panel-content>
-                              <br>
-                              <b>Ecotoxicity potential</b>
-                              <v-tooltip bottom max-width="700px">
-                                <template v-slot:activator="{ on, attrs }">
-                                  <v-icon
-                                      color='#1C195B'
-                                      style="padding-right: 10px"
-                                      v-bind="attrs"
-                                      v-on="on"
-                                  >
-                                    mdi-information-outline
-                                  </v-icon>
-                                </template>
-                                <span>
-                            Index that reflects the potential harm of a unit of chemical released into the environment. It is based on both the inherent toxicity of a compound and its potential dose. It will always have positive values; higher values indicate higher impact.
-                          </span>
-                              </v-tooltip>
-
-                              <v-data-table
-                                  :headers="ecotoxicity_table.header"
-                                  :items="ecotoxicity_table.value"
-                                  class="elevation-1"
-                                  :item-class="itemRowBold"
-                                  disable-pagination
-                                  :hide-default-footer="true"
-
-                              ></v-data-table>
-                              <div style="width:500px; margin: 20px auto 20px auto;">
-                                <BarChart :chartdata="ecotoxicity_chart.chartData" :options="ecotoxicity_chart.options"></BarChart>
-                              </div>
-                              <br>
-                              <b> Increase in the concentration of the pollutant in the receiving body </b>
-                              <v-data-table
-                                  :headers="pollutants_table.header"
-                                  :items="pollutants_table.value"
-                                  class="elevation-1"
-                                  :item-class="itemRowBold"
-                                  disable-pagination
-                                  :hide-default-footer="true"
-                              ></v-data-table>
-                              <br>
-                              <b> Effluent concentration with respect to EQS </b>
-                              <v-tooltip bottom max-width="700px">
-                                <template v-slot:activator="{ on, attrs }">
-                                  <v-icon
-                                      color='#1C195B'
-                                      style="padding-right: 10px"
-                                      v-bind="attrs"
-                                      v-on="on"
-                                  >
-                                    mdi-information-outline
-                                  </v-icon>
-                                </template>
-                                <span>
-                                  Index reflecting how large the load of each pollutant in the effluent is with respect to the EQS. The larger it is, the worse.
-                                </span>
-                              </v-tooltip>
-
-                              <v-data-table
-                                  :headers="eqs_table.header"
-                                  :items="eqs_table.value"
-                                  disable-pagination
-                                  :hide-default-footer="true"
-                                  class="elevation-1"
-                              ></v-data-table>
-                              <br>
-                              <b> Toxic Units in the receiving water body (assuming an initial concentration of 0) </b>
-                              <v-data-table
-                                    :headers="delta_ecotox_table.header"
-                                    :items="delta_ecotox_table.value"
-                                    class="elevation-1"
-                                    :item-class="itemRowBold"
-                                    disable-pagination
-                                    :hide-default-footer="true"
-                              >
-                                <template
-                                      v-for="value in Object.keys(industries_aggregated)"
-                                      v-slot:[`item.${value}`]="{ item }"
-                                  >
-
-                                    <template v-if="getDeltaEcotoxColor(item, value) != null">
-                                      <v-tooltip bottom>
-                                        <template v-slot:activator="{ on, attrs }">
-                                          <v-chip
-                                              :color="getDeltaEcotoxColor(item, value)[0]"
-                                              dark
-                                              :key="value"
-                                              v-bind="attrs"
-                                              v-on="on"
-                                              text-color="black"
-                                          >
-                                            {{ item[value] }}
-                                          </v-chip>
-                                        </template>
-                                        <span>{{ getDeltaEcotoxColor(item, value)[1] }}</span>
-                                      </v-tooltip>
-                                    </template>
-                                    <template v-else>
-                                      {{ item[value] }}
-                                    </template>
-                                  </template>
-                              </v-data-table>
-
-
-                              <br>
-                              <b>Final concentration in the receiving water body with respect to EQS (assuming an initial concentration of 0) </b>
-
-                              <v-data-table
-                                  :headers="delta_eqs_table.header"
-                                  :items="delta_eqs_table.value"
-                                  class="elevation-1"
-                                  disable-pagination
-                                  :hide-default-footer="true"
-                              >
-                                <template
-                                    v-for="value in Object.keys(industries_aggregated)"
-                                    v-slot:[`item.${value}`]="{ item }"
-                                >
-
-                                  <template v-if="getDeltaEQSColor(item, value) != null">
-                                    <v-tooltip bottom>
+                              <v-expansion-panels style="padding: 30px">
+                                <v-expansion-panel>
+                                  <v-expansion-panel-header>
+                                    <span>
+                                      <b>Ecotoxicity potential</b>
+                                      <v-tooltip bottom max-width="700px">
                                       <template v-slot:activator="{ on, attrs }">
-                                        <v-chip
-                                            :color="getDeltaEQSColor(item, value)[0]"
-                                            dark
-                                            :key="value"
+                                        <v-icon
+                                            color='#1C195B'
+                                            style="padding-right: 10px"
                                             v-bind="attrs"
                                             v-on="on"
-                                            text-color="black"
                                         >
-                                          {{ item[value] }}
-                                        </v-chip>
+                                          mdi-information-outline
+                                        </v-icon>
                                       </template>
-                                      <span>{{ getDeltaEQSColor(item, value)[1] }}</span>
+                                      <span>
+                            Index that reflects the potential harm of a unit of chemical released into the environment. It is based on both the inherent toxicity of a compound and its potential dose. It will always have positive values; higher values indicate higher impact.
+                          </span>
                                     </v-tooltip>
-                                  </template>
-                                  <template v-else>
-                                    {{ item[value] }}
-                                  </template>
-                                </template>
 
 
-                              </v-data-table>
-                              <br>
+                                    </span>
+
+                                  </v-expansion-panel-header>
+                                  <v-expansion-panel-content>
+                                    <v-data-table
+                                        :headers="ecotoxicity_table.header"
+                                        :items="ecotoxicity_table.value"
+                                        class="elevation-1"
+                                        :item-class="itemRowBold"
+                                        disable-pagination
+                                        :hide-default-footer="true"
+                                        dense
+
+                                    >
+                                      <template
+                                          v-for="value in Object.keys(industries_aggregated)"
+                                          v-slot:[`item.${value}`]="{ item }"
+                                      >
+
+                                        <template v-if="getEcotoxicity(item, value) != null">
+                                          <v-tooltip bottom>
+                                            <template v-slot:activator="{ on, attrs }">
+                                              <v-chip
+                                                  :color="getEcotoxicity(item, value)[0]"
+                                                  dark
+                                                  :key="value"
+                                                  v-bind="attrs"
+                                                  v-on="on"
+                                                  text-color="#1c1c1b"
+                                              >
+                                                {{ item[value] }}
+                                              </v-chip>
+                                            </template>
+                                            <span>{{ getEcotoxicity(item, value)[1] }}</span>
+                                          </v-tooltip>
+                                        </template>
+                                        <template v-else>
+                                          {{ item[value] }}
+                                        </template>
+                                      </template>
+
+                                    </v-data-table>
+                                    <div style="width:500px; margin: 20px auto 20px auto;">
+                                      <BarChart :chartdata="ecotoxicity_chart.chartData" :options="ecotoxicity_chart.options"></BarChart>
+                                    </div>
+                                    <br>
+                                  </v-expansion-panel-content>
+                                </v-expansion-panel>
+                                <v-expansion-panel>
+                                  <v-expansion-panel-header>
+                                    <b> Increase in the concentration of the pollutant in the receiving body after discharge</b>
+                                  </v-expansion-panel-header>
+                                  <v-expansion-panel-content>
+                                    <v-data-table
+                                        :headers="pollutants_table.header"
+                                        :items="pollutants_table.value"
+                                        class="elevation-1"
+                                        :item-class="itemRowBold"
+                                        disable-pagination
+                                        :hide-default-footer="true"
+                                        dense
+                                    >
+                                      <template
+                                          v-for="value in Object.keys(industries_aggregated)"
+                                          v-slot:[`item.${value}`]="{ item }"
+                                      >
+
+                                        <template v-if="getDelta(item, value) != null">
+                                          <v-tooltip bottom>
+                                            <template v-slot:activator="{ on, attrs }">
+                                              <v-chip
+                                                  :color="getDelta(item, value)[0]"
+                                                  dark
+                                                  :key="value"
+                                                  v-bind="attrs"
+                                                  v-on="on"
+                                                  text-color="#1c1c1b"
+                                              >
+                                                {{ item[value] }}
+                                              </v-chip>
+                                            </template>
+                                            <span>{{ getDelta(item, value)[1] }}</span>
+                                          </v-tooltip>
+                                        </template>
+                                        <template v-else>
+                                          {{ item[value] }}
+                                        </template>
+                                      </template>
+
+                                    </v-data-table>
+                                  </v-expansion-panel-content>
+                                </v-expansion-panel>
+                                <v-expansion-panel>
+                                  <v-expansion-panel-header>
+                                    <span>
+                                      <b> Effluent concentration with respect to EQS </b>
+                                      <v-tooltip bottom max-width="700px">
+                                      <template v-slot:activator="{ on, attrs }">
+                                        <v-icon
+                                            color='#1C195B'
+                                            style="padding-right: 10px"
+                                            v-bind="attrs"
+                                            v-on="on"
+                                        >
+                                          mdi-information-outline
+                                        </v-icon>
+                                      </template>
+                                      <span>
+                                  Index reflecting how large the load of each pollutant in the effluent is with respect to the EQS. The larger it is, the worse.
+                                </span>
+                                    </v-tooltip>
+
+                                    </span>
+                                  </v-expansion-panel-header>
+                                  <v-expansion-panel-content>
+                                    <v-data-table
+                                        :headers="eqs_table.header"
+                                        :items="eqs_table.value"
+                                        disable-pagination
+                                        :hide-default-footer="true"
+                                        class="elevation-1"
+                                        dense
+                                    >
+                                      <template
+                                          v-for="value in Object.keys(industries_aggregated)"
+                                          v-slot:[`item.${value}`]="{ item }"
+                                      >
+
+                                        <template v-if="getEQSColor(item, value) != null">
+                                          <v-tooltip bottom>
+                                            <template v-slot:activator="{ on, attrs }">
+                                              <v-chip
+                                                  :color="getEQSColor(item, value)[0]"
+                                                  dark
+                                                  :key="value"
+                                                  v-bind="attrs"
+                                                  v-on="on"
+                                                  text-color="#1c1c1b"
+                                              >
+                                                {{ item[value] }}
+                                              </v-chip>
+                                            </template>
+                                            <span>{{ getEQSColor(item, value)[1] }}</span>
+                                          </v-tooltip>
+                                        </template>
+                                        <template v-else>
+                                          {{ item[value] }}
+                                        </template>
+                                      </template>
+
+
+                                    </v-data-table>
+                                  </v-expansion-panel-content>
+                                </v-expansion-panel>
+                                <v-expansion-panel>
+                                  <v-expansion-panel-header>
+                                    <span>
+                                      <b>Toxic Units in the receiving water body after discharging</b>
+                                      <v-tooltip bottom max-width="700px">
+                                  <template v-slot:activator="{ on, attrs }">
+                                    <v-icon
+                                        color='#1C195B'
+                                        style="padding-right: 10px"
+                                        v-bind="attrs"
+                                        v-on="on"
+                                    >
+                                      mdi-information-outline
+                                    </v-icon>
+                                  </template>
+                                  <span>Assuming that the water body where water is withdrawn has a concentration of 0</span>
+                                </v-tooltip>
+                                    </span>
+                                  </v-expansion-panel-header>
+                                  <v-expansion-panel-content>
+                                    <v-data-table
+                                        :headers="delta_ecotox_table.header"
+                                        :items="delta_ecotox_table.value"
+                                        class="elevation-1"
+                                        :item-class="itemRowBold"
+                                        disable-pagination
+                                        :hide-default-footer="true"
+                                        dense
+                                    >
+                                      <template
+                                          v-for="value in Object.keys(industries_aggregated)"
+                                          v-slot:[`item.${value}`]="{ item }"
+                                      >
+
+                                        <template v-if="getDeltaEcotoxColor(item, value) != null">
+                                          <v-tooltip bottom>
+                                            <template v-slot:activator="{ on, attrs }">
+                                              <v-chip
+                                                  :color="getDeltaEcotoxColor(item, value)[0]"
+                                                  dark
+                                                  :key="value"
+                                                  v-bind="attrs"
+                                                  v-on="on"
+                                                  text-color="#1c1c1b"
+                                              >
+                                                {{ item[value] }}
+                                              </v-chip>
+                                            </template>
+                                            <span>{{ getDeltaEcotoxColor(item, value)[1] }}</span>
+                                          </v-tooltip>
+                                        </template>
+                                        <template v-else>
+                                          {{ item[value] }}
+                                        </template>
+                                      </template>
+                                    </v-data-table>
+                                  </v-expansion-panel-content>
+                                </v-expansion-panel>
+                                <v-expansion-panel>
+                                  <v-expansion-panel-header>
+                                    <span>
+                                      <b>Final concentration in the receiving water body with respect to EQS</b>
+                                      <v-tooltip bottom max-width="700px">
+                                  <template v-slot:activator="{ on, attrs }">
+                                    <v-icon
+                                        color='#1C195B'
+                                        style="padding-right: 10px"
+                                        v-bind="attrs"
+                                        v-on="on"
+                                    >
+                                      mdi-information-outline
+                                    </v-icon>
+                                  </template>
+                                  <span>Assuming that the water body where water is withdrawn has a concentration of 0</span>
+                                </v-tooltip>
+                                    </span>
+                                  </v-expansion-panel-header>
+                                  <v-expansion-panel-content>
+                                    <v-data-table
+                                        :headers="delta_eqs_table.header"
+                                        :items="delta_eqs_table.value"
+                                        class="elevation-1"
+                                        disable-pagination
+                                        :hide-default-footer="true"
+                                        dense
+                                    >
+                                      <template
+                                          v-for="value in Object.keys(industries_aggregated)"
+                                          v-slot:[`item.${value}`]="{ item }"
+                                      >
+
+                                        <template v-if="getDeltaEQSColor(item, value) != null">
+                                          <v-tooltip bottom>
+                                            <template v-slot:activator="{ on, attrs }">
+                                              <v-chip
+                                                  :color="getDeltaEQSColor(item, value)[0]"
+                                                  dark
+                                                  :key="value"
+                                                  v-bind="attrs"
+                                                  v-on="on"
+                                                  text-color="#1c1c1b"
+                                              >
+                                                {{ item[value] }}
+                                              </v-chip>
+                                            </template>
+                                            <span>{{ getDeltaEQSColor(item, value)[1] }}</span>
+                                          </v-tooltip>
+                                        </template>
+                                        <template v-else>
+                                          {{ item[value] }}
+                                        </template>
+                                      </template>
+
+
+                                    </v-data-table>
+                                  </v-expansion-panel-content>
+                                </v-expansion-panel>
+                              </v-expansion-panels>
                             </v-expansion-panel-content>
                           </v-expansion-panel>
                           <v-expansion-panel>
@@ -499,7 +725,38 @@
                                   :headers="treatment_efficiency_table.header"
                                   :items="treatment_efficiency_table.value"
                                   class="elevation-1"
-                              ></v-data-table>
+                                  disable-pagination
+                                  :hide-default-footer="true"
+                                  dense
+                              >
+                                <template
+                                    v-for="value in Object.keys(industries_aggregated)"
+                                    v-slot:[`item.${value}`]="{ item }"
+                                >
+
+                                  <template v-if="getTreatmentEfficiencyColor(item, value) != null">
+                                    <v-tooltip bottom>
+                                      <template v-slot:activator="{ on, attrs }">
+                                        <v-chip
+                                            :color="getTreatmentEfficiencyColor(item, value)[0]"
+                                            dark
+                                            :key="value"
+                                            v-bind="attrs"
+                                            v-on="on"
+                                            text-color="#1c1c1b"
+                                        >
+                                          {{ item[value] }}
+                                        </v-chip>
+                                      </template>
+                                      <span>{{ getTreatmentEfficiencyColor(item, value)[1] }}</span>
+                                    </v-tooltip>
+                                  </template>
+                                  <template v-else>
+                                    {{ item[value] }}
+                                  </template>
+                                </template>
+
+                              </v-data-table>
                               <div style="width: 600px; margin: 20px auto 20px auto;">
                                 <RadarChart :chartdata="treatment_efficiency_chart.chartData" :options="treatment_efficiency_chart.options"></RadarChart>
                               </div>
@@ -520,6 +777,7 @@
                                   class="elevation-1"
                                   disable-pagination
                                   :hide-default-footer="true"
+                                  dense
                               >
                                 <template v-slot:item.value="{ item }">
                                   <v-tooltip bottom max-width="700px" v-if="item.info">
@@ -556,7 +814,7 @@
                                             :key="value"
                                             v-bind="attrs"
                                             v-on="on"
-                                            text-color="black"
+                                            text-color="#1c1c1b"
                                         >
                                           {{ item[value] }}
                                         </v-chip>
@@ -569,10 +827,7 @@
                                   </template>
                                 </template>
 
-
                               </v-data-table>
-
-
 
                             </v-expansion-panel-content>
                           </v-expansion-panel>
@@ -588,6 +843,9 @@
                                   :headers="layers_table.header"
                                   :items="layers_table.value"
                                   class="elevation-1"
+                                  disable-pagination
+                                  :hide-default-footer="true"
+                                  dense
                               >
                                 <template
                                     v-for="value in selected_industries.map(industry => industry.name)"
@@ -603,7 +861,7 @@
                                             :key="value"
                                             v-bind="attrs"
                                             v-on="on"
-                                            text-color="black"
+                                            text-color="#1c1c1b"
                                         >
                                           {{ item[value] }}
                                         </v-chip>
@@ -636,18 +894,22 @@
 
           </v-col>
           <v-col class="menu">
-            <p>Select assessments to include in the report.</p>
-            <v-checkbox
-                v-for="assessment in created_assessments"
-                v-model="selected_assessments"
-                :label="assessment.name"
-                :value="assessment"
-                color="#1C195B"
-                style="margin-left: 38px"
-                :key="assessment.name"
-            >
+            <div style= "padding: 10px;">
+              <p class="side_menu_title">Select assessments to include in the report</p>
+              <v-checkbox
+                  v-for="assessment in assessments_with_industries"
+                  v-model="selected_assessments"
+                  :label="assessment.name"
+                  :value="assessment"
+                  color="#1C195B"
+                  style="margin-left: 38px"
+                  :key="assessment.name"
+                  dense
+              >
 
-            </v-checkbox>
+              </v-checkbox>
+            </div>
+
             <!--
             <v-treeview
                 :items="assessments_and_industries_tree"
@@ -662,59 +924,101 @@
                 open-on-click
             ></v-treeview>
             -->
-            <p>Select the layers to include in the report.</p>
-            <v-treeview
-                :items="layer_tree"
-                dense
-                hoverable
-                selectable
-                selection-type="leaf"
-                return-object
-                v-model="selected_layers"
-                open-on-click
-                color="#1C195B"
-                selected-color="#1C195B"
-            >
-            </v-treeview>
+            <div style="padding: 10px">
+              <p class="side_menu_title">Select the layers to include in the report</p>
+              <v-treeview
+                  :items="layer_tree"
+                  dense
+                  hoverable
+                  selectable
+                  selection-type="leaf"
+                  return-object
+                  v-model="selected_layers"
+                  open-on-click
+                  color="#1C195B"
+                  selected-color="#1C195B"
+              >
+              </v-treeview>
 
-            <v-select
-                v-model="level_of_detail"
-                :items="level_of_detail_items"
-                filled
-                label="Level of detail"
-                style="padding-top: 30px"
-            ></v-select>
-            <v-select
-                v-model="aggregation_level"
-                :items="aggregation_items"
-                filled
-                label="Aggregation level"
-            ></v-select>
-            <v-select
-                v-model="include_future"
-                :items="yes_no"
-                filled
-                label="Include 2030 BAU values in the report"
-            ></v-select>
-            <v-select
-                v-model="period_model"
-                :items="daily_annual_assessment"
-                filled
-                label="Time period to express the results"
-            ></v-select>
+            </div>
+
+            <div style="padding: 10px;">
+              <p class="side_menu_title" style="padding-top: 20px;">Upload custom risk thresholds</p>
+              <v-row>
+                <v-col cols="12">
+                  <v-btn
+                      small
+                      tile
+                      block
+                      color="#b62373"
+                  >
+                    DOWNLOAD TEMPLATE
+                    <v-icon right>
+                      mdi-cloud-download
+                    </v-icon>
+                  </v-btn>
+                </v-col>
+                <v-col cols="12">
+                  <v-file-input
+                      label="Import template"
+                      style="padding-top: 0px; margin-top: -3px"
+                      v-model="imported_file_excel"
+                      @change="onUploadExcel"
+
+                  ></v-file-input>
+                </v-col>
+              </v-row>
+            </div>
+
+            <div style="padding: 10px">
+              <v-select
+                  v-model="level_of_detail"
+                  :items="level_of_detail_items"
+                  filled
+                  label="Level of detail"
+                  style="padding-top: 30px"
+                  dense
+              ></v-select>
+              <v-select
+                  v-model="aggregation_level"
+                  :items="aggregation_items"
+                  filled
+                  label="Aggregation level"
+                  dense
+              ></v-select>
+              <v-select
+                  v-model="include_future"
+                  :items="yes_no"
+                  filled
+                  label="Include 2030 BAU values in the report"
+                  dense
+              ></v-select>
+              <v-select
+                  v-model="period_model"
+                  :items="daily_annual_assessment"
+                  filled
+                  label="Time period to express the results"
+                  dense
+              ></v-select>
+
+            </div>
+
             <v-row>
-              <v-col>
-                <v-btn block @click="button_generate_pdf_clicked">
-                  GENERATE PDF
-                </v-btn>
-                <v-progress-linear
-                    indeterminate
-                    rounded
-                    height="6"
-                    v-show="generating_pdf"
-                    color="#1C195B"
+              <v-col >
+                <div style="padding: 10px">
+                  <v-btn block tile color="#b62373" @click="button_generate_pdf_clicked" :disabled="selected_industries.length === 0">
+                    GENERATE PDF
+                  </v-btn>
+                  <v-progress-linear
+                      indeterminate
+                      rounded
+                      height="6"
+                      v-show="generating_pdf"
+                      color="#1C195B"
 
-                ></v-progress-linear>
+                  ></v-progress-linear>
+
+                </div>
               </v-col>
             </v-row>
 
@@ -737,7 +1041,7 @@
 
     </div>
     <div v-else>
-      <p>Please, create an industry first to make a PDF report.</p>
+      <p class="side_menu_title">Please, create an industry first to make a PDF report.</p>
     </div>
 
 
@@ -758,7 +1062,8 @@ import {utils, metrics} from "../utils"
 import standard_industrial_classification from "../standard_industrial_classification"
 import RadarChart from "@/components/RadarChart";
 import colors from "../colors"
-import risk_categories from "../risk_categories"
+import risk_thereshold from "../risk_categories"
+import * as Excel from "exceljs";
 
 
 export default {
@@ -770,6 +1075,7 @@ export default {
   },
   data() {
     return {
+      risk_categories: risk_thereshold,
       created_assessments: this.$assessments,  //Created assessments
       selected_industries: [],
       selected_assessments: [],
@@ -868,9 +1174,12 @@ export default {
           delta_tu: "Final Toxic Units in the receiving water body (assuming an initial amount of 0)",
           delta_eqs: "Final average pollutant concentration with respect to EQS in the receiving water body (assuming an initial concentration of 0)",
           avg_treatment_efficiency: "Average percentage of treatment efficiency"
-        }
+        },
 
-      }
+
+
+      },
+      imported_file_excel: null,
 
 
   }
@@ -1035,6 +1344,105 @@ export default {
   },
   methods: {
 
+    parseRiskThereshold(risk, lowString, mediumString, highString, very_highString){
+
+      let blue = ['#529fee', "Low impact"]
+      let red = ['red', "Very high impact"]
+      let orange = ['orange', "High impact"]
+      let yellow = ['yellow', "Medium impact"]
+
+      let layers = {
+        l: ['#f6f600', "Low risk"],
+        lm: ['#f6cc00', "Low-medium risk"],
+        mh: ['#ff9900', "Medium-high risk"],
+        h: ['#ff1900', "High risk"],
+        eh: ['#990000', "Extremely high risk"],
+      }
+
+      let low = 0
+      let medium = 0
+      let high = 0
+      let very_high = 0
+
+      try {
+        low = parseFloat(lowString)
+        medium = parseFloat(mediumString)
+        high = parseFloat(highString)
+        very_high = parseFloat(very_highString)
+      } catch (error){
+        return
+      }
+
+      let increasing_worse = function(value){   //the higher the value, the better
+        if (value < low) return blue
+        else if (value < medium) return yellow
+        else if (value < high) return orange
+        else if (value >= very_high) return red
+        return null
+      }
+
+      let increasing_better = function(value){   //the higher the value, the better
+        if (value < low) return red
+        else if (value < medium) return orange
+        else if (value < high) return yellow
+        else if (value >= very_high) return blue
+        return null
+      }
+
+      if(risk === "Global warming potential"){
+        this.risk_categories["global_warming"] = increasing_worse
+      }else if(risk === "Dilution factor"){
+        this.risk_categories["dilution_factor"] = increasing_better
+      }else if(risk === "Treated water factor"){
+        this.risk_categories["water_treated"] = increasing_better
+      }else if(risk === "Consumption available ratio"){
+        this.risk_categories["water_stress_ratio"] = increasing_worse
+      }else if(risk === "Recycled water factor"){
+        this.risk_categories["recycled_water_factor"] = increasing_better
+      }else if(risk === "Specific water consumption"){
+        this.risk_categories["specific_water_consumption"] = increasing_better
+      }else if(risk === "Eutrophication potential"){
+        this.risk_categories["eutrophication"] = increasing_worse
+      }else if(risk === "Ecotoxicity potential"){
+        this.risk_categories["ecotoxicity"] = increasing_worse
+      }else if(risk === "Increase in the concentration of the pollutant in the receiving body"){
+        this.risk_categories["delta"] = increasing_worse
+      }else if(risk === "Effluent concentration with respect to EQS"){
+        this.risk_categories["eqs"] = increasing_worse
+      }else if(risk === "Toxic Units in the receiving water body"){
+        this.risk_categories["delta_ecotoxicity"] = increasing_worse
+      }else if(risk === "Final concentration in the receiving water body with respect to EQS"){
+        this.risk_categories["delta_eqs"] = increasing_worse
+      }else if(risk === "Pollutant treatment efficiency"){
+        this.risk_categories["treatment_efficiency"] = increasing_better
+      }
+    },
+
+    onUploadExcel(){
+
+      let _this = this
+      if(this.imported_file_excel != null){
+        const wb = new Excel.Workbook();
+        const reader = new FileReader()
+
+        reader.readAsArrayBuffer(this.imported_file_excel)
+        reader.onload = () => {
+          const buffer = reader.result;
+          wb.xlsx.load(buffer).then(workbook => {
+
+            let sheet = workbook.getWorksheet(1)
+            sheet.eachRow((row, rowIndex) => {
+              if (rowIndex > 3) {
+                let [_, risk, low, medium, high, very_high] = row.values
+                _this.parseRiskThereshold(risk, low, medium, high, very_high)
+
+              }
+            })
+          })
+        }
+      }
+    },
+
     get_color(color){
       return color == null ? null : color[0]
     },
@@ -1046,27 +1454,52 @@ export default {
 
     getAvailabilityColor (item, value) {
       if (item.value == this.table_title.availability_quantity.dilution_factor){
-        return risk_categories["dilution_factor"](item[value])
+        return this.risk_categories["dilution_factor"](item[value])
       } else if (item.value == this.table_title.availability_quantity.recycled){
-        return risk_categories["recycled_water_factor"](item[value])
+        return this.risk_categories["recycled_water_factor"](item[value])
       }else if (item.value == this.table_title.availability_quantity.treated){
-        return risk_categories["water_treated"](item[value])
+        return this.risk_categories["water_treated"](item[value])
       }else if (item.value == this.table_title.availability_quantity.consumption_available){
-        return risk_categories["water_stress_ratio"](item[value])
+        return this.risk_categories["water_stress_ratio"](item[value])
+      }else if(item.value == this.table_title.availability_quantity.specific_water_consumption){
+        return this.risk_categories["specific_water_consumption"](item[value])
       }
       return null
     },
 
+    getEutrophicationColor(item, value) {
+      return this.risk_categories["eutrophication"](item[value])
+    },
+
     getDeltaEcotoxColor(item, value) {
       if (item.value == this.table_title.pollutants.total){
-        return risk_categories["delta_ecotoxicity"](item[value] / 11)
+        return this.risk_categories["delta_ecotoxicity"](item[value] / 11)
       } else {
-        return risk_categories["delta_ecotoxicity"](item[value])
+        return this.risk_categories["delta_ecotoxicity"](item[value])
       }
     },
 
+    getDelta(item, value) {
+      return this.risk_categories["delta"](item[value])
+    },
+
+    getEQSColor(item, value) {
+      return this.risk_categories["eqs"](item[value])
+    },
+    getGlobalWarming(item, value) {
+      return this.risk_categories["global_warming"](item[value])
+    },
+
+    getEcotoxicity(item, value){
+      return this.risk_categories["ecotoxicity"](item[value])
+    },
+
     getDeltaEQSColor(item, value) {
-      return risk_categories["delta_eqs"](item[value])
+      return this.risk_categories["delta_eqs"](item[value])
+    },
+
+    getTreatmentEfficiencyColor(item, value) {
+      return this.risk_categories["treatment_efficiency"](item[value])
     },
 
     getGISLayerColor(item, value){
@@ -1075,31 +1508,31 @@ export default {
         return name1 == name2 || name1 == name2 + " (BAU 2030)"
       }
       if (equals(item.layer, "Seasonal variability")){
-        return risk_categories.seasonal_variability(item[value])
+        return this.risk_categories.seasonal_variability(item[value])
       }else if (equals(item.layer, "Interannual variability")){
-        return risk_categories.interannual_variability(item[value])
+        return this.risk_categories.interannual_variability(item[value])
       }else if (equals(item.layer, "Water stress")){
-        return risk_categories.water_stress(item[value])
+        return this.risk_categories.water_stress(item[value])
       }else if (equals(item.layer, "Water depletion")){
-        return risk_categories.water_depletion(item[value])
+        return this.risk_categories.water_depletion(item[value])
       }else if (equals(item.layer, "Aridity index")){
-        return risk_categories.aridity_index(item[value])
+        return this.risk_categories.aridity_index(item[value])
       }else if (equals(item.layer, "Groundwater table decline")){
-        return risk_categories.groundwater_table_decline(item[value])
+        return this.risk_categories.groundwater_table_decline(item[value])
       }else if (equals(item.layer, "Riverine flood risk")){
-        return risk_categories.riverine_flood_risk(item[value])
+        return this.risk_categories.riverine_flood_risk(item[value])
       }else if (equals(item.layer, "Coastal flood risk")){
-        return risk_categories.coastal_flood_risk(item[value])
+        return this.risk_categories.coastal_flood_risk(item[value])
       }else if (equals(item.layer, "Drought risk")){
-        return risk_categories.drought_risk(item[value])
+        return this.risk_categories.drought_risk(item[value])
       }else if (equals(item.layer, "Coastal eutrophication potential")){
-        return risk_categories.coastal_eutrophication_potential(item[value])
+        return this.risk_categories.coastal_eutrophication_potential(item[value])
       }else if (equals(item.layer, "Peak RepRisk Country ESG Risk Index")){
-        return risk_categories.reprisk(item[value])
+        return this.risk_categories.reprisk(item[value])
       }else if (equals(item.layer, "Unimproved/No Sanitation")){
-        return risk_categories.no_sanitation(item[value])
+        return this.risk_categories.no_sanitation(item[value])
       } else if (equals(item.layer, "Unimproved/No Drinking Water")){
-        return risk_categories.no_drinking(item[value])
+        return this.risk_categories.no_drinking(item[value])
       }
     },
 
@@ -1112,31 +1545,31 @@ export default {
       let ret = null
 
       if (equals(layer, "Seasonal variability")){
-        ret =  risk_categories.seasonal_variability(value)
+        ret =  this.risk_categories.seasonal_variability(value)
       }else if (equals(layer, "Interannual variability")){
-        ret = risk_categories.interannual_variability(value)
+        ret = this.risk_categories.interannual_variability(value)
       }else if (equals(layer, "Water stress")){
-        ret = risk_categories.water_stress(value)
+        ret = this.risk_categories.water_stress(value)
       }else if (equals(layer, "Water depletion")){
-        ret = risk_categories.water_depletion(value)
+        ret = this.risk_categories.water_depletion(value)
       }else if (equals(layer, "Aridity index")){
-        ret = risk_categories.aridity_index(value)
+        ret = this.risk_categories.aridity_index(value)
       }else if (equals(layer, "Groundwater table decline")){
-        ret = risk_categories.groundwater_table_decline(value)
+        ret = this.risk_categories.groundwater_table_decline(value)
       }else if (equals(layer, "Riverine flood risk")){
-        ret = risk_categories.riverine_flood_risk(value)
+        ret = this.risk_categories.riverine_flood_risk(value)
       }else if (equals(layer, "Coastal flood risk")){
-        ret = risk_categories.coastal_flood_risk(value)
+        ret = this.risk_categories.coastal_flood_risk(value)
       }else if (equals(layer, "Drought risk")){
-        ret = risk_categories.drought_risk(value)
+        ret = this.risk_categories.drought_risk(value)
       }else if (equals(layer, "Coastal eutrophication potential")){
-        ret = risk_categories.coastal_eutrophication_potential(value)
+        ret = this.risk_categories.coastal_eutrophication_potential(value)
       }else if (equals(layer, "Peak RepRisk Country ESG Risk Index")){
-        ret = risk_categories.reprisk(value)
+        ret = this.risk_categories.reprisk(value)
       }else if (equals(layer, "Unimproved/No Sanitation")){
-        ret = risk_categories.no_sanitation(value)
+        ret = this.risk_categories.no_sanitation(value)
       } else if (equals(layer, "Unimproved/No Drinking Water")){
-        ret = risk_categories.no_drinking(value)
+        ret = this.risk_categories.no_drinking(value)
       }
 
       return ret == null ? null : ret[0]
@@ -1145,27 +1578,37 @@ export default {
 
     getReportingColor(item, value) {
       if (item.value == "Effect of water withdrawal on the water body (GRI 303-2)"){
-        return risk_categories["withdrawal_effect"](item[value])
+        return this.risk_categories["withdrawal_effect"](item[value])
       } else if (item.value == "Effect of water discharges on the water body (GRI 306-5)"){
-        return risk_categories["discharge_effect"](item[value])
+        return this.risk_categories["discharge_effect"](item[value])
       }
     },
 
     getSimpleReportColor(item, value){
 
       if (item.value == this.table_title.simple_table.dilution_factor){
-        return risk_categories["dilution_factor"](item[value])
+        return this.risk_categories["dilution_factor"](item[value])
       } else if (item.value == this.table_title.simple_table.recycled){
-        return risk_categories["recycled_water_factor"](item[value])
+        return this.risk_categories["recycled_water_factor"](item[value])
       } else if (item.value == this.table_title.simple_table.treated){
-        return risk_categories["water_treated"](item[value])
+        return this.risk_categories["water_treated"](item[value])
       } else if (item.value == this.table_title.simple_table.consumption_available){
-        return risk_categories["water_stress_ratio"](item[value])
+        return this.risk_categories["water_stress_ratio"](item[value])
       } else if (item.value == this.table_title.simple_table.delta_tu){
-        return risk_categories["delta_ecotoxicity"](item[value])
+        return this.risk_categories["delta_ecotoxicity"](item[value])
       } else if (item.value == this.table_title.simple_table.delta_eqs){
-        return risk_categories["delta_eqs"](item[value])
+        return this.risk_categories["delta_eqs"](item[value])
+      } else if(item.value == this.table_title.simple_table.specific_water_consumption){
+        return this.risk_categories["specific_water_consumption"](item[value])
+      }else if(item.value == this.table_title.simple_table.total_ghg){
+        return this.risk_categories["global_warming"](item[value])
+      }else if(item.value == this.table_title.simple_table.eutrophication){
+        return this.risk_categories["eutrophication"](item[value])
+      }else if(item.value == this.table_title.simple_table.avg_treatment_efficiency){
+        return this.risk_categories["treatment_efficiency"](item[value])
       }
+
+      return null
     },
 
     itemRowBold: function (item) {
@@ -1776,6 +2219,7 @@ export default {
 
         pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
 
+
         pollutants_table.value.push(dichloroethane)
         pollutants_table.value.push(cadmium)
         pollutants_table.value.push(hexachlorobenzene)
@@ -2122,14 +2566,7 @@ export default {
             }
           },
           "tooltips": {
-            "callbacks": {
-              "title": (tooltipItem, data) => {
-                //return data.labels[tooltipItem[0].index]
-                return Object.values(tooltipItem).map(item => {
-                  return data.labels[item.index]
-                }).toString()
-              }
-            }
+
           }
         }
 
@@ -2449,7 +2886,7 @@ export default {
           dd.content.push(layers_description)
 
           dd.content.push("\n")
-          risk_categories.legend_risk_pdf(dd)
+          this.risk_categories.legend_risk_pdf(dd)
           dd.content.push("\n\n")
 
 
@@ -2460,6 +2897,8 @@ export default {
     },
 
     emissions_table_pdf(dd, industries_aux, assessment_days) {
+
+      let _this = this
 
       let days_factor = 1
       if(this.period_model === "annual") days_factor = 365
@@ -2504,14 +2943,14 @@ export default {
         let emissions = metrics.emissions_and_descriptions(industries)
         let row = [key]
 
-        row.push({text: emissions.total, style: "bold"})
-        row.push(emissions.elec)
-        row.push(emissions.fuel)
-        row.push(emissions.treatment)
-        row.push(emissions.biog)
-        row.push(emissions.slu)
-        row.push(emissions.reuse)
-        row.push(emissions.disc)
+        row.push({text: emissions.total, style: "bold", fillColor: _this.get_color(this.risk_categories.global_warming(emissions.total))})
+        row.push({text: emissions.elec, fillColor: _this.get_color(this.risk_categories.global_warming(emissions.elec))})
+        row.push({text: emissions.fuel, fillColor: _this.get_color(this.risk_categories.global_warming(emissions.fuel))})
+        row.push({text: emissions.treatment, fillColor: _this.get_color(this.risk_categories.global_warming(emissions.treatment))})
+        row.push({text: emissions.biog, fillColor: _this.get_color(this.risk_categories.global_warming(emissions.biog))})
+        row.push({text: emissions.slu, fillColor: _this.get_color(this.risk_categories.global_warming(emissions.slu))})
+        row.push({text: emissions.reuse, fillColor: _this.get_color(this.risk_categories.global_warming(emissions.reuse))})
+        row.push({text: emissions.disc, fillColor: _this.get_color(this.risk_categories.global_warming(emissions.disc))})
 
 
         industriesEmission.table.body.push(row)
@@ -2554,6 +2993,8 @@ export default {
       });
 
       dd.content.push(industriesEmission)
+      dd.content.push("\n")
+      this.risk_categories.legend_impact_pdf(dd)
       dd.content.push("\n\n")
 
 
@@ -2602,15 +3043,16 @@ export default {
         let row = [key]
 
         let dilution_factor_value = await metrics.dilution_factor(this.global_layers, industries)
-        row.push( {text: dilution_factor_value, fillColor: _this.get_color(risk_categories.dilution_factor(dilution_factor_value))})
+        row.push( {text: dilution_factor_value, fillColor: _this.get_color(this.risk_categories.dilution_factor(dilution_factor_value))})
         let recycled_water_factor = metrics.recycled_water_factor(industries)
-        row.push({text: recycled_water_factor, fillColor: _this.get_color(risk_categories.recycled_water_factor(recycled_water_factor))})
+        row.push({text: recycled_water_factor, fillColor: _this.get_color(this.risk_categories.recycled_water_factor(recycled_water_factor))})
         let treated_water_factor = metrics.treated_water_factor(industries)
-        row.push({text: treated_water_factor, fillColor: _this.get_color(risk_categories.water_treated(treated_water_factor))})
+        row.push({text: treated_water_factor, fillColor: _this.get_color(this.risk_categories.water_treated(treated_water_factor))})
         let available_ratio_value = await metrics.available_ratio(this.global_layers, industries)
-        row.push({text: available_ratio_value, fillColor: _this.get_color(risk_categories.water_stress_ratio(available_ratio_value))})
+        row.push({text: available_ratio_value, fillColor: _this.get_color(this.risk_categories.water_stress_ratio(available_ratio_value))})
 
-        row.push(metrics.efficiency_factor(industries))
+        row.push({text: metrics.efficiency_factor(industries), fillColor: _this.get_color(this.risk_categories.specific_water_consumption(available_ratio_value))})
+
 
         data_chart.datasets.push({
           data: [recycled_water_factor, metrics.treated_water_factor(industries), available_ratio_value],
@@ -2630,16 +3072,7 @@ export default {
             min: 0
           }
         },
-        "tooltips": {
-          "callbacks": {
-            "title": (tooltipItem, data) => {
-              //return data.labels[tooltipItem[0].index]
-              return Object.values(tooltipItem).map(item => {
-                return data.labels[item.index]
-              }).toString()
-            }
-          }
-        }
+        "tooltips": {}
       }
 
       const ctx = document.getElementById('chart');
@@ -2651,7 +3084,7 @@ export default {
 
       dd.content.push(industriesIndicator)
       dd.content.push("\n")
-      risk_categories.legend_impact_pdf(dd)
+      this.risk_categories.legend_impact_pdf(dd)
       dd.content.push("\n\n")
       dd.content.push({
         image: chart.toBase64Image(),
@@ -2692,11 +3125,12 @@ export default {
         table: {
           body: [
             [
+              {text:'Industry', style: "bold"},
               {text:'Total GHG emissions (kgCO2eq)', style: "bold"},
               {text:'Eutrophication potential (gPO4eq/m3)', style: "bold"},
               {text:'Final Toxic Units in the receiving water body (assuming an initial amount of 0) (TU)', style: "bold"},
               {text:'Final average pollutant concentration with respect to EQS in the receiving water body (assuming an initial concentration of 0) ', style: "bold"},
-              {text:' Average percentage of treatment efficiency ', style: "bold"},
+              {text:'Average percentage of treatment efficiency ', style: "bold"},
 
 
             ]
@@ -2710,25 +3144,31 @@ export default {
         let row_1 = [key]
 
         let dilution_factor_value = await metrics.dilution_factor(this.global_layers, industries)
-        row.push( {text: dilution_factor_value, fillColor: _this.get_color(risk_categories.dilution_factor(dilution_factor_value))})
+        row.push( {text: dilution_factor_value, fillColor: _this.get_color(this.risk_categories.dilution_factor(dilution_factor_value))})
         let recycled_water_factor = metrics.recycled_water_factor(industries)
-        row.push({text: recycled_water_factor, fillColor: _this.get_color(risk_categories.recycled_water_factor(recycled_water_factor))})
+        row.push({text: recycled_water_factor, fillColor: _this.get_color(this.risk_categories.recycled_water_factor(recycled_water_factor))})
         let treated_water_factor = metrics.treated_water_factor(industries)
-        row.push({text: treated_water_factor, fillColor: _this.get_color(risk_categories.water_treated(treated_water_factor))})
+        row.push({text: treated_water_factor, fillColor: _this.get_color(this.risk_categories.water_treated(treated_water_factor))})
         let available_ratio_value = await metrics.available_ratio(this.global_layers, industries)
-        row.push({text: available_ratio_value, fillColor: _this.get_color(risk_categories.water_stress_ratio(available_ratio_value))})
-        row.push(metrics.efficiency_factor(industries))
+        row.push({text: available_ratio_value, fillColor: _this.get_color(this.risk_categories.water_stress_ratio(available_ratio_value))})
+        row.push({text: metrics.efficiency_factor(industries), fillColor: _this.get_color(this.risk_categories.specific_water_consumption(available_ratio_value))})
 
         let ghg_total = metrics.emissions_and_descriptions(industries, days_factor).total
-        row_1.push(ghg_total)
+        row_1.push({text: ghg_total, fillColor: _this.get_color(this.risk_categories.global_warming(ghg_total))})
+
+
         let eutrophication = metrics.eutrophication_potential(industries).total
-        row_1.push(eutrophication)
+        row_1.push({text: eutrophication, fillColor: _this.get_color(this.risk_categories.eutrophication(eutrophication)),})
+
 
         let tu = await metrics.delta_tu(industries, this.global_layers)
-        row_1.push({text: tu.total, fillColor: _this.get_color(risk_categories.delta_ecotoxicity(tu.total))})
+        row_1.push({text: tu.total, fillColor: _this.get_color(this.risk_categories.delta_ecotoxicity(tu.total))})
 
         let delta_eqs = await metrics.delta_eqs_avg(industries, this.global_layers)
-        row_1.push({text: delta_eqs, fillColor: _this.get_color(risk_categories.delta_eqs(delta_eqs))})
+        row_1.push({text: delta_eqs, fillColor: _this.get_color(this.risk_categories.delta_eqs(delta_eqs))})
+
+        let avg_efficiency = metrics.avg_treatment_efficiency(industries)
+        row_1.push({text: avg_efficiency, fillColor: _this.get_color(this.risk_categories.treatment_efficiency(avg_efficiency))})
 
         industriesIndicator.table.body.push(row)
         industriesIndicator_1.table.body.push(row_1)
@@ -2739,7 +3179,7 @@ export default {
       dd.content.push("\n\n")
       dd.content.push(industriesIndicator_1)
       dd.content.push("\n")
-      risk_categories.legend_impact_pdf(dd)
+      this.risk_categories.legend_impact_pdf(dd)
       dd.content.push("\n\n")
 
 
@@ -2747,6 +3187,8 @@ export default {
 
 
     eutrophication_pdf(dd, industries_aux, assessment_days) {
+
+      let _this = this
 
       let days_factor = 1
       if(this.period_model === "annual") days_factor = 365
@@ -2787,18 +3229,16 @@ export default {
         let row = [key]
 
         let total_value = eutrophication.total
-        row.push({text: total_value, style: "bold"})
+        row.push({text: total_value, style: "bold", fillColor: _this.get_color(this.risk_categories.eutrophication(total_value)),})
 
         let cod_value = eutrophication.cod
-        row.push(cod_value)
+        row.push({text: cod_value, fillColor: _this.get_color(this.risk_categories.eutrophication(cod_value)),})
 
         let tn_value = eutrophication.tn
-        row.push(tn_value)
+        row.push({text: tn_value, fillColor: _this.get_color(this.risk_categories.eutrophication(tn_value)),})
 
         let tp_value = eutrophication.tp
-        row.push(tp_value)
-
-
+        row.push({text: tp_value, fillColor: _this.get_color(this.risk_categories.eutrophication(tp_value)),})
 
 
         industriesEutrophication.table.body.push(row)
@@ -2840,6 +3280,8 @@ export default {
       });
 
       dd.content.push(industriesEutrophication)
+      dd.content.push("\n")
+      _this.risk_categories.legend_impact_pdf(dd)
       dd.content.push("\n\n")
       dd.content.push({
         image: chart.toBase64Image(),
@@ -2853,6 +3295,8 @@ export default {
       let days_factor = 1
       if(this.period_model === "annual") days_factor = 365
       else if(this.period_model === "assessment") days_factor = assessment_days
+
+      let _this = this
 
       dd.content.push({
         text: "Impact on biodiversity and ecosystems\n\n",
@@ -2919,40 +3363,40 @@ export default {
         let tu = metrics.ecotoxicity_potential_tu(industries)
 
         let total_value = tu.total
-        row.push({text: total_value, style: "bold"})
+        row.push({text: total_value, style: "bold", fillColor: _this.get_color(this.risk_categories["ecotoxicity"](total_value))})
 
         let dichloroethane_value = tu.diclo
-        row.push(dichloroethane_value)
+        row.push({text: dichloroethane_value, fillColor: _this.get_color(this.risk_categories["ecotoxicity"](dichloroethane_value))})
 
         let cadmium_value = tu.cadmium
-        row.push(cadmium_value)
+        row.push({text: cadmium_value, fillColor: _this.get_color(this.risk_categories["ecotoxicity"](cadmium_value))})
 
         let hexaclorobenzene_value = tu.hexaclorobenzene
-        row.push(hexaclorobenzene_value)
+        row.push({text: hexaclorobenzene_value, fillColor: _this.get_color(this.risk_categories["ecotoxicity"](hexaclorobenzene_value))})
 
         let mercury_value = tu.mercury
-        row.push(mercury_value)
+        row.push({text: mercury_value, fillColor: _this.get_color(this.risk_categories["ecotoxicity"](mercury_value))})
 
         let lead_value = tu.lead
-        row.push(lead_value)
+        row.push({text: lead_value, fillColor: _this.get_color(this.risk_categories["ecotoxicity"](lead_value))})
 
         let nickel_value = tu.nickel
-        row.push(nickel_value)
+        row.push({text: nickel_value, fillColor: _this.get_color(this.risk_categories["ecotoxicity"](nickel_value))})
 
         let chloroalkanes_value = tu.chloroalkanes
-        row.push(chloroalkanes_value)
+        row.push({text: chloroalkanes_value, fillColor: _this.get_color(this.risk_categories["ecotoxicity"](chloroalkanes_value))})
 
         let hexaclorobutadie_value = tu.hexaclorobutadie
-        row.push(hexaclorobutadie_value)
+        row.push({text: hexaclorobutadie_value, fillColor: _this.get_color(this.risk_categories["ecotoxicity"](hexaclorobutadie_value))})
 
         let nonylphenols_value = tu.nonylphenols
-        row.push(nonylphenols_value)
+        row.push({text: nonylphenols_value, fillColor: _this.get_color(this.risk_categories["ecotoxicity"](nonylphenols_value))})
 
         let tetrachloroethene_value = tu.tetracloroetile
-        row.push(tetrachloroethene_value)
+        row.push({text: tetrachloroethene_value, fillColor: _this.get_color(this.risk_categories["ecotoxicity"](tetrachloroethene_value))})
 
         let trichloroethylene_value = tu.tricloroetile
-        row.push(trichloroethylene_value)
+        row.push({text: trichloroethylene_value, fillColor: _this.get_color(this.risk_categories["ecotoxicity"](trichloroethylene_value))})
 
 
         industriesEcotoxicity.table.body.push(row)
@@ -2995,8 +3439,7 @@ export default {
 
       dd.content.push(industriesEcotoxicity)
       dd.content.push("\n")
-      dd.content.push("\n")
-      risk_categories.legend_impact_pdf(dd)
+
       dd.content.push("\n")
       dd.content.push([
         {text: [{text: "1", sup: true, style: "asterisk"}, {text:"1,2-Dichloroethane, "},
@@ -3008,6 +3451,8 @@ export default {
           ]},
       ])
 
+      dd.content.push("\n")
+      this.risk_categories.legend_impact_pdf(dd)
       dd.content.push("\n\n")
       dd.content.push({
         image: chart.toBase64Image(),
@@ -3024,12 +3469,13 @@ export default {
 
     async delta_pdf(dd, industries_aux, assessment_days) {
 
+      let _this = this
       let days_factor = 1
       if(this.period_model === "annual") days_factor = 365
       else if(this.period_model === "assessment") days_factor = assessment_days
 
       dd.content.push({
-        text: " Increase in the concentration of the pollutant in the receiving body \n\n",
+        text: "Increase in the concentration of the pollutant in the receiving body \n\n",
         style: 'subsubheader'
       })
 
@@ -3094,48 +3540,49 @@ export default {
         let row_1 = [key]
 
         let bod_value = await metrics.bod_effl(industries, this.global_layers)
-        row.push(bod_value)
+
+        //row.push({text: total_value, fillColor: _this.get_color(this.risk_categories.delta_ecotoxicity(total_value)), style: "bold"})
+
+        row.push({text: bod_value, fillColor: _this.get_color(this.risk_categories.delta(bod_value)), style: "bold"})
 
         let tn_value = await metrics.tn_effl(industries,this.global_layers)
-        row.push(tn_value)
+        row.push({text: tn_value, fillColor: _this.get_color(this.risk_categories.delta(tn_value)), style: "bold"})
 
         let tp_value = await metrics.tp_effl(industries, this.global_layers)
-        row.push(tp_value)
+        row.push({text: tp_value, fillColor: _this.get_color(this.risk_categories.delta(tp_value)), style: "bold"})
 
         let dichloroethane_value = await metrics.dichloroethane_effl(industries, this.global_layers)
-        row.push(dichloroethane_value)
+        row.push({text: dichloroethane_value, fillColor: _this.get_color(this.risk_categories.delta(dichloroethane_value)), style: "bold"})
 
         let cadmium_value = await metrics.cadmium_effl(industries, this.global_layers)
-        row.push(cadmium_value)
+        row.push({text: cadmium_value, fillColor: _this.get_color(this.risk_categories.delta(cadmium_value)), style: "bold"})
 
         let hexaclorobenzene_value = await metrics.hexaclorobenzene_effl(industries, this.global_layers)
-        row.push(hexaclorobenzene_value)
+        row.push({text: hexaclorobenzene_value, fillColor: _this.get_color(this.risk_categories.delta(hexaclorobenzene_value)), style: "bold"})
 
         let mercury_value = await metrics.mercury_effl(industries, this.global_layers)
-        row.push(mercury_value)
+        row.push({text: mercury_value, fillColor: _this.get_color(this.risk_categories.delta(mercury_value)), style: "bold"})
 
         let lead_value = await metrics.lead_effl(industries, this.global_layers)
-        row.push(lead_value)
+        row.push({text: lead_value, fillColor: _this.get_color(this.risk_categories.delta(lead_value)), style: "bold"})
 
         let nickel_value = await metrics.nickel_effl(industries, this.global_layers)
-        row.push(nickel_value)
+        row.push({text: nickel_value, fillColor: _this.get_color(this.risk_categories.delta(nickel_value)), style: "bold"})
 
         let chloroalkanes_value = await  metrics.chloroalkanes_effl(industries, this.global_layers)
-        row.push(chloroalkanes_value)
+        row.push({text: chloroalkanes_value, fillColor: _this.get_color(this.risk_categories.delta(chloroalkanes_value)), style: "bold"})
 
         let hexaclorobutadie_value = await metrics.hexaclorobutadie_effl(industries,this.global_layers)
-        row_1.push(hexaclorobutadie_value)
+        row_1.push({text: hexaclorobutadie_value, fillColor: _this.get_color(this.risk_categories.delta(hexaclorobutadie_value)), style: "bold"})
 
         let nonylphenols_value = await metrics.nonylphenols_effl(industries, this.global_layers)
-        row_1.push(nonylphenols_value)
+        row_1.push({text: nonylphenols_value, fillColor: _this.get_color(this.risk_categories.delta(nonylphenols_value)), style: "bold"})
 
         let tetrachloroethene_value = await metrics.tetrachloroethene_effl(industries, this.global_layers)
-        row_1.push(tetrachloroethene_value)
+        row_1.push({text: tetrachloroethene_value, fillColor: _this.get_color(this.risk_categories.delta(tetrachloroethene_value)), style: "bold"})
 
         let trichloroethylene_value = await metrics.tricloroetile_effl(industries, this.global_layers)
-        row_1.push(trichloroethylene_value)
-
-
+        row_1.push({text: trichloroethylene_value, fillColor: _this.get_color(this.risk_categories.delta(trichloroethylene_value)), style: "bold"})
 
 
         industriesDelta.table.body.push(row)
@@ -3156,12 +3603,17 @@ export default {
             {text: [{text: "6", sup: true, style: "asterisk"}, {text:"Trichloroethylene"}]},
           ]},
       ])
+      dd.content.push("\n")
+      _this.risk_categories.legend_impact_pdf(dd)
+      dd.content.push("\n\n")
 
 
     },
 
     eqs_pdf(dd) {
 
+
+      let _this = this
 
       dd.content.push({
         text: "\nEffluent concentration with respect to EQS \n\n",
@@ -3211,43 +3663,44 @@ export default {
         let row = [key]
         let tu = metrics.environmental_quality_standards(industries)
 
+
+
         let dichloroethane_value = tu.diclo
-        row.push(dichloroethane_value)
+        row.push({text: dichloroethane_value, fillColor: _this.get_color(this.risk_categories.eqs(dichloroethane_value))})
 
         let cadmium_value = tu.cadmium
-        row.push(cadmium_value)
+        row.push({text: cadmium_value, fillColor: _this.get_color(this.risk_categories.eqs(cadmium_value))})
 
         let hexaclorobenzene_value = tu.hexaclorobenzene
-        row.push(hexaclorobenzene_value)
+        row.push({text: hexaclorobenzene_value, fillColor: _this.get_color(this.risk_categories.eqs(hexaclorobenzene_value))})
 
         let mercury_value = tu.mercury
-        row.push(mercury_value)
+        row.push({text: mercury_value, fillColor: _this.get_color(this.risk_categories.eqs(mercury_value))})
 
         let lead_value = tu.lead
-        row.push(lead_value)
+        row.push({text: lead_value, fillColor: _this.get_color(this.risk_categories.eqs(lead_value))})
 
         let nickel_value = tu.nickel
-        row.push(nickel_value)
+        row.push({text: nickel_value, fillColor: _this.get_color(this.risk_categories.eqs(nickel_value))})
 
         let chloroalkanes_value = tu.chloroalkanes
-        row.push(chloroalkanes_value)
+        row.push({text: chloroalkanes_value, fillColor: _this.get_color(this.risk_categories.eqs(chloroalkanes_value))})
 
         let hexaclorobutadie_value = tu.hexaclorobutadie
-        row.push(hexaclorobutadie_value)
+        row.push({text: hexaclorobutadie_value, fillColor: _this.get_color(this.risk_categories.eqs(hexaclorobutadie_value))})
 
         let nonylphenols_value = tu.nonylphenols
-        row.push(nonylphenols_value)
+        row.push({text: nonylphenols_value, fillColor: _this.get_color(this.risk_categories.eqs(nonylphenols_value))})
 
         let tetrachloroethene_value = tu.tetracloroetile
-        row.push(tetrachloroethene_value)
+        row.push({text: tetrachloroethene_value, fillColor: _this.get_color(this.risk_categories.eqs(tetrachloroethene_value))})
 
         let trichloroethylene_value = tu.tricloroetile
-        row.push(trichloroethylene_value)
+        row.push({text: trichloroethylene_value, fillColor: _this.get_color(this.risk_categories.eqs(trichloroethylene_value))})
 
 
         industriesEcotoxicity.table.body.push(row)
       }
-
 
 
       dd.content.push(industriesEcotoxicity)
@@ -3261,7 +3714,9 @@ export default {
             {text: [{text: "6", sup: true, style: "asterisk"}, {text:"Trichloroethylene"}]},
           ]},
       ])
-
+      dd.content.push("\n")
+      _this.risk_categories.legend_impact_pdf(dd)
+      dd.content.push("\n")
 
     },
 
@@ -3326,41 +3781,41 @@ export default {
         let tu = await metrics.delta_tu(industries, this.global_layers)
 
         let total_value = tu.total
-        row.push({text: total_value, fillColor: _this.get_color(risk_categories.delta_ecotoxicity(total_value)), style: "bold"})
+        row.push({text: total_value, fillColor: _this.get_color(this.risk_categories.delta_ecotoxicity(total_value)), style: "bold"})
 
 
         let dichloroethane_value = tu.diclo
-        row.push({text: dichloroethane_value, fillColor: _this.get_color(risk_categories.delta_ecotoxicity(dichloroethane_value))})
+        row.push({text: dichloroethane_value, fillColor: _this.get_color(this.risk_categories.delta_ecotoxicity(dichloroethane_value))})
 
         let cadmium_value = tu.cadmium
-        row.push({text: cadmium_value, fillColor: _this.get_color(risk_categories.delta_ecotoxicity(cadmium_value))})
+        row.push({text: cadmium_value, fillColor: _this.get_color(this.risk_categories.delta_ecotoxicity(cadmium_value))})
 
         let hexaclorobenzene_value = tu.hexaclorobenzene
-        row.push({text: hexaclorobenzene_value, fillColor: _this.get_color(risk_categories.delta_ecotoxicity(hexaclorobenzene_value))})
+        row.push({text: hexaclorobenzene_value, fillColor: _this.get_color(this.risk_categories.delta_ecotoxicity(hexaclorobenzene_value))})
 
         let mercury_value = tu.mercury
-        row.push({text: mercury_value, fillColor: _this.get_color(risk_categories.delta_ecotoxicity(mercury_value))})
+        row.push({text: mercury_value, fillColor: _this.get_color(this.risk_categories.delta_ecotoxicity(mercury_value))})
 
         let lead_value = tu.lead
-        row.push({text: lead_value, fillColor: _this.get_color(risk_categories.delta_ecotoxicity(lead_value))})
+        row.push({text: lead_value, fillColor: _this.get_color(this.risk_categories.delta_ecotoxicity(lead_value))})
 
         let nickel_value = tu.nickel
-        row.push({text: nickel_value, fillColor: _this.get_color(risk_categories.delta_ecotoxicity(nickel_value))})
+        row.push({text: nickel_value, fillColor: _this.get_color(this.risk_categories.delta_ecotoxicity(nickel_value))})
 
         let chloroalkanes_value = tu.chloroalkanes
-        row.push({text: chloroalkanes_value, fillColor: _this.get_color(risk_categories.delta_ecotoxicity(chloroalkanes_value))})
+        row.push({text: chloroalkanes_value, fillColor: _this.get_color(this.risk_categories.delta_ecotoxicity(chloroalkanes_value))})
 
         let hexaclorobutadie_value = tu.hexaclorobutadie
-        row.push({text: hexaclorobutadie_value, fillColor: _this.get_color(risk_categories.delta_ecotoxicity(hexaclorobutadie_value))})
+        row.push({text: hexaclorobutadie_value, fillColor: _this.get_color(this.risk_categories.delta_ecotoxicity(hexaclorobutadie_value))})
 
         let nonylphenols_value = tu.nonylphenols
-        row.push({text: nonylphenols_value, fillColor: _this.get_color(risk_categories.delta_ecotoxicity(nonylphenols_value))})
+        row.push({text: nonylphenols_value, fillColor: _this.get_color(this.risk_categories.delta_ecotoxicity(nonylphenols_value))})
 
         let tetrachloroethene_value = tu.tetracloroetile
-        row.push({text: tetrachloroethene_value, fillColor: _this.get_color(risk_categories.delta_ecotoxicity(tetrachloroethene_value))})
+        row.push({text: tetrachloroethene_value, fillColor: _this.get_color(this.risk_categories.delta_ecotoxicity(tetrachloroethene_value))})
 
         let trichloroethylene_value = tu.tricloroetile
-        row.push({text: trichloroethylene_value, fillColor: _this.get_color(risk_categories.delta_ecotoxicity(trichloroethylene_value))})
+        row.push({text: trichloroethylene_value, fillColor: _this.get_color(this.risk_categories.delta_ecotoxicity(trichloroethylene_value))})
 
 
         industriesEcotoxicity.table.body.push(row)
@@ -3368,8 +3823,6 @@ export default {
       }
 
       dd.content.push(industriesEcotoxicity)
-      dd.content.push("\n")
-      risk_categories.legend_impact_pdf(dd)
       dd.content.push("\n")
       dd.content.push([
         {text: [{text: "1", sup: true, style: "asterisk"}, {text:"1,2-Dichloroethane, "},
@@ -3380,7 +3833,8 @@ export default {
             {text: [{text: "6", sup: true, style: "asterisk"}, {text:"Trichloroethylene"}]},
           ]},
       ])
-
+      dd.content.push("\n")
+      this.risk_categories.legend_impact_pdf(dd)
       dd.content.push("\n\n")
     },
 
@@ -3438,37 +3892,37 @@ export default {
         let tu = await metrics.delta_eqs(industries, this.global_layers)
 
         let dichloroethane_value = tu.diclo
-        row.push({text: dichloroethane_value, fillColor: _this.get_color(risk_categories.delta_eqs(dichloroethane_value))})
+        row.push({text: dichloroethane_value, fillColor: _this.get_color(this.risk_categories.delta_eqs(dichloroethane_value))})
 
         let cadmium_value = tu.cadmium
-        row.push({text: cadmium_value, fillColor: _this.get_color(risk_categories.delta_eqs(cadmium_value))})
+        row.push({text: cadmium_value, fillColor: _this.get_color(this.risk_categories.delta_eqs(cadmium_value))})
 
         let hexaclorobenzene_value = tu.hexaclorobenzene
-        row.push({text: hexaclorobenzene_value, fillColor: _this.get_color(risk_categories.delta_eqs(hexaclorobenzene_value))})
+        row.push({text: hexaclorobenzene_value, fillColor: _this.get_color(this.risk_categories.delta_eqs(hexaclorobenzene_value))})
 
         let mercury_value = tu.mercury
-        row.push({text: mercury_value, fillColor: _this.get_color(risk_categories.delta_eqs(mercury_value))})
+        row.push({text: mercury_value, fillColor: _this.get_color(this.risk_categories.delta_eqs(mercury_value))})
 
         let lead_value = tu.lead
-        row.push({text: lead_value, fillColor: _this.get_color(risk_categories.delta_eqs(lead_value))})
+        row.push({text: lead_value, fillColor: _this.get_color(this.risk_categories.delta_eqs(lead_value))})
 
         let nickel_value = tu.nickel
-        row.push({text: nickel_value, fillColor: _this.get_color(risk_categories.delta_eqs(nickel_value))})
+        row.push({text: nickel_value, fillColor: _this.get_color(this.risk_categories.delta_eqs(nickel_value))})
 
         let chloroalkanes_value = tu.chloroalkanes
-        row.push({text: chloroalkanes_value, fillColor: _this.get_color(risk_categories.delta_eqs(chloroalkanes_value))})
+        row.push({text: chloroalkanes_value, fillColor: _this.get_color(this.risk_categories.delta_eqs(chloroalkanes_value))})
 
         let hexaclorobutadie_value = tu.hexaclorobutadie
-        row.push({text: hexaclorobutadie_value, fillColor: _this.get_color(risk_categories.delta_eqs(hexaclorobutadie_value))})
+        row.push({text: hexaclorobutadie_value, fillColor: _this.get_color(this.risk_categories.delta_eqs(hexaclorobutadie_value))})
 
         let nonylphenols_value = tu.nonylphenols
-        row.push({text: nonylphenols_value, fillColor: _this.get_color(risk_categories.delta_eqs(nonylphenols_value))})
+        row.push({text: nonylphenols_value, fillColor: _this.get_color(this.risk_categories.delta_eqs(nonylphenols_value))})
 
         let tetrachloroethene_value = tu.tetracloroetile
-        row.push({text: tetrachloroethene_value, fillColor: _this.get_color(risk_categories.delta_eqs(tetrachloroethene_value))})
+        row.push({text: tetrachloroethene_value, fillColor: _this.get_color(this.risk_categories.delta_eqs(tetrachloroethene_value))})
 
         let trichloroethylene_value = tu.tricloroetile
-        row.push({text: trichloroethylene_value, fillColor: _this.get_color(risk_categories.delta_eqs(trichloroethylene_value))})
+        row.push({text: trichloroethylene_value, fillColor: _this.get_color(this.risk_categories.delta_eqs(trichloroethylene_value))})
 
 
         industriesEcotoxicity.table.body.push(row)
@@ -3476,9 +3930,6 @@ export default {
 
 
       dd.content.push(industriesEcotoxicity)
-      dd.content.push("\n")
-      risk_categories.legend_impact_pdf(dd)
-
       dd.content.push("\n")
       dd.content.push([
         {text: [{text: "1", sup: true, style: "asterisk"}, {text:"1,2-Dichloroethane, "},
@@ -3489,13 +3940,17 @@ export default {
             {text: [{text: "6", sup: true, style: "asterisk"}, {text:"Trichloroethylene"}]},
           ]},
       ])
-      dd.content.push("\n\n\n")
+      dd.content.push("\n")
+      this.risk_categories.legend_impact_pdf(dd)
+      dd.content.push("\n")
 
 
     },
 
     efficiency_pdf(dd, industries_aux, assessment_days) {
 
+
+      let _this = this
       let days_factor = 1
       if(this.period_model === "annual") days_factor = 365
       else if(this.period_model === "assessment") days_factor = assessment_days
@@ -3565,47 +4020,48 @@ export default {
         let row = [key]
         let row_1 = [key]
 
+
         let bod_value = metrics.bod_efficiency(industries)
-        row.push(bod_value)
+        row.push({text: bod_value, fillColor: _this.get_color(this.risk_categories.treatment_efficiency(bod_value))})
 
         let tn_value = metrics.tn_efficiency(industries)
-        row.push(tn_value)
+        row.push({text: tn_value, fillColor: _this.get_color(this.risk_categories.treatment_efficiency(tn_value))})
 
         let tp_value = metrics.tp_efficiency(industries)
-        row.push(tp_value)
+        row.push({text: tp_value, fillColor: _this.get_color(this.risk_categories.treatment_efficiency(tp_value))})
 
         let dichloroethane_value = metrics.dichloroethane_efficiency(industries)
-        row.push(dichloroethane_value)
+        row.push({text: dichloroethane_value, fillColor: _this.get_color(this.risk_categories.treatment_efficiency(dichloroethane_value))})
 
         let cadmium_value = metrics.cadmium_efficiency(industries)
-        row.push(cadmium_value)
+        row.push({text: cadmium_value, fillColor: _this.get_color(this.risk_categories.treatment_efficiency(cadmium_value))})
 
         let hexaclorobenzene_value = metrics.hexaclorobenzene_efficiency(industries)
-        row.push(hexaclorobenzene_value)
+        row.push({text: hexaclorobenzene_value, fillColor: _this.get_color(this.risk_categories.treatment_efficiency(hexaclorobenzene_value))})
 
         let mercury_value = metrics.mercury_efficiency(industries)
-        row.push(mercury_value)
+        row.push({text: mercury_value, fillColor: _this.get_color(this.risk_categories.treatment_efficiency(mercury_value))})
 
         let lead_value = metrics.lead_efficiency(industries)
-        row.push(lead_value)
+        row.push({text: lead_value, fillColor: _this.get_color(this.risk_categories.treatment_efficiency(lead_value))})
 
         let nickel_value = metrics.nickel_efficiency(industries)
-        row.push(nickel_value)
+        row.push({text: nickel_value, fillColor: _this.get_color(this.risk_categories.treatment_efficiency(nickel_value))})
 
         let chloroalkanes_value = metrics.chloroalkanes_efficiency(industries)
-        row.push(chloroalkanes_value)
+        row.push({text: chloroalkanes_value, fillColor: _this.get_color(this.risk_categories.treatment_efficiency(chloroalkanes_value))})
 
         let hexaclorobutadie_value = metrics.hexaclorobutadie_efficiency(industries)
-        row_1.push(hexaclorobutadie_value)
+        row_1.push({text: hexaclorobutadie_value, fillColor: _this.get_color(this.risk_categories.treatment_efficiency(hexaclorobutadie_value))})
 
         let nonylphenols_value = metrics.nonylphenols_efficiency(industries)
-        row_1.push(nonylphenols_value)
+        row_1.push({text: nonylphenols_value, fillColor: _this.get_color(this.risk_categories.treatment_efficiency(nonylphenols_value))})
 
         let tetrachloroethene_value = metrics.tetrachloroethene_efficiency(industries)
-        row_1.push(tetrachloroethene_value)
+        row_1.push({text: tetrachloroethene_value, fillColor: _this.get_color(this.risk_categories.treatment_efficiency(tetrachloroethene_value))})
 
         let trichloroethylene_value = metrics.tricloroetile_efficiency(industries)
-        row_1.push(trichloroethylene_value)
+        row_1.push({text: trichloroethylene_value, fillColor: _this.get_color(this.risk_categories.treatment_efficiency(trichloroethylene_value))})
 
         data_chart.datasets.push({
           data: [bod_value, tn_value, tp_value, dichloroethane_value, cadmium_value, hexaclorobenzene_value, mercury_value, lead_value, nickel_value, chloroalkanes_value, hexaclorobutadie_value, nonylphenols_value, tetrachloroethene_value, trichloroethylene_value],
@@ -3657,6 +4113,8 @@ export default {
             {text: [{text: "6", sup: true, style: "asterisk"}, {text:"Trichloroethylene"}]},
           ]},
       ])
+      dd.content.push("\n")
+      _this.risk_categories.legend_impact_pdf(dd)
       dd.content.push("\n\n")
       dd.content.push({
         image: chart.toBase64Image(),
@@ -3705,13 +4163,13 @@ export default {
         row.push(en8)
         let en9 = indicators["g4-en9"]
 
-        row.push({text: en9, fillColor: _this.get_color(risk_categories.withdrawal_effect(en9))})
+        row.push({text: en9, fillColor: _this.get_color(this.risk_categories.withdrawal_effect(en9))})
         let en10 = indicators["g4-en10"]
         row.push(en10)
         let en22 = indicators["g4-en22"]
         row.push(en22)
         let en26 = indicators["g4-en26"]
-        row.push({text: en26, fillColor: _this.get_color(risk_categories.discharge_effect(en26))})
+        row.push({text: en26, fillColor: _this.get_color(this.risk_categories.discharge_effect(en26))})
         let wd_value = indicators["wd"]
         row.push(wd_value)
         let dis_value = indicators["dis"]
@@ -3725,7 +4183,7 @@ export default {
 
       dd.content.push(industriesIndicator)
       dd.content.push("\n")
-      risk_categories.legend_impact_pdf(dd)
+      this.risk_categories.legend_impact_pdf(dd)
       dd.content.push("\n\n")
 
     },
@@ -3907,7 +4365,7 @@ export default {
           tableHeader: {
             bold: true,
             fontSize: 12,
-            color: 'black'
+            color: '#1c1c1b'
           },
           bold: {
             bold: true
@@ -3989,7 +4447,7 @@ export default {
           this.eutrophication_pdf(dd, industries, assessment_days)
           dd.content.push("\n\n")
           await this.ecotoxicity_pdf(dd, industries, assessment_days)
-         this.efficiency_pdf(dd, industries, assessment_days)
+          this.efficiency_pdf(dd, industries, assessment_days)
           dd.content.push("\n\n")
           await this.reporting_pdf(dd, industries, assessment_days)
           dd.content.push("\n\n")
@@ -4008,6 +4466,10 @@ export default {
 
 
   computed: {
+
+    assessments_with_industries(){
+      return this.created_assessments.filter(assessment => assessment.industries.length > 0)
+    },
 
     industries_aggregated(){
       let _this = this
@@ -4140,9 +4602,16 @@ export default {
   .style-2 {
     font-weight: normal;
   }
+
+
 </style>
 
 <style scoped>
+
+.side_menu_title{
+  font-weight: bold;
+  font-size: 18px;
+}
 
 .outer{
   overflow: hidden;
@@ -4183,7 +4652,7 @@ export default {
 
 .v-tab.v-tab--active{
   background-color: #1C195B;
-  color: #F2F4F3
+  color: #F2F4F3 !important;
 }
 
 .table_title {
@@ -4201,5 +4670,25 @@ b {
 table {
   padding: 15px;
 }
+
+.divider {
+  margin-top: 25px;
+  border-color: #1C195B !important;
+}
+
+.v-icon{
+  padding-bottom: 5px
+}
+
+.v-data-table{
+  padding-left: 20px;
+  padding-right: 20px;
+  padding-bottom: 20px;
+}
+
+.v-btn--disabled{
+  background-color: rgba(0, 0, 0, 0.26) !important
+}
+
 
 </style>

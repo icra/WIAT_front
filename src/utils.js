@@ -428,8 +428,8 @@ let metrics = {
         ]
 
         let avg = treatment_efficiency.sum() / treatment_efficiency.length
-        if(Number.isFinite(avg)) return avg.toExponential(3)
-        else return (0).toExponential(3)
+        if(Number.isFinite(avg)) return avg.toExponential(2)
+        else return (0).toExponential(2)
     },
 
     async reporting_metrics(industries, global_layers){
@@ -535,8 +535,8 @@ let metrics = {
 
         let avg = Object.values(eqs).sum() / Object.values(eqs).length
 
-        if(Number.isFinite(avg)) return avg.toExponential(3)
-        else return (0).toExponential(3)
+        if(Number.isFinite(avg)) return avg.toExponential(2)
+        else return (0).toExponential(2)
 
     },
 

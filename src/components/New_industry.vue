@@ -94,8 +94,9 @@
 
                   </div>
                   <v-btn v-if="button_estimation.includes(industry_input) && !isNaN(button_estimations(industry_input)) && button_estimations(industry_input) != null"
-                         outlined
+                         tile
                          x-small
+                         color="#b62373"
                          @click="industry_model[industry_input] = button_estimations(industry_input)"
                   >
                     Estimation:  {{button_estimations(industry_input)}}<!-- Botó amb estimació -->
@@ -199,7 +200,8 @@
 
                         </div>
                         <v-btn v-if="button_estimation.includes(industry_input) && !isNaN(button_estimations(industry_input)) && button_estimations(industry_input) != null"
-                               outlined
+                               tile
+                               color="#b62373"
                                x-small
                                @click="industry_model[industry_input] = button_estimations(industry_input)"
                         >
@@ -264,7 +266,9 @@
                 <v-btn
                     @click="tab_1_continue"
                     :disabled="tab_1_disabled"
-                    outlined
+                    tile
+                    color="#b62373"
+
                 >
                   SAVE AND CONTINUE
                 </v-btn>
@@ -309,7 +313,8 @@
                       {{user_inputs[input].question}}
                     </span>
                     <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
-                           outlined
+                           tile
+                           color="#b62373"
                            x-small
                            @click="onsite_wwtp_model[input] = button_estimations(input)"
                     >
@@ -387,7 +392,8 @@
                       {{user_inputs[input].question}}
                     </span>
                                 <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
-                                       outlined
+                                       tile
+                                       color="#b62373"
                                        x-small
                                        @click="onsite_wwtp_model[input] = button_estimations(input)"
                                 >
@@ -454,7 +460,8 @@
                       {{user_inputs[input].question}}
                     </span>
                                 <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
-                                       outlined
+                                       tile
+                                       color="#b62373"
                                        x-small
                                        @click="onsite_wwtp_model[input] = button_estimations(input)"
                                 >
@@ -521,7 +528,8 @@
                       {{user_inputs[input].question}}
                     </span>
                                 <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
-                                       outlined
+                                       tile
+                                       color="#b62373"
                                        x-small
                                        @click="onsite_wwtp_model[input] = button_estimations(input)"
                                 >
@@ -588,7 +596,8 @@
                       {{user_inputs[input].question}}
                     </span>
                                 <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
-                                       outlined
+                                       tile
+                                       color="#b62373"
                                        x-small
                                        @click="onsite_wwtp_model[input] = button_estimations(input)"
                                 >
@@ -655,7 +664,8 @@
                       {{user_inputs[input].question}}
                     </span>
                                 <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
-                                       outlined
+                                       tile
+                                       color="#b62373"
                                        x-small
                                        @click="onsite_wwtp_model[input] = button_estimations(input)"
                                 >
@@ -722,7 +732,8 @@
                       {{user_inputs[input].question}}
                     </span>
                                 <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
-                                       outlined
+                                       tile
+                                       color="#b62373"
                                        x-small
                                        @click="onsite_wwtp_model[input] = button_estimations(input)"
                                 >
@@ -789,7 +800,8 @@
                       {{user_inputs[input].question}}
                     </span>
                                 <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
-                                       outlined
+                                       tile
+                                       color="#b62373"
                                        x-small
                                        @click="onsite_wwtp_model[input] = button_estimations(input)"
                                 >
@@ -856,7 +868,8 @@
                       {{user_inputs[input].question}}
                     </span>
                                 <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
-                                       outlined
+                                       tile
+                                       color="#b62373"
                                        x-small
                                        @click="onsite_wwtp_model[input] = button_estimations(input)"
                                 >
@@ -923,7 +936,8 @@
                       {{user_inputs[input].question}}
                     </span>
                                 <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
-                                       outlined
+                                       tile
+                                       color="#b62373"
                                        x-small
                                        @click="onsite_wwtp_model[input] = button_estimations(input)"
                                 >
@@ -990,7 +1004,8 @@
                       {{user_inputs[input].question}}
                     </span>
                                 <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
-                                       outlined
+                                       tile
+                                       color="#b62373"
                                        x-small
                                        @click="onsite_wwtp_model[input] = button_estimations(input)"
                                 >
@@ -1057,7 +1072,8 @@
                       {{user_inputs[input].question}}
                     </span>
                                 <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
-                                       outlined
+                                       tile
+                                       color="#b62373"
                                        x-small
                                        @click="onsite_wwtp_model[input] = button_estimations(input)"
                                 >
@@ -1116,9 +1132,9 @@
           </div>
           <br>
           <v-btn
-            outlined
+            tile
             @click="tab_2_continue"
-          >
+            color="#b62373"          >
             SAVE AND CONTINUE
           </v-btn>
 
@@ -1152,7 +1168,8 @@
                       {{user_inputs[input].question}}
                     </span>
                     <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
-                           outlined
+                           tile
+                           color="#b62373"
                            x-small
                            @click="direct_discharge_model[input] = button_estimations(input)"
                     >
@@ -1206,9 +1223,10 @@
           <br>
 
           <v-btn
-              outlined
+              tile
+
               @click="tab_3_continue"
-          >
+              color="#b62373"          >
             SAVE AND CONTINUE
           </v-btn>
 
@@ -1247,7 +1265,8 @@
                       {{user_inputs[input].question}}
                     </span>
                     <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
-                           outlined
+                           tile
+                           color="#b62373"
                            x-small
                            @click="offsite_wwtp_model[input] = button_estimations(input)"
                     >
@@ -1324,7 +1343,8 @@
                       {{user_inputs[input].question}}
                     </span>
                                 <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
-                                       outlined
+                                       tile
+                                       color="#b62373"
                                        x-small
                                        @click="offsite_wwtp_model[input] = button_estimations(input)"
                                 >
@@ -1391,7 +1411,8 @@
                       {{user_inputs[input].question}}
                     </span>
                                 <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
-                                       outlined
+                                       tile
+                                       color="#b62373"
                                        x-small
                                        @click="offsite_wwtp_model[input] = button_estimations(input)"
                                 >
@@ -1458,7 +1479,8 @@
                       {{user_inputs[input].question}}
                     </span>
                                 <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
-                                       outlined
+                                       tile
+                                       color="#b62373"
                                        x-small
                                        @click="offsite_wwtp_model[input] = button_estimations(input)"
                                 >
@@ -1525,7 +1547,8 @@
                       {{user_inputs[input].question}}
                     </span>
                                 <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
-                                       outlined
+                                       tile
+                                       color="#b62373"
                                        x-small
                                        @click="offsite_wwtp_model[input] = button_estimations(input)"
                                 >
@@ -1592,7 +1615,8 @@
                       {{user_inputs[input].question}}
                     </span>
                                 <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
-                                       outlined
+                                       tile
+                                       color="#b62373"
                                        x-small
                                        @click="offsite_wwtp_model[input] = button_estimations(input)"
                                 >
@@ -1659,7 +1683,8 @@
                       {{user_inputs[input].question}}
                     </span>
                                 <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
-                                       outlined
+                                       tile
+                                       color="#b62373"
                                        x-small
                                        @click="offsite_wwtp_model[input] = button_estimations(input)"
                                 >
@@ -1726,7 +1751,8 @@
                       {{user_inputs[input].question}}
                     </span>
                                 <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
-                                       outlined
+                                       tile
+                                       color="#b62373"
                                        x-small
                                        @click="offsite_wwtp_model[input] = button_estimations(input)"
                                 >
@@ -1793,7 +1819,8 @@
                       {{user_inputs[input].question}}
                     </span>
                                 <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
-                                       outlined
+                                       tile
+                                       color="#b62373"
                                        x-small
                                        @click="offsite_wwtp_model[input] = button_estimations(input)"
                                 >
@@ -1860,7 +1887,8 @@
                       {{user_inputs[input].question}}
                     </span>
                                 <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
-                                       outlined
+                                       tile
+                                       color="#b62373"
                                        x-small
                                        @click="offsite_wwtp_model[input] = button_estimations(input)"
                                 >
@@ -1927,7 +1955,8 @@
                       {{user_inputs[input].question}}
                     </span>
                                 <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
-                                       outlined
+                                       tile
+                                       color="#b62373"
                                        x-small
                                        @click="offsite_wwtp_model[input] = button_estimations(input)"
                                 >
@@ -1994,7 +2023,8 @@
                       {{user_inputs[input].question}}
                     </span>
                                 <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
-                                       outlined
+                                       tile
+                                       color="#b62373"
                                        x-small
                                        @click="offsite_wwtp_model[input] = button_estimations(input)"
                                 >
@@ -2053,9 +2083,9 @@
           </div>
           <br>
           <v-btn
-              outlined
+              tile
               @click="tab_4_continue"
-          >
+              color="#b62373"          >
             SAVE AND CONTINUE
           </v-btn>
 
@@ -3399,10 +3429,14 @@ export default {
 
 <style scoped>
 .link_to_report_hovered{
-  color: black;
+  color: #1c1c1b;
   text-decoration: underline;
 }
 .link_to_report{
-  color: black;
+  color: #1c1c1b;
+}
+
+.v-btn--disabled{
+  background-color: rgba(0, 0, 0, 0.26) !important
 }
 </style>

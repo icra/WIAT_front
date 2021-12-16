@@ -20,4 +20,12 @@ export default new Vuetify({
             },
         },
     },
+    theme: {
+        themes: {
+            light: {
+                primary: '#1C195B',
+
+            },
+        },
+    }
 });

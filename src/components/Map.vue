@@ -5,14 +5,14 @@
     <aside class="toolbox" >
 
       <div id="toggle_layer" @click="toggle_layer_selection_menu">
-          <v-icon large style="display: table-cell;vertical-align: middle;text-align: center;">mdi-layers</v-icon>
+          <v-icon large style="display: table-cell;vertical-align: middle;text-align: center; color:#1C195B;">mdi-layers</v-icon>
       </div>
 
 
       <div v-if="selected_layer !== null">
         <div class="box legend">
           <div>
-            <b>{{ selected_layer }}</b> <v-icon style="float: right;" @click="$emit('closeLayer')">mdi-layers-remove</v-icon>
+            <b>{{ selected_layer }}</b> <v-icon style="float: right; color:#1C195B;" @click="$emit('closeLayer')">mdi-layers-remove</v-icon>
           </div>
           <div v-html="html_legend"></div>
 
@@ -29,6 +29,8 @@
                 :key="resolution.key"
                 :label="resolution.label"
                 :value="resolution.key"
+                color='#1C195B'
+                dense
             ></v-radio>
           </v-radio-group>
           <div v-if="baseline_future_model === 'baseline' && layers[selected_layer].monthly ">
@@ -38,6 +40,8 @@
                   :key="resolution.key"
                   :label="resolution.label"
                   :value="resolution.key"
+                  color='#1C195B'
+                  dense
               ></v-radio>
             </v-radio-group>
             <v-row align="center" v-if="annual_monthly_model === 'monthly'">
@@ -51,6 +55,7 @@
                     v-model="months_model"
                     item-text="label"
                     item-value="key"
+
                 ></v-select>
               </v-col>
             </v-row>
@@ -137,8 +142,9 @@
             <v-btn
                 :disabled="!decimal_degrees_valid"
                 small
-                outlined
+                tile
                 block
+                color="#b62373"
                 @click="searchDecimalsDegrees"
             >
               SEARCH
@@ -234,9 +240,10 @@
           <v-btn
               :disabled="!coordinates_valid"
               small
-              outlined
+              tile
               block
               @click="searchCoordinates"
+              color="#b62373"
           >
             SEARCH
           </v-btn>
@@ -262,7 +269,7 @@ import 'leaflet-geosearch/dist/geosearch.css';
 import carto from '@carto/carto.js'
 import "leaflet-easybutton"
 import "leaflet-easybutton/src/easy-button.css"
-
+import 'leaflet-arrowheads'
 
 delete Icon.Default.prototype._getIconUrl;
 Icon.Default.mergeOptions({
@@ -290,7 +297,7 @@ export default {
   props: ["selected_layer", "selected_assessment", "selected_industry"],
   data() {
     return {
-      center: [41.9672203,2.8385181],
+      center: this.$last_location,
       location_markers: this.$location_markers,  //Created industries [{assessment, industry, location}]
       mapDiv: null,
       markers: [],
@@ -421,7 +428,8 @@ export default {
       coordinates_valid: false,
       listenToWatch: true,
       adding_supply_chain: false,
-      supply_chain_name: null
+      supply_chain_name: null,
+      vectors: []
 
     };
   },
@@ -544,7 +552,6 @@ export default {
         popupAnchor: [1, -34],
         shadowSize: [41, 41]
       });
-
 
       let latlng = e.latlng
 
@@ -993,6 +1000,9 @@ export default {
       this.markers.forEach(marker => {
         this.mapDiv.removeLayer(marker);
       })
+      this.vectors.forEach(vector => {
+        vector.remove()
+      })
     },
 
     //Delete clicked marker
@@ -1008,6 +1018,7 @@ export default {
 
       let _this = this
       _this.markers = []
+      _this.vectors.splice(0, _this.vectors.length)
       markers.forEach(marker =>{
 
         let new_marker = null
@@ -1038,6 +1049,13 @@ export default {
               _this.toggle_popup(marker.name, false)
             }
           })
+
+          let myVector = L.polyline([ marker.latlng, marker.industry_coords ]).arrowheads({
+            size: "5px"
+          })
+          myVector.addTo(_this.mapDiv)
+
+          _this.vectors.push(myVector)
 
         }
         else {
@@ -1998,6 +2016,13 @@ export default {
   mounted() {
     this.setupLeafletMap();
     this.place_markers(this.$location_markers)
+  },
+  destroyed() {
+
+    let location = this.mapDiv.getCenter()
+    this.$last_location[0] = location.lat
+    this.$last_location[1] = location.lng
+
   }
 };
 </script>
@@ -2067,8 +2092,8 @@ aside.toolbox {
 }
 
 .trigger {
-  background-color: rgb(70, 63, 202);
-  border-color: rgb(70, 63, 202);
+  background-color: #1C195B;
+  border-color: #1C195B;
   font-size: 0.875rem;
   color: white;
   padding: 8px 15px;
@@ -2085,16 +2110,27 @@ aside.toolbox {
 }
 
 
+
 .legend i {
   width: 18px;
   height: 18px;
   float: left;
   margin-right: 8px;
-  opacity: 0.5;
 }
 
-.leaflet-bar button { height: 30px !important; width: 30px !important; font-size: 2.9em;  color: #1976d2}
+.leaflet-bar button { height: 30px !important; width: 30px !important; font-size: 2.9em;  color: #1C195B}
 
+.v-application a{
+  color:#1C195B !important;
+}
+
+.v-messages {
+  min-height: 0px !important;
+}
+
+.v-btn--disabled{
+  background-color: rgba(0, 0, 0, 0.26) !important
+}
 
 
 
