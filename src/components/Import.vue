@@ -140,7 +140,7 @@
 
         </v-col>
         <v-col cols="3">
-          <b>2)</b> Fill out .XLSX file
+          <b>2)</b> Fill out Excel file
         </v-col>
         <v-col>
           <div style="display: flex;">

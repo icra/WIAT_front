@@ -1,7 +1,7 @@
 <template>
   <div class="outer">
     <div>
-      <h1> {{ this.industry.name}} </h1>
+      <h1 style="color: #b62373"> {{ this.industry.name}} </h1>
     </div>
     <br>
 

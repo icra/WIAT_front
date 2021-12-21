@@ -250,7 +250,7 @@ export class Industry{
             load += concentration * this.onsite_wwtp.wwt_vol_trea // g/day
         }
         if(this.has_direct_discharge == 1) {
-            load += concentration  *  this.direct_discharge.wwt_vol_disc  // g/day
+            load += concentration  *  this.direct_discharge.dd_vol_disc  // g/day
         }
         if(this.has_offsite_wwtp == 1){
             load += concentration * this.offsite_wwtp.wwt_vol_trea  // g/day

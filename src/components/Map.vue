@@ -2092,8 +2092,8 @@ aside.toolbox {
 }
 
 .trigger {
-  background-color: #1C195B;
-  border-color: #1C195B;
+  background-color: #b62373;
+  border-color: #b62373;
   font-size: 0.875rem;
   color: white;
   padding: 8px 15px;
@@ -2102,7 +2102,6 @@ aside.toolbox {
   display: inline-block;
   margin: 4px 2px;
   cursor: pointer;
-  border-radius: 5px;
 }
 
 .trigger:hover {

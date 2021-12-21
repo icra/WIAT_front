@@ -1085,7 +1085,7 @@ export default {
       global_layers: utils.format_layer_description(Vue.prototype.$layers_description),
       include_future: true,
       yes_no: [{text: "Yes", value: true},{text: "No", value: false}],
-      level_of_detail: 'extended',
+      level_of_detail: 'simple',
       level_of_detail_items: [{text: "Extended", value: "extended"},{text: "Simple", value: "simple"}],
       period_model: "daily",
       daily_annual_assessment: [{text: "Daily", value: "daily"},{text: "Annual", value: "annual"}, {text: "Assessment period", value: "assessment"}],
@@ -2940,7 +2940,7 @@ export default {
 
       for (const [key, industries] of Object.entries(this.industries_aggregated)) {
         let total = 0
-        let emissions = metrics.emissions_and_descriptions(industries)
+        let emissions = metrics.emissions_and_descriptions(industries, days_factor)
         let row = [key]
 
         row.push({text: emissions.total, style: "bold", fillColor: _this.get_color(this.risk_categories.global_warming(emissions.total))})
@@ -4464,6 +4464,12 @@ export default {
     },
   },
 
+  created(){
+    let _this = this
+    this.assessments_with_industries.forEach(assessment => {
+      _this.selected_assessments.push(assessment)
+    })
+  },
 
   computed: {
 

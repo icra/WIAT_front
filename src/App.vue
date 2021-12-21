@@ -29,39 +29,59 @@
         <div class="icon_sidebar_container" style="overflow: hidden">
           <v-list height="100%">
             <div class="icon_sidebar_list">
-              <v-hover v-slot:default="{ hover }">
-                <v-list-item :class="hover ? 'icon_hovered_pressed' : ''" @click="secondMenu = !secondMenu" style="height: 75px; margin-top: 25px">
-                  <v-list-item-icon>
-                    <v-icon color = "#F2F4F3" v-if="secondMenu">
-                      mdi-arrow-left
-                    </v-icon>
-                    <v-icon color = "#F2F4F3" v-else>
-                      mdi-arrow-right
-                    </v-icon>
-                  </v-list-item-icon>
-                  <v-list-item-content></v-list-item-content>
-                </v-list-item>
-              </v-hover>
+              <v-tooltip right>
+                <template v-slot:activator="{ on, attrs }">
+                  <div v-on="on" v-bind="attrs">
+                    <v-hover v-slot:default="{ hover }">
+                      <v-list-item :class="hover ? 'icon_hovered_pressed' : ''" @click="secondMenu = !secondMenu" style="height: 75px; margin-top: 25px">
+                        <v-list-item-icon>
+                          <v-icon color = "#F2F4F3" v-if="secondMenu">
+                            mdi-arrow-left
+                          </v-icon>
+                          <v-icon color = "#F2F4F3" v-else>
+                            mdi-arrow-right
+                          </v-icon>
+                        </v-list-item-icon>
+                        <v-list-item-content></v-list-item-content>
+                      </v-list-item>
+                    </v-hover>
+                  </div>
+
+                </template>
+                <span>Menu</span>
+              </v-tooltip>
+
               <v-list-item-group>
-                <v-hover
-                    v-slot:default="{ hover }"
+                <v-tooltip
+                    right
                     v-for="(item, index) in items"
                     :key="item.title"
                 >
-                  <v-list-item
-                      @click="left_side_menu_icon_selected(index)"
-                      :class="(hover || icon_selected === index)? 'icon_hovered_pressed' : ''"
-                      :to="{ name: item.to}"
-                      style="height: 75px" :value="index"
-                  >
-                    <v-list-item-icon>
-                      <v-icon color = "#F2F4F3" style="display: inline-block; position: relative; left: 50%; top: 50%; transform: translate(-50%, 25%);">
-                        {{ item.icon }}
-                      </v-icon>
-                    </v-list-item-icon>
-                    <v-list-item-content></v-list-item-content>
-                  </v-list-item>
-                </v-hover>
+                  <template v-slot:activator="{ on, attrs }">
+                    <div v-on="on" v-bind="attrs">
+                      <v-hover
+                          v-slot:default="{ hover }"
+                      >
+                        <v-list-item
+                            @click="left_side_menu_icon_selected(index)"
+                            :class="(hover || icon_selected === index)? 'icon_hovered_pressed' : ''"
+                            :to="{ name: item.to}"
+                            style="height: 75px" :value="index"
+                        >
+                          <v-list-item-icon>
+                            <v-icon color = "#F2F4F3" style="display: inline-block; position: relative; left: 50%; top: 50%; transform: translate(-50%, 25%);">
+                              {{ item.icon }}
+                            </v-icon>
+                          </v-list-item-icon>
+                          <v-list-item-content></v-list-item-content>
+                        </v-list-item>
+                      </v-hover>
+                    </div>
+
+                  </template>
+                  <span>{{item.title}}</span>
+                </v-tooltip>
+
 
                 <v-dialog
                     v-model="dialog"
@@ -735,7 +755,7 @@ export default {
       rightMenu: false, //Assessment/Company creation sidebar
       items: [  //Icons for the main sidebar
         { title: "Maps and Datasets", icon: 'mdi-map', to:"map" },
-        { title: "Import assessment", icon: 'mdi-import', to:"import"},
+        { title: "Import/Export", icon: 'mdi-import', to:"import"},
         { title: "Report", icon: 'mdi-file-chart', to:"report" },
 
       ],

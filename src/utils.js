@@ -157,7 +157,7 @@ function effl_efficiency(industries, industry_effluent, wwtp_effluent){   //Amou
 
     let filtered = water_filtered(industries, industry_effluent, wwtp_effluent)
     let generated = calculate_pollutant_generated(industries, industry_effluent)
-
+    
     let eff = filtered / generated
 
     if(isNaN(eff)) return (0).toFixed(3)
