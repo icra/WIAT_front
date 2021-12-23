@@ -1,24 +1,210 @@
 <template>
   <v-app class="app">
-
+f
     <!-- Header -->
-    <!--<v-app-bar
-        height="75px"
+    <v-app-bar
+        height="70px"
         width="100%"
-        app
         absolute
-        style="left: 0px"
+        style="margin-left: 0px; margin-right: 0px; background-color: white"
     >
-      <div class="header">
-        <v-icon size="90">$wbcsd_logo</v-icon>
-        <v-icon size="90">$icra_logo</v-icon>
-        <v-icon size="90">$icra_logo</v-icon>
-      </div>
-    </v-app-bar>-->
+      <v-row style="background-color: white; width: 100%">
+        <v-col cols="4" class="header">
+          <a href="https://www.wbcsd.org/" target="_blank">
+            <div>
+              <v-icon>$wbcsd_logo</v-icon>
+            </div>
+          </a>
+        </v-col>
+        <v-col cols="8" class="header">
+          <div >
+            <v-hover
+                v-slot="{ hover }"
+            >
+              <p :class="{ 'hover_header': hover }" class="center_vertically" @click="dialog_tour = true">HOW TO USE</p>
+            </v-hover>
+            <v-dialog
+                v-model="dialog_tour"
+                width="700"
+                scrollable
+            >
+              <div style="background-color: white; overflow: hidden">
 
-      <!-- Main sidebar (first)-->
-      <v-navigation-drawer
-          style="z-index:2; max-height: 100%;"
+                <v-card flat style="padding: 40px; height: 100%">
+                  TOUR
+                </v-card>
+
+              </div>
+            </v-dialog>
+
+          </div>
+
+          <div>
+            <v-hover
+                v-slot="{ hover }"
+            >
+              <p :class="{ 'hover_header': hover }" class="center_vertically" @click="dialog_about = true">ABOUT US</p>
+            </v-hover>
+
+            <v-dialog
+                v-model="dialog_about"
+                width="700"
+                scrollable
+            >
+              <div style="background-color: white; overflow: hidden">
+
+                <v-card flat style="padding: 40px">
+                  WIAT (Wastewater Impact Assessment Tool) v1.0  is a tool that allows users to understand which aspects of wastewater treatment and industry management cause major impacts related to climate, biodiversity and water security, as well as to help identify water risks and prioritize their water management interventions.
+                  <br>
+
+                  This project is part of the <a href="https://wbcsdpublications.org/wastewater-zero/" target="_blank" rel="noopener noreferrer">Wastewater Zero Commitment</a> initiative developed by the WBCSD.
+                  <br>
+                  <br>
+                  <b>
+                    Developed by
+                  </b>
+                  <v-img
+                      max-width="400"
+                      src="/developers/developers.PNG"
+                  ></v-img>
+                  <a href="https://www.wbcsd.org/" target="_blank" rel="noopener noreferrer">WBCSD</a> | <a href="https://www.icra.cat/" target="_blank" rel="noopener noreferrer">ICRA</a> | <a href="https://www.earthgenome.org/" target="_blank" rel="noopener noreferrer">The Earth Genome</a> | <a href="https://futureh2o.asu.edu/" target="_blank" rel="noopener noreferrer">Future H2O</a>
+
+                  <br>
+                  <br>
+                  <b>
+                    Working group
+                  </b>
+                  <v-img
+                      max-width="400"
+                      src="/developers/user_group.PNG"
+                  ></v-img>
+                  <br>
+                  <a href="https://www.adityabirla.com/" target="_blank" rel="noopener noreferrer">Aditya Birla Group</a> | <a href="https://www.chevron.com/" target="_blank" rel="noopener noreferrer">Chevron Corporation</a> | <a href="https://www.dow.com/en-us.html" target="_blank" rel="noopener noreferrer">Dow Chemical Company</a> | <a href="https://www.holcim.com/" target="_blank" rel="noopener noreferrer">Holcim Group</a>
+
+
+                </v-card>
+
+              </div>
+            </v-dialog>
+          </div>
+
+          <div>
+            <v-hover
+                v-slot="{ hover }"
+            >
+              <p :class="{ 'hover_header': hover }" class="center_vertically" @click="dialog_documents = true">DOCUMENTS</p>
+            </v-hover>
+            <v-dialog
+                v-model="dialog_documents"
+                width="700"
+                scrollable
+            >
+              <div style="background-color: white; overflow: hidden">
+
+                <v-card flat  style="padding: 40px">
+
+                  <div style="padding: 0px 50px 0px 50px">
+                    <a class="button-link" href="/WIAT science and methods.pdf" download >
+                      <v-btn small tile block color="#b62373">
+                        Download methodology
+                        <v-icon right>
+                          mdi-cloud-download
+                        </v-icon>
+                      </v-btn>
+                    </a>
+
+                    <br>
+
+                    <a class="button-link" href="/WIAT science and methods.pdf" download >
+                      <v-btn small tile block color="#b62373">
+                        DOWNLOAD USER MANUAL - NOT IMPLEMENTED
+                        <v-icon right>
+                          mdi-cloud-download
+                        </v-icon>
+                      </v-btn>
+                    </a>
+
+                  </div>
+
+
+
+
+                </v-card>
+
+              </div>
+            </v-dialog>
+          </div>
+
+          <div>
+            <v-hover
+                v-slot="{ hover }"
+            >
+              <p :class="{ 'hover_header': hover }" class="center_vertically" @click="dialog_contact = true">CONTACT US</p>
+            </v-hover>
+            <v-dialog
+                v-model="dialog_contact"
+                width="700"
+                scrollable
+            >
+              <div style="background-color: white; overflow: hidden">
+
+                <v-card flat style="padding: 40px 0px 40px 0px">
+                  <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfaBsOylgrbD-NUOVAlTNYhUDJBbBUiWbVIncD0nkdANNotbA/viewform?embedded=true" width="640" height="520" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+                </v-card>
+
+              </div>
+            </v-dialog>
+
+          </div>
+
+          <div>
+            <v-hover
+                v-slot="{ hover }"
+            >
+              <p :class="{ 'hover_header': hover }" class="center_vertically" @click="dialog_legal = true">LEGAL DISCLAIMER</p>
+            </v-hover>
+            <v-dialog
+                v-model="dialog_legal"
+                width="700"
+                scrollable
+            >
+              <div style="background-color: white; overflow: hidden">
+
+                <v-card flat style="padding: 40px">
+                  <v-row>
+                    <v-col>
+                      This tool has been developed in the name of WBCSD. It is the result of a collaborative effort by members of WBCSD and external agencies involved as advisory during the development of the tool. Input and feedback from stakeholders were incorporated in a balanced way. Use of and/or reliance on any data and/or information included on the WIAT tool is at User’s discretion. WBCSD and others involved in development of the tool or the sources from which data is collected make no claim, representation or warranty of any kind on the accuracy of the data/information included on the tool and shall not be held liable for incidental or consequential damages with or arising out of the furnishing, use or performance of this tool. By assessing, downloading and/or using this data/information in any manner the User agrees to assume any/all-risk with respect to use of such information.
+                    </v-col>
+                  </v-row>
+                  <br>
+                  <br>
+                  <v-row justify="center">
+                    <v-col style="text-align: center">
+                      Copyright ©WBCSD, January 2022
+                    </v-col>
+                    <v-col style="text-align: center">
+                      All rights reserved
+                    </v-col>
+                    <v-col style="text-align: center">
+                      <a href="https://www.wbcsd.org/Overview/Privacy-Policy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+                    </v-col>
+                  </v-row>
+
+                </v-card>
+
+              </div>
+            </v-dialog>
+
+          </div>
+
+        </v-col >
+
+      </v-row>
+    </v-app-bar>
+
+    <!-- Main sidebar (first)-->
+    <v-navigation-drawer
+          style="z-index:2; height: calc(100% - 70px); margin-top: 70px"
           clipped
           permanent
           width="4rem"
@@ -82,163 +268,12 @@
                   <span>{{item.title}}</span>
                 </v-tooltip>
 
-
-                <v-dialog
-                    v-model="dialog"
-                    width="700"
-                    scrollable
-                >
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-hover v-slot:default="{ hover }">
-                      <div :class="hover ? 'icon_hovered_pressed' : ''" style="height: 75px; width: 100%;" @click="dialog=true" >
-                        <div style="display: inline-block; position: relative; left: 50%; top: 50%; transform: translate(-60%, -50%);">
-                          <v-icon color = "#F2F4F3">mdi-frequently-asked-questions</v-icon>
-                        </div>
-                      </div>
-                    </v-hover>
-
-                  </template>
-                  <div style="background-color: white; overflow: hidden">
-                    <v-tabs v-model="tab" fixed-tabs>
-                      <v-tab>Tour</v-tab>
-                      <v-tab>About</v-tab>
-                      <v-tab>Documents</v-tab>
-                      <v-tab>Contact</v-tab>
-                      <v-tab>LEGAL DISCLAIMER</v-tab>
-
-                    </v-tabs>
-
-                    <v-tabs-items v-model="tab" style="padding: 40px; height: 100%">
-                      <v-tab-item
-                      >
-                        <v-card flat>
-                          TOUR
-                        </v-card>
-                      </v-tab-item>
-
-                      <v-tab-item
-                      >
-                        <v-card flat>
-                          WIAT (Wastewater Impact Assessment Tool) v1.0  is a tool that allows users to understand which aspects of wastewater treatment and industry management cause major impacts related to climate, biodiversity and water security, as well as to help identify water risks and prioritize their water management interventions.
-                          <br>
-
-                          This project is part of the <a href="https://wbcsdpublications.org/wastewater-zero/" target="_blank" rel="noopener noreferrer">Wastewater Zero Commitment</a> initiative developed by the WBCSD.
-                          <br>
-                          <br>
-                          <b>
-                            Developed by
-                          </b>
-                          <v-img
-                              max-width="400"
-                              src="/developers/developers.PNG"
-                          ></v-img>
-                          <a href="https://www.wbcsd.org/" target="_blank" rel="noopener noreferrer">WBCSD</a> | <a href="https://www.icra.cat/" target="_blank" rel="noopener noreferrer">ICRA</a> | <a href="https://www.earthgenome.org/" target="_blank" rel="noopener noreferrer">The Earth Genome</a> | <a href="https://futureh2o.asu.edu/" target="_blank" rel="noopener noreferrer">Future H2O</a>
-
-                          <br>
-                          <br>
-                          <b>
-                            Working group
-                          </b>
-                          <v-img
-                              max-width="400"
-                              src="/developers/user_group.PNG"
-                          ></v-img>
-                          <br>
-                          <a href="https://www.adityabirla.com/" target="_blank" rel="noopener noreferrer">Aditya Birla Group</a> | <a href="https://www.chevron.com/" target="_blank" rel="noopener noreferrer">Chevron Corporation</a> | <a href="https://www.dow.com/en-us.html" target="_blank" rel="noopener noreferrer">Dow Chemical Company</a> | <a href="https://www.holcim.com/" target="_blank" rel="noopener noreferrer">Holcim Group</a>
-
-
-                        </v-card>
-
-                      </v-tab-item>
-
-                      <v-tab-item
-                      >
-                        <v-card flat>
-
-                          <div style="padding: 0px 50px 0px 50px">
-                            <a class="button-link" href="/WIAT science and methods.pdf" download >
-                              <v-btn small tile block color="#b62373">
-                                Download methodology
-                                <v-icon right>
-                                  mdi-cloud-download
-                                </v-icon>
-                              </v-btn>
-                            </a>
-
-                            <br>
-
-                            <a class="button-link" href="/WIAT science and methods.pdf" download >
-                              <v-btn small tile block color="#b62373">
-                                DOWNLOAD USER MANUAL - NOT IMPLEMENTED
-                                <v-icon right>
-                                  mdi-cloud-download
-                                </v-icon>
-                              </v-btn>
-                            </a>
-
-                          </div>
-
-
-
-
-                        </v-card>
-
-                      </v-tab-item>
-                      <v-tab-item style="height: 700px"
-                      >
-                        <v-card flat >
-                          <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfaBsOylgrbD-NUOVAlTNYhUDJBbBUiWbVIncD0nkdANNotbA/viewform?embedded=true" width="640" height="520" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
-                        </v-card>
-
-                      </v-tab-item>
-                      <v-tab-item
-                      >
-                        <v-card flat>
-                          <v-row>
-                            <v-col>
-                              This tool has been developed in the name of WBCSD. It is the result of a collaborative effort by members of WBCSD and external agencies involved as advisory during the development of the tool. Input and feedback from stakeholders were incorporated in a balanced way. Use of and/or reliance on any data and/or information included on the WIAT tool is at User’s discretion. WBCSD and others involved in development of the tool or the sources from which data is collected make no claim, representation or warranty of any kind on the accuracy of the data/information included on the tool and shall not be held liable for incidental or consequential damages with or arising out of the furnishing, use or performance of this tool. By assessing, downloading and/or using this data/information in any manner the User agrees to assume any/all-risk with respect to use of such information.
-                            </v-col>
-                          </v-row>
-                          <br>
-                          <br>
-                          <v-row justify="center">
-                            <v-col style="text-align: center">
-                              Copyright ©WBCSD, January 2022
-                            </v-col>
-                            <v-col style="text-align: center">
-                              All rights reserved
-                            </v-col>
-                            <v-col style="text-align: center">
-                              <a href="https://www.wbcsd.org/Overview/Privacy-Policy" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
-                            </v-col>
-                          </v-row>
-
-                        </v-card>
-
-                      </v-tab-item>
-
-
-
-
-                    </v-tabs-items>
-
-                  </div>
-                </v-dialog>
-
               </v-list-item-group>
 
 
 
 
-              <v-hover v-slot:default="{ hover }">
-                <div :class="hover ? 'icon_hovered_pressed' : ''" style="height: 75px; width: 100%; margin-top: 40px; ">
-                  <a href="https://www.wbcsd.org/" target="_blank" style="position: absolute; width: 100%">
-                    <div style="display: inline-block; position: relative; left: 50%; top: 50%; transform: translate(-50%, 25%);">
-                      <v-icon size="50"  color = "#F2F4F3">$wbcsd_logo</v-icon>
-                    </div>
-                  </a>
-                </div>
-              </v-hover>
+
 
             </div>
           </v-list>
@@ -247,7 +282,7 @@
 
     <!-- Assessment and factory sidebar (second) -->
     <v-navigation-drawer
-        style="z-index:1; background-color: #F2F4F3; left: 4rem"
+        style="z-index:1; background-color: #F2F4F3; left: 4rem; margin-top: 70px; height: calc(100% - 70px)"
         v-model="secondMenu"
         :width="secondMenu ? '18rem' : '0rem'"
         app
@@ -341,14 +376,14 @@
 
 
       <!-- Main content -->
-    <div style="position: absolute; height: 100%; width: 100%">
+    <div style="position: absolute; height: calc(100% - 70px); width: 100%; margin-top: 70px">
       <div class="content" :class="manageContentClass">
         <router-view :selected_assessment="assessment_expansion_panel" :selected_layer="selected_layer" :selected_industry="selected_industry" @createIndustry="createNewIndustry" @createSupplyChain="create_supply_chain" @editIndustry="open_edit_industry_tab" @selectLayer="toggleLayerSelection" @closeRightMenu="closeRightMenu" @closeLayer="applyLayer(selected_layer)" @changeFirstMenuTab="changeFirstMenuTab" ref="reference"></router-view>
       </div>
     </div>
 
     <v-navigation-drawer
-        style="background-color: white;"
+        style="background-color: white; margin-top: 70px; height: calc(100% - 70px); overflow: hidden"
         v-model="rightMenu"
         :width="rightMenu ? '20rem' : '0rem'"
         flat
@@ -357,7 +392,7 @@
         clipped
     >
 
-      <div style="height: 100%">
+      <div style="height: 100%; overflow: hidden">
         <div style="height: 34px;  background-color: #1C195B; width: 100%" >
           <v-icon style="margin: 5px 0px 5px 10px" color="white" @click="rightMenu = !rightMenu">mdi-close</v-icon>
         </div>
@@ -794,7 +829,12 @@ export default {
       actived_layers: [],
       new_supply_chain_valid: false,
       supply_chain_name: null,
-      supply_chain_marker: null
+      supply_chain_marker: null,
+      dialog_tour: false,
+      dialog_about: false,
+      dialog_documents: false,
+      dialog_contact: false,
+      dialog_legal: false
 
 
     }
@@ -1267,9 +1307,9 @@ html::-webkit-scrollbar {
 .header{
   background-color: white;
   width: 100%;
-  height: 100%;
   display: flex;
   align-items: center;
+  align-content: center;
   justify-content: space-evenly;
 }
 .icon_sidebar_container {
@@ -1353,6 +1393,27 @@ html::-webkit-scrollbar {
 }
 v-btn--disabled{
   color: rgba(0, 0, 0, 0.12) !important
+}
+
+.center_vertically{
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+  color: #1C195B;
+  font-weight: bold;
+
+}
+
+.hover_header{
+  text-decoration: underline;
+  color: #b62373;
+}
+
+.v-icon__component {
+  height: 45px !important;
+  width: 300px !important;
 }
 
 
