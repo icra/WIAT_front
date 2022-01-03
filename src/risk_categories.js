@@ -1,8 +1,15 @@
 
-let blue = ['#529fee', "Low impact"]
-let red = ['red', "Very high impact"]
-let orange = ['orange', "High impact"]
-let yellow = ['yellow', "Medium impact"]
+let impact_strings = {
+    l: "Low impact",
+    m: "Medium impact",
+    h: "High impact",
+    vh: "Very high impact",
+}
+
+let blue = ['#529fee', impact_strings.l]
+let red = ['red', impact_strings.vh]
+let orange = ['orange', impact_strings.h]
+let yellow = ['yellow', impact_strings.m]
 
 let layers = {
     l: ['#f6f600', "Low risk"],
@@ -12,7 +19,28 @@ let layers = {
     eh: ['#990000', "Extremely high risk"],
 }
 
+
+
 let risk_category = {
+
+
+    impact_strings: impact_strings,
+
+
+    quality_quantity(value){
+        if(value == impact_strings.l) return blue
+        else if(value == impact_strings.m) return yellow
+        else if(value == impact_strings.h) return orange
+        else if(value == impact_strings.vh) return red
+        return null
+    },
+    impact_biodiversity(value){
+        if(value == impact_strings.l) return blue
+        else if(value == impact_strings.m) return yellow
+        else if(value == impact_strings.h) return orange
+        else if(value == impact_strings.vh) return red
+        return null
+    },
     global_warming: function(value){
         return null
     },
@@ -77,8 +105,17 @@ let risk_category = {
         else if (value >= 2) return red
         return null
     },
-    treatment_efficiency: function(){
-      return null
+    treatment_efficiency: function(value){
+        if (value < 25) return red
+        else if (value < 50) return orange
+        else if (value < 75) return yellow
+        else if (value >= 75) return blue
+        return null
+    },
+    influent_treatment_efficiency: function(value){
+        if (value <= 100) return blue
+        else if (value > 100) return red
+        return null
     },
     seasonal_variability: function(value){
         if(value < 0.33) return layers.l

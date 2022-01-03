@@ -72,6 +72,9 @@ export class Industry{
         this.has_direct_discharge = null
         this.direct_discharge = new Direct_discharge()
         this.industry_type = null
+        this.ind_cod_infl= 0
+        this.ind_tn_infl = 0
+        this.ind_tp_infl = 0
         this.ind_cod_effl= 0
         this.ind_tn_effl = 0
         this.ind_tp_effl = 0
@@ -242,6 +245,10 @@ export class Industry{
         return load
     }
 
+    infl_pollutant_load(pollutant){
+        return this[pollutant]*this.volume_of_water_withdrawn()
+    }
+
     generated_pollutant_load(pollutant){
         let load = 0
         let concentration = this[pollutant]
@@ -332,7 +339,7 @@ export class Direct_discharge{
         this.wwt_nonilfenols_effl = 0 //Nonylphenols
         this.wwt_tetracloroetile_effl = 0 //tetrachloroethene
         this.wwt_tricloroetile_effl = 0 //Trichloroethylene
-        this.dd_vol_disc = 0
+        this.dd_vol_disc = null
         this.wwt_ch4_efac_dis = 0
         this.wwt_n2o_efac_dis = 0
     }
@@ -370,8 +377,8 @@ export class WWTP{
 
         this.location = null
         this.wwt_treatment_type = 0
-        this.wwt_vol_trea = 0
-        this.wwt_vol_disc = 0
+        this.wwt_vol_trea = null
+        this.wwt_vol_disc = null
         this.wwt_vol_reused = 0
         this.wwt_vol_treated_external = 0   //Amount of water treated in another WWTP
         this.wwt_vol_from_external = 0   //Amount of water FROM other WWTP

@@ -14,6 +14,21 @@ function sumObjectsByKey(...objs) {
 }
 
 let utils = {
+
+    equals(a, b){
+        return JSON.stringify(a) === JSON.stringify(b);
+    },
+
+    // Lowest to highest
+    lowestToHighest(numbers){
+        return numbers.sort((a, b) => a - b);
+    },
+
+    //Highest to lowest
+    highestToLowest(numbers){
+        return numbers.sort((a, b) => b-a);
+    },
+
     get_country_code_from_coordinates(lat, lng){
         let crg = require('country-reverse-geocoding').country_reverse_geocoding();
         let country = crg.get_country(lat, lng);
@@ -96,6 +111,11 @@ function calculate_effluent_load(industries, pollutant_effl){
     return load
 }
 
+function calculate_influent_load(industries, pollutant){
+    let load = industries.map(industry => industry.infl_pollutant_load(pollutant)).sum()
+    return load
+}
+
 function effl_concentration(industries, pollutant_effl){
     let load = calculate_effluent_load(industries, pollutant_effl)
     let discharged = calculate_water_discharged(industries)
@@ -133,7 +153,7 @@ async function effl_delta(industries, effl, global_layers){
 
     let delta = load / (streamflow_value + water_discharged - water_withdrawn)
 
-    if(isNaN(delta)) return (0).toExponential(3)
+    if(isNaN(delta)) return "-"
     return delta.toExponential(3) //g/m3
 }
 
@@ -160,7 +180,7 @@ function effl_efficiency(industries, industry_effluent, wwtp_effluent){   //Amou
     
     let eff = filtered / generated
 
-    if(isNaN(eff)) return (0).toFixed(3)
+    if(isNaN(eff)) return "-"
     else return (eff*100).toFixed(3)
 }
 
@@ -172,6 +192,25 @@ function calculate_pollutant_generated(industries, pollutant){
     return industries.map(industry => industry.generated_pollutant_load(pollutant)).sum()
 }
 
+function better_treatment(industries){
+    let scores = industries.map(industry => {
+        let _scores = [0,0]
+        if(industry.has_onsite_wwtp == 1){
+            _scores[0] = industry.onsite_wwtp.wwt_treatment_type
+        }
+        if(industry.has_offsite_wwtp == 1){
+            _scores[1] = industry.offsite_wwtp.wwt_treatment_type
+        }
+        return Math.max(..._scores)
+    })
+
+    if (Math.max(...scores) == 0) return "Discharge without treatment"
+    else if (Math.max(...scores) == 1) return "Primary"
+    else if (Math.max(...scores) == 2) return "Secondary"
+    else if (Math.max(...scores) == 3) return "Tertiary"
+
+}
+
 
 let metrics = {
 
@@ -181,7 +220,7 @@ let metrics = {
         Object.keys(aggregated).forEach(key => {
             let value = aggregated[key]*days_factor
             if(Number.isFinite(value)) aggregated[key] = value.toExponential(2)
-            else aggregated[key] = (0).toExponential(2)
+            else aggregated[key] = "-"
         })
         return aggregated
     },
@@ -190,7 +229,7 @@ let metrics = {
 
         let water_discharged = calculate_water_discharged(industries)    // m3/day
 
-        if(water_discharged == 0) return (0).toFixed(2)
+        if(water_discharged == 0) return "-"
 
         let streamflow_value = await streamflow(industries, global_layers) //streamflow (m3/day)
 
@@ -208,7 +247,7 @@ let metrics = {
 
 
         let available_ratio = water_withdrawn / streamflow_value
-        if (isNaN(available_ratio)) return (0).toFixed(2)
+        if (isNaN(available_ratio)) return "-"
         else return (available_ratio*100).toFixed(2)
 
     },
@@ -221,7 +260,7 @@ let metrics = {
             let recycled_water_factor = recycled_water / water_generated
             return (recycled_water_factor*100).toFixed(2)
         }
-        return (0).toFixed(2)
+        return "-"
     },
 
     treated_water_factor(industries){
@@ -229,7 +268,7 @@ let metrics = {
         let water_discharged = calculate_water_generated(industries)    // m3/day
         let water_treated = calculate_water_treated(industries)
 
-        if (water_discharged == 0) return (0).toFixed(2)
+        if (water_discharged == 0) return "-"
         else return (100*water_treated/water_discharged).toFixed(2)
     },
 
@@ -237,7 +276,7 @@ let metrics = {
         let product_produced = calculate_product_produced(industries)
         let vol_withdrawn = calculate_water_withdrawn(industries)
         if (vol_withdrawn>0) return (product_produced/vol_withdrawn).toExponential(2)
-        return (0).toFixed(2)
+        return "-"
     },
 
     nqa(industries){
@@ -283,21 +322,30 @@ let metrics = {
 
         Object.keys(obj).forEach(pollutant => {
             let value = obj[pollutant]
-            if(!isNaN(value)) obj[pollutant] = value.toFixed(2)
-            else obj[pollutant] = (0).toFixed(2)
+            if(!isNaN(value)) {
+                obj[pollutant] = value.toExponential(2)
+            }
+            else obj[pollutant] = "-"
         })
 
         return obj
 
     },
+    eqs_avg(industries){
+        let eqs = this.environmental_quality_standards(industries)
 
+        let avg = Object.values(eqs).sum() / Object.values(eqs).length
 
-    async bod_effl(industries, global_layers){
+        if(Number.isFinite(avg)) return avg.toExponential(2)
+        else return "-"
+    },
+
+    async cod_effl(industries, global_layers){
         let value = await effl_delta(industries, "wwt_cod_effl", global_layers)
         return value
     },
 
-    bod_efficiency(industries){
+    cod_efficiency(industries){
         let value = effl_efficiency(industries, "ind_cod_effl", "wwt_cod_effl")
         return value
     },
@@ -419,23 +467,54 @@ let metrics = {
         return value
     },
 
+    amount_water_influent_cleaned(industries){
+        let cod_infl = calculate_influent_load(industries, "ind_cod_infl")
+        let tn_infl = calculate_influent_load(industries, "ind_tn_infl")
+        let tp_infl = calculate_influent_load(industries, "ind_tp_infl")
+
+        let cod_effl = calculate_effluent_load(industries, "wwt_cod_effl")
+        let tn_effl = calculate_effluent_load(industries, "wwt_tn_effl")
+        let tp_effl = calculate_effluent_load(industries, "wwt_tp_effl")
+
+        let cod = cod_infl == 0 ? "-" : (100*cod_effl/cod_infl).toFixed(2)
+        let tn = tn_infl == 0 ? "-" : (100*tn_effl/tn_infl).toFixed(2)
+        let tp = tp_infl == 0 ? "-" : (100*tp_effl/tp_infl).toFixed(2)
+
+        return {cod, tn, tp}
+    },
+
+    avg_influent_efficiency(industries){
+        let efficiency = Object.values(this.amount_water_influent_cleaned(industries))
+        let avg = efficiency.sum() / efficiency.length
+
+        if(Number.isFinite(avg)) return avg.toFixed(2)
+        else return ("-")
+
+    },
+
     avg_treatment_efficiency(industries){
-        let treatment_efficiency = [this.bod_efficiency(industries), this.tn_efficiency(industries),
+        let treatment_efficiency = [this.cod_efficiency(industries), this.tn_efficiency(industries),
             this.tp_efficiency(industries), this.dichloroethane_efficiency(industries), this.cadmium_efficiency(industries),
             this.hexaclorobenzene_efficiency(industries), this.mercury_efficiency(industries), this.lead_efficiency(industries),
             this.nickel_efficiency(industries), this.chloroalkanes_efficiency(industries), this.hexaclorobutadie_efficiency(industries),
             this.nonylphenols_efficiency(industries), this.tetrachloroethene_efficiency(industries), this.tricloroetile_efficiency(industries)
         ]
 
-        let avg = treatment_efficiency.sum() / treatment_efficiency.length
-        if(Number.isFinite(avg)) return avg.toExponential(2)
-        else return (0).toExponential(2)
+        let treatment_efficiency_filtered = treatment_efficiency.filter(x => !Number.isNaN(parseFloat(x))).map(x => parseFloat(x))
+        console.log(treatment_efficiency_filtered)
+
+        if(treatment_efficiency_filtered.length == 0) return "-"
+
+        let avg = treatment_efficiency_filtered.sum() / treatment_efficiency_filtered.length
+        if(Number.isFinite(avg)) return avg.toFixed(2)
+        else return "-"
     },
 
     async reporting_metrics(industries, global_layers){
         let _this = this
         let withdrawn_factor_value = await withdrawn_factor(industries, global_layers)
         let discharged_factor_value = await discharged_factor(industries, global_layers)
+
 
         let reporting_metrics = {
             "g4-en8": calculate_water_withdrawn(industries)*365,
@@ -445,14 +524,16 @@ let metrics = {
             "g4-en26": discharged_factor_value,
             "wd": 365*0.001*calculate_water_withdrawn(industries), //Water withdrawn
             "dis": 365*0.001*calculate_water_discharged(industries),  //water discharged
-            "re": 365*0.001*calculate_water_recycled(industries) //water reused
+            "re": 365*0.001*calculate_water_recycled(industries), //water reused
         }
 
         Object.keys(reporting_metrics).forEach(key => {
             let value = reporting_metrics[key]
             if(Number.isFinite(value)) reporting_metrics[key] = value.toExponential(2)
-            else reporting_metrics[key] = (0).toExponential(2)
+            else reporting_metrics[key] = "-"
         })
+
+        reporting_metrics["highest_level_discharge"] = better_treatment(industries)
 
         return reporting_metrics
     },
@@ -477,7 +558,7 @@ let metrics = {
         Object.keys(toxic_units).forEach(key => {
             let value = toxic_units[key]
             if(Number.isFinite(value)) toxic_units[key] = value.toExponential(2)
-            else toxic_units[key] = (0).toExponential(2)
+            else toxic_units[key] = "-"
         })
 
         return toxic_units
@@ -502,7 +583,7 @@ let metrics = {
         Object.keys(toxic_units).forEach(key => {
             let value = toxic_units[key]
             if(Number.isFinite(value)) toxic_units[key] = value.toExponential(2)
-            else toxic_units[key] = (0).toExponential(2)
+            else toxic_units[key] = "-"
         })
 
         return toxic_units
@@ -525,7 +606,7 @@ let metrics = {
         Object.keys(toxic_units).forEach(key => {
             let value = toxic_units[key]
             if(Number.isFinite(value)) toxic_units[key] = value.toExponential(2)
-            else toxic_units[key] = (0).toExponential(2)
+            else toxic_units[key] = "-"
         })
 
         return toxic_units
@@ -536,20 +617,11 @@ let metrics = {
         let avg = Object.values(eqs).sum() / Object.values(eqs).length
 
         if(Number.isFinite(avg)) return avg.toExponential(2)
-        else return (0).toExponential(2)
+        else return "-"
 
     },
 
 
-    /*async delta_toxic_units(industries, global_layers){
-        let total_tu = this.ecotoxicity_potential_tu(industries).total
-        let water_discharged = calculate_water_discharged(industries)
-        let streamflow_value = await streamflow(industries, global_layers) //streamflow (m3/day)
-        let water_withdrawn = calculate_water_withdrawn(industries)
-        let delta = total_tu/(streamflow_value - water_withdrawn + water_discharged)
-        if(isNaN(delta)) return (0).toExponential(3)
-        return delta.toExponential(3)
-    },*/
 
     eutrophication_potential(industries){
         let eutrophication = {
@@ -558,13 +630,12 @@ let metrics = {
             tp: effl_concentration(industries, "wwt_tp_effl")*3.06,
         }
 
-        let total_eutrophication = Object.values(eutrophication).sum()
-        eutrophication["total"] = total_eutrophication
+        eutrophication["total"] = Object.values(eutrophication).sum()
 
         Object.keys(eutrophication).forEach(key => {
             let value = eutrophication[key]
             if(Number.isFinite(value)) eutrophication[key] = value.toExponential(2)
-            else eutrophication[key] = (0).toExponential(2)
+            else eutrophication[key] = "-"
         })
 
         return eutrophication

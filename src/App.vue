@@ -25,13 +25,16 @@ f
             </v-hover>
             <v-dialog
                 v-model="dialog_tour"
-                width="700"
+                width="1100"
                 scrollable
             >
               <div style="background-color: white; overflow: hidden">
 
                 <v-card flat style="padding: 40px; height: 100%">
-                  TOUR
+                  <video controls id="video">
+                    <source src="demo.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"' />
+                  </video>
+
                 </v-card>
 
               </div>
@@ -143,13 +146,13 @@ f
             </v-hover>
             <v-dialog
                 v-model="dialog_contact"
-                width="700"
+                width="720"
                 scrollable
             >
               <div style="background-color: white; overflow: hidden">
 
-                <v-card flat style="padding: 40px 0px 40px 0px">
-                  <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfaBsOylgrbD-NUOVAlTNYhUDJBbBUiWbVIncD0nkdANNotbA/viewform?embedded=true" width="640" height="520" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
+                <v-card flat style="padding: 40px 40px 40px 40px">
+                  <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfaBsOylgrbD-NUOVAlTNYhUDJBbBUiWbVIncD0nkdANNotbA/viewform?embedded=true" width="640" height="674" frameborder="0" marginheight="0" marginwidth="0">Loading…</iframe>
                 </v-card>
 
               </div>
@@ -844,6 +847,15 @@ export default {
   },
 
   watch: {
+
+    dialog_tour: function(opened){
+      if(!opened){
+        let video = document.querySelector("#video");
+        video.pause()
+        video.currentTime = 0;
+      }
+    },
+
     assessment_expansion_panel: function(assessment){
       try {
         this.$refs.reference.close_supply_chain_mode()

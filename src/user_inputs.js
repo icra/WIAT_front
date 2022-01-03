@@ -375,6 +375,10 @@ export let user_inputs = {
     "offsite_wwtp_type": {question: "Off-site treatment wastewater plant type", value: null,},
     "industry_type": {question: "Standard industrial classification", value: null,},
     "product_produced": {question: "Amount of product produced by the industry", value: 0, unit: "tonnes/day"},
+    "ind_cod_infl": {question: "Concentration of COD in the industry influent", value: 0, unit: "g/m3"},
+    "ind_tn_infl": {question: "Concentration of Total Nitrogen in the industry influent", value: 0, unit: "g/m3"},
+    "ind_tp_infl": {question: "Concentration of Total Phosphorus in the industry influent", value: 0, unit: "g/m3"},
+
     "ind_cod_effl": {question: "Concentration of COD in the industry effluent", value: 0, unit: "g/m3"},
     "ind_tn_effl": {question: "Concentration of Total Nitrogen in the industry effluent", value: 0, unit: "g/m3"},
     "ind_tp_effl": {question: "Concentration of Total Phosphorus in the industry effluent", value: 0, unit: "g/m3"},
@@ -392,7 +396,7 @@ export let user_inputs = {
 
 }
 
-export let industry_inputs = ["volume_withdrawn", "has_onsite_wwtp", "has_direct_discharge", "has_offsite_wwtp", "industry_type", "product_produced", "ind_cod_effl", "ind_tn_effl", "ind_tp_effl", "ind_diclo_effl", "ind_cadmium_effl", "ind_hexaclorobenzene_effl", "ind_mercury_effl", "ind_plomo_effl", "ind_niquel_effl", "ind_chloro_effl", "ind_hexaclorobutadie_effl", "ind_nonilfenols_effl", "ind_tetracloroetile_effl", "ind_tricloroetile_effl" ]
+export let industry_inputs = ["volume_withdrawn", "has_onsite_wwtp", "has_direct_discharge", "has_offsite_wwtp", "industry_type", "product_produced", "ind_cod_infl", "ind_tn_infl", "ind_tp_infl", "ind_cod_effl", "ind_tn_effl", "ind_tp_effl", "ind_diclo_effl", "ind_cadmium_effl", "ind_hexaclorobenzene_effl", "ind_mercury_effl", "ind_plomo_effl", "ind_niquel_effl", "ind_chloro_effl", "ind_hexaclorobutadie_effl", "ind_nonilfenols_effl", "ind_tetracloroetile_effl", "ind_tricloroetile_effl" ]
 
 
 export let onsite_wwtp_no_offsite = ["wwt_treatment_type", "wwt_vol_trea", "wwt_vol_disc", "wwt_vol_reused", "wwt_cod_effl", "wwt_tn_effl", "wwt_tp_effl", "wwt_diclo_effl", "wwt_cadmium_effl", "wwt_hexaclorobenzene_effl", "wwt_mercury_effl", "wwt_plomo_effl", "wwt_niquel_effl", "wwt_chloro_effl", "wwt_hexaclorobutadie_effl", "wwt_nonilfenols_effl", "wwt_tetracloroetile_effl", "wwt_tricloroetile_effl", "wwt_nrg_cons", "wwt_conv_kwh", "wwt_mass_slu", "wwt_cod_slud", "wwt_ch4_efac_tre", "wwt_n2o_efac_tre", "wwt_ch4_efac_dis", "wwt_n2o_efac_dis", "wwt_fuel_typ", "wwt_vol_fuel",

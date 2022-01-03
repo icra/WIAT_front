@@ -93,7 +93,6 @@
           <v-col>
             <div style="height: 100%; display: flex; align-items: center; justify-content: center;">
 
-              <!--<a href="/wiat_template.xlsx" download >bbbb</a> -->
 
               <v-btn
                   @click="download_json"

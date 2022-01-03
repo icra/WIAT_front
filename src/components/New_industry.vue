@@ -311,6 +311,17 @@
                   <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                     <span>
                       {{user_inputs[input].question}}
+                      <v-tooltip bottom v-if="required.includes(input)">
+                      <template v-slot:activator="{ on, attrs }">
+                        <span
+                            v-bind="attrs"
+                            v-on="on"
+                            style="color: red"
+                        >*</span>
+                      </template>
+                      <span>Required input</span>
+                    </v-tooltip>
+
                     </span>
                     <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
                            tile
@@ -1131,12 +1142,23 @@
 
           </div>
           <br>
-          <v-btn
-            tile
-            @click="tab_2_continue"
-            color="#b62373"          >
-            SAVE AND CONTINUE
-          </v-btn>
+
+          <v-tooltip bottom :disabled="!tab_2_disabled">
+            <template v-slot:activator="{ on }">
+              <div v-on="on" class="d-inline-block">
+                <v-btn
+                    @click="tab_2_continue"
+                    :disabled="tab_2_disabled"
+                    tile
+                    color="#b62373"
+
+                >
+                  SAVE AND CONTINUE
+                </v-btn>
+              </div>
+            </template>
+            <span>Please, fill in the required items before continue.</span>
+          </v-tooltip>
 
         </v-stepper-content>  <!-- Onsite WWTP -->
 
@@ -1222,13 +1244,22 @@
 
           <br>
 
-          <v-btn
-              tile
+          <v-tooltip bottom :disabled="!tab_3_disabled">
+            <template v-slot:activator="{ on }">
+              <div v-on="on" class="d-inline-block">
+                <v-btn
+                    @click="tab_3_continue"
+                    :disabled="tab_3_disabled"
+                    tile
+                    color="#b62373"
 
-              @click="tab_3_continue"
-              color="#b62373"          >
-            SAVE AND CONTINUE
-          </v-btn>
+                >
+                  SAVE AND CONTINUE
+                </v-btn>
+              </div>
+            </template>
+            <span>Please, fill in the required items before continue.</span>
+          </v-tooltip>
 
         </v-stepper-content>  <!-- Direct discharge -->
 
@@ -2082,12 +2113,22 @@
 
           </div>
           <br>
-          <v-btn
-              tile
-              @click="tab_4_continue"
-              color="#b62373"          >
-            SAVE AND CONTINUE
-          </v-btn>
+          <v-tooltip bottom :disabled="!tab_4_disabled">
+            <template v-slot:activator="{ on }">
+              <div v-on="on" class="d-inline-block">
+                <v-btn
+                    @click="tab_4_continue"
+                    :disabled="tab_4_disabled"
+                    tile
+                    color="#b62373"
+
+                >
+                  SAVE AND CONTINUE
+                </v-btn>
+              </div>
+            </template>
+            <span>Please, fill in the required items before continue.</span>
+          </v-tooltip>
 
         </v-stepper-content>  <!-- offsite wwtp -->
 
@@ -2212,7 +2253,7 @@ export default {
       advanced_truck_transportation: ["wwt_trck_typ", "wwt_vol_tslu"],
 
 
-      required: ["volume_withdrawn", "product_produced", "has_onsite_wwtp", "has_offsite_wwtp", "has_direct_discharge", "industry_type" ],
+      required: ["volume_withdrawn", "product_produced", "has_onsite_wwtp", "has_offsite_wwtp", "has_direct_discharge", "industry_type", "wwt_vol_trea", "wwt_vol_disc", "dd_vol_disc" ],
       industry_model: {},
       onsite_wwtp_model: {},
       direct_discharge_model: {},
@@ -3415,6 +3456,25 @@ export default {
       let disabled = industry.volume_withdrawn != null && industry.volume_withdrawn != "" &&
           industry.product_produced != null && industry.product_produced != "" &&
           industry.has_onsite_wwtp != null && industry.has_direct_discharge != null && industry.has_offsite_wwtp != null && industry.industry_type != null
+      return !disabled
+    },
+
+    tab_2_disabled(){
+      let wwtp = this.onsite_wwtp_model
+      let disabled = wwtp.wwt_vol_trea != null && wwtp.wwt_vol_trea != "" && wwtp.wwt_vol_disc != null && wwtp.wwt_vol_disc != ""
+      return !disabled
+    },
+
+    tab_3_disabled(){
+      let dd = this.direct_discharge_model
+      let disabled = dd.dd_vol_disc != null && dd.dd_vol_disc != ""
+      return !disabled
+    },
+
+
+    tab_4_disabled(){
+      let wwtp = this.onsite_wwtp_model
+      let disabled = wwtp.wwt_vol_trea != null && wwtp.wwt_vol_trea != "" && wwtp.wwt_vol_disc != null && wwtp.wwt_vol_disc != ""
       return !disabled
     },
 
