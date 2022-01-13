@@ -541,7 +541,6 @@ export default {
 
     async onMapClick(e) {
 
-
       let _this = this
 
       let greenIcon = new L.Icon({
@@ -555,7 +554,9 @@ export default {
 
       let latlng = e.latlng
 
-      if(utils.get_country_code_from_coordinates(latlng.lat, latlng.lng) != null){
+      let island = await utils.areCoordsLand(latlng.lat, latlng.lng)
+
+      if(island){
         this.mapDiv.setView([latlng.lat, latlng.lng]);
 
         if(_this.clicked_marker !== null) _this.mapDiv.removeLayer(_this.clicked_marker);
@@ -580,7 +581,10 @@ export default {
           }
         });
       }
+      else{
 
+        _this.$emit('wrongLocation', latlng)
+      }
 
 
     },

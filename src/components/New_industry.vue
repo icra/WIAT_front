@@ -1188,7 +1188,18 @@
                   <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                     <span>
                       {{user_inputs[input].question}}
+                      <v-tooltip bottom v-if="required.includes(input)">
+                        <template v-slot:activator="{ on, attrs }">
+                            <span
+                                v-bind="attrs"
+                                v-on="on"
+                                style="color: red"
+                            >*</span>
+                        </template>
+                        <span>Required input</span>
+                      </v-tooltip>
                     </span>
+
                     <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
                            tile
                            color="#b62373"
@@ -1294,6 +1305,16 @@
                   <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                     <span>
                       {{user_inputs[input].question}}
+                      <v-tooltip bottom v-if="required.includes(input)">
+                        <template v-slot:activator="{ on, attrs }">
+                            <span
+                                v-bind="attrs"
+                                v-on="on"
+                                style="color: red"
+                            >*</span>
+                        </template>
+                        <span>Required input</span>
+                      </v-tooltip>
                     </span>
                     <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
                            tile

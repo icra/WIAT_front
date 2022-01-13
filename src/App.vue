@@ -311,17 +311,17 @@ f
                   <b>{{ assessment.name }}</b>
                   <template v-slot:actions>
                     <v-hover v-slot:default="{ hover }" style="margin-right: 10px">
-                      <v-icon v-if="assessment_active[assessment_index]" :color="hover ? '#555283' : '#1C195B'" @click="hide_show_industries(assessment_index)" @click.native.stop>
+                      <v-icon class="icon_clickable" v-if="assessment_active[assessment_index]" :color="hover ? '#555283' : '#1C195B'" @click="hide_show_industries(assessment_index)" @click.native.stop>
                         mdi-eye
                       </v-icon>
-                      <v-icon v-else :color="hover ? '#555283' : '#1C195B'" @click="hide_show_industries(assessment_index)" @click.native.stop>
+                      <v-icon v-else class="icon_clickable" :color="hover ? '#555283' : '#1C195B'" @click="hide_show_industries(assessment_index)" @click.native.stop>
                         mdi-eye-off
                       </v-icon>
 
                     </v-hover>
 
                     <v-hover v-slot:default="{ hover }">
-                      <v-icon :color="hover ? '#555283' : '#1C195B'" @click="open_edit_assessment_tab(assessment_index)" @click.native.stop>
+                      <v-icon class="icon_clickable" :color="hover ? '#555283' : '#1C195B'" @click="open_edit_assessment_tab(assessment_index)" @click.native.stop>
                         mdi-cog
                       </v-icon>
                     </v-hover>
@@ -347,6 +347,7 @@ f
                               style="float: right; margin-right: 3px; padding-bottom: 3px"
                               color="#1C195B"
                               size="18px"
+                              class="icon_clickable"
                           >
                             mdi-circle-edit-outline
                           </v-icon>
@@ -381,7 +382,7 @@ f
       <!-- Main content -->
     <div style="position: absolute; height: calc(100% - 70px); width: 100%; margin-top: 70px">
       <div class="content" :class="manageContentClass">
-        <router-view :selected_assessment="assessment_expansion_panel" :selected_layer="selected_layer" :selected_industry="selected_industry" @createIndustry="createNewIndustry" @createSupplyChain="create_supply_chain" @editIndustry="open_edit_industry_tab" @selectLayer="toggleLayerSelection" @closeRightMenu="closeRightMenu" @closeLayer="applyLayer(selected_layer)" @changeFirstMenuTab="changeFirstMenuTab" ref="reference"></router-view>
+        <router-view :selected_assessment="assessment_expansion_panel" :selected_layer="selected_layer" :selected_industry="selected_industry" @createIndustry="createNewIndustry" @createSupplyChain="create_supply_chain" @editIndustry="open_edit_industry_tab" @selectLayer="toggleLayerSelection" @closeRightMenu="closeRightMenu" @closeLayer="applyLayer(selected_layer)" @changeFirstMenuTab="changeFirstMenuTab" @wrongLocation="snackbars.wrong_location.v_model = true" ref="reference"></router-view>
       </div>
     </div>
 
@@ -816,6 +817,8 @@ export default {
         create_industry_not_in_map: {v_model: false, text: "Can't create industry, please return to the map tab and try again", },
         place_supply_chain: {v_model: false, text: "Please, indicate the location of the supply chain industry on the map"},
         new_supply_chain: {v_model: false, text: "Supply chain industry added", },
+        wrong_location: {v_model: false, text: "Please select a valid location", },
+
       },
       map_content_info: {}, //Info to show when the map is clicked
       assessment_expansion_panel: undefined, //Selected assessment in expansion panel
@@ -901,7 +904,9 @@ export default {
         isSupplyChain: true,
         latlng: _this.supply_chain_marker,
         name: "<b>"+_this.supply_chain_name+"</b> (supply chain of "+industry.name+")",
-        industry_coords: industry.location
+        industry_coords: industry.location,
+        assessment: this.assessment_expansion_panel,
+        industry: this.selected_industry,
       }
 
       _this.$location_markers.push(marker)
@@ -912,6 +917,8 @@ export default {
 
       } catch (error) {}
     },
+
+
 
     beforeunloadFn(){
       event.preventDefault()
@@ -991,7 +998,9 @@ export default {
                 isSupplyChain: true,
                 latlng: sp.location,
                 name: "<b>"+sp.name+"</b> (supply chain of "+_industry.name+")",
-                industry_coords: _industry.location
+                industry_coords: _industry.location,
+                assessment: assessment,
+                industry: industry
               }
               _this.$location_markers.push(marker)
 
@@ -1187,6 +1196,7 @@ export default {
       else return 'An assessment with same name already exists.' //If there is an assessment with the same name, must be the edited assessment
     },
     hide_show_industries(assessment_index){
+
       this.assessment_active[assessment_index] = !this.assessment_active[assessment_index] //hide/show industries of the assessment
       if(this.assessment_active[assessment_index]){
         //show assessment
@@ -1200,6 +1210,7 @@ export default {
           }
         }
       }
+
       try {
         this.$refs.reference.close_supply_chain_mode()
       }catch (error) {}
@@ -1426,6 +1437,14 @@ v-btn--disabled{
 .v-icon__component {
   height: 45px !important;
   width: 300px !important;
+}
+
+.icon_clickable {
+  transition: all .2s ease-in-out;
+}
+
+.icon_clickable:hover{
+  transform: scale(1.2);
 }
 
 

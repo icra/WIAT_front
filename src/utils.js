@@ -1,3 +1,5 @@
+import axios from "axios";
+
 let main = require("./main")
 
 //sum array of numbers
@@ -36,6 +38,22 @@ let utils = {
         let code = country.code
         return code
     },
+
+    async areCoordsLand(lat, lng){
+        let file_name = "baseline_population"
+        let call = "https://wiat-server.icradev.cat/data_point?filename="+file_name+"&longitude="+lng+"&latitude="+lat
+        return axios
+            .get(call)
+            .then(response => {
+                if(response) {
+                    if(response.data.test[0]["0"]) {
+                        return response.data.test[0]["0"] >= 0
+                    }
+                    else return false
+                }else return false
+            })
+    },
+
     getRandomColor(){
         let letters = '0123456789ABCDEF';
         let color = '#';
@@ -501,7 +519,6 @@ let metrics = {
         ]
 
         let treatment_efficiency_filtered = treatment_efficiency.filter(x => !Number.isNaN(parseFloat(x))).map(x => parseFloat(x))
-        console.log(treatment_efficiency_filtered)
 
         if(treatment_efficiency_filtered.length == 0) return "-"
 

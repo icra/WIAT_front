@@ -20,7 +20,9 @@
     "georaster": "^1.5.4",
     "georaster-layer-for-leaflet": "^3.0.1",
     "https": "^1.0.0",
+    "is-sea": "^0.3.1",
     "jquery": "^3.6.0",
+    "katex": "^0.15.1",
     "leaflet": "^1.7.1",
     "leaflet-arrowheads": "^1.2.3",
     "leaflet-easybutton": "^2.4.0",
@@ -32,6 +34,7 @@
     "vue": "^2.6.11",
     "vue-async-computed": "^3.9.0",
     "vue-chartjs": "^3.5.1",
+    "vue-katex": "^0.5.0",
     "vue-router": "^3.2.0",
     "vuetify": "^2.4.0"
   },
