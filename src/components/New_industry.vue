@@ -3492,13 +3492,11 @@ export default {
       return !disabled
     },
 
-
     tab_4_disabled(){
-      let wwtp = this.onsite_wwtp_model
+      let wwtp = this.offsite_wwtp_model
       let disabled = wwtp.wwt_vol_trea != null && wwtp.wwt_vol_trea != "" && wwtp.wwt_vol_disc != null && wwtp.wwt_vol_disc != ""
       return !disabled
     },
-
 
   }
 

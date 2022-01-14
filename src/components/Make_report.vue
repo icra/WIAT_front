@@ -48,11 +48,28 @@
                               <v-data-table
                                   :headers="industry_table.header"
                                   :items="industry_table.industries"
-                                  
                                   disable-pagination
                                   :hide-default-footer="true"
                                   dense
-                              ></v-data-table>
+                                  :single-expand="singleExpand"
+                                  :expanded.sync="expanded"
+                                  show-expand
+                                  item-key="industry_name"
+                              >
+
+
+                                <template v-slot:expanded-item="{ headers, item }">
+                                  <td :colspan="headers.length" style="padding: 20px; background-color: #c4c4d4">
+                                    <v-data-table
+                                        :headers="get_supply_chain(item.industry).header"
+                                        :items="get_supply_chain(item.industry).items"
+                                        :hide-default-footer="true"
+                                    ></v-data-table>
+                                  </td>
+                                </template>
+
+
+                              </v-data-table>
                             </v-expansion-panel-content>
                           </v-expansion-panel>
                           <v-expansion-panel>
@@ -254,6 +271,12 @@
                                   :hide-default-footer="true"
                                   dense
                               >
+                                <template v-slot:no-data>
+                                  <v-progress-linear
+                                      indeterminate
+                                      color="#1C195B"
+                                  ></v-progress-linear>
+                                </template>
                                 <template
                                     v-for="value in selected_industries.map(industry => industry.name)"
                                     v-slot:[`item.${value}`]="{ item }"
@@ -3272,6 +3295,8 @@ export default {
   },
   data() {
     return {
+      expanded: [],
+      singleExpand: true,
       risk_categories: risk_thereshold,
       created_assessments: this.$assessments,  //Created assessments
       selected_industries: [],
@@ -3661,11 +3686,36 @@ export default {
   },
   methods: {
 
+
+
+
+    get_supply_chain(industry){
+      let header = [
+        {text: "Supply chain", value: "name"},
+        {text: "Latitude", value: "lat"},
+        {text: "Longitude", value: "lng"}
+      ]
+
+      let items = []
+
+      industry.supply_chain.forEach(supply_chain => {
+        items.push({
+          name: supply_chain.name,
+          lat: supply_chain.location.lat,
+          lng: supply_chain.location.lng
+        })
+      })
+
+      return {header, items}
+
+
+    },
+
+
     click_tab(){
       this.simple_report_table = {header: [], value: []}
       this.reporting_indicators = {header: [], value: []}
-
-
+      this.layers_table = {header: [], value: []}
     },
 
     getBase64ImageFromURL(url) {
@@ -5413,13 +5463,29 @@ export default {
 
             let row = [industry.name]
             for (let [layer_name, layer] of chunk) {
-
               //Baseline
               let baseline_data = await layer["data_for_report"](lat, lng)
               row.push({text: baseline_data, fillColor: this.getGISLayerColorPDF(layer_name, baseline_data)})
 
             }
             layers_description.table.body.push(row)
+
+            //Adding rows for supply chain
+            for(let supply_chain of industry.supply_chain){
+              let name = supply_chain.name
+              let lat = supply_chain.location.lat
+              let lng = supply_chain.location.lng
+
+              let row = [supply_chain.name + " (Supply chain of "+industry.name+")"]
+              for (let [layer_name, layer] of chunk) {
+                let baseline_data = await layer["data_for_report"](lat, lng)
+                row.push({text: baseline_data, fillColor: this.getGISLayerColorPDF(layer_name, baseline_data)})
+
+              }
+              layers_description.table.body.push(row)
+            }
+
+
           }
 
           dd.content.push(layers_description)
@@ -6930,6 +6996,7 @@ export default {
                   {text:'Longitude', style: "bold"},
                   {text:"Standard Industrial Classification", style: "bold"},
                   {text:"Assessment period (days)", style: "bold"},
+                  {text:"Supply chain", style: "bold"}
                 ]
             ]
           }
@@ -6937,16 +7004,33 @@ export default {
 
         industries.forEach(industryAux => {
           let industry = industryAux.industry
-          industriesSummary.table.body.push(
-              [
-                industry.name,
-                industry.location.lat.toFixed(3),
-                industry.location.lng.toFixed(3),
-                industry.industry_type === null ? "-" : industry.industry_type,
-                assessment_days
+
+          let arr = [
+            industry.name,
+            industry.location.lat.toFixed(3),
+            industry.location.lng.toFixed(3),
+            industry.industry_type === null ? "-" : standard_industrial_classification.find(category => category.value == industry.industry_type).text,
+            assessment_days,
+          ]
+
+          let sc = {
+            table: {
+              body: [
+                ['Name', 'Latitude', 'Longitude'],
               ]
-          )
+            },
+          }
+
+          industry.supply_chain.forEach(x => {
+            sc.table.body.push([x.name, x.location.lat.toFixed(3), x.location.lng.toFixed(3)])
+          })
+
+          arr.push(sc)
+
+          industriesSummary.table.body.push(arr)
         })
+
+
 
         dd.content.push(industriesSummary)
         dd.content.push("\n\n")
@@ -7051,6 +7135,7 @@ export default {
             {text: "Longitude", value: "lon"},
             {text: "Standard Industrial Classification", value: "industry_type"},
             {text: "Assessment period (days)", value: "assessment_period"},
+            { text: 'Supply chain', value: 'data-table-expand'},
             ],
           industries: []
         }
@@ -7061,7 +7146,8 @@ export default {
             lat: industry.location.lat.toFixed(3),
             lon: industry.location.lng.toFixed(3),
             industry_type: industry.industry_type === null ? "-" : standard_industrial_classification.find(category => category.value == industry.industry_type).text,
-            assessment_period: assessment_days
+            assessment_period: assessment_days,
+            industry: industry,
           })
         })
         return table
