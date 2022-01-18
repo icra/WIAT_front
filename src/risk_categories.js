@@ -259,11 +259,14 @@ let risk_category = {
         dd.content.push({
             style: 'legend',
             table: {
-                widths: [10, 'auto', 10, 'auto', 10, 'auto', 10, 'auto', 10, 'auto'],
+                widths: [10, 'auto', 10, 'auto', 10, 'auto', 10, 'auto', 10, 'auto', 10, 'auto'],
                 body: [
                     [
-                        {text: " ", fillColor: layers.l[0], border: [true, true, true, true]},
+                        {text: " ", fillColor: "white", border: [true, true, true, true]},
                         {text: "Unknown", border: [false, false, false, false]},
+                        {text: " ", fillColor: layers.l[0], border: [false, false, false, false]},
+                        {text: layers.l[1], border: [false, false, false, false]},
+
                         {text: " ", fillColor: layers.lm[0], border: [false, false, false, false]},
                         {text: layers.lm[1], border: [false, false, false, false]},
                         {text: " ", fillColor: layers.mh[0], border: [false, false, false, false]},

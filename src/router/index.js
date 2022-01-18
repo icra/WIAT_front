@@ -5,7 +5,6 @@ import New_assessment from "../components/New_assessment";
 import New_industry from "../components/New_industry";
 import Import from "../components/Import";
 import Make_report from "../components/Make_report";
-import More from "@/components/More";
 Vue.use(VueRouter)
 
 const routes = [
@@ -35,11 +34,7 @@ const routes = [
     name: 'report',
     component: Make_report
   },
-  {
-    path: '/more',
-    name: 'more',
-    component: More
-  }
+
 
 ]
 

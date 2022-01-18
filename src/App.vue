@@ -9,14 +9,14 @@
         style="margin-left: 0px; margin-right: 0px; background-color: white"
     >
       <v-row style="background-color: white; width: 100%">
-        <v-col cols="4" class="header">
+        <v-col cols="3" class="header">
           <a href="https://www.wbcsd.org/" target="_blank">
             <div>
               <v-icon>$wbcsd_logo</v-icon>
             </div>
           </a>
         </v-col>
-        <v-col cols="8" class="header">
+        <v-col cols="9" class="header">
           <div >
             <v-hover
                 v-slot="{ hover }"
@@ -310,22 +310,51 @@
                 <v-expansion-panel-header disable-icon-rotate style="background-color: #c4c4d4">
                   <b>{{ assessment.name }}</b>
                   <template v-slot:actions>
-                    <v-hover v-slot:default="{ hover }" style="margin-right: 10px">
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-hover  v-slot:default="{ hover }" style="margin-right: 10px">
+                          <span>
+                            <v-icon
+                                v-bind="attrs"
+                                v-on="on"
+                                class="icon_clickable" :color="hover ? '#555283' : '#1C195B'" @click="hide_show_industries(assessment_index)" @click.native.stop
+                                v-if="assessment_active[assessment_index]"
+                            >
 
-                      <v-icon class="icon_clickable" v-if="assessment_active[assessment_index]" :color="hover ? '#555283' : '#1C195B'" @click="hide_show_industries(assessment_index)" @click.native.stop>
-                        mdi-eye
-                      </v-icon>
-                      <v-icon v-else class="icon_clickable" :color="hover ? '#555283' : '#1C195B'" @click="hide_show_industries(assessment_index)" @click.native.stop>
-                        mdi-eye-off
-                      </v-icon>
+                            mdi-eye
+                          </v-icon>
+                            <v-icon
+                              v-bind="attrs"
+                              v-on="on"
+                              class="icon_clickable" :color="hover ? '#555283' : '#1C195B'" @click="hide_show_industries(assessment_index)" @click.native.stop
+                              v-else>
+                            mdi-eye-off
+                          </v-icon>
 
-                    </v-hover>
+                          </span>
+                        </v-hover>
+                      </template>
+                      <span v-if="assessment_active[assessment_index]">Hide</span>
+                      <span v-else>Show</span>
 
-                    <v-hover v-slot:default="{ hover }">
-                      <v-icon class="icon_clickable" :color="hover ? '#555283' : '#1C195B'" @click="open_edit_assessment_tab(assessment_index)" @click.native.stop>
-                        mdi-cog
-                      </v-icon>
-                    </v-hover>
+                    </v-tooltip>
+
+
+
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-hover v-slot:default="{ hover }">
+                          <v-icon
+                              v-bind="attrs"
+                              v-on="on"
+                              class="icon_clickable" :color="hover ? '#555283' : '#1C195B'" @click="open_edit_assessment_tab(assessment_index)" @click.native.stop>
+                            mdi-cog
+                          </v-icon>
+                        </v-hover>
+                      </template>
+                      <span>Edit assessment</span>
+                    </v-tooltip>
+
 
                   </template>
                 </v-expansion-panel-header>
@@ -1197,8 +1226,11 @@ export default {
       else return 'An assessment with same name already exists.' //If there is an assessment with the same name, must be the edited assessment
     },
     hide_show_industries(assessment_index){
-
+      console.log(assessment_index)
+      console.log("before:", this.assessment_active)
       this.assessment_active[assessment_index] = !this.assessment_active[assessment_index] //hide/show industries of the assessment
+      console.log("after:", this.assessment_active)
+
       if(this.assessment_active[assessment_index]){
         //show assessment
         this.update_markers()
@@ -1433,8 +1465,10 @@ v-btn--disabled{
   top: 50%;
   -ms-transform: translateY(-50%);
   transform: translateY(-50%);
+  padding-right: 50px;
   color: #1C195B;
   font-weight: bold;
+  text-align: center;
 
 }
 
