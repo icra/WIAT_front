@@ -91,6 +91,16 @@
                                   :hide-default-footer="true"
                                   @click:row="simpleTableRowClick"
                               >
+
+                                <template v-slot:item.state="{ item }">
+                                  <v-tooltip left>
+                                    <template v-slot:activator="{ on }">
+                                      <div v-on="on"></div>
+                                    </template>
+                                    <span>Click me</span>
+                                  </v-tooltip>
+                                </template>
+
                                 <template v-slot:no-data>
                                   <v-progress-linear
                                       indeterminate
@@ -7346,6 +7356,7 @@ table {
   tbody {
     tr:hover {
       font-weight: bold;
+      cursor: pointer;
     }
   }
 }

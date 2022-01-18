@@ -1,6 +1,6 @@
 <template>
   <v-app class="app">
-f
+
     <!-- Header -->
     <v-app-bar
         height="70px"
@@ -311,6 +311,7 @@ f
                   <b>{{ assessment.name }}</b>
                   <template v-slot:actions>
                     <v-hover v-slot:default="{ hover }" style="margin-right: 10px">
+
                       <v-icon class="icon_clickable" v-if="assessment_active[assessment_index]" :color="hover ? '#555283' : '#1C195B'" @click="hide_show_industries(assessment_index)" @click.native.stop>
                         mdi-eye
                       </v-icon>
@@ -1293,6 +1294,12 @@ export default {
 </script>
 
 <style>
+
+
+
+@import url('https://use.typekit.net/eud5bih.css');
+
+
 html {
   overflow: hidden !important;
   scrollbar-width: none;
@@ -1390,10 +1397,12 @@ html::-webkit-scrollbar {
 .hover_industry{
   background-color: #f0f2f1;
   transition: 0.3s;
+  cursor: pointer;
+
 }
 
 .app{
-  font-family: "Aktiv Grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+  font-family: "aktiv-grotesk", "Helvetica Neue", Helvetica, Arial, sans-serif !important;
 }
 
 .button-link{
