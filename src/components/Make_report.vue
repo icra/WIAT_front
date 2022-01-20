@@ -348,12 +348,13 @@
               <v-checkbox
                   v-for="assessment in assessments_with_industries"
                   v-model="selected_assessments"
-                  :label="assessment.name"
-                  :value="assessment"
+                  :label="assessment.assessment.name"
+                  :disabled="assessment.disabled"
                   color="#1C195B"
                   style="margin-left: 38px"
-                  :key="assessment.name"
+                  :key="assessment.assessment.name"
                   dense
+                  :value="assessment.assessment"
               >
 
               </v-checkbox>
@@ -3561,7 +3562,6 @@ export default {
 
     selected_assessments: function (new_selected_assessments, old_value){
 
-
       if(new_selected_assessments.length > 0){
         this.selected_industries = []
         if (old_value.length == 0) this.tab = 0
@@ -3863,6 +3863,8 @@ export default {
       }
 
       try{
+        console.log(risk)
+        risk = risk.richText[0].text
         if(risk === "Global warming potential"){
           this.risk_categories["global_warming"] = increasing_worse()
         }else if(risk === "Dilution factor"){
@@ -3887,7 +3889,7 @@ export default {
           this.risk_categories["delta_ecotoxicity"] = increasing_worse()
         }else if(risk === "Increase of the average concentration of the pollutants in the receiving water body after discharge (with respect to EQS)"){
           this.risk_categories["delta_eqs"] = increasing_worse()
-        }else if(risk === "Average percentage of treatment efficiency (compared to WWTP influent)"){
+        }else if(risk === "Percentage of treatment efficiency (compared to WWTP influent)"){
           this.risk_categories["treatment_efficiency"] = increasing_better()
         }
       }catch (error){
@@ -4157,6 +4159,8 @@ export default {
 
         for (const [key, industries] of Object.entries(_this.industries_aggregated)) {
           let total_emission = 0
+
+
           emission_table.header.push({
             text: key, value: key,
           })
@@ -7080,7 +7084,7 @@ export default {
   created(){
     let _this = this
     this.assessments_with_industries.forEach(assessment => {
-      _this.selected_assessments.push(assessment)
+      if(!assessment.disabled) _this.selected_assessments.push(assessment.assessment)
     })
   },
 
@@ -7088,13 +7092,21 @@ export default {
 
     assessments_with_industries(){
       let _this = this
-      return this.created_assessments.filter(assessment => {
-        if(assessment.industries.length > 0){
-          return assessment.industries.map(industry => {
-            return _this.is_industry_valid(industry)
-          }).includes(true)
-        }else return false
+
+      let disabled = this.created_assessments.map(assessment => {
+        if(assessment.industries.length == 0){
+          return {
+            assessment: assessment,
+            disabled: true,
+          }
+        }else{
+          return {
+            assessment: assessment,
+            disabled: !assessment.industries.map(industry => {return _this.is_industry_valid(industry)}).includes(true)
+          }
+        }
       })
+      return disabled
     },
 
     industries_aggregated(){
@@ -7104,22 +7116,25 @@ export default {
         return n.assessment.name;
       });
 
-      if(_this.tab !== undefined && _this.tab !== null && Object.values(groupedByAssessments)[_this.tab] != undefined){
 
-        let industriesOfassessment = Object.values(groupedByAssessments)[_this.tab].map(industry => {return industry.industry})
-        if(_this.aggregation_level == "country"){
+      if(_this.tab !== undefined && _this.tab !== null && Object.values(groupedByAssessments)[_this.tab] != undefined) {
+
+        let industriesOfassessment = Object.values(groupedByAssessments)[_this.tab].map(industry => {
+          return industry.industry
+        })
+        if (_this.aggregation_level == "country") {
 
           //Agrupació per països
-          const groupedByCountry = _.groupBy(industriesOfassessment, function(industry) {
+          const groupedByCountry = _.groupBy(industriesOfassessment, function (industry) {
             return utils.get_country_code_from_coordinates(industry.location.lat, industry.location.lng)
           }) //Array of arrays of industries
           return groupedByCountry
-        }
-        else if(_this.aggregation_level == "industry"){
+        } else if (_this.aggregation_level == "industry") {
           let industries = {}
           industriesOfassessment.forEach(industry => {
             industries[industry.name] = [industry]
           })
+
           return industries
         }
       }
@@ -7151,14 +7166,19 @@ export default {
         }
 
         assessment.industries.forEach(industry => {
-          table.industries.push({
-            industry_name: industry.name,
-            lat: industry.location.lat.toFixed(3),
-            lon: industry.location.lng.toFixed(3),
-            industry_type: industry.industry_type === null ? "-" : standard_industrial_classification.find(category => category.value == industry.industry_type).text,
-            assessment_period: assessment_days,
-            industry: industry,
-          })
+
+          if(_this.is_industry_valid(industry)){
+            table.industries.push({
+              industry_name: industry.name,
+              lat: industry.location.lat.toFixed(3),
+              lon: industry.location.lng.toFixed(3),
+              industry_type: industry.industry_type === null ? "-" : standard_industrial_classification.find(category => category.value == industry.industry_type).text,
+              assessment_period: assessment_days,
+              industry: industry,
+            })
+          }
+
+
         })
         return table
       }

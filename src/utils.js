@@ -198,7 +198,7 @@ function effl_efficiency(industries, industry_effluent, wwtp_effluent){   //Amou
     
     let eff = filtered / generated
 
-    if(isNaN(eff)) return "-"
+    if(isNaN(eff) || !isFinite(eff)) return "-"
     else return (eff*100).toFixed(3)
 }
 
@@ -233,6 +233,7 @@ function better_treatment(industries){
 let metrics = {
 
     emissions_and_descriptions(industries, days_factor){
+
         let industries_emissions = industries.map(industry => industry.ghg())
         let aggregated = sumObjectsByKey(...industries_emissions)
         Object.keys(aggregated).forEach(key => {
@@ -503,10 +504,13 @@ let metrics = {
 
     avg_influent_efficiency(industries){
         let efficiency = Object.values(this.amount_water_influent_cleaned(industries))
-        let avg = efficiency.sum() / efficiency.length
+        let efficiency_filtered = efficiency.filter(x => !Number.isNaN(parseFloat(x))).map(x => parseFloat(x))
 
+        if(efficiency_filtered.length == 0) return "-"
+
+        let avg = efficiency_filtered.sum() / efficiency_filtered.length
         if(Number.isFinite(avg)) return avg.toFixed(2)
-        else return ("-")
+        else return "-"
 
     },
 

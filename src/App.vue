@@ -118,9 +118,9 @@
 
                     <br>
 
-                    <a class="button-link" href="/WIAT science and methods.pdf" download >
+                    <a class="button-link" href="/user_guide.pdf" download >
                       <v-btn small tile block color="#b62373">
-                        DOWNLOAD USER MANUAL - NOT IMPLEMENTED
+                        DOWNLOAD USER MANUAL
                         <v-icon right>
                           mdi-cloud-download
                         </v-icon>
@@ -955,18 +955,6 @@ export default {
       event.returnValue = ""
     },
 
-    /*assessmentTreeSelected(nodeAssessment){
-
-      if(nodeAssessment.length > 0){ //Node selected
-        if(nodeAssessment[0].hasOwnProperty("children")){  //Assessment selected
-          this.assessment_expansion_panel = nodeAssessment[0].idx
-        }
-      }else{  //Node unselected
-        console.log('asdfsdaf')
-        this.assessment_expansion_panel = undefined
-      }
-
-    },*/
 
     layerTreeSelected(nodeLayer){
       if(nodeLayer.length > 0) this.applyLayer(nodeLayer[0].name)
