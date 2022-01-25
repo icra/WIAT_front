@@ -311,7 +311,7 @@ export default {
         },
         {
           key: "future",
-          label: "Future"
+          label: "2030"
         },
       ],
       baseline_future_model: "baseline",
@@ -678,7 +678,7 @@ export default {
 
       if(this.adding_supply_chain) text += ('<br><br><button class="trigger">ADD SUPPLY CHAIN INDUSTRY</button>')
       else if(add_industry === true) text += ('<br><br><button class="trigger">ADD INDUSTRY</button>')
-      else if(add_industry === "supply_chain") text += ('<br><br>'+this.supply_chain_name)
+      //else if(add_industry === "supply_chain") text += ('<br><br>'+this.supply_chain_name)
 
 
       this.popup_info.setPopupContent(text)
@@ -1041,17 +1041,17 @@ export default {
 
           new_marker.on('click', function(e) {
             _this.mapDiv.panTo(marker.latlng)
+            _this.$emit('editSupplyChain', marker.assessment, marker.industry, marker.supply_chain)
+
             if(_this.selected_layer!==null) {
               _this.popup_info=new_marker.bindPopup()
               _this.supply_chain_name = marker.name
               //_this.toggle_popup(marker.name, false)
               let current_layer = _this.get_layer(_this.selected_layer, _this.baseline_future_model, _this.annual_monthly_model, _this.months_model)
               current_layer.click(marker.latlng, "supply_chain")
-            }else{
+            }/*else{
               new_marker.unbindPopup()
-              _this.popup_info=new_marker.bindPopup()
-              _this.toggle_popup(marker.name, false)
-            }
+            }*/
           })
 
           let myVector = L.polyline([ marker.latlng, marker.industry_coords ]).arrowheads({

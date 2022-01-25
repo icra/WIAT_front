@@ -97,6 +97,10 @@ export class Industry{
 
     }
 
+    delete_supply_chain(i){
+        this.supply_chain.splice(i,1);
+    }
+
     add_industry_to_supply_chain(industry){
         this.supply_chain.push(industry)
     }

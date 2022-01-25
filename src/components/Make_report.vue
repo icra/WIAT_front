@@ -1,30 +1,41 @@
 <template>
   <div class="outer">
-    <h1 style="color: #b62373">Report</h1>
     <div v-if="is_there_any_industry_created" style="height: 100%;">
-      <div style="height: 100%; padding-top: 10px">
+      <div style="height: 100%;">
+        <v-tabs
+            center-active
+            grow
+            id="main_tab"
+            v-model="main_tab"
+
+        >
+
+          <v-tabs-slider color="#b62373"></v-tabs-slider>
+          <v-tab style="border-color: #b62373">REPORT</v-tab>
+          <v-tab style="border-color: #b62373">ACCESS DATA ENTRY</v-tab>
+          <v-tab style="border-color: #b62373">VALUES OF GLOBAL INDICATORS</v-tab>
+          <v-tab style="border-color: #b62373">EXPORT IN PDF</v-tab>
+
+        </v-tabs>
         <v-row>
           <v-col cols="9">
-            <v-tabs v-model="tab" >
-              <v-tab
-                  v-for="assessment_name in assessment_names"
-                  :key="assessment_name"
-                  @click="click_tab"
-              >
-                {{assessment_name}}
-              </v-tab>
-            </v-tabs>
+            <div>
+              <v-tabs v-model="tab" id="assessment_tab" v-show="main_tab != 3">
+                <v-tab
+                    v-for="assessment_name in assessment_names"
+                    :key="assessment_name"
+                    @click="click_tab"
+                >
+                  {{assessment_name}}
+                </v-tab>
+              </v-tabs>
+            </div>
           </v-col>
         </v-row>
-        <v-row style="height: 82%" class = "border_report">
-          <v-col v-show="selected_industries.length === 0" cols="9" style="height: 100%" class="side_menu_title">
-            Please, select at least an industry to make the report
+        <v-row style="height: 82%" class = "border_report" v-if="is_there_any_industry_created">
 
-          </v-col>
-
-
-          <v-col v-show="selected_industries.length > 0" cols="9" style="height: 100%">
-            <template class="report" >
+          <v-col cols="12" style="height: 100%">
+            <template v-if="main_tab == 0" class="report" >
 
               <div style="width: 100%; height: 100%">
                 <v-tabs-items v-model="tab" style="padding-bottom: 50px">
@@ -36,7 +47,6 @@
                     <v-card flat style="margin-left: 10px;">
 
                       <div>
-
                         <v-expansion-panels>
                           <v-expansion-panel>
                             <v-expansion-panel-header>
@@ -265,71 +275,264 @@
                               </v-data-table>
                             </v-expansion-panel-content>
                           </v-expansion-panel>
-                          <v-expansion-panel v-if="selected_layers.length > 0">
-                            <v-expansion-panel-header>
-                              <div class = table_descriptor>
-                                <span class="table_title">Global GIS Indicators</span>
+                        </v-expansion-panels>
+
+
+                      </div>
+
+                    </v-card>
+                  </v-tab-item>
+                </v-tabs-items>
+              </div>
+
+            </template>
+            <template v-else-if="main_tab == 1" class="report" >
+
+              <div style="width: 100%; height: 100%">
+                <v-tabs-items v-model="tab" style="padding-bottom: 50px">
+                  <v-tab-item
+                      v-for="(assessment_name, assessment_idx) in assessment_names"
+                      :key="assessment_name"
+                  >
+                    <br>
+                    <v-card flat style="margin-left: 10px;">
+
+                      <div>
+                        <p class="side_menu_title">Select industry to edit</p>
+
+                        <!--
+                        <v-radio-group v-model="radio_industry_edit" row style="padding: 10px 0px 15px 0px">
+                          <v-radio
+                              v-for="n in Object.keys(industries_aggregated).length"
+                              :key="n-1"
+                              :label="Object.keys(industries_aggregated)[n-1]"
+                              :value="n-1"
+
+                          ></v-radio>
+
+                        </v-radio-group>-->
+                        <v-btn  :to="{ name: 'edit_industry', params: {assessment_id: assessment_idx, industry_id: radio_industry_edit}}" tile color="#b62373" :disabled="radio_industry_edit == null">
+                          EDIT INDUSTRY
+                        </v-btn>
+
+                      </div>
+
+                    </v-card>
+                  </v-tab-item>
+                </v-tabs-items>
+              </div>
+
+            </template>
+            <template v-else-if="main_tab == 2" class="report" >
+
+              <div style="width: 100%; height: 100%">
+                <v-tabs-items v-model="tab" style="padding-bottom: 0px">
+                  <v-tab-item
+                      v-for="(assessment_name, idx) in assessment_names"
+                      :key="assessment_name"
+                  >
+                    <br>
+                    <v-card flat style="margin-left: 10px;">
+
+                      <div>
+
+                          <v-row
+                              class="pa-4"
+                              justify="space-between"
+                          >
+                            <v-col cols="4">
+                              <p class="side_menu_title">Layers to include in the report</p>
+                              <v-radio-group v-model="radio_layers">
+                                <v-radio
+                                    :key="1"
+                                    label="Select layers"
+                                    :value="1"
+                                ></v-radio>
+                                <v-treeview
+                                    :items="layer_tree"
+                                    dense
+                                    hoverable
+                                    selectable
+                                    selection-type="leaf"
+                                    return-object
+                                    v-model="selected_layers"
+                                    open-on-click
+                                    color="#1C195B"
+                                    selected-color="#1C195B"
+                                    style="padding-left: 15px"
+                                    item-disabled="locked"
+                                >
+                                </v-treeview>
+                                <v-radio
+                                    :key="2"
+                                    label="Layers used in the calculations"
+                                    :value="2"
+                                    style="padding-top: 5px"
+                                ></v-radio>
+                              </v-radio-group>
+
+                            </v-col>
+                            <v-divider vertical></v-divider>
+
+                            <v-col
+                                class="d-flex">
+                              <div style="width: 100%">
+                                <v-data-table
+                                    :headers="layers_table.header"
+                                    :items="layers_table.value"
+                                    v-if="selected_layers.length > 0 "
+                                    disable-pagination
+                                    :hide-default-footer="true"
+                                    dense
+                                >
+                                  <template v-slot:no-data>
+                                    <v-progress-linear
+                                        indeterminate
+                                        color="#1C195B"
+                                    ></v-progress-linear>
+                                  </template>
+                                  <template
+                                      v-for="value in valid_created_assessments[tab].industries.map(x => x.name)"
+                                      v-slot:[`item.${value}`]="{ item }"
+                                  >
+
+                                    <template v-if="getGISLayerColor(item, value) != null">
+                                      <v-tooltip bottom>
+                                        <template v-slot:activator="{ on, attrs }">
+                                          <v-chip
+                                              :color="getGISLayerColor(item, value)[0]"
+                                              dark
+                                              :key="value"
+                                              v-bind="attrs"
+                                              v-on="on"
+                                              text-color="#1c1c1b"
+                                          >
+                                            {{ item[value] }}
+                                          </v-chip>
+                                        </template>
+                                        <span>{{ getGISLayerColor(item, value)[1] }}</span>
+                                      </v-tooltip>
+                                    </template>
+                                    <template v-else>
+                                      <v-chip
+                                          color="transparent"
+                                          dark
+                                          :key="value"
+                                          text-color="#1c1c1b"
+                                          class= "chip_no_hover"
+                                      >
+                                        {{ item[value] }}
+                                      </v-chip>
+                                    </template>
+                                  </template>
+                                </v-data-table>
+                                <b v-else>Select a layer</b>
                               </div>
 
-                            </v-expansion-panel-header>
-                            <v-expansion-panel-content>
-                              <v-data-table
-                                  :headers="layers_table.header"
-                                  :items="layers_table.value"
-                                  
-                                  disable-pagination
-                                  :hide-default-footer="true"
+                            </v-col>
+                          </v-row>
+
+
+                      </div>
+
+                    </v-card>
+                  </v-tab-item>
+                </v-tabs-items>
+              </div>
+
+            </template>
+            <template v-else-if="main_tab == 3" class="report" >
+
+              <div style="width: 100%; height: 100%">
+                <v-tabs-items v-model="tab" style="padding-bottom: 50px">
+                  <v-tab-item
+                      v-for="(assessment_name, idx) in assessment_names"
+                      :key="assessment_name"
+                  >
+                    <br>
+                    <v-card flat style="margin-left: 10px;">
+
+                      <div>
+
+                        <v-row
+                            class="pa-4"
+                            justify="space-between"
+                        >
+
+                          <v-col cols="4">
+                            <div>
+                              <p class="side_menu_title">1) Select the layers to include in the report</p>
+                              <v-checkbox
+                                  v-for="assessment in assessments_with_industries"
+                                  v-model="selected_assessments"
+                                  :label="assessment.assessment.name"
+                                  :disabled="assessment.disabled"
+                                  color="#1C195B"
+                                  style="margin-left: 38px"
+                                  :key="assessment.assessment.name"
                                   dense
+                                  :value="assessment.assessment"
                               >
-                                <template v-slot:no-data>
-                                  <v-progress-linear
-                                      indeterminate
-                                      color="#1C195B"
-                                  ></v-progress-linear>
-                                </template>
-                                <template
-                                    v-for="value in selected_industries.map(industry => industry.name)"
-                                    v-slot:[`item.${value}`]="{ item }"
-                                >
 
-                                  <template v-if="getGISLayerColor(item, value) != null">
-                                    <v-tooltip bottom>
-                                      <template v-slot:activator="{ on, attrs }">
-                                        <v-chip
-                                            :color="getGISLayerColor(item, value)[0]"
-                                            dark
-                                            :key="value"
-                                            v-bind="attrs"
-                                            v-on="on"
-                                            text-color="#1c1c1b"
-                                        >
-                                          {{ item[value] }}
-                                        </v-chip>
-                                      </template>
-                                      <span>{{ getGISLayerColor(item, value)[1] }}</span>
-                                    </v-tooltip>
-                                  </template>
-                                  <template v-else>
-                                    <v-chip
-                                        color="transparent"
-                                        dark
-                                        :key="value"
-                                        text-color="#1c1c1b"
-                                        class= "chip_no_hover"
-                                    >
-                                      {{ item[value] }}
-                                    </v-chip>
-                                  </template>
-                                </template>
+                              </v-checkbox>
+                            </div>
+
+                          </v-col>
+
+                          <v-divider vertical></v-divider>
+
+                          <v-col
+                              cols="4"
+                          >
+                            <p class="side_menu_title">2) Select the global indicators to include in the report (optional)</p>
+                            <v-treeview
+                                :items="layer_tree"
+                                dense
+                                hoverable
+                                selectable
+                                selection-type="leaf"
+                                return-object
+                                v-model="selected_layers_pdf"
+                                open-on-click
+                                color="#1C195B"
+                                selected-color="#1C195B"
+                            ></v-treeview>
+
+                          </v-col>
+
+                          <v-divider vertical></v-divider>
+
+                          <v-col
+                              class="text-center"
+                              cols="4"
+                          >
+                            <div>
+                              <v-btn block tile color="#b62373" @click="button_generate_pdf_clicked" :disabled="selected_industries.length === 0">
+                                3) Download the report
+                              </v-btn>
+                              <v-progress-linear
+                                  indeterminate
+                                  rounded
+                                  height="6"
+                                  v-show="generating_pdf"
+                                  color="#1C195B"
+
+                              ></v-progress-linear>
+                            </div>
+                          </v-col>
 
 
 
-                              </v-data-table>
 
-                            </v-expansion-panel-content>
-                          </v-expansion-panel>
 
-                        </v-expansion-panels>
+                        </v-row>
+
+
+
+
+
+
+
 
 
                       </div>
@@ -342,7 +545,7 @@
             </template>
 
           </v-col>
-          <v-col class="menu">
+          <!--<v-col class="menu">
             <div style= "padding: 10px;">
               <p class="side_menu_title">Select assessments to include in the report</p>
               <v-checkbox
@@ -360,20 +563,6 @@
               </v-checkbox>
             </div>
 
-            <!--
-            <v-treeview
-                :items="assessments_and_industries_tree"
-                dense
-                hoverable
-                selectable
-                selection-type="leaf"
-                return-object
-                v-model="selected_industries"
-                color="#1C195B"
-                selected-color="#1C195B"
-                open-on-click
-            ></v-treeview>
-            -->
             <div style="padding: 10px">
               <p class="side_menu_title">Select the layers to include in the report</p>
               <v-treeview
@@ -424,13 +613,7 @@
             </div>
 
             <div style="padding: 10px">
-              <!--<v-select
-                  v-model="aggregation_level"
-                  :items="aggregation_items"
-                  filled
-                  label="Aggregation level"
-                  dense
-              ></v-select>-->
+
               <v-select
                   v-model="include_future"
                   :items="yes_no"
@@ -438,14 +621,6 @@
                   label="Include 2030 BAU values in the report"
                   dense
               ></v-select>
-              <!--<v-select
-                  v-model="period_model"
-                  :items="daily_annual_assessment"
-                  filled
-                  label="Time period to express the results"
-                  dense
-              ></v-select>-->
-
             </div>
 
             <v-row>
@@ -467,7 +642,9 @@
               </v-col>
             </v-row>
 
-          </v-col>
+          </v-col> -->
+
+
         </v-row>
       </div>
 
@@ -1330,6 +1507,85 @@
         </div>
 
       </v-dialog>
+      <v-dialog
+          v-model="dialog_ecotoxicity_and_biodiversity"
+          width="80%"
+      >
+        <div class="dialog_detail" style="background-color: white">
+          <v-data-table
+              :headers="treatment_efficiency_influent_table.header"
+              :items="treatment_efficiency_influent_table.value"
+              disable-pagination
+              :hide-default-footer="true"
+              dense
+          >
+
+            <template v-slot:item.value="{ item }">
+              <span v-if="item.info">
+                {{item.value}}
+                <v-btn
+                    icon
+                    @click="$data[item.info] = true"
+                    class="icon_clickable"
+                    x-small
+                >
+                  <v-icon
+                      color='#1C195B'
+                  >
+                    mdi-information-outline
+                  </v-icon>
+                </v-btn>
+
+
+              </span>
+              <span v-else>{{item.value}}</span>
+            </template>
+
+            <template
+                v-for="value in Object.keys(industries_aggregated)"
+                v-slot:[`item.${value}`]="{ item }"
+            >
+
+              <template v-if="getTreatmentEfficiencyInfluentColor(item, value) != null">
+                <v-tooltip bottom>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-chip
+                        :color="getTreatmentEfficiencyInfluentColor(item, value)[0]"
+                        dark
+                        :key="value"
+                        v-bind="attrs"
+                        v-on="on"
+                        text-color="#1c1c1b"
+                    >
+                      {{ item[value] }}
+                    </v-chip>
+                  </template>
+                  <span>{{ getTreatmentEfficiencyInfluentColor(item, value)[1] }}</span>
+                </v-tooltip>
+              </template>
+              <template v-else>
+                <v-chip
+                    color="transparent"
+                    dark
+                    :key="value"
+                    text-color="#1c1c1b"
+                    class= "chip_no_hover"
+                >
+                  {{ item[value] }}
+                </v-chip>
+              </template>
+            </template>
+
+          </v-data-table>
+          <div style="width: 600px; margin: 20px auto 20px auto;">
+            <RadarChart :chartdata="treatment_efficiency_influent_chart.chartData" :options="treatment_efficiency_chart.options"></RadarChart>
+          </div>
+
+        </div>
+
+      </v-dialog>
+
+
 
       <!-- Quality and quantity -->
       <v-dialog
@@ -1344,9 +1600,10 @@
           <b>Where:</b>
           <br>
           <ul>
-            <li><span v-katex="'W_a'"></span>: Amount of water available in the river</li>
+            <li><span v-katex="'W_a'"></span>: Amount of water available in the river <b>(streamflow global indicator)</b></li>
             <li><span v-katex="'W_w'"></span>: Amount of water withdrawn from the river</li>
             <li><span v-katex="'W_{effl}'"></span>: Amount of water discharged into the river by industry</li>
+
           </ul>
         </div>
 
@@ -1412,7 +1669,7 @@
           <ul>
             <li><span v-katex="'W_w'"></span>: amount of water that the industry withdraws from the river.</li>
 
-            <li><span v-katex="'W_a'"></span>: amount of water available on the river, which is extracted from the stream flow global indicator.</li>
+            <li><span v-katex="'W_a'"></span>: amount of water available on the river <b>(streamflow global indicator)</b></li>
           </ul>
         </div>
 
@@ -2069,7 +2326,7 @@
             <li><span v-katex="'cadmium_{effl}'"></span>: load of cadmium in the effluent </li>
             <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
             <li><span v-katex="'EC50_{cadmium}: 9.5 \\mu g/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river </li>
+            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river <b>(streamflow global indicator)</b></li>
             <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
 
           </ul>
@@ -2095,7 +2352,7 @@
             <li><span v-katex="'hexachlorobenzene_{effl}'"></span>: load of hexachlorobenzene in the effluent </li>
             <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
             <li><span v-katex="'EC50_{hexachlorobenzene}: 30 \\mu g/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river </li>
+            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river (streamflow global indicator)</li>
             <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
 
           </ul>
@@ -2121,7 +2378,7 @@
             <li><span v-katex="'mercury_{effl}'"></span>: load of mercury in the effluent </li>
             <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
             <li><span v-katex="'EC50_{mercury}: 1.4 \\mu g/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river </li>
+            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river (streamflow global indicator)</li>
             <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
 
           </ul>
@@ -2147,7 +2404,7 @@
           <li><span v-katex="'lead_{effl}'"></span>: load of lead in the effluent </li>
           <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
           <li><span v-katex="'EC50_{lead}: 440 \\mu g/L'"></span></li>
-          <li><span v-katex="'W_{a}'"></span>: amount of water available in the river </li>
+          <li><span v-katex="'W_{a}'"></span>: amount of water available in the river (streamflow global indicator)</li>
           <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
 
         </ul>
@@ -2173,7 +2430,7 @@
             <li><span v-katex="'nickel_{effl}'"></span>: load of nickel in the effluent </li>
             <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
             <li><span v-katex="'EC50_{nickel}: 1000 \\mu g/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river </li>
+            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river (streamflow global indicator)</li>
             <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
 
           </ul>
@@ -2199,7 +2456,7 @@
             <li><span v-katex="'chloroalkanes_{effl}'"></span>: load of chloroalkanes in the effluent </li>
             <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
             <li><span v-katex="'EC50_{chloroalkanes}: 65000 \\mu g/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river </li>
+            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river (streamflow global indicator)</li>
             <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
 
           </ul>
@@ -2225,7 +2482,7 @@
             <li><span v-katex="'hexachlorobutadiene_{effl}'"></span>: load of hexachlorobutadiene in the effluent </li>
             <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
             <li><span v-katex="'EC50_{hexachlorobutadiene}: 500 \\mu g/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river </li>
+            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river (streamflow global indicator)</li>
             <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
 
           </ul>
@@ -2251,7 +2508,7 @@
             <li><span v-katex="'nonylphenol_{effl}'"></span>: load of nonylphenol in the effluent </li>
             <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
             <li><span v-katex="'EC50_{nonylphenol}: 150 \\mu g/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river </li>
+            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river (streamflow global indicator)</li>
             <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
 
           </ul>
@@ -2277,7 +2534,7 @@
             <li><span v-katex="'tetrachloroethylene_{effl}'"></span>: load of tetrachloroethylene in the effluent </li>
             <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
             <li><span v-katex="'EC50_{tetrachloroethylene}: 3200 \\mu g/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river </li>
+            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river (streamflow global indicator)</li>
             <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
 
           </ul>
@@ -2303,7 +2560,7 @@
             <li><span v-katex="'trichloroethylene_{effl}'"></span>: load of trichloroethylene in the effluent </li>
             <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
             <li><span v-katex="'EC50_{trichloroethylene}: 76000 \\mu g/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river </li>
+            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river (streamflow global indicator)</li>
             <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
 
           </ul>
@@ -2588,7 +2845,7 @@
             <li><span v-katex="'1,2-Dichloroethane_{effl}'"></span>: load of 1,2-Dichloroethane in the effluent </li>
             <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
             <li><span v-katex="'EQS_{1,2-Dichloroethane}: 0.01 Mg/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river </li>
+            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river (streamflow global indicator)</li>
             <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
 
           </ul>
@@ -2614,7 +2871,7 @@
             <li><span v-katex="'cadmium_{effl}'"></span>: load of cadmium in the effluent </li>
             <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
             <li><span v-katex="'EQS_{cadmium}: 0.001 Mg/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river </li>
+            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river (streamflow global indicator)</li>
             <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
 
           </ul>
@@ -2640,7 +2897,7 @@
             <li><span v-katex="'hexachlorobenzene_{effl}'"></span>: load of hexachlorobenzene in the effluent </li>
             <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
             <li><span v-katex="'EQS_{hexachlorobenzene}: 0.0005 mg/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river </li>
+            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river (streamflow global indicator)</li>
             <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
 
           </ul>
@@ -2666,7 +2923,7 @@
             <li><span v-katex="'mercury_{effl}'"></span>: load of mercury in the effluent </li>
             <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
             <li><span v-katex="'EQS_{mercury}: 0.00007 mg/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river </li>
+            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river (streamflow global indicator)</li>
             <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
 
           </ul>
@@ -2692,7 +2949,7 @@
             <li><span v-katex="'lead_{effl}'"></span>: load of lead in the effluent </li>
             <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
             <li><span v-katex="'EQS_{lead}: 0.0072 mg/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river </li>
+            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river (streamflow global indicator)</li>
             <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
 
           </ul>
@@ -2718,7 +2975,7 @@
             <li><span v-katex="'nickel_{effl}'"></span>: load of nickel in the effluent </li>
             <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
             <li><span v-katex="'EQS_{nickel}: 0.02 mg/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river </li>
+            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river (streamflow global indicator)</li>
             <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
 
           </ul>
@@ -2744,7 +3001,7 @@
             <li><span v-katex="'chloroalkanes_{effl}'"></span>: load of chloroalkanes in the effluent </li>
             <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
             <li><span v-katex="'EQS_{chloroalkanes}: 0.0014 mg/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river </li>
+            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river (streamflow global indicator)</li>
             <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
 
           </ul>
@@ -2770,7 +3027,7 @@
             <li><span v-katex="'hexachlorobutadiene_{effl}'"></span>: load of hexachlorobutadiene in the effluent </li>
             <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
             <li><span v-katex="'EQS_{hexachlorobutadiene}: 0.0006mg/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river </li>
+            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river (streamflow global indicator)</li>
             <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
 
           </ul>
@@ -2796,7 +3053,7 @@
             <li><span v-katex="'nonylphenol_{effl}'"></span>: load of nonylphenol in the effluent </li>
             <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
             <li><span v-katex="'EQS_{nonylphenol}: 0.002 mg/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river </li>
+            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river (streamflow global indicator)</li>
             <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
 
           </ul>
@@ -2822,7 +3079,7 @@
             <li><span v-katex="'tetrachloroethylene_{effl}'"></span>: load of tetrachloroethylene in the effluent </li>
             <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
             <li><span v-katex="'EQS_{tetrachloroethylene}: 0.01 mg/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river </li>
+            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river (streamflow global indicator)</li>
             <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
 
           </ul>
@@ -2848,7 +3105,7 @@
             <li><span v-katex="'trichloroethylene_{effl}'"></span>: load of trichloroethylene in the effluent </li>
             <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
             <li><span v-katex="'EQS_{trichloroethylene}: 0.01 mg/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river </li>
+            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river (streamflow global indicator)</li>
             <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
 
           </ul>
@@ -3316,13 +3573,11 @@ export default {
       layers: Vue.prototype.$layers_description,
       generating_pdf: false,
       global_layers: utils.format_layer_description(Vue.prototype.$layers_description),
-      include_future: true,
-      yes_no: [{text: "Yes", value: true},{text: "No", value: false}],
-      level_of_detail: 'extended',
-      period_model: "daily",
-      daily_annual_assessment: [{text: "Daily", value: "daily"},{text: "Annual", value: "annual"}, {text: "Assessment period", value: "assessment"}],
-      selected_layers: [], //layers included in the report
+      selected_layers: [Vue.prototype.$layers_description[1].children[0].children[3]], //layers included in the report (initially only streamflow)
+      selected_layers_pdf: [], //layers included in the pdf report
+
       tab: 0,
+      main_tab: 0,
       layers_table: {header: [], value: []},
       pollutants_table: {header: [], value: []},
       water_quantity: {header: [], value: []},
@@ -3402,7 +3657,7 @@ export default {
           total: "Total"
         },
         simple_table: {
-          quality_quantity: "Quality and quantity",
+          quality_quantity: "Quantity indicators",
           dilution_factor: "Dilution factor",
           recycled: "Recycled water factor",
           treated: "Treated water factor",
@@ -3410,6 +3665,7 @@ export default {
           specific_water_consumption: "Specific water consumption",
           total_ghg: "Total GHG emissions",
           eutrophication: "Eutrophication potential",
+          ecotoxicity_and_biodiversity: "Ecotoxicity and biodiversity indicators",
           tu: "Toxic units on the effluent",
           delta_tu: "Increase in toxic units in the receiving water body after discharge",
           delta_eqs: "Increase of the average concentration of the pollutants in the receiving water body after discharge (with respect to EQS)",
@@ -3430,6 +3686,7 @@ export default {
       dialog_delta_tu: false,
       dialog_delta_eqs: false,
       dialog_influent_efficiency: false,
+      dialog_ecotoxicity_and_biodiversity: false,
 
       biodiversity_models: [],
 
@@ -3510,6 +3767,8 @@ export default {
       info_efficiency_influent_cod: false,
       info_efficiency_influent_tn: false,
       info_efficiency_influent_tp: false,
+      radio_layers: 2,
+      radio_industry_edit: null
 
 
 
@@ -3518,6 +3777,18 @@ export default {
     }
   },
   watch: {
+
+    radio_layers: function(value){
+
+      let _this = this
+      if(value == 2){
+        Vue.nextTick(async function () {
+          _this.selected_layers.splice(0, _this.selected_layers.length, _this.layers[1].children[0].children[3])
+        })
+
+      }
+    },
+
     aggregation_level: async function () {
 
 
@@ -3542,6 +3813,7 @@ export default {
     selected_layers: async function () {
       /*this.layers_table = await this.generate_layers_table()
       */
+      this.layers_table.value = [],
       this.emissions_table = this.generate_emissions_table()
       this.water_quantity = await this.generate_water_quality_table()
       this.eutrophication_table = this.generate_eutrophication_table()
@@ -3596,7 +3868,6 @@ export default {
           _this.eqs_table = _this.generate_eqs_table()
           _this.delta_eqs_table = await _this.generate_delta_eqs_table()
           _this.delta_ecotox_table = await _this.generate_delta_ecotox_table()
-
         })
 
 
@@ -3696,9 +3967,6 @@ export default {
   },
   methods: {
 
-
-
-
     get_supply_chain(industry){
       let header = [
         {text: "Supply chain", value: "name"},
@@ -3777,13 +4045,14 @@ export default {
 
     simpleTableRowClick(item, row){
 
-      if(item.value == "Quality and quantity") this.dialog_quality_quantity = true
+      if(item.value == "Quantity indicators") this.dialog_quality_quantity = true
       else if(item.value == "Total GHG emissions") this.dialog_emissions = true
       else if(item.value == "Eutrophication potential") this.dialog_eutrophication = true
       else if(item.value == "Impact on biodiversity and ecosystems") {
         this.biodiversity_models = []
         this.dialog_ecotox = true
       }
+      else if(item.value == this.table_title.simple_table.ecotoxicity_and_biodiversity) this.dialog_ecotoxicity_and_biodiversity = true
       else if(item.value == this.table_title.simple_table.avg_treatment_efficiency) this.dialog_efficiency = true
       else if(item.value == this.table_title.simple_table.tu) this.dialog_tu = true
       else if(item.value == this.table_title.simple_table.delta_tu) this.dialog_delta_tu = true
@@ -3863,7 +4132,6 @@ export default {
       }
 
       try{
-        console.log(risk)
         risk = risk.richText[0].text
         if(risk === "Global warming potential"){
           this.risk_categories["global_warming"] = increasing_worse()
@@ -4119,32 +4387,22 @@ export default {
 
       let _this = this
 
-      const groupedByAssessments = _.groupBy(this.selected_industries, function(n) {
-        return n.assessment.name;
-      });
 
-      if(_this.tab !== undefined && Object.values(groupedByAssessments)[_this.tab] != undefined){
-
-        let assessment = Object.values(groupedByAssessments)[_this.tab][0].assessment
-        let assessment_days = utils.daysBetween(assessment.assessment_period_start, assessment.assessment_period_end)
-
-        let days_factor = 1
-        if(this.period_model === "annual") days_factor = 365
-        else if(this.period_model === "assessment") days_factor = assessment_days
+      if(_this.tab !== undefined){
 
         let emission_table = {
           header: [{text: "Emissions", value: "value", sortable: false}],
           emissions: []
         }
 
-        let total = {value: _this.table_title.global_warming_potential.total, unit: "kgCO2eq"}
-        let elec = {value: _this.table_title.global_warming_potential.elec, unit: "kgCO2eq", info:"info_electricity"}
-        let fuel = {value: _this.table_title.global_warming_potential.fuel, unit: "kgCO2eq", info:"info_fuel_engines"}
-        let tre = {value: _this.table_title.global_warming_potential.treatment, unit: "kgCO2eq", info:"info_treatment"}
-        let biog = {value: _this.table_title.global_warming_potential.biogas, unit: "kgCO2eq", info: "info_biogas"}
-        let slu = {value: _this.table_title.global_warming_potential.sludge, unit: "kgCO2eq", info: "info_sludge_management"}
-        let reus = {value: _this.table_title.global_warming_potential.reuse, unit: "kgCO2eq", info:"info_reuse"}
-        let disc = {value: _this.table_title.global_warming_potential.discharged, unit: "kgCO2eq", info:"info_discharge"}
+        let total = {value: _this.table_title.global_warming_potential.total, unit: "kgCO2eq/day"}
+        let elec = {value: _this.table_title.global_warming_potential.elec, unit: "kgCO2eq/day", info:"info_electricity"}
+        let fuel = {value: _this.table_title.global_warming_potential.fuel, unit: "kgCO2eq/day", info:"info_fuel_engines"}
+        let tre = {value: _this.table_title.global_warming_potential.treatment, unit: "kgCO2eq/day", info:"info_treatment"}
+        let biog = {value: _this.table_title.global_warming_potential.biogas, unit: "kgCO2eq/day", info: "info_biogas"}
+        let slu = {value: _this.table_title.global_warming_potential.sludge, unit: "kgCO2eq/day", info: "info_sludge_management"}
+        let reus = {value: _this.table_title.global_warming_potential.reuse, unit: "kgCO2eq/day", info:"info_reuse"}
+        let disc = {value: _this.table_title.global_warming_potential.discharged, unit: "kgCO2eq/day", info:"info_discharge"}
 
 
         const data_chart = {
@@ -4155,16 +4413,12 @@ export default {
           }]
         };
 
-
-
         for (const [key, industries] of Object.entries(_this.industries_aggregated)) {
-          let total_emission = 0
-
 
           emission_table.header.push({
             text: key, value: key,
           })
-          let emissions = metrics.emissions_and_descriptions(industries, days_factor)
+          let emissions = metrics.emissions_and_descriptions(industries, 1)
 
           total[key] = emissions["total"]
           elec[key] = emissions["elec"]
@@ -4234,18 +4488,8 @@ export default {
 
       let _this = this
 
-      const groupedByAssessments = _.groupBy(this.selected_industries, function(n) {
-        return n.assessment.name;
-      });
 
-      if(_this.tab !== undefined && _this.tab !== null && Object.values(groupedByAssessments)[_this.tab] != undefined){
-
-        let assessment = Object.values(groupedByAssessments)[_this.tab][0].assessment
-        let assessment_days = utils.daysBetween(assessment.assessment_period_start, assessment.assessment_period_end)
-
-        let days_factor = 1
-        if(this.period_model === "annual") days_factor = 365
-        else if(this.period_model === "assessment") days_factor = assessment_days
+      if(_this.tab !== undefined){
 
         let pollutants_table = {
           header: [{text: "", value: "value", sortable: false}],
@@ -4334,18 +4578,8 @@ export default {
 
       let _this = this
 
-      const groupedByAssessments = _.groupBy(this.selected_industries, function(n) {
-        return n.assessment.name;
-      });
 
-      if(_this.tab !== undefined && _this.tab !== null && Object.values(groupedByAssessments)[_this.tab] != undefined){
-
-        let assessment = Object.values(groupedByAssessments)[_this.tab][0].assessment
-        let assessment_days = utils.daysBetween(assessment.assessment_period_start, assessment.assessment_period_end)
-
-        let days_factor = 1
-        if(this.period_model === "annual") days_factor = 365
-        else if(this.period_model === "assessment") days_factor = assessment_days
+      if(_this.tab !== undefined){
 
         let pollutants_table = {
           header: [{text: "", value: "value", sortable: false}],
@@ -4353,18 +4587,18 @@ export default {
         }
 
 
-        let dichloroethane = {value: _this.table_title.pollutants.diclo, unit: "TU", info:"info_tu_diclo"}
-        let cadmium = {value: _this.table_title.pollutants.cadmium, unit: "TU", info:"info_tu_cadmium"}
-        let hexachlorobenzene = {value: _this.table_title.pollutants.hexaclorobenzene, unit: "TU", info:"info_tu_hexaclorobenzene"}
-        let mercury = {value: _this.table_title.pollutants.mercury, unit: "TU", info:"info_tu_mercury"}
-        let lead = {value: _this.table_title.pollutants.lead, unit: "TU", info:"info_tu_lead"}
-        let nickel = {value: _this.table_title.pollutants.nickel, unit: "TU", info:"info_tu_nickel"}
-        let chloroalkanes = {value: _this.table_title.pollutants.chloroalkanes, unit: "TU", info:"info_tu_chloroalkanes"}
-        let hexaclorobutadie = {value: _this.table_title.pollutants.hexaclorobutadie, unit: "TU", info:"info_tu_hexaclorobutadiene"}
-        let nonylphenols = {value: _this.table_title.pollutants.nonylphenols, unit: "TU", info:"info_tu_nonylphenols"}
-        let tetrachloroethene = {value: _this.table_title.pollutants.tetrachloroethene, unit: "TU", info:"info_tu_tetrachloroethene"}
-        let trichloroethylene = {value: _this.table_title.pollutants.tricloroetile, unit: "TU", info:"info_tu_trychloroethylene"}
-        let total = {value: _this.table_title.pollutants.total, unit: "TU"}
+        let dichloroethane = {value: _this.table_title.pollutants.diclo, unit: "TU/day", info:"info_tu_diclo"}
+        let cadmium = {value: _this.table_title.pollutants.cadmium, unit: "TU/day", info:"info_tu_cadmium"}
+        let hexachlorobenzene = {value: _this.table_title.pollutants.hexaclorobenzene, unit: "TU/day", info:"info_tu_hexaclorobenzene"}
+        let mercury = {value: _this.table_title.pollutants.mercury, unit: "TU/day", info:"info_tu_mercury"}
+        let lead = {value: _this.table_title.pollutants.lead, unit: "TU/day", info:"info_tu_lead"}
+        let nickel = {value: _this.table_title.pollutants.nickel, unit: "TU/day", info:"info_tu_nickel"}
+        let chloroalkanes = {value: _this.table_title.pollutants.chloroalkanes, unit: "TU/day", info:"info_tu_chloroalkanes"}
+        let hexaclorobutadie = {value: _this.table_title.pollutants.hexaclorobutadie, unit: "TU/day", info:"info_tu_hexaclorobutadiene"}
+        let nonylphenols = {value: _this.table_title.pollutants.nonylphenols, unit: "TU/day", info:"info_tu_nonylphenols"}
+        let tetrachloroethene = {value: _this.table_title.pollutants.tetrachloroethene, unit: "TU/day", info:"info_tu_tetrachloroethene"}
+        let trichloroethylene = {value: _this.table_title.pollutants.tricloroetile, unit: "TU/day", info:"info_tu_trychloroethylene"}
+        let total = {value: _this.table_title.pollutants.total, unit: "TU/day"}
 
 
 
@@ -4460,18 +4694,9 @@ export default {
 
       let _this = this
 
-      const groupedByAssessments = _.groupBy(this.selected_industries, function(n) {
-        return n.assessment.name;
-      });
 
-      if(_this.tab !== undefined && _this.tab !== null && Object.values(groupedByAssessments)[_this.tab] != undefined){
+      if(_this.tab !== undefined){
 
-        let assessment = Object.values(groupedByAssessments)[_this.tab][0].assessment
-        let assessment_days = utils.daysBetween(assessment.assessment_period_start, assessment.assessment_period_end)
-
-        let days_factor = 1
-        if(this.period_model === "annual") days_factor = 365
-        else if(this.period_model === "assessment") days_factor = assessment_days
 
         let pollutants_table = {
           header: [{text: "", value: "value", sortable: false}],
@@ -4536,36 +4761,25 @@ export default {
 
       let _this = this
 
-      const groupedByAssessments = _.groupBy(this.selected_industries, function(n) {
-        return n.assessment.name;
-      });
-
-      if(_this.tab !== undefined && _this.tab !== null && Object.values(groupedByAssessments)[_this.tab] != undefined){
-
-        let assessment = Object.values(groupedByAssessments)[_this.tab][0].assessment
-        let assessment_days = utils.daysBetween(assessment.assessment_period_start, assessment.assessment_period_end)
-
-        let days_factor = 1
-        if(this.period_model === "annual") days_factor = 365
-        else if(this.period_model === "assessment") days_factor = assessment_days
+      if(_this.tab !== undefined){
 
         let pollutants_table = {
           header: [{text: "", value: "value", sortable: false}],
           value: []
         }
 
-        let dichloroethane = {value: _this.table_title.pollutants.diclo, unit: "TU", info:"info_delta_tu_diclo"}
-        let cadmium = {value: _this.table_title.pollutants.cadmium, unit: "TU", info:"info_delta_tu_cadmium"}
-        let hexachlorobenzene = {value: _this.table_title.pollutants.hexaclorobenzene, unit: "TU", info:"info_delta_tu_hexaclorobenzene"}
-        let mercury = {value: _this.table_title.pollutants.mercury, unit: "TU", info:"info_delta_tu_mercury"}
-        let lead = {value: _this.table_title.pollutants.lead, unit: "TU", info:"info_delta_tu_lead"}
-        let nickel = {value: _this.table_title.pollutants.nickel, unit: "TU", info:"info_delta_tu_nickel"}
-        let chloroalkanes = {value: _this.table_title.pollutants.chloroalkanes, unit: "TU", info:"info_delta_tu_chloroalkanes"}
-        let hexaclorobutadie = {value: _this.table_title.pollutants.hexaclorobutadie, unit: "TU", info:"info_delta_tu_hexaclorobutadiene"}
-        let nonylphenols = {value: _this.table_title.pollutants.nonylphenols, unit: "TU", info:"info_delta_tu_nonylphenols"}
-        let tetrachloroethene = {value: _this.table_title.pollutants.tetrachloroethene, unit: "TU", info:"info_delta_tu_tetrachloroethene"}
-        let trichloroethylene = {value: _this.table_title.pollutants.tricloroetile, unit: "TU", info:"info_delta_tu_trychloroethylene"}
-        let total = {value: _this.table_title.pollutants.total, unit: "TU"}
+        let dichloroethane = {value: _this.table_title.pollutants.diclo, unit: "TU/day", info:"info_delta_tu_diclo"}
+        let cadmium = {value: _this.table_title.pollutants.cadmium, unit: "TU/day", info:"info_delta_tu_cadmium"}
+        let hexachlorobenzene = {value: _this.table_title.pollutants.hexaclorobenzene, unit: "TU/day", info:"info_delta_tu_hexaclorobenzene"}
+        let mercury = {value: _this.table_title.pollutants.mercury, unit: "TU/day", info:"info_delta_tu_mercury"}
+        let lead = {value: _this.table_title.pollutants.lead, unit: "TU/day", info:"info_delta_tu_lead"}
+        let nickel = {value: _this.table_title.pollutants.nickel, unit: "TU/day", info:"info_delta_tu_nickel"}
+        let chloroalkanes = {value: _this.table_title.pollutants.chloroalkanes, unit: "TU/day", info:"info_delta_tu_chloroalkanes"}
+        let hexaclorobutadie = {value: _this.table_title.pollutants.hexaclorobutadie, unit: "TU/day", info:"info_delta_tu_hexaclorobutadiene"}
+        let nonylphenols = {value: _this.table_title.pollutants.nonylphenols, unit: "TU/day", info:"info_delta_tu_nonylphenols"}
+        let tetrachloroethene = {value: _this.table_title.pollutants.tetrachloroethene, unit: "TU/day", info:"info_delta_tu_tetrachloroethene"}
+        let trichloroethylene = {value: _this.table_title.pollutants.tricloroetile, unit: "TU/day", info:"info_delta_tu_trychloroethylene"}
+        let total = {value: _this.table_title.pollutants.total, unit: "TU/day"}
 
 
         const data_chart = {
@@ -4656,18 +4870,8 @@ export default {
 
       let _this = this
 
-      const groupedByAssessments = _.groupBy(this.selected_industries, function(n) {
-        return n.assessment.name;
-      });
 
-      if(_this.tab !== undefined && _this.tab !== null && Object.values(groupedByAssessments)[_this.tab] != undefined){
-
-        let assessment = Object.values(groupedByAssessments)[_this.tab][0].assessment
-        let assessment_days = utils.daysBetween(assessment.assessment_period_start, assessment.assessment_period_end)
-
-        let days_factor = 1
-        if(this.period_model === "annual") days_factor = 365
-        else if(this.period_model === "assessment") days_factor = assessment_days
+      if(_this.tab !== undefined){
 
         let pollutants_table = {
           header: [{text: "", value: "value", sortable: false}],
@@ -4734,18 +4938,8 @@ export default {
 
       let _this = this
 
-      const groupedByAssessments = _.groupBy(this.selected_industries, function(n) {
-        return n.assessment.name;
-      });
 
-      if(_this.tab !== undefined && _this.tab !== null && Object.values(groupedByAssessments)[_this.tab] != undefined){
-
-        let assessment = Object.values(groupedByAssessments)[_this.tab][0].assessment
-        let assessment_days = utils.daysBetween(assessment.assessment_period_start, assessment.assessment_period_end)
-
-        let days_factor = 1
-        if(this.period_model === "annual") days_factor = 365
-        else if(this.period_model === "assessment") days_factor = assessment_days
+      if(_this.tab !== undefined){
 
         let table = {
           header: [{text: "", value: "value", sortable: false}],
@@ -4805,18 +4999,8 @@ export default {
 
       let _this = this
 
-      const groupedByAssessments = _.groupBy(this.selected_industries, function(n) {
-        return n.assessment.name;
-      });
 
-      if(_this.tab !== undefined && _this.tab !== null && Object.values(groupedByAssessments)[_this.tab] != undefined){
-
-        let assessment = Object.values(groupedByAssessments)[_this.tab][0].assessment
-        let assessment_days = utils.daysBetween(assessment.assessment_period_start, assessment.assessment_period_end)
-
-        let days_factor = 1
-        if(this.period_model === "annual") days_factor = 365
-        else if(this.period_model === "assessment") days_factor = assessment_days
+      if(_this.tab !== undefined){
 
         let pollutants_table = {
           header: [{text: "", value: "value", sortable: false}],
@@ -4830,10 +5014,10 @@ export default {
         //let treated_factor = {value: _this.table_title.simple_table.treated, unit: "%", info:"Amount of water treated in the treatment plant divided by the amount of water withdrawn. The higher the value, the better."}
         //let available_ratio = {value: _this.table_title.simple_table.consumption_available, unit: "%", info: "This metric is calculated from the relationship between the amount of water withdrawn by the industry and the amount of water available and multiplied by 100. It indicates the percentage of the available water withdrawn by the industry’s consumption. This metric may have values ranging from 0, to a value greater than 100, indicating that the demand for water is higher than the available."}
         //let efficiency_factor = {value: _this.table_title.simple_table.specific_water_consumption, unit: "tonnes/m3", info: "Tonnes of product produced by the industry per cubic meter of water used"}
-        let total_ghg = {value: _this.table_title.simple_table.total_ghg, unit: "kgCO2eq", info: "This metric indicates the CO2e emissions from the industry. It will always have positive values; higher values indicate higher impact."}
+        let total_ghg = {value: _this.table_title.simple_table.total_ghg, unit: "kgCO2eq/day", info: "This metric indicates the CO2e emissions from the industry. It will always have positive values; higher values indicate higher impact."}
         let eutrophication = {value: _this.table_title.simple_table.eutrophication, unit: "gPO4eq/m3", info: "Eutrophication potential (EP) is defined as the potential to cause over-fertilization of water and soil, which can result in increased growth of biomass. It will always have positive values; higher values indicate higher impact."}
-        let ecotox_effluent = {value: this.table_title.simple_table.tu, unit: "TU", info: " Toxic units (TU) are used in the field of toxicology to quantify the interactions of toxicants in mixtures of chemicals. A toxic unit for a given compound is based on the concentration at which there is a 50% effect (ex. EC50) for a certain biological endpoint."}
-        let delta_ecotox = {value: this.table_title.simple_table.delta_tu, unit: "TU"}
+        let ecotox_effluent = {value: this.table_title.simple_table.tu, unit: "TU/day", info: " Toxic units (TU) are used in the field of toxicology to quantify the interactions of toxicants in mixtures of chemicals. A toxic unit for a given compound is based on the concentration at which there is a 50% effect (ex. EC50) for a certain biological endpoint."}
+        let delta_ecotox = {value: this.table_title.simple_table.delta_tu, unit: "TU/day"}
 
         let eqs = {value: this.table_title.simple_table.eqs, unit: "-", info: "Index reflecting how large the load of each pollutant in the effluent is with respect to the EQS (Environmental Quality Standards). The larger it is, the worse."}
         let delta_eqs = {value: this.table_title.simple_table.delta_eqs, unit: "-"}
@@ -4865,7 +5049,7 @@ export default {
 
           quality_quantity[key] = this.return_avg_risk([dilution_factor_risk, recycled_factor_risk, treated_factor_risk, available_factor_risk, efficiency_factor_risk])
 
-          total_ghg[key] = metrics.emissions_and_descriptions(industries, days_factor).total
+          total_ghg[key] = metrics.emissions_and_descriptions(industries, 1).total
           eutrophication[key] = metrics.eutrophication_potential(industries).total
 
           ecotox_effluent[key] = metrics.ecotoxicity_potential_tu(industries).total
@@ -4907,18 +5091,8 @@ export default {
 
       let _this = this
 
-      const groupedByAssessments = _.groupBy(this.selected_industries, function(n) {
-        return n.assessment.name;
-      });
 
-      if(_this.tab !== undefined && _this.tab !== null && Object.values(groupedByAssessments)[_this.tab] != undefined){
-
-        let assessment = Object.values(groupedByAssessments)[_this.tab][0].assessment
-        let assessment_days = utils.daysBetween(assessment.assessment_period_start, assessment.assessment_period_end)
-
-        let days_factor = 1
-        if(this.period_model === "annual") days_factor = 365
-        else if(this.period_model === "assessment") days_factor = assessment_days
+      if(_this.tab !== undefined){
 
         let pollutants_table = {
           header: [{text: "", value: "value", sortable: false}],
@@ -5008,18 +5182,7 @@ export default {
 
       let _this = this
 
-      const groupedByAssessments = _.groupBy(this.selected_industries, function(n) {
-        return n.assessment.name;
-      });
-
-      if(_this.tab !== undefined && _this.tab !== null && Object.values(groupedByAssessments)[_this.tab] != undefined){
-
-        let assessment = Object.values(groupedByAssessments)[_this.tab][0].assessment
-        let assessment_days = utils.daysBetween(assessment.assessment_period_start, assessment.assessment_period_end)
-
-        let days_factor = 1
-        if(this.period_model === "annual") days_factor = 365
-        else if(this.period_model === "assessment") days_factor = assessment_days
+      if(_this.tab !== undefined){
 
         let pollutants_table = {
           header: [{text: "", value: "value", sortable: false}],
@@ -5127,11 +5290,8 @@ export default {
 
       let _this = this
 
-      const groupedByAssessments = _.groupBy(this.selected_industries, function(n) {
-        return n.assessment.name;
-      });
 
-      if(_this.tab !== undefined && _this.tab !== null && Object.values(groupedByAssessments)[_this.tab] != undefined){
+      if(_this.tab !== undefined){
 
 
         let pollutants_table = {
@@ -5217,18 +5377,7 @@ export default {
 
       let _this = this
 
-      const groupedByAssessments = _.groupBy(this.selected_industries, function(n) {
-        return n.assessment.name;
-      });
-
-      if(_this.tab !== undefined && _this.tab !== null && Object.values(groupedByAssessments)[_this.tab] != undefined){
-
-        let assessment = Object.values(groupedByAssessments)[_this.tab][0].assessment
-        let assessment_days = utils.daysBetween(assessment.assessment_period_start, assessment.assessment_period_end)
-
-        let days_factor = 1
-        if(this.period_model === "annual") days_factor = 365
-        else if(this.period_model === "assessment") days_factor = assessment_days
+      if(_this.tab !== undefined){
 
         let pollutants_table = {
           header: [{text: "", value: "value", sortable: false}],
@@ -5330,26 +5479,17 @@ export default {
         return [layer.name, layer.layer]
       })
 
-      const groupedByAssessments = _.groupBy(this.selected_industries, function(n) {
-        return n.assessment.name;
-      });
-
       let _this = this
 
-      if(_this.tab !== undefined && _this.tab !== null && Object.values(groupedByAssessments)[_this.tab] != undefined){
-
-        let assessment = Object.values(groupedByAssessments)[_this.tab][0].assessment
-        let assessment_days = utils.daysBetween(assessment.assessment_period_start, assessment.assessment_period_end)
-
+      if(_this.tab !== undefined){
 
         let layer_table = {
           header: [{text: "Layer", value: "layer", sortable: false}],
           value: []
         }
-
         let industries_and_supply_chain = []
-        Object.values(groupedByAssessments)[_this.tab].forEach(industryAux => {
-          let industry = industryAux.industry
+
+        this.valid_created_assessments[_this.tab].industries.forEach(industry => {
 
           industries_and_supply_chain.push({
             name: industry.name,
@@ -5413,6 +5553,7 @@ export default {
     add_identifier: function (category, id){
       let _this = this
       category.id = id
+      category.locked = (_this.radio_layers === 2)
       id++
 
       if(category.hasOwnProperty("children")){
@@ -5427,7 +5568,7 @@ export default {
 
     async layers_table_pdf(dd, industries, assessment_days){
 
-      let selected_layers_formatted = this.selected_layers.map(function (layer) {
+      let selected_layers_formatted = this.selected_layers_pdf.map(function (layer) {
         return [layer.name, layer.layer]
       })
 
@@ -5520,8 +5661,6 @@ export default {
       let _this = this
 
       let days_factor = 1
-      if(this.period_model === "annual") days_factor = 365
-      else if(this.period_model === "assessment") days_factor = assessment_days
 
       dd.content.push({
         text: "Global Warming Potential\n\n",
@@ -5534,14 +5673,14 @@ export default {
           body: [
             [
               {text:'Industry', style: "bold"},
-              {text:"Total (kgCO2eq)",style: "bold"},
-              {text:'Electricity consumption (kgCO2eq)',style: "bold"},
-              {text:'Fuel engines (kgCO2eq)',style: "bold"},
-              {text:"Water treatment (kgCO2eq)",style: "bold"},
-              {text:"Biogas (kgCO2eq)",style: "bold"},
-              {text:"Sludge management (kgCO2eq)",style: "bold"},
-              {text:"Water reuse transport (kgCO2eq)",style: "bold"},
-              {text:"Water discharged (kgCO2eq)",style: "bold"},
+              {text:"Total (kgCO2eq/day)",style: "bold"},
+              {text:'Electricity consumption (kgCO2eq/day)',style: "bold"},
+              {text:'Fuel engines (kgCO2eq/day)',style: "bold"},
+              {text:"Water treatment (kgCO2eq/day)",style: "bold"},
+              {text:"Biogas (kgCO2eq/day)",style: "bold"},
+              {text:"Sludge management (kgCO2eq/day)",style: "bold"},
+              {text:"Water reuse transport (kgCO2eq/day)",style: "bold"},
+              {text:"Water discharged (kgCO2eq/day)",style: "bold"},
 
             ]
           ]
@@ -5557,8 +5696,9 @@ export default {
       };
 
 
-      for (const [key, industries] of Object.entries(this.industries_aggregated)) {
+      for (const [key, industries] of industries_aux) {
         let total = 0
+        console.log(industries)
         let emissions = metrics.emissions_and_descriptions(industries, days_factor)
         let row = [key]
 
@@ -5626,14 +5766,10 @@ export default {
 
     async quality_quantity_indicators(dd, industries_aux, assessment_days) {
 
-      let days_factor = 1
-      if(this.period_model === "annual") days_factor = 365
-      else if(this.period_model === "assessment") days_factor = assessment_days
-
       let _this = this
 
       dd.content.push({
-        text: "Availability & Quantity indicators\n\n",
+        text: "Quantity indicators\n\n",
         style: 'subheader'
       })
 
@@ -5658,7 +5794,7 @@ export default {
         datasets: []
       };
 
-      for (const [key, industries] of Object.entries(this.industries_aggregated)) {
+      for (const [key, industries] of industries_aux) {
         let row = [key]
 
         let dilution_factor_value = await metrics.dilution_factor(this.global_layers, industries)
@@ -5712,98 +5848,6 @@ export default {
 
     },
 
-    async simple_table_pdf(dd, assessment_days) {
-
-      let days_factor = 1
-      if(this.period_model === "annual") days_factor = 365
-      else if(this.period_model === "assessment") days_factor = assessment_days
-
-      let _this = this
-
-      dd.content.push({
-        text: "General indicators\n\n",
-        style: 'subheader'
-      })
-
-
-      let industriesIndicator = {
-        table: {
-          body: [
-            [
-              {text:'Industry', style: "bold"},
-              {text:'Dilution factor (%)',style: "bold"},
-              {text:'Recycled water factor (%)',style: "bold"},
-              {text:"Treated water factor (%)",style: "bold"},
-              {text:"Consumption available ratio (%)",style: "bold"},
-              {text:"Specific water consumption (tonnes/m3)",style: "bold"},
-            ]
-          ]
-        }
-      }
-      let industriesIndicator_1 = {
-        table: {
-          body: [
-            [
-              {text:'Industry', style: "bold"},
-              {text:'Total GHG emissions (kgCO2eq)', style: "bold"},
-              {text:'Eutrophication potential (gPO4eq/m3)', style: "bold"},
-              {text:'Increase in toxic units in the receiving water body after discharge', style: "bold"},
-              {text:'Increase of the average concentration of the pollutants in the receiving water body after discharge (with respect to EQS) ', style: "bold"},
-              {text:'Average percentage of treatment efficiency ', style: "bold"},
-
-
-            ]
-          ]
-        }
-      }
-
-
-      for (const [key, industries] of Object.entries(this.industries_aggregated)) {
-        let row = [key]
-        let row_1 = [key]
-
-        let dilution_factor_value = await metrics.dilution_factor(this.global_layers, industries)
-        row.push( {text: dilution_factor_value, fillColor: _this.get_color(this.risk_categories.dilution_factor(dilution_factor_value))})
-        let recycled_water_factor = metrics.recycled_water_factor(industries)
-        row.push({text: recycled_water_factor, fillColor: _this.get_color(this.risk_categories.recycled_water_factor(recycled_water_factor))})
-        let treated_water_factor = metrics.treated_water_factor(industries)
-        row.push({text: treated_water_factor, fillColor: _this.get_color(this.risk_categories.water_treated(treated_water_factor))})
-        let available_ratio_value = await metrics.available_ratio(this.global_layers, industries)
-        row.push({text: available_ratio_value, fillColor: _this.get_color(this.risk_categories.water_stress_ratio(available_ratio_value))})
-        row.push({text: metrics.efficiency_factor(industries), fillColor: _this.get_color(this.risk_categories.specific_water_consumption(available_ratio_value))})
-
-        let ghg_total = metrics.emissions_and_descriptions(industries, days_factor).total
-        row_1.push({text: ghg_total, fillColor: _this.get_color(this.risk_categories.global_warming(ghg_total))})
-
-
-        let eutrophication = metrics.eutrophication_potential(industries).total
-        row_1.push({text: eutrophication, fillColor: _this.get_color(this.risk_categories.eutrophication(eutrophication)),})
-
-
-        let tu = await metrics.delta_tu(industries, this.global_layers)
-        row_1.push({text: tu.total, fillColor: _this.get_color(this.risk_categories.delta_ecotoxicity(tu.total))})
-
-        let delta_eqs = await metrics.delta_eqs_avg(industries, this.global_layers)
-        row_1.push({text: delta_eqs, fillColor: _this.get_color(this.risk_categories.delta_eqs(delta_eqs))})
-
-        let avg_efficiency = metrics.avg_treatment_efficiency(industries)
-        row_1.push({text: avg_efficiency, fillColor: _this.get_color(this.risk_categories.treatment_efficiency(avg_efficiency))})
-
-        industriesIndicator.table.body.push(row)
-        industriesIndicator_1.table.body.push(row_1)
-
-      }
-
-      dd.content.push(industriesIndicator)
-      dd.content.push("\n\n")
-      dd.content.push(industriesIndicator_1)
-      dd.content.push("\n")
-      this.risk_categories.legend_impact_pdf(dd)
-      dd.content.push("\n\n")
-
-
-    },
-
 
     eutrophication_pdf(dd, industries_aux, assessment_days) {
 
@@ -5842,7 +5886,7 @@ export default {
       };
 
 
-      for (const [key, industries] of Object.entries(this.industries_aggregated)) {
+      for (const [key, industries] of industries_aux) {
 
         let eutrophication = metrics.eutrophication_potential(industries)
         let row = [key]
@@ -5912,8 +5956,6 @@ export default {
     async ecotoxicity_pdf(dd, industries_aux, assessment_days) {
 
       let days_factor = 1
-      if(this.period_model === "annual") days_factor = 365
-      else if(this.period_model === "assessment") days_factor = assessment_days
 
       let _this = this
 
@@ -5932,35 +5974,35 @@ export default {
           body: [
             [
               {text:'Industry', style: "bold"},
-              {text:"Total (TU)",style: "bold"},
+              {text:"Total (TU/day)",style: "bold"},
               [
                 {text: [{text: "1,2-DCE", style: "bold"}, {text: "1" , sup: true, style: "asterisk"},]},
-                {text: "(TU)", style: "bold"},
+                {text: "(TU/day)", style: "bold"},
               ], //1,2-Dichloroethane
-              {text:'Cadmium (TU)',style: "bold"},
+              {text:'Cadmium (TU/day)',style: "bold"},
               [
                 {text: [{text: "HBC", style: "bold"}, {text: "2" , sup: true, style: "asterisk"},]},
-                {text: "(TU)", style: "bold"},
+                {text: "(TU/day)", style: "bold"},
               ], //Hexachlorobenzene
-              {text:"Mercury (TU)",style: "bold"},
-              {text:"Lead (TU)",style: "bold"},
-              {text:"Nickel (TU)",style: "bold"},
-              {text:"Chloroalkanes (TU)",style: "bold"},
+              {text:"Mercury (TU/day)",style: "bold"},
+              {text:"Lead (TU/day)",style: "bold"},
+              {text:"Nickel (TU/day)",style: "bold"},
+              {text:"Chloroalkanes (TU/day)",style: "bold"},
               [
                 {text: [{text: "HCBD", style: "bold"}, {text: "3" , sup: true, style: "asterisk"},]},
-                {text: "(TU)", style: "bold"},
+                {text: "(TU/day)", style: "bold"},
               ], //Hexachlorobutadiene
               [
                 {text: [{text: "NP", style: "bold"}, {text: "4" , sup: true, style: "asterisk"},]},
-                {text: "(TU)", style: "bold"},
+                {text: "(TU/day)", style: "bold"},
               ], //Nonylphenols
               [
                 {text: [{text: "PCE", style: "bold"}, {text: "5" , sup: true, style: "asterisk"},]},
-                {text: "(TU)", style: "bold"},
+                {text: "(TU/day)", style: "bold"},
               ], //Tetrachloroethene
               [
                 {text: [{text: "TCE", style: "bold"}, {text: "6" , sup: true, style: "asterisk"},]},
-                {text: "(TU)", style: "bold"},
+                {text: "(TU/day)", style: "bold"},
               ], //trichloroethylene
 
             ]
@@ -5976,7 +6018,7 @@ export default {
         }]
       };
 
-      for (const [key, industries] of Object.entries(this.industries_aggregated)) {
+      for (const [key, industries] of industries_aux) {
 
         let row = [key]
         let tu = metrics.ecotoxicity_potential_tu(industries)
@@ -6079,9 +6121,9 @@ export default {
       })
 
       await this.delta_pdf(dd, industries_aux, assessment_days)
-      this.eqs_pdf(dd)
-      await this.delta_eqs_pdf(dd)
-      await this.delta_tu_pdf(dd)
+      this.eqs_pdf(dd, industries_aux)
+      await this.delta_eqs_pdf(dd, industries_aux)
+      await this.delta_tu_pdf(dd, industries_aux)
 
 
     },
@@ -6153,7 +6195,7 @@ export default {
 
 
 
-      for (const [key, industries] of Object.entries(this.industries_aggregated)) {
+      for (const [key, industries] of industries_aux) {
 
         let row = [key]
         let row_1 = [key]
@@ -6229,7 +6271,7 @@ export default {
 
     },
 
-    eqs_pdf(dd) {
+    eqs_pdf(dd, industries_aux) {
 
 
       let _this = this
@@ -6277,7 +6319,7 @@ export default {
         }
       }
 
-      for (const [key, industries] of Object.entries(this.industries_aggregated)) {
+      for (const [key, industries] of industries_aux) {
 
         let row = [key]
         let tu = metrics.environmental_quality_standards(industries)
@@ -6339,7 +6381,7 @@ export default {
 
     },
 
-    async delta_tu_pdf(dd) {
+    async delta_tu_pdf(dd, industries_aux) {
 
       let _this = this
 
@@ -6353,40 +6395,40 @@ export default {
           body: [
             [
               {text:'Industry', style: "bold"},
-              {text:"Total (TU)",style: "bold"},
+              {text:"Total (TU/day)",style: "bold"},
               [
                 {text: [{text: "1,2-DCE", style: "bold"}, {text: "1" , sup: true, style: "asterisk"},]},
-                {text: "(TU)", style: "bold"},
+                {text: "(TU/day)", style: "bold"},
 
               ], //1,2-Dichloroethane
-              {text:'Cadmium (TU)',style: "bold"},
+              {text:'Cadmium (TU/day)',style: "bold"},
               [
                 {text: [{text: "HBC", style: "bold"}, {text: "2" , sup: true, style: "asterisk"},]},
-                {text: "(TU)", style: "bold"},
+                {text: "(TU/day)", style: "bold"},
 
               ], //Hexachlorobenzene
 
-              {text:"Mercury (TU)",style: "bold"},
-              {text:"Lead (TU)",style: "bold"},
-              {text:"Nickel (TU)",style: "bold"},
-              {text:"Chloroalkanes (TU)",style: "bold"},
+              {text:"Mercury (TU/day)",style: "bold"},
+              {text:"Lead (TU/day)",style: "bold"},
+              {text:"Nickel (TU/day)",style: "bold"},
+              {text:"Chloroalkanes (TU/day)",style: "bold"},
               [
                 {text: [{text: "HCBD", style: "bold"}, {text: "3" , sup: true, style: "asterisk"},]},
-                {text: "(TU)", style: "bold"},
+                {text: "(TU/day)", style: "bold"},
 
               ], //Hexachlorobutadiene
               [
                 {text: [{text: "NP", style: "bold"}, {text: "4" , sup: true, style: "asterisk"},]},
-                {text: "(TU)", style: "bold"},
+                {text: "(TU/day)", style: "bold"},
 
               ], //Nonylphenols
               [
                 {text: [{text: "PCE", style: "bold"}, {text: "5" , sup: true, style: "asterisk"},]},
-                {text: "(TU)", style: "bold"},
+                {text: "(TU/day)", style: "bold"},
               ], //Tetrachloroethene
               [
                 {text: [{text: "TCE", style: "bold"}, {text: "6" , sup: true, style: "asterisk"},]},
-                {text: "(TU)", style: "bold"},
+                {text: "(TU/day)", style: "bold"},
               ], //trichloroethylene
             ]
           ]
@@ -6394,7 +6436,7 @@ export default {
       }
 
 
-      for (const [key, industries] of Object.entries(this.industries_aggregated)) {
+      for (const [key, industries] of industries_aux) {
 
         let row = [key]
         let tu = await metrics.delta_tu(industries, this.global_layers)
@@ -6458,7 +6500,7 @@ export default {
     },
 
 
-    async delta_eqs_pdf(dd) {
+    async delta_eqs_pdf(dd, industries_aux) {
 
       dd.content.push({
         text: "\nIncrease of the average concentration of the pollutants in the receiving water body after discharge (with respect to EQS)  \n\n",
@@ -6476,7 +6518,7 @@ export default {
                 {text: [{text: "1,2-DCE", style: "bold"}, {text: "1" , sup: true, style: "asterisk"},]},
 
               ], //1,2-Dichloroethane
-              {text:'Cadmium (TU)',style: "bold"},
+              {text:'Cadmium (TU/day)',style: "bold"},
               [
                 {text: [{text: "HBC", style: "bold"}, {text: "2" , sup: true, style: "asterisk"},]},
 
@@ -6505,7 +6547,7 @@ export default {
         }
       }
 
-      for (const [key, industries] of Object.entries(this.industries_aggregated)) {
+      for (const [key, industries] of industries_aux) {
 
         let row = [key]
         let tu = await metrics.delta_eqs(industries, this.global_layers)
@@ -6635,7 +6677,7 @@ export default {
         datasets: []
       };
 
-      for (const [key, industries] of Object.entries(this.industries_aggregated)) {
+      for (const [key, industries] of industries_aux) {
         let row = [key]
         let row_1 = [key]
 
@@ -6744,7 +6786,6 @@ export default {
 
     influent_efficiency_pdf(dd, industries_aux, assessment_days) {
 
-
       let _this = this
 
       dd.content.push({
@@ -6770,7 +6811,7 @@ export default {
         datasets: []
       };
 
-      for (const [key, industries] of Object.entries(this.industries_aggregated)) {
+      for (const [key, industries] of industries_aux) {
         let row = [key]
 
         let eff = metrics.amount_water_influent_cleaned(industries)
@@ -6861,7 +6902,7 @@ export default {
         }
       }
 
-      for (const [key, industries] of Object.entries(this.industries_aggregated)) {
+      for (const [key, industries] of industries_aux) {
         let row = [key]
 
         let indicators = await metrics.reporting_metrics(industries, this.global_layers)
@@ -7044,34 +7085,28 @@ export default {
           industriesSummary.table.body.push(arr)
         })
 
-
-
         dd.content.push(industriesSummary)
         dd.content.push("\n\n")
 
-
-        if(this.level_of_detail == "simple"){
-          dd.content.push("\n\n")
-          await this.simple_table_pdf(dd, assessment_days)
-          dd.content.push("\n\n")
-        }else if (this.level_of_detail == "extended"){
-          this.emissions_table_pdf(dd, industries, assessment_days)
-          dd.content.push("\n\n")
-          await this.quality_quantity_indicators(dd, industries, assessment_days)
-          dd.content.push("\n\n")
-          this.eutrophication_pdf(dd, industries, assessment_days)
-          dd.content.push("\n\n")
-          await this.ecotoxicity_pdf(dd, industries, assessment_days)
-          this.efficiency_pdf(dd, industries, assessment_days)
-          dd.content.push("\n\n")
-          this.influent_efficiency_pdf(dd, industries, assessment_days)
-          dd.content.push("\n\n")
-          await this.reporting_pdf(dd, industries, assessment_days)
-          dd.content.push("\n\n")
-        }
+        let industries_aggregated = industries.map(industry => [industry.industry.name, [industry.industry]])
 
 
-        await this.layers_table_pdf(dd, industries, assessment_days)
+        console.log(industries)
+        this.emissions_table_pdf(dd, industries_aggregated, assessment_days)
+        dd.content.push("\n\n")
+        await this.quality_quantity_indicators(dd, industries_aggregated, assessment_days)
+        dd.content.push("\n\n")
+        this.eutrophication_pdf(dd, industries_aggregated, assessment_days)
+        dd.content.push("\n\n")
+        await this.ecotoxicity_pdf(dd, industries_aggregated, assessment_days)
+        this.efficiency_pdf(dd, industries_aggregated, assessment_days)
+        dd.content.push("\n\n")
+        this.influent_efficiency_pdf(dd, industries_aggregated, assessment_days)
+        dd.content.push("\n\n")
+        await this.reporting_pdf(dd, industries_aggregated, assessment_days)
+        dd.content.push("\n\n")
+
+        await this.layers_table_pdf(dd, industries_aggregated, assessment_days)
       }
 
 
@@ -7089,6 +7124,10 @@ export default {
   },
 
   computed: {
+
+    valid_created_assessments(){
+      return this.assessments_with_industries.filter(assessment => !assessment.disabled).map(assessment => assessment.assessment)
+    },
 
     assessments_with_industries(){
       let _this = this
@@ -7110,6 +7149,49 @@ export default {
     },
 
     industries_aggregated(){
+      let _this = this
+      let industries = []
+
+      this.created_assessments.forEach(assessment => {
+        assessment.industries.forEach(industry => {
+          //Required items
+          if(this.is_industry_valid(industry)){
+            industries.push({
+              "industry": industry,
+              "assessment": assessment,
+              "name": industry.name
+            })
+          }
+        })
+      })
+
+      const groupedByAssessments = _.groupBy(industries, function(n) {
+        return n.assessment.name;
+      });
+
+      if(_this.tab !== undefined && _this.tab !== null && Object.values(groupedByAssessments)[_this.tab] != undefined) {
+
+        let industriesOfassessment = Object.values(groupedByAssessments)[_this.tab].map(industry => {
+          return industry.industry
+        })
+        if (_this.aggregation_level == "country") {
+          //Agrupació per països
+          const groupedByCountry = _.groupBy(industriesOfassessment, function (industry) {
+            return utils.get_country_code_from_coordinates(industry.location.lat, industry.location.lng)
+          }) //Array of arrays of industries
+          return groupedByCountry
+        } else if (_this.aggregation_level == "industry") {
+          let industries = {}
+          industriesOfassessment.forEach(industry => {
+            industries[industry.name] = [industry]
+          })
+
+          return industries
+        }
+      }
+    },
+
+    industries_aggregated_pdf(){
       let _this = this
 
       const groupedByAssessments = _.groupBy(this.selected_industries, function(n) {
@@ -7134,7 +7216,6 @@ export default {
           industriesOfassessment.forEach(industry => {
             industries[industry.name] = [industry]
           })
-
           return industries
         }
       }
@@ -7144,24 +7225,20 @@ export default {
 
       let _this = this
 
-      const groupedByAssessments = _.groupBy(this.selected_industries, function(n) {
-        return n.assessment.name;
-      });
+      if(_this.tab !== undefined){
 
-      if(_this.tab !== undefined && _this.tab !== null && Object.values(groupedByAssessments)[_this.tab] != undefined){
-
-        let assessment = Object.values(groupedByAssessments)[_this.tab][0].assessment
+        let assessment = this.valid_created_assessments[_this.tab]
         let assessment_days = utils.daysBetween(assessment.assessment_period_start, assessment.assessment_period_end)
 
         let table = {
           header: [
-              {text: "Name", value: "industry_name"},
+            {text: "Name", value: "industry_name"},
             {text: "Latitude", value: "lat"},
             {text: "Longitude", value: "lon"},
             {text: "Standard Industrial Classification", value: "industry_type"},
             {text: "Assessment period (days)", value: "assessment_period"},
             { text: 'Supply chain', value: 'data-table-expand'},
-            ],
+          ],
           industries: []
         }
 
@@ -7186,10 +7263,9 @@ export default {
     },
 
     assessment_names: function() {
-      const groupedByAssessments = _.groupBy(this.selected_industries, function(n) {
-        return n.assessment.name;
-      });
-      return Object.entries(groupedByAssessments).map(assessment => assessment[0])
+      //return this.assessments_with_industries.map(assessment => assessment.assessment.name)
+
+      return this.assessments_with_industries.filter(assessment => !assessment.disabled).map(assessment => assessment.assessment.name)
     },
 
     layer_tree: function () {
@@ -7288,6 +7364,17 @@ export default {
   height: 100%;
 }
 
+
+#assessment_tab .v-tab.v-tab--active{
+  background-color: #1C195B;
+  color: #F2F4F3 !important;
+}
+
+#main_tab .v-tab.v-tab--active{
+  background-color: #b62373 !important;
+  color: #F2F4F3 !important;
+}
+
 .border_report{
   border-style: solid;
   border-color: #1C195B;
@@ -7301,10 +7388,7 @@ export default {
   padding-bottom: 30px;
 }
 
-.v-tab.v-tab--active{
-  background-color: #1C195B;
-  color: #F2F4F3 !important;
-}
+
 
 .table_title {
   font-size: 140%;

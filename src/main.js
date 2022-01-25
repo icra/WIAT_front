@@ -19,9 +19,12 @@ Vue.prototype.$last_location = [41.9672203,2.8385181]
 Vue.prototype.$layers_description = [
   {
     name: "Population",
+    locked: false,
     children: [
       {
         name: "Population",
+        locked: false,
+
         layer: {
           layers: {
             baseline: {
@@ -42,15 +45,23 @@ Vue.prototype.$layers_description = [
   },
   {
     name: "Water quantity",
+    locked: false,
+
     children: [
       {
         name: "Water availability",
+        locked: false,
+
         children: [
           {
             name: "Water variability ",
+            locked: false,
+
             children: [
               {
                 name: "Seasonal variability",
+                locked: false,
+
                 layer: {
                   layers: {
                     baseline: {
@@ -70,6 +81,8 @@ Vue.prototype.$layers_description = [
               },
               {
                 name: "Interannual variability",
+                locked: false,
+
                 layer: {
                   layers: {
                     baseline: {
@@ -91,6 +104,8 @@ Vue.prototype.$layers_description = [
           },
           {
             name: "Water supply",
+            locked: false,
+
             layer: {
               layers: {
                 baseline: {
@@ -110,6 +125,8 @@ Vue.prototype.$layers_description = [
           },
           {
             name: "Flow accumulation",
+            locked: false,
+
             layer: {
               layers: {
                 baseline: {
@@ -129,6 +146,8 @@ Vue.prototype.$layers_description = [
           },
           {
             name: "Streamflow",
+            locked: false,
+
             layer: {
               layers: {
                 baseline: {
@@ -151,9 +170,13 @@ Vue.prototype.$layers_description = [
       },
       {
         name: "Water demand",
+        locked: false,
+
         children: [
           {
             name: "Water demand",
+            locked: false,
+
             layer: {
               layers: {
                 baseline: {
@@ -175,9 +198,13 @@ Vue.prototype.$layers_description = [
       },
       {
         name: "Water scarcity ratios",
+        locked: false,
+
         children: [
           {
             name: "Water stress",
+            locked: false,
+
             layer: {
               layers: {
                 baseline: {
@@ -197,6 +224,8 @@ Vue.prototype.$layers_description = [
           },
           {
             name: "Water depletion",
+            locked: false,
+
             layer: {
               layers: {
                 baseline: {
@@ -216,6 +245,8 @@ Vue.prototype.$layers_description = [
           },
           {
             name: "Aridity index",
+            locked: false,
+
             layer: {
               layers: {
                 baseline: {
@@ -237,9 +268,13 @@ Vue.prototype.$layers_description = [
       },
       {
         name: "Groundwater",
+        locked: false,
+
         children: [
           {
             name: "Groundwater table decline",
+            locked: false,
+
             layer: {
               layers: {
                 baseline: {
@@ -262,9 +297,13 @@ Vue.prototype.$layers_description = [
       },
       {
         name: "Flood risk",
+        locked: false,
+
         children: [
           {
             name: "Riverine flood risk",
+            locked: false,
+
             layer: {
               layers: {
                 baseline: {
@@ -284,6 +323,8 @@ Vue.prototype.$layers_description = [
           },
           {
             name: "Coastal flood risk",
+            locked: false,
+
             layer: {
               layers: {
                 baseline: {
@@ -305,9 +346,13 @@ Vue.prototype.$layers_description = [
       },
       {
         name: "Drought risk",
+        locked: false,
+
         children: [
           {
             name: "Drought risk",
+            locked: false,
+
             layer: {
               layers: {
                 baseline: {
@@ -331,13 +376,19 @@ Vue.prototype.$layers_description = [
   },
   {
     name: "Water quality",
+    locked: false,
+
     children: [
       {
         name: "Pollution",
+        locked: false,
+
         children: [
             {
           name: 'Coastal Eutrophication Potential',
-          layer: {
+              locked: false,
+
+              layer: {
             layers: {
               baseline: {
                 annual: {
@@ -356,6 +407,8 @@ Vue.prototype.$layers_description = [
         },
           {
             name: 'Surface Water Pharmaceutical Pollution',
+            locked: false,
+
             layer: {
               layers: {
                 baseline: {
@@ -375,6 +428,8 @@ Vue.prototype.$layers_description = [
           },
           {
             name: 'Coastal Pharmaceutical Pollution',
+            locked: false,
+
             layer: {
               layers: {
                 baseline: {
@@ -394,6 +449,8 @@ Vue.prototype.$layers_description = [
           },
           {
             name: 'Unimproved/No Drinking Water',
+            locked: false,
+
             layer: {
               layers: {
                 baseline: {
@@ -413,6 +470,8 @@ Vue.prototype.$layers_description = [
           },
           {
             name: 'Unimproved/No Sanitation',
+            locked: false,
+
             layer: {
               layers: {
                 baseline: {
@@ -436,9 +495,13 @@ Vue.prototype.$layers_description = [
   },
   {
     name: "Reputational risk",
+    locked: false,
+
     children: [
       {
         name: 'Peak RepRisk Country ESG Risk Index',
+        locked: false,
+
         layer: {
           layers: {
             baseline: {

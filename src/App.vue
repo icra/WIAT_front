@@ -412,7 +412,7 @@
       <!-- Main content -->
     <div style="position: absolute; height: calc(100% - 70px); width: 100%; margin-top: 70px">
       <div class="content" :class="manageContentClass">
-        <router-view :selected_assessment="assessment_expansion_panel" :selected_layer="selected_layer" :selected_industry="selected_industry" @createIndustry="createNewIndustry" @createSupplyChain="create_supply_chain" @editIndustry="open_edit_industry_tab" @selectLayer="toggleLayerSelection" @closeRightMenu="closeRightMenu" @closeLayer="applyLayer(selected_layer)" @changeFirstMenuTab="changeFirstMenuTab" @wrongLocation="snackbars.wrong_location.v_model = true" ref="reference"></router-view>
+        <router-view :selected_assessment="assessment_expansion_panel" :selected_layer="selected_layer" :selected_industry="selected_industry" @createIndustry="createNewIndustry" @createSupplyChain="create_supply_chain" @editIndustry="open_edit_industry_tab"  @editSupplyChain="open_edit_supply_chain_tab" @selectLayer="toggleLayerSelection" @closeRightMenu="closeRightMenu" @closeLayer="applyLayer(selected_layer)" @changeFirstMenuTab="changeFirstMenuTab" @wrongLocation="snackbars.wrong_location.v_model = true" ref="reference"></router-view>
       </div>
     </div>
 
@@ -783,6 +783,45 @@
             </div>
 
           </div>
+          <!-- Edit supply chain industry -->
+          <div v-else-if="right_sidebar_content === 8">
+            <div style="margin: 7px; padding: 7px; background-color: white">
+              <h3 style="color: #b62373">Edit supply chain (from industry {{ factory_name }})</h3>
+              <v-form
+                  v-model="new_supply_chain_valid"
+              >
+                <v-text-field
+                    v-model="supply_chain_name"
+                    :rules="[new_supply_chain_rules_name, rules_required]"
+                ></v-text-field>
+                <v-btn
+                    :disabled="!new_supply_chain_valid"
+                    @click="edit_supply_chain"
+                    small
+                    tile
+                    block
+                    color="#b62373"
+                >
+                  Rename
+                </v-btn>
+
+                <br>
+              </v-form>
+              <v-btn @click="delete_supply_chain" small tile block color="#b62373">
+                Delete
+              </v-btn>
+            </div>
+            <div style="margin: 7px; padding: 7px;">
+
+
+
+              <!--<v-btn block small outlined :to="{ name: 'statistics_industry', params: {assessment_id: selected_assessment, industry_id: selected_industry}}" @click="icon_selected = -1; selected_layer=null; secondMenu=false; rightMenu=false">
+                SHOW RESULTS
+              </v-btn>-->
+
+            </div>
+          </div>
+
 
         </div>
 
@@ -835,7 +874,10 @@ export default {
       selected_assessment: null,  //Id of the assessment to edit
       factory_name: null, //v-model for creating new factory
       new_factory_valid: false, //Enable or disable button for creating new factory
+
       selected_industry: null, //Id of the company to edit
+      selected_sc: null, //Id of the supply chain to edit
+
       snackbars: {
         new_assessment: {v_model: false, text: "New assessment created correctly", },
         edit_assessment: {v_model: false, text: "Assessment edited correctly", },
@@ -843,11 +885,14 @@ export default {
         new_industry: {v_model: false, text: "New industry added correctly", },
         edit_industry: {v_model: false, text: "Industry edited correctly", },
         delete_industry: {v_model: false, text: "Industry deleted correctly", },
+        delete_sc: {v_model: false, text: "Supply chain industry deleted correctly", },
         assessment_not_selected: {v_model: false, text: "Can't create industry, please select and assessment first", },
         create_industry_not_in_map: {v_model: false, text: "Can't create industry, please return to the map tab and try again", },
         place_supply_chain: {v_model: false, text: "Please, indicate the location of the supply chain industry on the map"},
         new_supply_chain: {v_model: false, text: "Supply chain industry added", },
         wrong_location: {v_model: false, text: "Please select a valid location", },
+        edit_sc: {v_model: false, text: "Supply chain industry edited correctly", },
+
 
       },
       map_content_info: {}, //Info to show when the map is clicked
@@ -933,10 +978,10 @@ export default {
       let marker = {
         isSupplyChain: true,
         latlng: _this.supply_chain_marker,
-        name: "<b>"+_this.supply_chain_name+"</b> (supply chain of "+industry.name+")",
         industry_coords: industry.location,
         assessment: this.assessment_expansion_panel,
         industry: this.selected_industry,
+        supply_chain: industry.supply_chain.length - 1
       }
 
       _this.$location_markers.push(marker)
@@ -1011,23 +1056,20 @@ export default {
 
             //Adding supply chain
             let _industry = _this.$assessments[assessment].industries[industry]
-            _industry.supply_chain.forEach(sp => {
+            for(let sc=0; sc<_industry.supply_chain.length; sc++){
+              let sc_obj = _industry.supply_chain[sc]
               marker = {
                 isSupplyChain: true,
-                latlng: sp.location,
-                name: "<b>"+sp.name+"</b> (supply chain of "+_industry.name+")",
+                latlng: sc_obj.location,
+                //name: "<b>"+sp.name+"</b> (supply chain of "+_industry.name+")",
                 industry_coords: _industry.location,
                 assessment: assessment,
-                industry: industry
+                industry: industry,
+                supply_chain: sc
               }
               _this.$location_markers.push(marker)
 
-
-            })
-
-
-
-
+            }
 
           }
         }
@@ -1158,10 +1200,34 @@ export default {
 
 
     },
+    open_edit_supply_chain_tab(assessment_index, industry_index, sc_index){
+      this.right_sidebar_content = 8
+      this.rightMenu = true
+      this.factory_name = this.created_assessments[assessment_index].industries[industry_index].name
+      this.selected_assessment = assessment_index
+      this.selected_industry = industry_index
+      this.selected_sc = sc_index
+      this.assessment_expansion_panel = assessment_index
+      this.supply_chain_name = this.created_assessments[assessment_index].industries[industry_index].supply_chain[sc_index].name
+      try {
+        this.$refs.reference.pan_location(this.created_assessments[assessment_index].industries[industry_index].location)
+        this.$refs.reference.close_supply_chain_mode()
+      } catch (error) {}
+
+
+
+
+    },
+
     edit_industry(){
       this.rightMenu = false
       this.$assessments[this.selected_assessment].industries[this.selected_industry].name = this.factory_name
       this.snackbars.edit_industry.v_model = true
+    },
+    edit_supply_chain(){
+      this.rightMenu = false
+      this.$assessments[this.selected_assessment].industries[this.selected_industry].supply_chain[this.selected_sc].name = this.supply_chain_name
+      this.snackbars.edit_sc.v_model = true
     },
     delete_industry(){
       if(this.icon_selected === -1) this.icon_selected = 0
@@ -1175,6 +1241,16 @@ export default {
         this.$refs.reference.industries_deleted()
       } catch (error) {}
     },
+    delete_supply_chain(){
+      this.rightMenu = false
+      this.snackbars.delete_sc.v_model = true
+      this.$assessments[this.selected_assessment].industries[this.selected_industry].delete_supply_chain(this.selected_sc)
+      this.update_markers()
+      /*try {
+        this.$refs.reference.industries_deleted()
+      } catch (error) {}*/
+    },
+
     new_factory_rules_name(value) {  //Rules for creating new industry
       let factories_with_same_name = this.created_assessments[this.assessment_expansion_panel].industries.filter(company => {
         return company.name === value
@@ -1199,6 +1275,8 @@ export default {
       if (industries_with_same_name.length === 0 || (industries_with_same_name.length === 1 && this.created_assessments[this.selected_assessment].industries[this.selected_industry].name === value)) return true  //If there is an assessment with the same name, must be the edited assessment
       else return 'An assessment with same name already exists.'
     },
+
+
     new_assessment_rules_name(value){//Rules for creating new assessment
       let assessments_with_same_name = this.created_assessments.filter(assessment => {
         return assessment.name === value
