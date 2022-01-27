@@ -34,6 +34,13 @@ let risk_category = {
         else if(value == impact_strings.vh) return red
         return null
     },
+    pollution(value){
+        if(value == impact_strings.l) return blue
+        else if(value == impact_strings.m) return yellow
+        else if(value == impact_strings.h) return orange
+        else if(value == impact_strings.vh) return red
+        return null
+    },
     impact_biodiversity(value){
         if(value == impact_strings.l) return blue
         else if(value == impact_strings.m) return yellow
@@ -45,28 +52,32 @@ let risk_category = {
         return null
     },
     dilution_factor: function(value){
-        if (value < 2) return red
+        if(value < 0) return null
+        else if (value < 2) return red
         else if (value < 10) return orange
         else if (value < 100) return yellow
         else if (value >= 100) return blue
         return null
     },
     recycled_water_factor: function(value){
-        if (value < 2) return red
+        if(value < 0) return null
+        else if (value < 2) return red
         else if (value < 5) return orange
         else if (value < 20) return yellow
         else if (value >= 20) return blue
         return null
     },
     water_treated: function(value){
-        if (value < 2) return red
+        if(value < 0) return null
+        else if (value < 2) return red
         else if (value < 5) return orange
         else if (value < 20) return yellow
         else if (value >= 20) return blue
         return null
     },
     water_stress_ratio: function(value){
-        if (value < 2) return blue
+        if(value < 0) return null
+        else if (value < 2) return blue
         else if (value < 5) return yellow
         else if (value < 20) return orange
         else if (value >= 20) return red
@@ -92,28 +103,32 @@ let risk_category = {
     },
 
     delta_eqs: function(value){
-        if (value < 0.2) return blue
+        if(value < 0) return null
+        else if (value < 0.2) return blue
         else if (value < 1) return yellow
         else if (value < 2) return orange
         else if (value >= 2) return red
         return null
     },
     delta_ecotoxicity: function(value){
-        if (value < 0.2) return blue
+        if(value < 0) return null
+        else if (value < 0.2) return blue
         else if (value < 1) return yellow
         else if (value < 2) return orange
         else if (value >= 2) return red
         return null
     },
     treatment_efficiency: function(value){
-        if (value < 25) return red
+        if(value < 0) return null
+        else if (value < 25) return red
         else if (value < 50) return orange
         else if (value < 75) return yellow
         else if (value >= 75) return blue
         return null
     },
     influent_treatment_efficiency: function(value){
-        if (value <= 100) return blue
+        if(value < 0) return null
+        else if (value <= 100) return blue
         else if (value > 100) return red
         return null
     },

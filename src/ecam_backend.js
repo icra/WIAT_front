@@ -229,7 +229,7 @@ export class Industry{
             let onsite_input = input[1]
             wwtp[offsite_input] = _this.has_onsite_wwtp == 1 ? onsite_wwtp[onsite_input] : 0
         })
-    }    //Update onsite wwtp if industry or connected onsite WWTP has changed
+    }    //Update offsite wwtp if industry or connected onsite WWTP has changed
 
     reset_offsite_wwtp(){
         this.offsite_wwtp = new WWTP()
@@ -557,7 +557,7 @@ export class WWTP{
 
     //indirect emissions from electricity consumption
     wwt_KPI_GHG_elec(){
-        let co2 = this.wwt_nrg_cons*this.wwt_conv_kwh;
+        let co2 = this.wwt_vol_trea*this.wwt_nrg_cons*this.wwt_conv_kwh;
         let ch4 = 0;
         let n2o = 0;
         let total = co2+ch4+n2o;

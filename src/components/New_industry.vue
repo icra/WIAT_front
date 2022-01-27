@@ -1304,7 +1304,12 @@
                 <div style="width: 100%;">
                   <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                     <span>
-                      {{user_inputs[input].question}}
+                      <span v-if="input === 'wwt_vol_trea'">
+                        Volume of industrial wastewater sent to the offsite WWTP every day
+                      </span>
+                      <span v-else>
+                        {{user_inputs[input].question}}
+                      </span>
                       <v-tooltip bottom v-if="required.includes(input)">
                         <template v-slot:activator="{ on, attrs }">
                             <span
@@ -2282,6 +2287,8 @@ export default {
     }
   },
   created() {
+
+    this.$emit('changeFirstMenuTab', -1)
     if (this.industry === undefined) this.$router.push('/')
 
     for (let industry_input of this.industry_inputs) {
@@ -3364,8 +3371,13 @@ export default {
       })
 
       for(let input of this.offsite_wwtp_inputs){
-        if(!isNaN(this.offsite_wwtp_model[input]) || this.offsite_wwtp_model[input]!="" ) this.industry.offsite_wwtp[input] = Number(this.offsite_wwtp_model[input])
+        if((!isNaN(this.offsite_wwtp_model[input]) || this.offsite_wwtp_model[input]!="") && this.offsite_wwtp_model[input]>0) this.industry.offsite_wwtp[input] = Number(this.offsite_wwtp_model[input])
       }
+
+      this.industry.offsite_wwtp['wwt_vol_disc'] = this.industry.offsite_wwtp["wwt_vol_trea"]
+
+
+
       this.stepper_model = 5
     },
 
@@ -3374,7 +3386,7 @@ export default {
         div.scrollTo(0, 0)
       })
       for(let input of this.direct_discharge_inputs){
-        if(!isNaN(this.direct_discharge_model[input]) || this.direct_discharge_model[input]!="") this.industry.direct_discharge[input] = Number(this.direct_discharge_model[input])
+        if((!isNaN(this.direct_discharge_model[input] ) || this.direct_discharge_model[input]!="") && this.direct_discharge_model[input]>0) this.industry.direct_discharge[input] = Number(this.direct_discharge_model[input])
       }
 
       if(this.industry.has_offsite_wwtp == 1) {
@@ -3389,7 +3401,7 @@ export default {
       })
 
       for(let input of this.onsite_wwtp_inputs){
-        if(!isNaN(this.onsite_wwtp_model[input]) || this.onsite_wwtp_model[input]!="") this.industry.onsite_wwtp[input] = Number(this.onsite_wwtp_model[input])
+        if((!isNaN(this.onsite_wwtp_model[input]) || this.onsite_wwtp_model[input]!="") && this.onsite_wwtp_model[input]>0) this.industry.onsite_wwtp[input] = Number(this.onsite_wwtp_model[input])
       }
 
       if(this.industry.has_offsite_wwtp == 1){
@@ -3410,7 +3422,7 @@ export default {
 
 
       for(let input of this.industry_inputs){
-        if(!isNaN(this.industry_model[input]) || this.industry_model[input]!="") this.industry[input] = Number(this.industry_model[input])
+        if((!isNaN(this.industry_model[input]) || this.industry_model[input]!="") &&  this.industry_model[input]) this.industry[input] = Number(this.industry_model[input])
       }
 
       //Local wwtp
@@ -3494,7 +3506,7 @@ export default {
 
     tab_4_disabled(){
       let wwtp = this.offsite_wwtp_model
-      let disabled = wwtp.wwt_vol_trea != null && wwtp.wwt_vol_trea != "" && wwtp.wwt_vol_disc != null && wwtp.wwt_vol_disc != ""
+      let disabled = wwtp.wwt_vol_trea != null && wwtp.wwt_vol_trea != ""
       return !disabled
     },
 

@@ -229,6 +229,7 @@ export let user_inputs = {
     "wwt_treatment_type" :{question:"Type of wastewater treatment", value: 0}, //Option | type of treatment (see Tables)
 
     "wwt_vol_trea": {question: "Volume of water treated in the WWTP every day", value: 0, unit: "m3/day"},
+
     "wwt_vol_disc" :{question:"Volume of water discharged to water body every day", value: 0, unit: "m3/day"},
     "dd_vol_disc" :{question:"Volume of water discharged to water body every day (direct discharge of untreated water)", value: 0, unit: "m3/day"},
 
@@ -319,7 +320,7 @@ export let user_inputs = {
     },
 
     //energy
-    "wwt_nrg_cons": {question: "Energy consumed from the grid fow wastewater treatment", value: 0, unit: "kWh", description_tooltip: "Total energy consumed during the assessment period by all wastewater treatment plants managed by the undertaking"},  //kWh | energy consumed from the grid
+    "wwt_nrg_cons": {question: "Electricity consumed from the grid for wastewater treatment per cubic meter treated", value: 0, unit: "kWh/m3"},  //kWh | energy consumed from the grid
     "wwt_conv_kwh": {question: "Emission factor for grid electricity", value: 0, unit: "kgCO2eq/kWh", description_tooltip: "Emission factor for grid electricity (indirect emissions)"},  //kgCO2eq/kWh | conversion factor
 
     //SLUDGE MANAGEMENT
@@ -369,9 +370,9 @@ export let user_inputs = {
 
     //INDUSTRY INPUTS
     "volume_withdrawn": {question: "Amount of water withdrawn from the water body every day", value: 0, unit: "m3/day"},
-    "has_onsite_wwtp": {question: "Has the industry an on-site treatment wastewater plant?", value: false,},
-    "has_direct_discharge": {question: "Does the industry directly discharge wastewater into the water body?", value: false, description_tooltip: "Untreated water"},
-    "has_offsite_wwtp": {question: "Has the industry an off-site treatment wastewater plant?", value: false,},
+    "has_onsite_wwtp": {question: "Has the industry an on-site wastewater pre-treatment or treatment plant?", value: false,},
+    "has_direct_discharge": {question: "Does the industry directly discharge wastewater effluent (without treatment) into the water body?", value: false, description_tooltip: "Untreated water"},
+    "has_offsite_wwtp": {question: "Does the industry discharge to an off-site treatment wastewater plant?", value: false,},
     "offsite_wwtp_type": {question: "Off-site treatment wastewater plant type", value: null,},
     "industry_type": {question: "Standard industrial classification", value: null,},
     "product_produced": {question: "Amount of product produced by the industry", value: 0, unit: "tonnes/day"},
@@ -413,7 +414,7 @@ export let onsite_wwtp_with_offsite_wwtp_inputs = ["wwt_treatment_type", "wwt_vo
 
 export let direct_discharge_inputs = ["dd_vol_disc", "wwt_ch4_efac_dis", "wwt_n2o_efac_dis"]
 
-export let offsite_wwtp_inputs =  ["wwt_treatment_type", "wwt_vol_trea", "wwt_vol_disc", "wwt_cod_effl", "wwt_tn_effl", "wwt_tp_effl", "wwt_diclo_effl", "wwt_cadmium_effl", "wwt_hexaclorobenzene_effl", "wwt_mercury_effl", "wwt_plomo_effl", "wwt_niquel_effl", "wwt_chloro_effl", "wwt_hexaclorobutadie_effl", "wwt_nonilfenols_effl", "wwt_tetracloroetile_effl", "wwt_tricloroetile_effl", "wwt_nrg_cons", "wwt_conv_kwh", "wwt_mass_slu", "wwt_cod_slud", "wwt_ch4_efac_tre", "wwt_n2o_efac_tre", "wwt_ch4_efac_dis", "wwt_n2o_efac_dis", "wwt_fuel_typ", "wwt_vol_fuel",
+export let offsite_wwtp_inputs =  ["wwt_treatment_type", "wwt_vol_trea", "wwt_cod_effl", "wwt_tn_effl", "wwt_tp_effl", "wwt_diclo_effl", "wwt_cadmium_effl", "wwt_hexaclorobenzene_effl", "wwt_mercury_effl", "wwt_plomo_effl", "wwt_niquel_effl", "wwt_chloro_effl", "wwt_hexaclorobutadie_effl", "wwt_nonilfenols_effl", "wwt_tetracloroetile_effl", "wwt_tricloroetile_effl", "wwt_nrg_cons", "wwt_conv_kwh", "wwt_mass_slu", "wwt_cod_slud", "wwt_ch4_efac_tre", "wwt_n2o_efac_tre", "wwt_ch4_efac_dis", "wwt_n2o_efac_dis", "wwt_fuel_typ", "wwt_vol_fuel",
     "wwt_biog_pro", "wwt_biog_fla", "wwt_biog_val", "wwt_biog_lkd", "wwt_biog_sold", "wwt_ch4_biog", "wwt_dige_typ", "wwt_fuel_dig", "wwt_reus_trck_typ", "wwt_reus_vol_trck",
     "wwt_mass_slu_sto", "wwt_time_slu_sto", "wwt_slu_sto_TVS", "wwt_slu_sto_f_CH4", "wwt_slu_sto_EF", "wwt_mass_slu_comp", "wwt_slu_comp_emis_treated_or_piles_covered", "wwt_slu_comp_solids_content", "wwt_slu_comp_TVS", "wwt_slu_comp_N_cont", "wwt_slu_comp_low_CN_EF", "wwt_slu_comp_uncovered_pile_EF", "wwt_slu_comp_seqst_rate",
     "wwt_mass_slu_inc", "wwt_temp_inc", "wwt_slu_inc_N_cont", "wwt_slu_inc_SNCR", "wwt_mass_slu_app", "wwt_slu_la_solids_content", "wwt_slu_la_TVS", "wwt_slu_la_N_cont", "wwt_slu_la_EF",

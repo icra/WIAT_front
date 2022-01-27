@@ -446,7 +446,6 @@
               ></v-text-field>
 
 
-
               <v-menu
                   v-model="start_date_modal"
                   :close-on-content-click="false"
@@ -466,6 +465,7 @@
                 <v-date-picker
                     v-model="start_date_model_assessment"
                     @input="start_date_modal = false"
+                    color="#1C195B"
                 ></v-date-picker>
               </v-menu>
               <v-menu
@@ -488,6 +488,7 @@
                 <v-date-picker
                     v-model="end_date_model_assessment"
                     @input="end_date_modal = false"
+                    color="#1C195B"
                 ></v-date-picker>
               </v-menu>
               <v-btn
@@ -533,6 +534,7 @@
                   <v-date-picker
                       v-model="start_date_model_assessment"
                       @input="start_date_modal = false"
+                      color="#1C195B"
                   ></v-date-picker>
                 </v-menu>
                 <v-menu
@@ -555,6 +557,7 @@
                   <v-date-picker
                       v-model="end_date_model_assessment"
                       @input="end_date_modal = false"
+                      color="#1C195B"
                   ></v-date-picker>
                 </v-menu>
 
@@ -1555,6 +1558,18 @@ v-btn--disabled{
 .icon_clickable:hover{
   transform: scale(1.2);
 }
+
+
+
+.v-picker--date .v-btn__content {
+  color: #646464 !important ;
+}
+
+.v-picker--date .v-btn--active .v-btn__content {
+  color: white !important ;
+}
+
+
 
 
 </style>

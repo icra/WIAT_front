@@ -69,7 +69,7 @@
 
     <v-dialog
         v-model="dialog"
-        max-width="540"
+        max-width="550"
     >
       <v-container
         style="background-color: white"
