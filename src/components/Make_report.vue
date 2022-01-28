@@ -7304,7 +7304,7 @@ export default {
       });*/
 
 
-      if(_this.tab !== undefined) {
+      if(_this.tab !== undefined && _this.tab !== null && _this.created_assessments.length > 0) {
 
         let industries = {}
         this.created_assessments[_this.tab].industries.forEach(industry => {

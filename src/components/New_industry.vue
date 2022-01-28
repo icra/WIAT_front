@@ -3371,7 +3371,7 @@ export default {
       })
 
       for(let input of this.offsite_wwtp_inputs){
-        if((!isNaN(this.offsite_wwtp_model[input]) || this.offsite_wwtp_model[input]!="") && this.offsite_wwtp_model[input]>0) this.industry.offsite_wwtp[input] = Number(this.offsite_wwtp_model[input])
+        if((!isNaN(this.offsite_wwtp_model[input]) || this.offsite_wwtp_model[input]!="") && this.offsite_wwtp_model[input]>=0) this.industry.offsite_wwtp[input] = Number(this.offsite_wwtp_model[input])
       }
 
       this.industry.offsite_wwtp['wwt_vol_disc'] = this.industry.offsite_wwtp["wwt_vol_trea"]
@@ -3386,7 +3386,7 @@ export default {
         div.scrollTo(0, 0)
       })
       for(let input of this.direct_discharge_inputs){
-        if((!isNaN(this.direct_discharge_model[input] ) || this.direct_discharge_model[input]!="") && this.direct_discharge_model[input]>0) this.industry.direct_discharge[input] = Number(this.direct_discharge_model[input])
+        if((!isNaN(this.direct_discharge_model[input] ) || this.direct_discharge_model[input]!="") && this.direct_discharge_model[input]>=0) this.industry.direct_discharge[input] = Number(this.direct_discharge_model[input])
       }
 
       if(this.industry.has_offsite_wwtp == 1) {
@@ -3401,7 +3401,7 @@ export default {
       })
 
       for(let input of this.onsite_wwtp_inputs){
-        if((!isNaN(this.onsite_wwtp_model[input]) || this.onsite_wwtp_model[input]!="") && this.onsite_wwtp_model[input]>0) this.industry.onsite_wwtp[input] = Number(this.onsite_wwtp_model[input])
+        if((!isNaN(this.onsite_wwtp_model[input]) || this.onsite_wwtp_model[input]!="") && this.onsite_wwtp_model[input]>=0) this.industry.onsite_wwtp[input] = Number(this.onsite_wwtp_model[input])
       }
 
       if(this.industry.has_offsite_wwtp == 1){
@@ -3422,7 +3422,7 @@ export default {
 
 
       for(let input of this.industry_inputs){
-        if((!isNaN(this.industry_model[input]) || this.industry_model[input]!="") &&  this.industry_model[input]) this.industry[input] = Number(this.industry_model[input])
+        if((!isNaN(this.industry_model[input]) || this.industry_model[input]!="") &&  this.industry_model[input]>=0) this.industry[input] = Number(this.industry_model[input])
       }
 
       //Local wwtp
