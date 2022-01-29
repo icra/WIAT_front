@@ -12,7 +12,7 @@
 
           <v-tabs-slider color="#b62373"></v-tabs-slider>
           <v-tab style="border-color: #b62373">REPORT</v-tab>
-          <v-tab style="border-color: #b62373">ACCESS DATA</v-tab>
+          <v-tab style="border-color: #b62373">DATA ENTRY</v-tab>
           <v-tab style="border-color: #b62373">VALUES OF GLOBAL INDICATORS</v-tab>
           <v-tab style="border-color: #b62373">EXPORT IN PDF</v-tab>
 
@@ -67,7 +67,6 @@
                                   item-key="industry_name"
                                   class="simple_report_table"
                                   @click:row="(item, slot) => slot.expand(!slot.isExpanded)"
-
                               >
 
 
@@ -89,7 +88,7 @@
                           <v-expansion-panel>
                             <v-expansion-panel-header>
                               <div class = table_descriptor>
-                                <span class="table_title"> Impact assessment </span>
+                                <span class="table_title"> Impacts and levers for actions </span>
                               </div>
                             </v-expansion-panel-header>
                             <v-expansion-panel-content>
@@ -97,12 +96,14 @@
                               <div class="instructions">
                                 *Click at any row to see advanced information!
                               </div>
-                              <v-data-table class="simple_report_table"
+                              <v-data-table
+                                  class="simple_report_table"
                                   :headers="simple_report_table.header"
                                   :items="simple_report_table.value"
-                                  :item-class="itemRowBold"
+                                  :item-class="itemRowBackground"
                                   disable-pagination
                                   :hide-default-footer="true"
+                                  style="border-color: #0AA44A"
                                   @click:row="simpleTableRowClick"
                               >
 
@@ -768,9 +769,9 @@
               </template>
             </template>
           </v-data-table>
-          <div style="width: 600px; margin: 20px auto 20px auto;">
+          <!--<div style="width: 600px; margin: 20px auto 20px auto;">
             <RadarChart :chartdata="quantity_chart.chartData" :options="quantity_chart.options"></RadarChart>
-          </div>
+          </div>-->
         </div>
 
       </v-dialog>
@@ -902,7 +903,6 @@
                             dense
                             class="expanded_table_hover"
                             v-if="item.value == table_title.simple_table.tu"
-
                         >
                           <template v-slot:item.value="{ item }">
               <span v-if="item.info">
@@ -1641,6 +1641,27 @@
 
       <!-- Quality and quantity -->
       <v-dialog
+          v-model="info_energy_used"
+          width="60%"
+      >
+        <div class="dialog_detail" style="background-color: white">
+          <h3>Energy used</h3>
+          <br>
+          Energy used by wastewater treatment plants to treat the water sent to the treatment plant.
+          <div v-katex:display="'\\sum_{i \\in WWTPS} W_{t_{i}} \\cdot energy_{{consumed}_i}'"></div>
+          <b>Where:</b>
+          <br>
+          <ul>
+            <li><span v-katex="'WWTPS'"></span>: Onsite and external WWTP's where industry treats water</li>
+            <li><span v-katex="'W_t'"></span>: Volume of water treated in the WWTP</li>
+            <li><span v-katex="'energy_{consumed}'"></span>: Electricity consumed from the grid for wastewater treatment per cubic meter treated</li>
+
+          </ul>
+        </div>
+
+      </v-dialog>
+
+      <v-dialog
           v-model="info_dilution_factor"
           width="60%"
       >
@@ -1755,14 +1776,16 @@
         <div class="dialog_detail" style="background-color: white">
           <h3>Indirect emissions from electricity consumption </h3>
           <br>
-          <div v-katex:display="'\\sum_{i \\in WWTPS}EF_{i} \\cdot EC_i'"></div>
+          <div v-katex:display="'\\sum_{i \\in WWTPS}EF_{i} \\cdot EC_i \\cdot W_t'"></div>
 
           <b>Where:</b>
           <br>
           <ul>
             <li><span v-katex="'WWTPS'"></span>: onsite and external WWTP's where industry treats water</li>
             <li><span v-katex="'EF'"></span>: emission factor for grid electricity</li>
-            <li><span v-katex="'EC'"></span>: energy consumed from the grid</li>
+            <li><span v-katex="'EC'"></span>: energy consumed from the grid for wastewater treatment per cubic meter treated </li>
+            <li><span v-katex="'W_t'"></span>: Amount of water treated </li>
+
           </ul>
         </div>
 
@@ -1957,15 +1980,86 @@
       </v-dialog>
       <v-dialog
           v-model="info_sludge_management"
-          width="60%"
+          width="85%"
       >
         <div class="dialog_detail" style="background-color: white">
-          <h3>Emissions from sludge management </h3>
-          <br>
-          GHG emissions from sludge management operations (storing, composting, incineration, land application, landfilling, stockpiling and truck transport).
-          <br>
-          <br>
-          <b>Reference:</b> <a href="docs/beam_final_report_1432.pdf#page=169" target="_blank">Section 12.8 "Composting", Beam page 147</a>, <a href="docs/beam_final_report_1432.pdf#page=183" target="_blank">Section 12.10 "Combustion (Incineration)", Beam, page 161 </a>, <a href="docs/beam_final_report_1432.pdf#page=188" target="_blank">Section 12.11 "Land application", Beam page 166 </a>, <a href="docs/beam_final_report_1432.pdf#page=175" target="_blank">Section 12.9 "Landfill disposal", page 153 </a>, <a href="https://doi.org/10.1016/j.jenvman.2014.04.016 " target="_blank">Majumder, R., Livesley, S., Gregory, D., & Arndt, S. (2014, 05 15). Biosolids stockpiles are a significant point source for greenhouse gas emissions. Journal of Environmental Management, 143, pp. 34-43</a>, <a href="docs/V2_3_Ch3_Mobile_Combustion.pdf#page=21" target="_blank">IPCC 2006, Volume 2, Chapter 3: Mobile Combustion, Table 3.2.2 </a>
+          <!-- aaa -->
+          <div v-if="dialog_biogas_stage == 0">
+            <h3>Emissions from sludge management </h3>
+            <br>
+            GHG emissions from sludge management operations (storing, composting, incineration, land application, landfilling, stockpiling and truck transport).
+            <br>
+            <br>
+            <!--
+            <v-expansion-panels>
+              <v-expansion-panel>
+                <v-expansion-panel-header style="padding-left: 10px">
+                  Composting
+                </v-expansion-panel-header>
+                <v-expansion-panel-content>
+                  <div style="padding-left: 10px">
+                    <div v-katex:display="'if(emissions\\_are\\_treated\\_or\\_covered) \\enspace CH_4=0'"></div>
+                    <div v-katex:display="'else \\enspace if(solid\\_content\\_of\\_\\_covered) \\enspace CH_4=0'"></div>
+
+
+
+                  </div>
+                </v-expansion-panel-content>
+              </v-expansion-panel>
+            </v-expansion-panels>
+            <br>
+  -->
+
+            <div v-katex:display="'Total = \\sum_{i \\in WWTPS} storage_i + composting_i +incineration_i+ land\\_ application_i+landfilling_i+transport_i'"></div>
+            <b>Where:</b>
+            <br>
+            <ul>
+              <li><span v-katex="'WWTPS'"></span>: onsite and external WWTP's where industry treats water</li>
+              <li><span class="sludge" @click="dialog_biogas_stage = 1">composting</span>: Amount of CO2eq emissions due to sludge composted</li>
+              <li>storage: Amount of CO2eq emissions related to sludge storage</li>
+              <li>incineration: Amount of CO2eq emissions due to sludge incineration</li>
+              <li>land_application: Amount of CO2eq emissions due to land application of sludge</li>
+              <li>stockpiling: Amount of CO2eq emissions due to sludge stockpiling</li>
+              <li>transport: Indirect CO2 emitted from sludge transport off-site</li>
+
+
+            </ul>
+
+            <br>
+            <b>Reference:</b> <a href="docs/beam_final_report_1432.pdf#page=169" target="_blank">Section 12.8 "Composting", Beam page 147</a>, <a href="docs/beam_final_report_1432.pdf#page=183" target="_blank">Section 12.10 "Combustion (Incineration)", Beam, page 161 </a>, <a href="docs/beam_final_report_1432.pdf#page=188" target="_blank">Section 12.11 "Land application", Beam page 166 </a>, <a href="docs/beam_final_report_1432.pdf#page=175" target="_blank">Section 12.9 "Landfill disposal", page 153 </a>, <a href="https://doi.org/10.1016/j.jenvman.2014.04.016 " target="_blank">Majumder, R., Livesley, S., Gregory, D., & Arndt, S. (2014, 05 15). Biosolids stockpiles are a significant point source for greenhouse gas emissions. Journal of Environmental Management, 143, pp. 34-43</a>, <a href="docs/V2_3_Ch3_Mobile_Combustion.pdf#page=21" target="_blank">IPCC 2006, Volume 2, Chapter 3: Mobile Combustion, Table 3.2.2 </a>
+
+          </div>
+          <div v-else>
+            <div>
+              <span @click="dialog_biogas_stage = 0">
+                <v-icon >mdi-undo</v-icon>
+              </span>
+            </div>
+            <div v-if="dialog_biogas_stage == 1">
+              <h3>Sludge composted </h3>
+              <br>
+              Amount of CO2eq emissions due to sludge composted
+              <br>
+              <br>
+
+              <span v-katex:display="'if \\enspace emissions\\enspace are\\enspace treated\\enspace or \\enspace covered: \\enspace CH_4=0'"></span>
+              <span v-katex:display="'else \\enspace if\\enspace solid\\enspace content \\enspace of\\enspace piles \\enspace are \\enspace covered: \\enspace CH_4=0'"></span>
+              <span v-katex:display="'else: \\enspace CH_4=0'"></span>
+
+
+              <b>Where:</b>
+              <br>
+              <ul>
+                <li><span v-katex="'WWTPS'"></span>: onsite and external WWTP's where industry treats water</li>
+
+
+              </ul>
+
+              <br>
+
+            </div>
+
+          </div>
 
 
         </div>
@@ -3563,14 +3657,126 @@
 
       </v-dialog>
 
+      <!-- Treatment efficiency influent-->
+      <v-dialog
+          v-model="industry_info"
+          width="80%"
+      >
+        <div class="dialog_detail" v-if="industry_clicked != null" style="background-color: white">
+          <h3>{{ industry_clicked[0].name }} </h3>
+          <br>
+
+          <v-row
+              class="pa-4"
+              justify="space-between"
+          >
+            <v-col cols="5">
+              <v-treeview
+                  :active.sync="active_indicator"
+                  :items="indicators_industry"
+                  activatable
+                  open-on-click
+                  transition
+                  dense
+              ></v-treeview>
+            </v-col>
+
+            <v-divider vertical></v-divider>
+
+            <v-col
+                class="d-flex text-center"
+            >
+              <v-scroll-y-transition mode="out-in">
+                <div
+                    class="text-h6 grey--text text--lighten-1 font-weight-light"
+                    style="align-self: center;"
+                    v-if="active_indicator.length == 0"
+                >
+                  Select an indicator
+                </div>
+                <div v-else>
+                  <div v-if="active_indicator[0] == 2">
+                    <v-data-table
+                        :headers="emissions_table.header"
+                        :items="emissions_table.emissions"
+
+                        :item-class="itemRowBold"
+                        disable-pagination
+                        :hide-default-footer="true"
+                        dense
+                    >
+                      <template v-slot:item.value="{ item }">
+              <span v-if="item.info">
+                {{item.value}}
+                <v-btn
+                    icon
+                    @click="$data[item.info] = true"
+                    class="icon_clickable"
+                    x-small
+                >
+                  <v-icon
+                      color='#1C195B'
+                  >
+                    mdi-information-outline
+                  </v-icon>
+                </v-btn>
+
+
+              </span>
+                        <span v-else>{{item.value}}</span>
+                      </template>
+
+                      <template
+                          v-for="value in Object.keys(industries_aggregated)"
+                          v-slot:[`item.${value}`]="{ item }"
+                      >
+
+                        <template v-if="getGlobalWarming(item, value) != null">
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-chip
+                                  :color="getGlobalWarming(item, value)[0]"
+                                  dark
+                                  :key="value"
+                                  v-bind="attrs"
+                                  v-on="on"
+                                  text-color="#1c1c1b"
+                              >
+                                {{ item[value] }}
+                              </v-chip>
+                            </template>
+                            <span>{{ getGlobalWarming(item, value)[1] }}</span>
+                          </v-tooltip>
+                        </template>
+                        <template v-else>
+                          <v-chip
+                              color="transparent"
+                              dark
+                              :key="value"
+                              text-color="#1c1c1b"
+                              class= "chip_no_hover"
+                          >
+                            {{ item[value] }}
+                          </v-chip>
+                        </template>
+                      </template>
+
+
+                    </v-data-table>
+
+                  </div>
+
+                </div>
+              </v-scroll-y-transition>
+            </v-col>
+          </v-row>
+
+        </div>
+
+      </v-dialog>
 
 
 
-      <!--
-      info_efficiency_tetrachloroethene: false,
-      info_efficiency_trychloroethylene: false,
-
-      -->
 
 
 
@@ -3649,6 +3855,7 @@ export default {
       effluent_toxicity_table: {header: [], value: []},
       pollutant_load_table: {header: [], value: []},
       _table: {header: [], value: []},
+      include_future: true,
 
       aggregation_level: "industry",
       aggregation_items: [{text: "Industry", value: "industry"}, {text: "Country", value: "country"}],
@@ -3722,7 +3929,6 @@ export default {
           specific_water_consumption: "Specific water consumption",
           total_ghg: "Carbon impact",
           eutrophication: "Eutrophication potential",
-          ecotoxicity_and_biodiversity: "Ecotoxicity and biodiversity indicators",
           tu: "Toxic units in the effluent",
           delta_tu: "Increase in toxic units in the receiving water body after discharge",
           delta_eqs: "Increase of the average concentration of the pollutants in the receiving water body after discharge (with respect to EQS)",
@@ -3730,7 +3936,9 @@ export default {
           impact_biodiversity: "Impact on biodiversity and ecosystems",
           eqs: "Average concentration of the pollutants in the effluent (with respect to EQS)",
           avg_influent_efficiency: "Average percentage of treatment efficiency (compared to industry influent)",
-          pollution: "Pollution impact"
+          pollution: "Pollution impact",
+          energy_used_text: "Energy used",
+
         },
       },
       imported_file_excel: null,
@@ -3748,6 +3956,7 @@ export default {
       dialog_pollution: false,
 
       biodiversity_models: [],
+      info_energy_used: false,
 
       info_dilution_factor: false,
       info_recycled_factor: false,
@@ -3828,11 +4037,22 @@ export default {
       info_efficiency_influent_tp: false,
       radio_layers: 2,
       radio_industry_edit: null,
-      tab_pollutant: 0
+      tab_pollutant: 0,
+      dialog_biogas_stage: 0,
+      industry_clicked: null,
+      industry_info: false,
+      active_indicator: []
+
     }
 
   },
   watch: {
+
+    info_sludge_management: function(value){
+      if(!value){
+        this.dialog_biogas_stage = 0
+      }
+    },
 
     radio_layers: function(value){
 
@@ -4056,7 +4276,12 @@ export default {
 
   },
   methods: {
-
+    prova(){
+      console.log(this.industry_clicked)
+    },
+    itemRowBackground: function (item) {
+      return item.value === this.table_title.simple_table.quality_quantity || item.value === this.table_title.simple_table.pollution || item.value === this.table_title.simple_table.total_ghg ? 'impact-style' : 'lever-style'
+    },
     get_supply_chain(industry){
       let header = [
         {text: "Supply chain", value: "name"},
@@ -4149,11 +4374,6 @@ export default {
       if(item.value == "Freshwater impact") this.dialog_quality_quantity = true
       else if(item.value == "Carbon impact") this.dialog_emissions = true
       else if(item.value == "Eutrophication potential") this.dialog_eutrophication = true
-      else if(item.value == "Impact on biodiversity and ecosystems") {
-        this.biodiversity_models = []
-        this.dialog_ecotox = true
-      }
-      else if(item.value == this.table_title.simple_table.ecotoxicity_and_biodiversity) this.dialog_ecotoxicity_and_biodiversity = true
       else if(item.value == this.table_title.simple_table.avg_treatment_efficiency) this.dialog_efficiency = true
       //else if(item.value == this.table_title.simple_table.tu) this.dialog_tu = true
       else if(item.value == this.table_title.simple_table.delta_tu) this.dialog_delta_tu = true
@@ -4161,6 +4381,15 @@ export default {
       else if(item.value == this.table_title.simple_table.delta_eqs) this.dialog_delta_eqs = true
       else if(item.value == this.table_title.simple_table.avg_influent_efficiency) this.dialog_influent_efficiency = true
       else if(item.value == "Pollution impact") this.dialog_pollution = true
+      else if(item.value == this.table_title.simple_table.specific_water_consumption) this.info_specific_consumption = true
+      else if(item.value == this.table_title.simple_table.recycled) this.info_recycled_factor = true
+      else if(item.value == this.table_title.simple_table.treated) this.info_treated_factor = true
+      else if(item.value == this.table_title.simple_table.energy_used_text) this.info_energy_used = true
+      else {
+        this.industry_clicked = this.industries_aggregated[item.value]
+        this.industry_info = true
+      }
+
 
 
     },
@@ -4344,6 +4573,7 @@ export default {
     itemRowBold: function (item) {
       return item.value == "Total" ? 'style-1' : 'style-2'
     },
+
 
     chunk(array, size){
       let R = [];
@@ -5097,8 +5327,12 @@ export default {
 
         let quality_quantity = {value: _this.table_title.simple_table.quality_quantity, unit: "-"}
         let total_ghg = {value: _this.table_title.simple_table.total_ghg, unit: "kgCO2eq/day", info: "This metric indicates the CO2e emissions from the industry. It will always have positive values; higher values indicate higher impact."}
-        //aaaa
         let pollution = {value: _this.table_title.simple_table.pollution, unit: "-"}
+        let recycled_factor = {value: _this.table_title.availability_quantity.recycled, unit: "%", info:"This metric indicates the percentage of the reused water used by the industry respect the water that leaves the industry"}
+        let efficiency_factor = {value: _this.table_title.availability_quantity.specific_water_consumption, unit: "tonnes/m3", info: "Specific water consumption is a metric that indicates what is the amount of water from the water body needed to produce a tone of product manufactured in the industry"}
+        let treated_factor = {value: _this.table_title.availability_quantity.treated, unit: "%", info:"This metric indicates the ratio between the water remaining after the industry consumption and the water that is treated in the WWTP"}
+        let energy_used_row = {value: "Energy used", unit: "kWh/day", info: "Energy used by wastewater treatment plants to treat the water sent to the treatment plant"}
+
 
         /*
         let eutrophication = {value: _this.table_title.simple_table.eutrophication, unit: "gPO4eq/m3", info: "Eutrophication potential (EP) is defined as the potential to cause over-fertilization of water and soil, which can result in increased growth of biomass. It will always have positive values; higher values indicate higher impact."}
@@ -5118,20 +5352,20 @@ export default {
           let dilution_factor_value = await metrics.dilution_factor(this.global_layers, industries)
           let dilution_factor_risk = this.risk_categories["dilution_factor"](dilution_factor_value)
 
-          let recycled_factor = metrics.recycled_water_factor(industries)
-          let recycled_factor_risk = this.risk_categories["recycled_water_factor"](recycled_factor)
-
-          let treated_factor = metrics.treated_water_factor(industries)
-          let treated_factor_risk = this.risk_categories["water_treated"](treated_factor)
+          recycled_factor[key] =  metrics.recycled_water_factor(industries)
+          //let recycled_factor_risk = this.risk_categories["recycled_water_factor"](recycled_factor)
 
           let available_factor = await metrics.available_ratio(this.global_layers, industries)
           let available_factor_risk = this.risk_categories["water_stress_ratio"](available_factor)
 
-          let efficiency_factor = metrics.efficiency_factor(industries)
-          let efficiency_factor_risk = this.risk_categories["specific_water_consumption"](efficiency_factor)
+          efficiency_factor[key] = metrics.efficiency_factor(industries)
+          //let efficiency_factor_risk = this.risk_categories["specific_water_consumption"](efficiency_factor)
 
-          quality_quantity[key] = this.return_avg_risk([dilution_factor_risk, recycled_factor_risk, treated_factor_risk, available_factor_risk, efficiency_factor_risk])
+          //quality_quantity[key] = this.return_avg_risk([dilution_factor_risk, recycled_factor_risk, treated_factor_risk, available_factor_risk, efficiency_factor_risk])
+          quality_quantity[key] = this.return_avg_risk([dilution_factor_risk, available_factor_risk])
+
           total_ghg[key] = metrics.emissions_and_descriptions(industries, 1).total
+          energy_used_row[key] = metrics.energy_used(industries)
 
           let eutrophication_factor = metrics.eutrophication_potential(industries).total
           let eutrophication_risk = this.risk_categories["eutrophication"](eutrophication_factor)
@@ -5155,9 +5389,7 @@ export default {
           let avg_influent_efficiency_risk = this.risk_categories["influent_treatment_efficiency"](avg_influent_efficiency_factor)
 
           pollution[key] = this.return_avg_risk([eutrophication_risk, ecotox_effluent_risk, delta_ecotox_risk, eqs_risk, delta_eqs_risk, avg_treatment_efficiency_risk, avg_influent_efficiency_risk])
-
-
-
+          treated_factor[key] = metrics.treated_water_factor(industries)
 
 
         }
@@ -5165,9 +5397,12 @@ export default {
 
         pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
         pollutants_table.value.push(quality_quantity)
+        pollutants_table.value.push(recycled_factor)
+        pollutants_table.value.push(efficiency_factor)
         pollutants_table.value.push(total_ghg)
+        pollutants_table.value.push(energy_used_row)
         pollutants_table.value.push(pollution)
-
+        pollutants_table.value.push(treated_factor)
 
 
         /*pollutants_table.value.push(eutrophication)
@@ -5184,6 +5419,70 @@ export default {
 
     },
 
+    async generate_simple_report_table_old() {
+
+      let _this = this
+
+
+      if(_this.tab !== undefined){
+
+        let pollutants_table = {
+          header: [{text: "", value: "value", sortable: false}, {text: "Pollution impact", value: "pollution_impact", sortable: false}, {text: "Freshwater impact", value: "freshwater_impact", sortable: false}, {text: "Carbon impact", value: "carbon_impact", sortable: false}],
+          value: []
+        }
+
+        //let quality_quantity = {value: _this.table_title.simple_table.quality_quantity, unit: "-"}
+        //let total_ghg = {value: _this.table_title.simple_table.total_ghg, unit: "kgCO2eq/day", info: "This metric indicates the CO2e emissions from the industry. It will always have positive values; higher values indicate higher impact."}
+        //let pollution = {value: _this.table_title.simple_table.pollution, unit: "-"}
+
+
+        for (const [key, industries] of Object.entries(_this.industries_aggregated)) {
+
+          let industry_row = {value: key}
+
+          let dilution_factor_value = await metrics.dilution_factor(this.global_layers, industries)
+          let dilution_factor_risk = this.risk_categories["dilution_factor"](dilution_factor_value)
+
+          let available_factor = await metrics.available_ratio(this.global_layers, industries)
+          let available_factor_risk = this.risk_categories["water_stress_ratio"](available_factor)
+
+          industry_row["freshwater_impact"] = this.return_avg_risk([dilution_factor_risk, available_factor_risk])
+
+          industry_row["carbon_impact"] = metrics.emissions_and_descriptions(industries, 1).total
+
+          let eutrophication_factor = metrics.eutrophication_potential(industries).total
+          let eutrophication_risk = this.risk_categories["eutrophication"](eutrophication_factor)
+
+          let ecotox_effluent_factor = metrics.ecotoxicity_potential_tu(industries).total
+          let ecotox_effluent_risk = this.risk_categories["ecotoxicity"](ecotox_effluent_factor)
+
+          let delta_ecotox_factor = (await metrics.delta_tu(industries, this.global_layers)).total
+          let delta_ecotox_risk = this.risk_categories["delta_ecotoxicity"](delta_ecotox_factor)
+
+          let eqs_factor = metrics.eqs_avg(industries)
+          let eqs_risk = this.risk_categories["eqs"](eqs_factor)
+
+          let delta_eqs_factor = await metrics.delta_eqs_avg(industries, this.global_layers)
+          let delta_eqs_risk = this.risk_categories["delta_eqs"](delta_eqs_factor)
+
+          let avg_treatment_efficiency_factor  = metrics.avg_treatment_efficiency(industries)
+          let avg_treatment_efficiency_risk = this.risk_categories["treatment_efficiency"](avg_treatment_efficiency_factor)
+
+          let avg_influent_efficiency_factor  = metrics.avg_influent_efficiency(industries)
+          let avg_influent_efficiency_risk = this.risk_categories["influent_treatment_efficiency"](avg_influent_efficiency_factor)
+
+          industry_row["pollution_impact"] = this.return_avg_risk([eutrophication_risk, ecotox_effluent_risk, delta_ecotox_risk, eqs_risk, delta_eqs_risk, avg_treatment_efficiency_risk, avg_influent_efficiency_risk])
+          pollutants_table.value.push(industry_row)
+        }
+
+
+        return pollutants_table
+      }
+      else return {header: [], emissions: []}
+
+    },
+
+
     async generate_water_quality_table() {
 
       let _this = this
@@ -5197,9 +5496,9 @@ export default {
         }
 
         let dilution_factor_row = {value: _this.table_title.availability_quantity.dilution_factor, unit: "-", info: "info_dilution_factor"}
-        let recycled_factor = {value: _this.table_title.availability_quantity.recycled, unit: "%", info:"info_recycled_factor"}
         let treated_factor = {value: _this.table_title.availability_quantity.treated, unit: "%", info:"info_treated_factor"}
         let available_ratio = {value: _this.table_title.availability_quantity.consumption_available, unit: "%", info: "info_water_stress"}
+        let recycled_factor = {value: _this.table_title.availability_quantity.recycled, unit: "%", info:"info_recycled_factor"}
         let efficiency_factor = {value: _this.table_title.availability_quantity.specific_water_consumption, unit: "tonnes/m3", info: "info_specific_consumption"}
         //let water_quality_standards = {value: "Environmental quality standards", unit: "%", info: "Percentage of emitted pollutants exceeding the maximum allowable concentration"}
 
@@ -5262,10 +5561,10 @@ export default {
         pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
 
         pollutants_table.value.push(dilution_factor_row)
-        pollutants_table.value.push(recycled_factor)
-        pollutants_table.value.push(treated_factor)
+        //pollutants_table.value.push(recycled_factor)
+        //pollutants_table.value.push(treated_factor)
         pollutants_table.value.push(available_ratio)
-        pollutants_table.value.push(efficiency_factor)
+        //pollutants_table.value.push(efficiency_factor)
         //pollutants_table.value.push(water_quality_standards)
 
 
@@ -7257,6 +7556,42 @@ export default {
 
   computed: {
 
+    indicators_industry(){
+      return [
+        {
+          id: 1,
+          name: 'Pollution :',
+          children: [
+            { id: 2, name: 'Impact' },
+            { id: 3,
+              name: 'Lever of action',
+              children: [
+                { id: 4,
+                  name: 'Effluent toxicity level' ,
+                  children: [
+                    { id: 5, name: this.table_title.simple_table.tu },
+                    { id: 6, name: this.table_title.simple_table.eqs },
+
+                  ]
+                },
+                { id: 7,
+                  name: 'Treatment efficiency',
+                  children: [
+                    { id: 8, name: this.table_title.simple_table.avg_treatment_efficiency },
+                    { id: 9, name: this.table_title.simple_table.avg_influent_efficiency },
+                    { id: 10, name: this.table_title.simple_table.treated },
+
+                  ]
+                },
+
+              ]
+            },
+          ],
+        },
+      ]
+    },
+
+
     valid_created_assessments(){
       return this.assessments_with_industries.filter(assessment => !assessment.disabled).map(assessment => assessment.assessment)
     },
@@ -7454,6 +7789,18 @@ export default {
     font-weight: normal;
   }
 
+  .impact-style {
+    background-color: #c4c4d4;
+    font-weight: bold;
+  }
+  .impact-style:hover{
+    background-color: #555283!important;
+  }
+
+  .lever-style{
+    border: 10px solid orange !important;
+  }
+
 
 </style>
 
@@ -7578,6 +7925,15 @@ table {
   overflow-y: hidden !important;
 }
 
+.sludge {
+  color: #b62373;
+}
+
+.sludge:hover {
+  text-decoration: underline;
+}
+
+
 
 
 
@@ -7587,6 +7943,7 @@ table {
 <style lang="scss">
 
 .simple_report_table {
+  border-collapse: collapse;
   tbody {
     tr:hover {
       font-weight: bold;
@@ -7605,6 +7962,8 @@ table {
     }
   }
 }
+
+
 
 
 </style>

@@ -39,19 +39,27 @@ let utils = {
         return code
     },
 
-    async areCoordsLand(lat, lng){
-        let file_name = "baseline_population"
+    async get_raster_data(file_name, lat, lng){
         let call = "https://wiat-server.icradev.cat/data_point?filename="+file_name+"&longitude="+lng+"&latitude="+lat
         return axios
             .get(call)
             .then(response => {
                 if(response) {
                     if(response.data.test[0]["0"]) {
-                        return response.data.test[0]["0"] >= 0
+                        if(response.data.test[0]["0"] >= 0) return response.data.test[0]["0"]
+                        else return null
                     }
-                    else return false
-                }else return false
+                    else return null
+                }else return null
             })
+    },
+
+    async areCoordsLand(lat, lng){
+        let file_name = "baseline_population"
+        let population_data = (await this.get_raster_data(file_name, lat, lng))
+        if(population_data !== null) return true
+        else return false
+
     },
 
     getRandomColor(){
@@ -183,7 +191,10 @@ async function streamflow(industries, global_layers){
             let _streamflow = await streamflow.data_on_point(industry.location.lat, industry.location.lng)*86400
             return _streamflow
         })) //streamflow (m3/day)
-    return streamflow_value.sum()
+
+
+
+    return streamflow_value.filter(x => x!= null).sum()
 
 }
 
@@ -642,8 +653,6 @@ let metrics = {
 
     },
 
-
-
     eutrophication_potential(industries){
         let eutrophication = {
             cod: effl_concentration(industries, "wwt_cod_effl")*0.022,
@@ -661,6 +670,10 @@ let metrics = {
 
         return eutrophication
 
+    },
+
+    energy_used(industries){
+        return industries.map(i => i.energy_used()).sum()
     }
 
 }

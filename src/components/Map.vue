@@ -1237,7 +1237,6 @@ export default {
       let color_legend_baseline_aridity = ['#cf7563', '#e09053', '#f2ba41', '#fae039', '#d2fa32', '#5de833', '#3fd168', '#4ab09c', '#458aa1','#3d5894' ]
       let label_legend_baseline_aridity = ["0-0.03", "0.03-0.2", "0.2-0.35", "0.35-0.5","0.5-0.65","0.65-0.8","0.8-1.0","1.0-1.25","1.25-1.5",">1.50"]
 
-
       this.layers["Aridity index"].layers.baseline.annual.layer = this.define_raster_layer("aridity_baseline", null, color_function_baseline_aridity, color_legend_baseline_aridity, label_legend_baseline_aridity,"", 1/10000)
 
       //Baseline runoff
@@ -1263,8 +1262,6 @@ export default {
 
       this.layers["Streamflow"].layers.baseline.annual.layer = this.define_raster_layer("dismanual",  'streamflow_color', undefined, color_legend_streamflow, label_legend_streamflow, " m3/seconds", 1, 32)
       this.layers["Streamflow"].layers.future.layer = this.define_raster_layer("streamflow_2030",  'streamflow_2030_color', undefined, color_legend_streamflow, label_legend_streamflow, " m3/seconds", 1, 32)
-
-
 
       //Baseline water stress
       const baselineWaterStressDataset = 'wat_050_aqueduct_baseline_water_stress'

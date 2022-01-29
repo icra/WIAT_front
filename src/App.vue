@@ -1213,7 +1213,7 @@ export default {
       this.assessment_expansion_panel = assessment_index
       this.supply_chain_name = this.created_assessments[assessment_index].industries[industry_index].supply_chain[sc_index].name
       try {
-        this.$refs.reference.pan_location(this.created_assessments[assessment_index].industries[industry_index].location)
+        this.$refs.reference.pan_location(this.created_assessments[assessment_index].industries[industry_index].supply_chain[sc_index].location)
         this.$refs.reference.close_supply_chain_mode()
       } catch (error) {}
 

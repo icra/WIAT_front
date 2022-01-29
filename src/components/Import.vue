@@ -859,6 +859,8 @@ export default {
 
                       this.snackbar_text = "FILE IMPORTED CORRECTLY"
                       this.snackbar_imported_file = true
+                      //_this.$emit('file_imported', "FILE IMPORTED CORRECTLY")
+                      //this.$router.push('/')
 
                     } catch (error) {
                       console.log(error)
@@ -1049,6 +1051,8 @@ export default {
         })
         this.snackbar_text = "FILE IMPORTED CORRECTLY"
         this.snackbar_imported_file = true
+        //_this.$emit('file_imported', "FILE IMPORTED CORRECTLY")
+        //this.$router.push('/')
 
       } catch (e) {
         //error

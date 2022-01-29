@@ -97,6 +97,21 @@ export class Industry{
 
     }
 
+    energy_used(){
+        let energy = 0
+        if(this.has_onsite_wwtp == 1){
+            energy += this.onsite_wwtp.wwt_vol_trea*this.onsite_wwtp.wwt_nrg_cons
+        }
+        if(this.has_offsite_wwtp == 1){
+            energy += this.offsite_wwtp.wwt_vol_trea*this.offsite_wwtp.wwt_nrg_cons
+        }
+        return energy
+    }
+
+    load_removal_efficiency(){
+        
+    }
+
     delete_supply_chain(i){
         this.supply_chain.splice(i,1);
     }
