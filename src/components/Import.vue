@@ -258,7 +258,7 @@ export default {
 
     parse_i(industry_input, i, mandatory = false){
       if(mandatory) return !isNaN(industry_input[i]) ? parseFloat(industry_input[i]) : null
-      else return !isNaN(industry_input[i]) ? parseFloat(industry_input[i]) : null
+      else return !isNaN(industry_input[i]) ? parseFloat(industry_input[i]) : 0
 
     },
 
