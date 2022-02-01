@@ -674,7 +674,25 @@ let metrics = {
 
     energy_used(industries){
         return industries.map(i => i.energy_used()).sum()
-    }
+    },
+
+    effluent_concentration(industries){
+        let load = {
+            cod: effl_concentration(industries, "wwt_cod_effl"),
+            tn: effl_concentration(industries, "wwt_tn_effl"),
+            tp: effl_concentration(industries, "wwt_tp_effl"),
+        }
+
+        Object.keys(load).forEach(key => {
+            let value = load[key]
+            if(Number.isFinite(value)) load[key] = value.toExponential(2)
+            else load[key] = "-"
+        })
+
+        return load
+
+    },
+
 
 }
 

@@ -158,7 +158,24 @@
     </div>
 
     <div style="padding-top: 30px">
-      <h1 style="color: #b62373">Upload custom risk thresholds</h1>
+      <h1 style="color: #b62373; display: inline ">Upload custom risk thresholds</h1>
+      <v-tooltip bottom max-width="500px">
+        <template v-slot:activator="{ on, attrs }">
+          <v-icon
+              color=#1C195B
+              v-bind="attrs"
+              v-on="on"
+              size="25px"
+              style="padding-bottom: 10px"
+          >
+            mdi-information-variant
+          </v-icon>
+        </template>
+        <span>WIAT has, for some impact indicators, a default ranking, but you can upload custom values (e.g. if the GHG emission is less than X, the impact is low, if it is greater than X, the impact is high).</span>
+      </v-tooltip>
+
+
+
     </div>
     <div style="padding: 20px 30px 0px 20px; margin-top: 10px" class="load_and_save">
       <v-row>

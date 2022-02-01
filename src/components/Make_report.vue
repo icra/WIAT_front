@@ -7,12 +7,10 @@
             grow
             id="main_tab"
             v-model="main_tab"
-
         >
-
           <v-tabs-slider color="#b62373"></v-tabs-slider>
           <v-tab style="border-color: #b62373">REPORT</v-tab>
-          <v-tab style="border-color: #b62373">DATA ENTRY</v-tab>
+          <v-tab style="border-color: #b62373">EDIT INDUSTRY</v-tab>
           <v-tab style="border-color: #b62373">VALUES OF GLOBAL INDICATORS</v-tab>
           <v-tab style="border-color: #b62373">EXPORT IN PDF</v-tab>
 
@@ -33,6 +31,7 @@
             </div>
           </v-col>
         </v-row>
+
         <v-row style="height: 82%" class = "border_report" v-if="is_there_any_industry_created">
 
           <v-col cols="12" style="height: 100%">
@@ -107,7 +106,6 @@
                                   @click:row="simpleTableRowClick"
                               >
 
-
                                 <template v-slot:no-data>
                                   <v-progress-linear
                                       indeterminate
@@ -135,11 +133,11 @@
                                     {{item.value}}
                                   </span>
                                 </template>
+
                                 <template
-                                    v-for="value in Object.keys(industries_aggregated)"
+                                    v-for="value in ['pollution_impact', 'freshwater_impact', 'carbon_impact']"
                                     v-slot:[`item.${value}`]="{ item }"
                                 >
-
                                   <template v-if="getSimpleReportColor(item, value) != null">
                                     <v-tooltip bottom>
                                       <template v-slot:activator="{ on, attrs }">
@@ -557,108 +555,7 @@
               </div>
 
             </template>
-
           </v-col>
-          <!--<v-col class="menu">
-            <div style= "padding: 10px;">
-              <p class="side_menu_title">Select assessments to include in the report</p>
-              <v-checkbox
-                  v-for="assessment in assessments_with_industries"
-                  v-model="selected_assessments"
-                  :label="assessment.assessment.name"
-                  :disabled="assessment.disabled"
-                  color="#1C195B"
-                  style="margin-left: 38px"
-                  :key="assessment.assessment.name"
-                  dense
-                  :value="assessment.assessment"
-              >
-
-              </v-checkbox>
-            </div>
-
-            <div style="padding: 10px">
-              <p class="side_menu_title">Select the layers to include in the report</p>
-              <v-treeview
-                  :items="layer_tree"
-                  dense
-                  hoverable
-                  selectable
-                  selection-type="leaf"
-                  return-object
-                  v-model="selected_layers"
-                  open-on-click
-                  color="#1C195B"
-                  selected-color="#1C195B"
-              >
-              </v-treeview>
-
-            </div>
-
-            <div style="padding: 10px;">
-              <p class="side_menu_title" style="padding-top: 20px;">Upload custom risk thresholds</p>
-              <v-row>
-                <v-col cols="12">
-                  <a class="download_link" href="/risk_threshold.xlsx" download >
-                    <v-btn
-                        small
-                        tile
-                        block
-                        color="#b62373"
-                    >
-                      DOWNLOAD TEMPLATE
-                      <v-icon right>
-                        mdi-cloud-download
-                      </v-icon>
-                    </v-btn>
-                  </a>
-
-                </v-col>
-                <v-col cols="12">
-                  <v-file-input
-                      label="Import template"
-                      style="padding-top: 0px; margin-top: -3px"
-                      v-model="imported_file_excel"
-                      @change="onUploadExcel"
-
-                  ></v-file-input>
-                </v-col>
-              </v-row>
-            </div>
-
-            <div style="padding: 10px">
-
-              <v-select
-                  v-model="include_future"
-                  :items="yes_no"
-                  filled
-                  label="Include 2030 BAU values in the report"
-                  dense
-              ></v-select>
-            </div>
-
-            <v-row>
-              <v-col >
-                <div style="padding: 10px">
-                  <v-btn block tile color="#b62373" @click="button_generate_pdf_clicked" :disabled="selected_industries.length === 0">
-                    GENERATE PDF
-                  </v-btn>
-                  <v-progress-linear
-                      indeterminate
-                      rounded
-                      height="6"
-                      v-show="generating_pdf"
-                      color="#1C195B"
-
-                  ></v-progress-linear>
-
-                </div>
-              </v-col>
-            </v-row>
-
-          </v-col> -->
-
-
         </v-row>
       </div>
 
@@ -681,963 +578,7 @@
     <br>
 
 
-    <div v-if="industries_aggregated != undefined">
-      <!-- Simple table -->
-      <v-dialog
-          v-model="dialog_quality_quantity"
-          width="80%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <v-data-table
-              :headers="water_quantity.header"
-              :items="water_quantity.value"
-              
-              disable-pagination
-              :hide-default-footer="true"
-              dense
-          >
-            <template v-slot:item.value="{ item }">
-              <!--<v-tooltip bottom max-width="700px" v-if="item.info">
-                <template v-slot:activator="{ on, attrs }">
-                  {{item.value}}
-                  <v-icon
-                      color='#1C195B'
-                      style="padding-right: 10px"
-                      v-bind="attrs"
-                      v-on="on"
-                      size="18px"
-                  >
-                    mdi-information-outline
-                  </v-icon>
-                </template>
-                <span>{{ item.info }}</span>
-              </v-tooltip>
-              <span v-else>{{item.value}}</span>-->
-              <span v-if="item.info">
-                {{item.value}}
-                <v-btn
-                    icon
-                    @click="$data[item.info] = true"
-                    class="icon_clickable"
-                    x-small
-                >
-                  <v-icon
-                      color='#1C195B'
-                  >
-                    mdi-information-outline
-                  </v-icon>
-                </v-btn>
-
-
-
-              </span>
-              <span v-else>{{item.value}}</span>
-            </template>
-
-            <template
-                v-for="value in Object.keys(industries_aggregated)"
-                v-slot:[`item.${value}`]="{ item }"
-            >
-
-              <template v-if="getAvailabilityColor(item, value) != null">
-                <v-tooltip bottom>
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-chip
-                        :color="getAvailabilityColor(item, value)[0]"
-                        dark
-                        :key="value"
-                        v-bind="attrs"
-                        v-on="on"
-                        text-color="#1c1c1b"
-                    >
-                      {{ item[value] }}
-                    </v-chip>
-                  </template>
-                  <span>{{ getAvailabilityColor(item, value)[1] }}</span>
-                </v-tooltip>
-              </template>
-              <template v-else>
-                <v-chip
-                    color="transparent"
-                    dark
-                    :key="value"
-                    text-color="#1c1c1b"
-                    class= "chip_no_hover"
-                >
-                  {{ item[value] }}
-                </v-chip>
-              </template>
-            </template>
-          </v-data-table>
-          <!--<div style="width: 600px; margin: 20px auto 20px auto;">
-            <RadarChart :chartdata="quantity_chart.chartData" :options="quantity_chart.options"></RadarChart>
-          </div>-->
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="dialog_emissions"
-          width="80%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <v-data-table
-              :headers="emissions_table.header"
-              :items="emissions_table.emissions"
-              
-              :item-class="itemRowBold"
-              disable-pagination
-              :hide-default-footer="true"
-              dense
-          >
-            <template v-slot:item.value="{ item }">
-              <span v-if="item.info">
-                {{item.value}}
-                <v-btn
-                    icon
-                    @click="$data[item.info] = true"
-                    class="icon_clickable"
-                    x-small
-                >
-                  <v-icon
-                      color='#1C195B'
-                  >
-                    mdi-information-outline
-                  </v-icon>
-                </v-btn>
-
-
-              </span>
-              <span v-else>{{item.value}}</span>
-            </template>
-
-            <template
-                v-for="value in Object.keys(industries_aggregated)"
-                v-slot:[`item.${value}`]="{ item }"
-            >
-
-              <template v-if="getGlobalWarming(item, value) != null">
-                <v-tooltip bottom>
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-chip
-                        :color="getGlobalWarming(item, value)[0]"
-                        dark
-                        :key="value"
-                        v-bind="attrs"
-                        v-on="on"
-                        text-color="#1c1c1b"
-                    >
-                      {{ item[value] }}
-                    </v-chip>
-                  </template>
-                  <span>{{ getGlobalWarming(item, value)[1] }}</span>
-                </v-tooltip>
-              </template>
-              <template v-else>
-                <v-chip
-                    color="transparent"
-                    dark
-                    :key="value"
-                    text-color="#1c1c1b"
-                    class= "chip_no_hover"
-                >
-                  {{ item[value] }}
-                </v-chip>
-              </template>
-            </template>
-
-
-          </v-data-table>
-          <div id="global_warming_chart_wrapper" style="width:500px; margin: 20px auto 20px auto;">
-            <BarChart :chartdata="ghg_emission_chart.chartData" :options="ghg_emission_chart.options"></BarChart>
-            <!--<canvas :id="'global_warming_potential_chart_tab_'+index"> </canvas>-->
-          </div>
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="dialog_pollution"
-          width="80%"
-      >
-        <div style="background-color: white" class="no_overflow">
-          <v-tabs
-              center-active
-              grow
-              v-model="tab_pollutant"
-          >
-            <v-tab>
-              Effluent toxicity level
-            </v-tab>
-            <v-tab>
-              Pollution load to the environment
-            </v-tab>
-            <v-tab>
-              Treatment efficiency
-            </v-tab>
-          </v-tabs>
-          <v-tabs-items v-model="tab_pollutant" class="no_scroll">
-            <v-tab-item
-            >
-              <div class="no_overflow">
-                <div class="instructions">
-                  *Click at any row to see advanced information!
-                </div>
-                <v-data-table class="simple_report_table"
-                              :headers="effluent_toxicity_table.header"
-                              :items="effluent_toxicity_table.value"
-                              disable-pagination
-                              :hide-default-footer="true"
-                              @click:row="(item, slot) => slot.expand(!slot.isExpanded)"
-                              single-expand
-                              show-expand
-                              item-key="value"
-                >
-
-                  <template v-slot:expanded-item="{ headers, item }">
-                    <td :colspan="headers.length" style="padding: 20px; background-color: #c4c4d4">
-                      <div style="width: 90%" class="center">
-                        <v-data-table
-                            :headers="ecotoxicity_table.header"
-                            :items="ecotoxicity_table.value"
-                            disable-pagination
-                            :hide-default-footer="true"
-                            dense
-                            class="expanded_table_hover"
-                            v-if="item.value == table_title.simple_table.tu"
-                        >
-                          <template v-slot:item.value="{ item }">
-              <span v-if="item.info">
-                {{item.value}}
-                <v-btn
-                    icon
-                    @click="$data[item.info] = true"
-                    class="icon_clickable"
-                    x-small
-                >
-                  <v-icon
-                      color='#1C195B'
-                  >
-                    mdi-information-outline
-                  </v-icon>
-                </v-btn>
-
-
-              </span>
-                            <span v-else>{{item.value}}</span>
-                          </template>
-                          <template
-                              v-for="value in Object.keys(industries_aggregated)"
-                              v-slot:[`item.${value}`]="{ item }"
-                          >
-
-                            <template v-if="getEcotoxicity(item, value) != null">
-                              <v-tooltip bottom>
-                                <template v-slot:activator="{ on, attrs }">
-                                  <v-chip
-                                      :color="getEcotoxicity(item, value)[0]"
-                                      dark
-                                      :key="value"
-                                      v-bind="attrs"
-                                      v-on="on"
-                                      text-color="#1c1c1b"
-                                  >
-                                    {{ item[value] }}
-                                  </v-chip>
-                                </template>
-                                <span>{{ getEcotoxicity(item, value)[1] }}</span>
-                              </v-tooltip>
-                            </template>
-                            <template v-else>
-                              <v-chip
-                                  color="transparent"
-                                  dark
-                                  :key="value"
-                                  text-color="#1c1c1b"
-                                  class= "chip_no_hover"
-                              >
-                                {{ item[value] }}
-                              </v-chip>
-                            </template>
-                          </template>
-
-                        </v-data-table>
-                        <v-data-table
-                            :headers="eqs_table.header"
-                            :items="eqs_table.value"
-                            disable-pagination
-                            :hide-default-footer="true"
-                            v-else-if="item.value == table_title.simple_table.eqs"
-                            dense
-                            class="expanded_table_hover"
-                        >
-
-                          <template v-slot:item.value="{ item }">
-              <span v-if="item.info">
-                {{item.value}}
-                <v-btn
-                    icon
-                    @click="$data[item.info] = true"
-                    class="icon_clickable"
-                    x-small
-                >
-                  <v-icon
-                      color='#1C195B'
-                  >
-                    mdi-information-outline
-                  </v-icon>
-                </v-btn>
-
-
-              </span>
-                            <span v-else>{{item.value}}</span>
-                          </template>
-                          <template
-                              v-for="value in Object.keys(industries_aggregated)"
-                              v-slot:[`item.${value}`]="{ item }"
-                          >
-
-                            <template v-if="getEQSColor(item, value) != null">
-                              <v-tooltip bottom>
-                                <template v-slot:activator="{ on, attrs }">
-                                  <v-chip
-                                      :color="getEQSColor(item, value)[0]"
-                                      dark
-                                      :key="value"
-                                      v-bind="attrs"
-                                      v-on="on"
-                                      text-color="#1c1c1b"
-                                  >
-                                    {{ item[value] }}
-                                  </v-chip>
-                                </template>
-                                <span>{{ getEQSColor(item, value)[1] }}</span>
-                              </v-tooltip>
-                            </template>
-                            <template v-else>
-                              <v-chip
-                                  color="transparent"
-                                  dark
-                                  :key="value"
-                                  text-color="#1c1c1b"
-                                  class= "chip_no_hover"
-                              >
-                                {{ item[value] }}
-                              </v-chip>
-                            </template>
-                          </template>
-
-
-                        </v-data-table>
-
-                      </div>
-
-                    </td>
-                  </template>
-
-
-                  <template v-slot:no-data>
-                    <v-progress-linear
-                        indeterminate
-                        color="#1C195B"
-                    ></v-progress-linear>
-                  </template>
-
-                  <template v-slot:item.value="{ item }">
-                    <v-tooltip bottom max-width="700px" v-if="item.info">
-                      <template v-slot:activator="{ on, attrs }">
-                        {{item.value}}
-                        <v-icon
-                            color='#1C195B'
-                            style="padding-right: 10px"
-                            v-bind="attrs"
-                            v-on="on"
-                            size="18px"
-                        >
-                          mdi-information-outline
-                        </v-icon>
-                      </template>
-                      <span>{{ item.info }}</span>
-                    </v-tooltip>
-                    <span v-else>
-                                    {{item.value}}
-                                  </span>
-                  </template>
-                  <template
-                      v-for="value in Object.keys(industries_aggregated)"
-                      v-slot:[`item.${value}`]="{ item }"
-                  >
-
-                    <template v-if="getSimpleReportColor(item, value) != null">
-                      <v-tooltip bottom>
-                        <template v-slot:activator="{ on, attrs }">
-                          <v-chip
-                              :color="getSimpleReportColor(item, value)[0]"
-                              dark
-                              :key="value"
-                              v-bind="attrs"
-                              v-on="on"
-                              text-color="#1c1c1b"
-                          >
-                            {{ item[value] }}
-                          </v-chip>
-                        </template>
-                        <span>{{ getSimpleReportColor(item, value)[1] }}</span>
-                      </v-tooltip>
-                    </template>
-                    <template v-else>
-                      <v-chip
-                          color="transparent"
-                          dark
-                          :key="value"
-                          text-color="#1c1c1b"
-                          class= "chip_no_hover"
-                      >
-                        {{ item[value] }}
-                      </v-chip>
-                    </template>
-                  </template>
-
-                </v-data-table>
-              </div>
-            </v-tab-item>
-            <v-tab-item
-            >
-              <div class="no_overflow">
-                <div class="instructions">
-                  *Click at any row to see advanced information!
-                </div>
-                <v-data-table class="simple_report_table"
-                              :headers="pollutant_load_table.header"
-                              :items="pollutant_load_table.value"
-                              disable-pagination
-                              :hide-default-footer="true"
-                              @click:row="(item, slot) => slot.expand(!slot.isExpanded)"
-                              single-expand
-                              show-expand
-                              item-key="value"
-                >
-
-                  <template v-slot:expanded-item="{ headers, item }">
-                    <td :colspan="headers.length" style="padding: 20px; background-color: #c4c4d4">
-                      <div style="width: 90%" class="center">
-                        <v-data-table
-                            :headers="delta_ecotox_table.header"
-                            :items="delta_ecotox_table.value"
-                            v-if="item.value == table_title.simple_table.delta_tu"
-                            class="expanded_table_hover"
-                            :item-class="itemRowBold"
-                            disable-pagination
-                            :hide-default-footer="true"
-                            dense
-                        >
-
-                          <template v-slot:item.value="{ item }">
-              <span v-if="item.info">
-                {{item.value}}
-                <v-btn
-                    icon
-                    @click="$data[item.info] = true"
-                    class="icon_clickable"
-                    x-small
-                >
-                  <v-icon
-                      color='#1C195B'
-                  >
-                    mdi-information-outline
-                  </v-icon>
-                </v-btn>
-
-
-              </span>
-                            <span v-else>{{item.value}}</span>
-                          </template>
-
-                          <template
-                              v-for="value in Object.keys(industries_aggregated)"
-                              v-slot:[`item.${value}`]="{ item }"
-                          >
-
-                            <template v-if="getDeltaEcotoxColor(item, value) != null">
-                              <v-tooltip bottom>
-                                <template v-slot:activator="{ on, attrs }">
-                                  <v-chip
-                                      :color="getDeltaEcotoxColor(item, value)[0]"
-                                      dark
-                                      :key="value"
-                                      v-bind="attrs"
-                                      v-on="on"
-                                      text-color="#1c1c1b"
-                                  >
-                                    {{ item[value] }}
-                                  </v-chip>
-                                </template>
-                                <span>{{ getDeltaEcotoxColor(item, value)[1] }}</span>
-                              </v-tooltip>
-                            </template>
-                            <template v-else>
-                              <v-chip
-                                  color="transparent"
-                                  dark
-                                  :key="value"
-                                  text-color="#1c1c1b"
-                                  class= "chip_no_hover"
-                              >
-                                {{ item[value] }}
-                              </v-chip>
-                            </template>
-                          </template>
-                        </v-data-table>
-                        <v-data-table
-                            :headers="delta_eqs_table.header"
-                            :items="delta_eqs_table.value"
-                            v-else-if="item.value == table_title.simple_table.delta_eqs"
-                            class="expanded_table_hover"
-
-                            disable-pagination
-                            :hide-default-footer="true"
-                            dense
-                        >
-
-                          <template v-slot:item.value="{ item }">
-              <span v-if="item.info">
-                {{item.value}}
-                <v-btn
-                    icon
-                    @click="$data[item.info] = true"
-                    class="icon_clickable"
-                    x-small
-                >
-                  <v-icon
-                      color='#1C195B'
-                  >
-                    mdi-information-outline
-                  </v-icon>
-                </v-btn>
-
-
-              </span>
-                            <span v-else>{{item.value}}</span>
-                          </template>
-
-                          <template
-                              v-for="value in Object.keys(industries_aggregated)"
-                              v-slot:[`item.${value}`]="{ item }"
-                          >
-
-                            <template v-if="getDeltaEQSColor(item, value) != null">
-                              <v-tooltip bottom>
-                                <template v-slot:activator="{ on, attrs }">
-                                  <v-chip
-                                      :color="getDeltaEQSColor(item, value)[0]"
-                                      dark
-                                      :key="value"
-                                      v-bind="attrs"
-                                      v-on="on"
-                                      text-color="#1c1c1b"
-                                  >
-                                    {{ item[value] }}
-                                  </v-chip>
-                                </template>
-                                <span>{{ getDeltaEQSColor(item, value)[1] }}</span>
-                              </v-tooltip>
-                            </template>
-                            <template v-else>
-                              <v-chip
-                                  color="transparent"
-                                  dark
-                                  :key="value"
-                                  text-color="#1c1c1b"
-                                  class= "chip_no_hover"
-                              >
-                                {{ item[value] }}
-                              </v-chip>
-                            </template>
-                          </template>
-
-
-                        </v-data-table>
-                        <v-data-table
-                            :headers="eutrophication_table.header"
-                            :items="eutrophication_table.value"
-                            v-else-if="item.value == table_title.simple_table.eutrophication"
-                            class="expanded_table_hover"
-
-                            disable-pagination
-                            :hide-default-footer="true"
-                            dense
-                        >
-                          <template v-slot:item.value="{ item }">
-              <span v-if="item.info">
-                {{item.value}}
-                <v-btn
-                    icon
-                    @click="$data[item.info] = true"
-                    class="icon_clickable"
-                    x-small
-                >
-                  <v-icon
-                      color='#1C195B'
-                  >
-                    mdi-information-outline
-                  </v-icon>
-                </v-btn>
-
-
-              </span>
-                            <span v-else>{{item.value}}</span>
-                          </template>
-
-                          <template
-                              v-for="value in Object.keys(industries_aggregated)"
-                              v-slot:[`item.${value}`]="{ item }"
-                          >
-
-                            <template v-if="getEutrophicationColor(item, value) != null">
-                              <v-tooltip bottom>
-                                <template v-slot:activator="{ on, attrs }">
-                                  <v-chip
-                                      :color="getEutrophicationColor(item, value)[0]"
-                                      dark
-                                      :key="value"
-                                      v-bind="attrs"
-                                      v-on="on"
-                                      text-color="#1c1c1b"
-                                  >
-                                    {{ item[value] }}
-                                  </v-chip>
-                                </template>
-                                <span>{{ getEutrophicationColor(item, value)[1] }}</span>
-                              </v-tooltip>
-                            </template>
-                            <template v-else>
-                              <v-chip
-                                  color="transparent"
-                                  dark
-                                  :key="value"
-                                  text-color="#1c1c1b"
-                                  class= "chip_no_hover"
-                              >
-                                {{ item[value] }}
-                              </v-chip>
-                            </template>
-                          </template>
-
-                        </v-data-table>
-                        <!--<div style="width:500px; margin: 20px auto 20px auto;">
-                          <BarChart :chartdata="eutrophication_chart.chartData" :options="eutrophication_chart.options"></BarChart>
-                        </div>-->
-                      </div>
-
-                    </td>
-                  </template>
-
-
-                  <template v-slot:no-data>
-                    <v-progress-linear
-                        indeterminate
-                        color="#1C195B"
-                    ></v-progress-linear>
-                  </template>
-
-                  <template v-slot:item.value="{ item }">
-                    <v-tooltip bottom max-width="700px" v-if="item.info">
-                      <template v-slot:activator="{ on, attrs }">
-                        {{item.value}}
-                        <v-icon
-                            color='#1C195B'
-                            style="padding-right: 10px"
-                            v-bind="attrs"
-                            v-on="on"
-                            size="18px"
-                        >
-                          mdi-information-outline
-                        </v-icon>
-                      </template>
-                      <span>{{ item.info }}</span>
-                    </v-tooltip>
-                    <span v-else>
-                                    {{item.value}}
-                                  </span>
-                  </template>
-                  <template
-                      v-for="value in Object.keys(industries_aggregated)"
-                      v-slot:[`item.${value}`]="{ item }"
-                  >
-
-                    <template v-if="getSimpleReportColor(item, value) != null">
-                      <v-tooltip bottom>
-                        <template v-slot:activator="{ on, attrs }">
-                          <v-chip
-                              :color="getSimpleReportColor(item, value)[0]"
-                              dark
-                              :key="value"
-                              v-bind="attrs"
-                              v-on="on"
-                              text-color="#1c1c1b"
-                          >
-                            {{ item[value] }}
-                          </v-chip>
-                        </template>
-                        <span>{{ getSimpleReportColor(item, value)[1] }}</span>
-                      </v-tooltip>
-                    </template>
-                    <template v-else>
-                      <v-chip
-                          color="transparent"
-                          dark
-                          :key="value"
-                          text-color="#1c1c1b"
-                          class= "chip_no_hover"
-                      >
-                        {{ item[value] }}
-                      </v-chip>
-                    </template>
-                  </template>
-
-                </v-data-table>
-              </div>
-            </v-tab-item>
-            <v-tab-item
-            >
-              <div class="no_overflow">
-                <div class="instructions">
-                  *Click at any row to see advanced information!
-                </div>
-                <v-data-table class="simple_report_table"
-                              :headers="treatment_efficiency_summary_table.header"
-                              :items="treatment_efficiency_summary_table.value"
-                              disable-pagination
-                              :hide-default-footer="true"
-                              @click:row="(item, slot) => slot.expand(!slot.isExpanded)"
-                              single-expand
-                              show-expand
-                              item-key="value"
-                >
-
-                  <template v-slot:expanded-item="{ headers, item }">
-                    <td :colspan="headers.length" style="padding: 20px; background-color: #c4c4d4">
-                      <div style="width: 90%" class="center">
-                        <v-data-table
-                            :headers="treatment_efficiency_table.header"
-                            :items="treatment_efficiency_table.value"
-                            v-if="item.value == table_title.simple_table.avg_treatment_efficiency"
-                            class="expanded_table_hover"
-
-                            disable-pagination
-                            :hide-default-footer="true"
-                            dense
-                        >
-
-                          <template v-slot:item.value="{ item }">
-              <span v-if="item.info">
-                {{item.value}}
-                <v-btn
-                    icon
-                    @click="$data[item.info] = true"
-                    class="icon_clickable"
-                    x-small
-                >
-                  <v-icon
-                      color='#1C195B'
-                  >
-                    mdi-information-outline
-                  </v-icon>
-                </v-btn>
-
-
-              </span>
-                            <span v-else>{{item.value}}</span>
-                          </template>
-                          <template
-                              v-for="value in Object.keys(industries_aggregated)"
-                              v-slot:[`item.${value}`]="{ item }"
-                          >
-
-                            <template v-if="getTreatmentEfficiencyColor(item, value) != null">
-                              <v-tooltip bottom>
-                                <template v-slot:activator="{ on, attrs }">
-                                  <v-chip
-                                      :color="getTreatmentEfficiencyColor(item, value)[0]"
-                                      dark
-                                      :key="value"
-                                      v-bind="attrs"
-                                      v-on="on"
-                                      text-color="#1c1c1b"
-                                  >
-                                    {{ item[value] }}
-                                  </v-chip>
-                                </template>
-                                <span>{{ getTreatmentEfficiencyColor(item, value)[1] }}</span>
-                              </v-tooltip>
-                            </template>
-                            <template v-else>
-                              <v-chip
-                                  color="transparent"
-                                  dark
-                                  :key="value"
-                                  text-color="#1c1c1b"
-                                  class= "chip_no_hover"
-                              >
-                                {{ item[value] }}
-                              </v-chip>
-                            </template>
-                          </template>
-
-                        </v-data-table>
-                        <!--<div style="width: 600px; margin: 20px auto 20px auto;">
-                          <RadarChart :chartdata="treatment_efficiency_chart.chartData" :options="treatment_efficiency_chart.options"></RadarChart>
-                        </div>-->
-                        <v-data-table
-                            :headers="treatment_efficiency_influent_table.header"
-                            :items="treatment_efficiency_influent_table.value"
-                            disable-pagination
-                            :hide-default-footer="true"
-                            dense
-                            v-else-if="item.value == table_title.simple_table.avg_influent_efficiency"
-                            class="expanded_table_hover"
-
-                        >
-
-                          <template v-slot:item.value="{ item }">
-              <span v-if="item.info">
-                {{item.value}}
-                <v-btn
-                    icon
-                    @click="$data[item.info] = true"
-                    class="icon_clickable"
-                    x-small
-                >
-                  <v-icon
-                      color='#1C195B'
-                  >
-                    mdi-information-outline
-                  </v-icon>
-                </v-btn>
-
-
-              </span>
-                            <span v-else>{{item.value}}</span>
-                          </template>
-
-                          <template
-                              v-for="value in Object.keys(industries_aggregated)"
-                              v-slot:[`item.${value}`]="{ item }"
-                          >
-
-                            <template v-if="getTreatmentEfficiencyInfluentColor(item, value) != null">
-                              <v-tooltip bottom>
-                                <template v-slot:activator="{ on, attrs }">
-                                  <v-chip
-                                      :color="getTreatmentEfficiencyInfluentColor(item, value)[0]"
-                                      dark
-                                      :key="value"
-                                      v-bind="attrs"
-                                      v-on="on"
-                                      text-color="#1c1c1b"
-                                  >
-                                    {{ item[value] }}
-                                  </v-chip>
-                                </template>
-                                <span>{{ getTreatmentEfficiencyInfluentColor(item, value)[1] }}</span>
-                              </v-tooltip>
-                            </template>
-                            <template v-else>
-                              <v-chip
-                                  color="transparent"
-                                  dark
-                                  :key="value"
-                                  text-color="#1c1c1b"
-                                  class= "chip_no_hover"
-                              >
-                                {{ item[value] }}
-                              </v-chip>
-                            </template>
-                          </template>
-
-                        </v-data-table>
-                        <!--<div style="width: 600px; margin: 20px auto 20px auto;">
-                          <RadarChart :chartdata="treatment_efficiency_influent_chart.chartData" :options="treatment_efficiency_chart.options"></RadarChart>
-                        </div>-->
-                      </div>
-
-                    </td>
-                  </template>
-
-
-                  <template v-slot:no-data>
-                    <v-progress-linear
-                        indeterminate
-                        color="#1C195B"
-                    ></v-progress-linear>
-                  </template>
-
-                  <template v-slot:item.value="{ item }">
-                    <v-tooltip bottom max-width="700px" v-if="item.info">
-                      <template v-slot:activator="{ on, attrs }">
-                        {{item.value}}
-                        <v-icon
-                            color='#1C195B'
-                            style="padding-right: 10px"
-                            v-bind="attrs"
-                            v-on="on"
-                            size="18px"
-                        >
-                          mdi-information-outline
-                        </v-icon>
-                      </template>
-                      <span>{{ item.info }}</span>
-                    </v-tooltip>
-                    <span v-else>
-                                    {{item.value}}
-                                  </span>
-                  </template>
-                  <template
-                      v-for="value in Object.keys(industries_aggregated)"
-                      v-slot:[`item.${value}`]="{ item }"
-                  >
-
-                    <template v-if="getSimpleReportColor(item, value) != null">
-                      <v-tooltip bottom>
-                        <template v-slot:activator="{ on, attrs }">
-                          <v-chip
-                              :color="getSimpleReportColor(item, value)[0]"
-                              dark
-                              :key="value"
-                              v-bind="attrs"
-                              v-on="on"
-                              text-color="#1c1c1b"
-                          >
-                            {{ item[value] }}
-                          </v-chip>
-                        </template>
-                        <span>{{ getSimpleReportColor(item, value)[1] }}</span>
-                      </v-tooltip>
-                    </template>
-                    <template v-else>
-                      <v-chip
-                          color="transparent"
-                          dark
-                          :key="value"
-                          text-color="#1c1c1b"
-                          class= "chip_no_hover"
-                      >
-                        {{ item[value] }}
-                      </v-chip>
-                    </template>
-                  </template>
-
-                </v-data-table>
-              </div>
-            </v-tab-item>
-
-
-          </v-tabs-items>
-
-
-        </div>
-
-      </v-dialog>
-
-
+    <div v-if="industry_clicked != null">
 
       <!-- Quality and quantity -->
       <v-dialog
@@ -1983,7 +924,6 @@
           width="85%"
       >
         <div class="dialog_detail" style="background-color: white">
-          <!-- aaa -->
           <div v-if="dialog_biogas_stage == 0">
             <h3>Emissions from sludge management </h3>
             <br>
@@ -2002,11 +942,8 @@
               <li><span class="hover" @click="dialog_biogas_stage = 3">incineration</span>: Amount of CO2eq emissions due to sludge incineration</li>
               <li><span class="hover" @click="dialog_biogas_stage = 4">land application</span>: Amount of CO2eq emissions due to land application of sludge</li>
               <li><span class="hover" @click="dialog_biogas_stage = 5">landfilling</span>: Fugitive methane emissions from biosolids decomposition in the landfill during the first 3 years after placement, and N2O emissions from landfilled biosolids</li>
-
-              <li>stockpiling: Amount of CO2eq emissions due to sludge stockpiling</li>
-              <li>storage: Amount of CO2eq emissions related to sludge storage</li>
-
-              <li><span class="hover" @click="dialog_biogas_stage = 8">transport</span>: Indirect CO2 emitted from sludge transport off-site</li>
+              <li><span class="hover" @click="dialog_biogas_stage = 6">stockpiling</span>: Amount of CO2eq emissions due to sludge stockpiling</li>
+              <li><span class="hover" @click="dialog_biogas_stage = 7">transport</span>: Indirect CO2 emitted from sludge transport off-site</li>
 
 
             </ul>
@@ -2026,51 +963,32 @@
               </div>
             </div>
             <div v-if="dialog_biogas_stage == 1">
-              <h3>Sludge stockpiling</h3>
+              <h3>Sludge storage</h3>
               <br>
-              Amount of CO2eq emissions due to sludge stockpiling
+              Amount of CO2eq emissions due to sludge storage
               <br>
               <br>
-              <span v-katex:display="'lifespan\\_ int = \\lfloor lifespan \\rfloor'"></span>
-              <span v-katex:display="'lifespan\\_ dec = lifespan - lifespan\\_ dec'"></span>
-              <span v-katex:display="'rate_{CH4}(i) = \\begin{cases}\n'+
-                'sludgemass \\cdot 0.2 \\cdot 10^{-3} &\\text{if }i<1\\\\\n'+
-                'sludgemass \\cdot 2 \\cdot 10^{-3} &\\text{if }1<=i<3\\\\\n'+
-                'sludgemass \\cdot 9.8 \\cdot 10^{-3} &\\text{if }3<=i<20\\\\\n'+
-                '0 &\\text{if }i>=20\\\\\n'+
-                '\\end{cases}'">
-              </span>
-              <span v-katex:display="'rate_{N2O}(i) = \\begin{cases}\n'+
-                'sludgemass \\cdot 60 \\cdot 10^{-3} &\\text{if }i<1\\\\\n'+
-                'sludgemass \\cdot 26.8 \\cdot 10^{-3} &\\text{if }1<=i<3\\\\\n'+
-                'sludgemass \\cdot 17.4 \\cdot 10^{-3} &\\text{if }3<=i<20\\\\\n'+
-                '0 &\\text{if }i>=20\\\\\n'+
-                '\\end{cases}'">
-              </span>
-              <span v-katex:display="'rate_{CO2}(i) = \\begin{cases}\n'+
-                'sludgemass \\cdot 30.1 \\cdot 10^{-3} &\\text{if }i<1\\\\\n'+
-                'sludgemass \\cdot 30.5 \\cdot 10^{-3} &\\text{if }1<=i<3\\\\\n'+
-                'sludgemass \\cdot 10.1 \\cdot 10^{-3} &\\text{if }3<=i<20\\\\\n'+
-                '0 &\\text{if }i>=20\\\\\n'+
-                '\\end{cases}'">
-              </span>
-              <span v-katex:display="'CH_4 = lifespan\\_ dec \\cdot rate_{CH4}(lifespan\\_ int) + \\sum _{i=0} ^{lifespan\\_ int -1} rate_{CH4}(i)'"></span>
-              <span v-katex:display="'N_2O = lifespan\\_ dec \\cdot rate_{N2O}(lifespan\\_ int) + \\sum _{i=0} ^{lifespan\\_ int -1} rate_{N2O}(i)'"></span>
-              <span v-katex:display="'CO_2 = lifespan\\_ dec \\cdot rate_{CO2}(lifespan\\_ int) + \\sum _{i=0} ^{lifespan\\_ int -1} rate_{CO2}(i)'"></span>
+              <span v-katex:display="'TVS = \\frac{slustoTVS}{100}'"></span>
+              <span v-katex:display="'FCH_4 = \\frac{slustoFCH_4}{100}'"></span>
+              <span v-katex:display="'CH_4EF = \\frac{slustoEF}{100}'"></span>
+              <span v-katex:display="'CH_4potential = sludgemass \\cdot TVStoOC \\cdot OCtoCH_4 \\cdot FCH_4'"></span>
+              <span v-katex:display="'CH_4 = CH_4potential \\cdot CH_4EF \\cdot ctCH_4eq'"></span>
+              <span v-katex:display="'CO_2SS = CH_4 '"></span>
 
-              <span v-katex:display="'CO_2SP = CH_4 + N_2O + CO_2'"></span>
-
-
+              <br>
               <b>Where:</b>
               <br>
               <ul>
-                <li><span v-katex="'sludgemass'"></span>: Amount of sludge that is stockpiled (dry weight)</li>
-                <li><span v-katex="'lifespan'"></span>: Expected timespan that the biosolid stockpile (BSP) will be emitting GHGs</li>
-                <li><span v-katex="'CO_2SP'"></span>: Amount of CO2eq emissions due to sludge composted</li>
+                <li><span v-katex="'sludgemass'"></span>: Amount of sludge that is sent to stored prior to disposal (dry weight)</li>
+                <li><span v-katex="'slustoEF'"></span>: Emission factor due to storage</li>
+                <li><span v-katex="'slustoTVS'"></span>: Total Volatile Solids (TVS) content of sludge stored (% of dry weight)</li>
+                <li><span v-katex="'slustoFCH_4'"></span>: CH_4 potential factor</li>
+                <li><span v-katex="'TVStoOC'"></span>: Organic Carbon content in Volatile Solids (0.56gOC/gVS)</li>
+                <li><span v-katex="'OCtoCH_4'"></span>: Organic C to CH4 conversion factor (=16/12 gCH4/gOC)</li>
+                <li><span v-katex="'ctCH_4eq'"></span>: Conversion of CH4 emissions to CO2 equivalent emissions (34 kgCO2eq/kgCH4)</li>
+                <li><span v-katex="'CO_2SS'"></span>: Amount of CO_2eq due to sludge storage</li>
               </ul>
               <br>
-              <b>Reference:</b> <a href="https://doi.org/10.1016/j.jenvman.2014.04.016 " target="_blank">Majumder, R., Livesley, S., Gregory, D., & Arndt, S. (2014, 05 15). Biosolids stockpiles are a significant point source for greenhouse gas emissions. Journal of Environmental Management, 143, pp. 34-43</a>
-
 
             </div>
             <div v-else-if="dialog_biogas_stage == 2">
@@ -2233,7 +1151,55 @@
 
 
             </div>
-            <div v-else-if="dialog_biogas_stage == 8">
+            <div v-else-if="dialog_biogas_stage == 6">
+              <h3>Sludge stockpiling</h3>
+              <br>
+              Amount of CO2eq emissions due to sludge stockpiling
+              <br>
+              <br>
+              <span v-katex:display="'lifespan\\_ int = \\lfloor lifespan \\rfloor'"></span>
+              <span v-katex:display="'lifespan\\_ dec = lifespan - lifespan\\_ dec'"></span>
+              <span v-katex:display="'rate_{CH4}(i) = \\begin{cases}\n'+
+                'sludgemass \\cdot 0.2 \\cdot 10^{-3} &\\text{if }i<1\\\\\n'+
+                'sludgemass \\cdot 2 \\cdot 10^{-3} &\\text{if }1<=i<3\\\\\n'+
+                'sludgemass \\cdot 9.8 \\cdot 10^{-3} &\\text{if }3<=i<20\\\\\n'+
+                '0 &\\text{if }i>=20\\\\\n'+
+                '\\end{cases}'">
+              </span>
+              <span v-katex:display="'rate_{N2O}(i) = \\begin{cases}\n'+
+                'sludgemass \\cdot 60 \\cdot 10^{-3} &\\text{if }i<1\\\\\n'+
+                'sludgemass \\cdot 26.8 \\cdot 10^{-3} &\\text{if }1<=i<3\\\\\n'+
+                'sludgemass \\cdot 17.4 \\cdot 10^{-3} &\\text{if }3<=i<20\\\\\n'+
+                '0 &\\text{if }i>=20\\\\\n'+
+                '\\end{cases}'">
+              </span>
+              <span v-katex:display="'rate_{CO2}(i) = \\begin{cases}\n'+
+                'sludgemass \\cdot 30.1 \\cdot 10^{-3} &\\text{if }i<1\\\\\n'+
+                'sludgemass \\cdot 30.5 \\cdot 10^{-3} &\\text{if }1<=i<3\\\\\n'+
+                'sludgemass \\cdot 10.1 \\cdot 10^{-3} &\\text{if }3<=i<20\\\\\n'+
+                '0 &\\text{if }i>=20\\\\\n'+
+                '\\end{cases}'">
+              </span>
+              <span v-katex:display="'CH_4 = lifespan\\_ dec \\cdot rate_{CH4}(lifespan\\_ int) + \\sum _{i=0} ^{lifespan\\_ int -1} rate_{CH4}(i)'"></span>
+              <span v-katex:display="'N_2O = lifespan\\_ dec \\cdot rate_{N2O}(lifespan\\_ int) + \\sum _{i=0} ^{lifespan\\_ int -1} rate_{N2O}(i)'"></span>
+              <span v-katex:display="'CO_2 = lifespan\\_ dec \\cdot rate_{CO2}(lifespan\\_ int) + \\sum _{i=0} ^{lifespan\\_ int -1} rate_{CO2}(i)'"></span>
+
+              <span v-katex:display="'CO_2SP = CH_4 + N_2O + CO_2'"></span>
+
+
+              <b>Where:</b>
+              <br>
+              <ul>
+                <li><span v-katex="'sludgemass'"></span>: Amount of sludge that is stockpiled (dry weight)</li>
+                <li><span v-katex="'lifespan'"></span>: Expected timespan that the biosolid stockpile (BSP) will be emitting GHGs</li>
+                <li><span v-katex="'CO_2SP'"></span>: Amount of CO2eq emissions due to sludge composted</li>
+              </ul>
+              <br>
+              <b>Reference:</b> <a href="https://doi.org/10.1016/j.jenvman.2014.04.016 " target="_blank">Majumder, R., Livesley, S., Gregory, D., & Arndt, S. (2014, 05 15). Biosolids stockpiles are a significant point source for greenhouse gas emissions. Journal of Environmental Management, 143, pp. 34-43</a>
+
+
+            </div>
+            <div v-else-if="dialog_biogas_stage == 7">
               <h3>Water reuse transport </h3>
               <br>
               Indirect CO2 emitted from sludge transport off-site
@@ -3894,7 +2860,6 @@
 
       </v-dialog>
 
-      <!-- Treatment efficiency influent-->
       <v-dialog
           v-model="industry_info"
           width="80%"
@@ -3915,7 +2880,20 @@
                   open-on-click
                   transition
                   dense
-              ></v-treeview>
+                  :open.sync="open_indicator"
+              >
+                <template v-slot:prepend="{ item, open }" style="height: 100%;">
+                  <div
+                      style="width: 5px; margin-left: 40px"
+                      :class="indicator_risk_class(item)"
+                  >
+                    &nbsp
+                  </div>
+
+                </template>
+
+
+              </v-treeview>
             </v-col>
 
             <v-divider vertical></v-divider>
@@ -3932,10 +2910,649 @@
                   Select an indicator
                 </div>
                 <div v-else>
-                  <div v-if="active_indicator[0] == 2">
+                  <div v-if="active_indicator[0] == 5">
+                    <v-data-table
+                        :headers="delta_ecotox_table.header"
+                        :items="delta_ecotox_table.value"
+                        class="expanded_table_hover"
+                        :item-class="itemRowBold"
+                        disable-pagination
+                        :hide-default-footer="true"
+                        dense
+                    >
+
+                      <template v-slot:item.value="{ item }">
+              <span v-if="item.info">
+                {{item.value}}
+                <v-btn
+                    icon
+                    @click="$data[item.info] = true"
+                    class="icon_clickable"
+                    x-small
+                >
+                  <v-icon
+                      color='#1C195B'
+                  >
+                    mdi-information-outline
+                  </v-icon>
+                </v-btn>
+
+
+              </span>
+                        <span v-else>{{item.value}}</span>
+                      </template>
+
+                      <template
+                          v-for="value in Object.keys(industries_aggregated)"
+                          v-slot:[`item.${value}`]="{ item }"
+                      >
+
+                        <template v-if="getDeltaEcotoxColor(item, value) != null">
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-chip
+                                  :color="getDeltaEcotoxColor(item, value)[0]"
+                                  dark
+                                  :key="value"
+                                  v-bind="attrs"
+                                  v-on="on"
+                                  text-color="#1c1c1b"
+                              >
+                                {{ item[value] }}
+                              </v-chip>
+                            </template>
+                            <span>{{ getDeltaEcotoxColor(item, value)[1] }}</span>
+                          </v-tooltip>
+                        </template>
+                        <template v-else>
+                          <v-chip
+                              color="transparent"
+                              dark
+                              :key="value"
+                              text-color="#1c1c1b"
+                              class= "chip_no_hover"
+                          >
+                            {{ item[value] }}
+                          </v-chip>
+                        </template>
+                      </template>
+                    </v-data-table>
+
+                  </div>
+                  <div v-else-if="active_indicator[0] == 6">
+                    <v-data-table
+                        :headers="delta_eqs_table.header"
+                        :items="delta_eqs_table.value"
+                        class="expanded_table_hover"
+
+                        disable-pagination
+                        :hide-default-footer="true"
+                        dense
+                    >
+
+                      <template v-slot:item.value="{ item }">
+              <span v-if="item.info">
+                {{item.value}}
+                <v-btn
+                    icon
+                    @click="$data[item.info] = true"
+                    class="icon_clickable"
+                    x-small
+                >
+                  <v-icon
+                      color='#1C195B'
+                  >
+                    mdi-information-outline
+                  </v-icon>
+                </v-btn>
+
+
+              </span>
+                        <span v-else>{{item.value}}</span>
+                      </template>
+
+                      <template
+                          v-for="value in Object.keys(industries_aggregated)"
+                          v-slot:[`item.${value}`]="{ item }"
+                      >
+
+                        <template v-if="getDeltaEQSColor(item, value) != null">
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-chip
+                                  :color="getDeltaEQSColor(item, value)[0]"
+                                  dark
+                                  :key="value"
+                                  v-bind="attrs"
+                                  v-on="on"
+                                  text-color="#1c1c1b"
+                              >
+                                {{ item[value] }}
+                              </v-chip>
+                            </template>
+                            <span>{{ getDeltaEQSColor(item, value)[1] }}</span>
+                          </v-tooltip>
+                        </template>
+                        <template v-else>
+                          <v-chip
+                              color="transparent"
+                              dark
+                              :key="value"
+                              text-color="#1c1c1b"
+                              class= "chip_no_hover"
+                          >
+                            {{ item[value] }}
+                          </v-chip>
+                        </template>
+                      </template>
+
+
+                    </v-data-table>
+
+                  </div>
+                  <div v-else-if="active_indicator[0] == 7">
+                    <v-data-table
+                        :headers="eutrophication_table.header"
+                        :items="eutrophication_table.value"
+                        class="expanded_table_hover"
+                        :item-class="itemRowBold"
+                        disable-pagination
+                        :hide-default-footer="true"
+                        dense
+                    >
+                      <template v-slot:item.value="{ item }">
+              <span v-if="item.info">
+                {{item.value}}
+                <v-btn
+                    icon
+                    @click="$data[item.info] = true"
+                    class="icon_clickable"
+                    x-small
+                >
+                  <v-icon
+                      color='#1C195B'
+                  >
+                    mdi-information-outline
+                  </v-icon>
+                </v-btn>
+
+
+              </span>
+                        <span v-else>{{item.value}}</span>
+                      </template>
+
+                      <template
+                          v-for="value in Object.keys(industries_aggregated)"
+                          v-slot:[`item.${value}`]="{ item }"
+                      >
+
+                        <template v-if="getEutrophicationColor(item, value) != null">
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-chip
+                                  :color="getEutrophicationColor(item, value)[0]"
+                                  dark
+                                  :key="value"
+                                  v-bind="attrs"
+                                  v-on="on"
+                                  text-color="#1c1c1b"
+                              >
+                                {{ item[value] }}
+                              </v-chip>
+                            </template>
+                            <span>{{ getEutrophicationColor(item, value)[1] }}</span>
+                          </v-tooltip>
+                        </template>
+                        <template v-else>
+                          <v-chip
+                              color="transparent"
+                              dark
+                              :key="value"
+                              text-color="#1c1c1b"
+                              class= "chip_no_hover"
+                          >
+                            {{ item[value] }}
+                          </v-chip>
+                        </template>
+                      </template>
+
+                    </v-data-table>
+
+                  </div>
+                  <div v-else-if="active_indicator[0] == 9">
+                    <v-data-table
+                        :headers="ecotoxicity_table.header"
+                        :items="ecotoxicity_table.value"
+                        disable-pagination
+                        :hide-default-footer="true"
+                        dense
+                        class="expanded_table_hover"
+                        :item-class="itemRowBold"
+                    >
+                      <template v-slot:item.value="{ item }">
+              <span v-if="item.info">
+                {{item.value}}
+                <v-btn
+                    icon
+                    @click="$data[item.info] = true"
+                    class="icon_clickable"
+                    x-small
+                >
+                  <v-icon
+                      color='#1C195B'
+                  >
+                    mdi-information-outline
+                  </v-icon>
+                </v-btn>
+
+
+              </span>
+                        <span v-else>{{item.value}}</span>
+                      </template>
+                      <template
+                          v-for="value in Object.keys(industries_aggregated)"
+                          v-slot:[`item.${value}`]="{ item }"
+                      >
+
+                        <template v-if="getEcotoxicity(item, value) != null">
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-chip
+                                  :color="getEcotoxicity(item, value)[0]"
+                                  dark
+                                  :key="value"
+                                  v-bind="attrs"
+                                  v-on="on"
+                                  text-color="#1c1c1b"
+                              >
+                                {{ item[value] }}
+                              </v-chip>
+                            </template>
+                            <span>{{ getEcotoxicity(item, value)[1] }}</span>
+                          </v-tooltip>
+                        </template>
+                        <template v-else>
+                          <v-chip
+                              color="transparent"
+                              dark
+                              :key="value"
+                              text-color="#1c1c1b"
+                              class= "chip_no_hover"
+                          >
+                            {{ item[value] }}
+                          </v-chip>
+                        </template>
+                      </template>
+
+                    </v-data-table>
+
+                  </div>
+                  <div v-else-if="active_indicator[0] == 10">
+                    <v-data-table
+                        :headers="eqs_table.header"
+                        :items="eqs_table.value"
+                        disable-pagination
+                        :hide-default-footer="true"
+                        dense
+                        class="expanded_table_hover"
+                    >
+
+                      <template v-slot:item.value="{ item }">
+              <span v-if="item.info">
+                {{item.value}}
+                <v-btn
+                    icon
+                    @click="$data[item.info] = true"
+                    class="icon_clickable"
+                    x-small
+                >
+                  <v-icon
+                      color='#1C195B'
+                  >
+                    mdi-information-outline
+                  </v-icon>
+                </v-btn>
+
+
+              </span>
+                        <span v-else>{{item.value}}</span>
+                      </template>
+                      <template
+                          v-for="value in Object.keys(industries_aggregated)"
+                          v-slot:[`item.${value}`]="{ item }"
+                      >
+
+                        <template v-if="getEQSColor(item, value) != null">
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-chip
+                                  :color="getEQSColor(item, value)[0]"
+                                  dark
+                                  :key="value"
+                                  v-bind="attrs"
+                                  v-on="on"
+                                  text-color="#1c1c1b"
+                              >
+                                {{ item[value] }}
+                              </v-chip>
+                            </template>
+                            <span>{{ getEQSColor(item, value)[1] }}</span>
+                          </v-tooltip>
+                        </template>
+                        <template v-else>
+                          <v-chip
+                              color="transparent"
+                              dark
+                              :key="value"
+                              text-color="#1c1c1b"
+                              class= "chip_no_hover"
+                          >
+                            {{ item[value] }}
+                          </v-chip>
+                        </template>
+                      </template>
+
+
+                    </v-data-table>
+
+                  </div>
+                  <div v-else-if="active_indicator[0] == 13">
+                    <v-data-table
+                        :headers="treatment_efficiency_table.header"
+                        :items="treatment_efficiency_table.value"
+                        class="expanded_table_hover"
+
+                        disable-pagination
+                        :hide-default-footer="true"
+                        dense
+                    >
+
+                      <template v-slot:item.value="{ item }">
+              <span v-if="item.info">
+                {{item.value}}
+                <v-btn
+                    icon
+                    @click="$data[item.info] = true"
+                    class="icon_clickable"
+                    x-small
+                >
+                  <v-icon
+                      color='#1C195B'
+                  >
+                    mdi-information-outline
+                  </v-icon>
+                </v-btn>
+
+
+              </span>
+                        <span v-else>{{item.value}}</span>
+                      </template>
+                      <template
+                          v-for="value in Object.keys(industries_aggregated)"
+                          v-slot:[`item.${value}`]="{ item }"
+                      >
+
+                        <template v-if="getTreatmentEfficiencyColor(item, value) != null">
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-chip
+                                  :color="getTreatmentEfficiencyColor(item, value)[0]"
+                                  dark
+                                  :key="value"
+                                  v-bind="attrs"
+                                  v-on="on"
+                                  text-color="#1c1c1b"
+                              >
+                                {{ item[value] }}
+                              </v-chip>
+                            </template>
+                            <span>{{ getTreatmentEfficiencyColor(item, value)[1] }}</span>
+                          </v-tooltip>
+                        </template>
+                        <template v-else>
+                          <v-chip
+                              color="transparent"
+                              dark
+                              :key="value"
+                              text-color="#1c1c1b"
+                              class= "chip_no_hover"
+                          >
+                            {{ item[value] }}
+                          </v-chip>
+                        </template>
+                      </template>
+
+                    </v-data-table>
+
+                  </div>
+                  <div v-else-if="active_indicator[0] == 14">
+                    <v-data-table
+                        :headers="treatment_efficiency_influent_table.header"
+                        :items="treatment_efficiency_influent_table.value"
+                        disable-pagination
+                        :hide-default-footer="true"
+                        dense
+                        class="expanded_table_hover"
+
+                    >
+
+                      <template v-slot:item.value="{ item }">
+              <span v-if="item.info">
+                {{item.value}}
+                <v-btn
+                    icon
+                    @click="$data[item.info] = true"
+                    class="icon_clickable"
+                    x-small
+                >
+                  <v-icon
+                      color='#1C195B'
+                  >
+                    mdi-information-outline
+                  </v-icon>
+                </v-btn>
+
+
+              </span>
+                        <span v-else>{{item.value}}</span>
+                      </template>
+
+                      <template
+                          v-for="value in Object.keys(industries_aggregated)"
+                          v-slot:[`item.${value}`]="{ item }"
+                      >
+
+                        <template v-if="getTreatmentEfficiencyInfluentColor(item, value) != null">
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-chip
+                                  :color="getTreatmentEfficiencyInfluentColor(item, value)[0]"
+                                  dark
+                                  :key="value"
+                                  v-bind="attrs"
+                                  v-on="on"
+                                  text-color="#1c1c1b"
+                              >
+                                {{ item[value] }}
+                              </v-chip>
+                            </template>
+                            <span>{{ getTreatmentEfficiencyInfluentColor(item, value)[1] }}</span>
+                          </v-tooltip>
+                        </template>
+                        <template v-else>
+                          <v-chip
+                              color="transparent"
+                              dark
+                              :key="value"
+                              text-color="#1c1c1b"
+                              class= "chip_no_hover"
+                          >
+                            {{ item[value] }}
+                          </v-chip>
+                        </template>
+                      </template>
+
+                    </v-data-table>
+
+                  </div>
+                  <div v-else-if="active_indicator[0] == 15">
+                    <v-data-table
+                        :headers="treated_table.header"
+                        :items="treated_table.value"
+                        disable-pagination
+                        :hide-default-footer="true"
+                        dense
+                        class="expanded_table_hover"
+
+                    >
+
+                      <template v-slot:item.value="{ item }">
+              <span v-if="item.info">
+                {{item.value}}
+                <v-btn
+                    icon
+                    @click="$data[item.info] = true"
+                    class="icon_clickable"
+                    x-small
+                >
+                  <v-icon
+                      color='#1C195B'
+                  >
+                    mdi-information-outline
+                  </v-icon>
+                </v-btn>
+
+
+              </span>
+                        <span v-else>{{item.value}}</span>
+                      </template>
+
+                    </v-data-table>
+
+                  </div>
+                  <div v-else-if="active_indicator[0] == 17">
+                    <v-data-table
+                        :headers="water_quantity.header"
+                        :items="water_quantity.value"
+
+                        disable-pagination
+                        :hide-default-footer="true"
+                        dense
+                    >
+                      <template v-slot:item.value="{ item }">
+                        <!--<v-tooltip bottom max-width="700px" v-if="item.info">
+                          <template v-slot:activator="{ on, attrs }">
+                            {{item.value}}
+                            <v-icon
+                                color='#1C195B'
+                                style="padding-right: 10px"
+                                v-bind="attrs"
+                                v-on="on"
+                                size="18px"
+                            >
+                              mdi-information-outline
+                            </v-icon>
+                          </template>
+                          <span>{{ item.info }}</span>
+                        </v-tooltip>
+                        <span v-else>{{item.value}}</span>-->
+                        <span v-if="item.info">
+                {{item.value}}
+                <v-btn
+                    icon
+                    @click="$data[item.info] = true"
+                    class="icon_clickable"
+                    x-small
+                >
+                  <v-icon
+                      color='#1C195B'
+                  >
+                    mdi-information-outline
+                  </v-icon>
+                </v-btn>
+
+
+
+              </span>
+                        <span v-else>{{item.value}}</span>
+                      </template>
+
+                      <template
+                          v-for="value in Object.keys(industries_aggregated)"
+                          v-slot:[`item.${value}`]="{ item }"
+                      >
+
+                        <template v-if="getAvailabilityColor(item, value) != null">
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-chip
+                                  :color="getAvailabilityColor(item, value)[0]"
+                                  dark
+                                  :key="value"
+                                  v-bind="attrs"
+                                  v-on="on"
+                                  text-color="#1c1c1b"
+                              >
+                                {{ item[value] }}
+                              </v-chip>
+                            </template>
+                            <span>{{ getAvailabilityColor(item, value)[1] }}</span>
+                          </v-tooltip>
+                        </template>
+                        <template v-else>
+                          <v-chip
+                              color="transparent"
+                              dark
+                              :key="value"
+                              text-color="#1c1c1b"
+                              class= "chip_no_hover"
+                          >
+                            {{ item[value] }}
+                          </v-chip>
+                        </template>
+                      </template>
+                    </v-data-table>
+
+                  </div>
+                  <div v-else-if="active_indicator[0] == 18">
+                    <v-data-table
+                        :headers="freshwater_lever_for_action.header"
+                        :items="freshwater_lever_for_action.value"
+                        disable-pagination
+                        :hide-default-footer="true"
+                        dense
+                        class="expanded_table_hover"
+
+                    >
+
+                      <template v-slot:item.value="{ item }">
+              <span v-if="item.info">
+                {{item.value}}
+                <v-btn
+                    icon
+                    @click="$data[item.info] = true"
+                    class="icon_clickable"
+                    x-small
+                >
+                  <v-icon
+                      color='#1C195B'
+                  >
+                    mdi-information-outline
+                  </v-icon>
+                </v-btn>
+
+
+              </span>
+                        <span v-else>{{item.value}}</span>
+                      </template>
+
+                    </v-data-table>
+
+                  </div>
+                  <div v-else-if="active_indicator[0] == 20">
                     <v-data-table
                         :headers="emissions_table.header"
-                        :items="emissions_table.emissions"
+                        :items="emissions_table.value"
 
                         :item-class="itemRowBold"
                         disable-pagination
@@ -4000,8 +3617,77 @@
 
 
                     </v-data-table>
-
                   </div>
+                  <div v-else-if="active_indicator[0] == 22">
+                    <v-data-table
+                        :headers="energy_use_table.header"
+                        :items="energy_use_table.value"
+
+                        :item-class="itemRowBold"
+                        disable-pagination
+                        :hide-default-footer="true"
+                        dense
+                    >
+                      <template v-slot:item.value="{ item }">
+              <span v-if="item.info">
+                {{item.value}}
+                <v-btn
+                    icon
+                    @click="$data[item.info] = true"
+                    class="icon_clickable"
+                    x-small
+                >
+                  <v-icon
+                      color='#1C195B'
+                  >
+                    mdi-information-outline
+                  </v-icon>
+                </v-btn>
+
+
+              </span>
+                        <span v-else>{{item.value}}</span>
+                      </template>
+
+
+                    </v-data-table>
+                  </div>
+                  <div v-else-if="active_indicator[0] == 23">
+                    <v-data-table
+                        :headers="effluent_load_table.header"
+                        :items="effluent_load_table.value"
+
+                        :item-class="itemRowBold"
+                        disable-pagination
+                        :hide-default-footer="true"
+                        dense
+                    >
+                      <template v-slot:item.value="{ item }">
+              <span v-if="item.info">
+                {{item.value}}
+                <v-btn
+                    icon
+                    @click="$data[item.info] = true"
+                    class="icon_clickable"
+                    x-small
+                >
+                  <v-icon
+                      color='#1C195B'
+                  >
+                    mdi-information-outline
+                  </v-icon>
+                </v-btn>
+
+
+              </span>
+                        <span v-else>{{item.value}}</span>
+                      </template>
+
+
+                    </v-data-table>
+                  </div>
+
+
 
                 </div>
               </v-scroll-y-transition>
@@ -4013,18 +3699,7 @@
       </v-dialog>
 
 
-
-
-
-
-
-
-
     </div>
-
-
-
-
 
   </div>
 </template>
@@ -4074,11 +3749,12 @@ export default {
       tab: 0,
       main_tab: 0,
       layers_table: {header: [], value: []},
-      pollutants_table: {header: [], value: []},
       water_quantity: {header: [], value: []},
+      treated_table: {header: [], value: []},
+      freshwater_lever_for_action: {header: [], value: []},
+
       treatment_efficiency_table: {header: [], value: []},
       treatment_efficiency_influent_table: {header: [], value: []},
-      treatment_efficiency_summary_table: {header: [], value: []},
 
       reporting_indicators: {header: [], value: []},
       ecotoxicity_table: {header: [], value: []},
@@ -4088,10 +3764,10 @@ export default {
 
       eutrophication_table:  {header: [], value: []},
       emissions_table: {header: [], value: []},
+      energy_use_table: {header: [], value: []},
+      effluent_load_table: {header: [], value: []},
+
       simple_report_table: {header: [], value: []},
-      effluent_toxicity_table: {header: [], value: []},
-      pollutant_load_table: {header: [], value: []},
-      _table: {header: [], value: []},
       include_future: true,
 
       aggregation_level: "industry",
@@ -4168,13 +3844,14 @@ export default {
           eutrophication: "Eutrophication potential",
           tu: "Toxic units in the effluent",
           delta_tu: "Increase in toxic units in the receiving water body after discharge",
-          delta_eqs: "Increase of the average concentration of the pollutants in the receiving water body after discharge (with respect to EQS)",
-          avg_treatment_efficiency: "Average percentage of treatment efficiency (compared to WWTP influent)",
+          delta_eqs: "Increase of the concentration of the pollutants in the receiving water body after discharge (with respect to EQS)",
+          avg_treatment_efficiency: "Percentage of treatment efficiency (compared to WWTP influent)",
           impact_biodiversity: "Impact on biodiversity and ecosystems",
-          eqs: "Average concentration of the pollutants in the effluent (with respect to EQS)",
-          avg_influent_efficiency: "Average percentage of treatment efficiency (compared to industry influent)",
+          eqs: "Concentration of the pollutants in the effluent (with respect to EQS)",
+          avg_influent_efficiency: "Percentage of treatment efficiency (compared to industry influent)",
           pollution: "Pollution impact",
           energy_used_text: "Energy used",
+          ecotoxicology: "Ecotoxicology indicators"
 
         },
       },
@@ -4278,19 +3955,30 @@ export default {
       dialog_biogas_stage: 0,
       industry_clicked: null,
       industry_info: false,
-      active_indicator: []
+      active_indicator: [],
+      open_indicator: [],
 
     }
 
   },
   watch: {
 
+    open_indicator(value){
+      let impact_index = [1, 16, 19] //Index in tree-view where main categories start
+      let new_item = value[value.length-1]
+      if(impact_index.includes(new_item)){
+        if(value.length > 1){
+          Vue.nextTick(async function () {
+            value.splice(0, value[value.length-1], new_item) //Close all categories previously opened          })
+          })
+        }
+      }
+    },
     info_sludge_management: function(value){
       if(value){
         this.dialog_biogas_stage = 0
       }
     },
-
     radio_layers: function(value){
 
       let _this = this
@@ -4301,59 +3989,74 @@ export default {
 
       }
     },
+    industry_clicked: async function () {
 
-    aggregation_level: async function () {
+      this.emissions_table = {header: [], value: []}
+      this.energy_use_table = {header: [], value: []}
+      this.effluent_load_table = {header: [], value: []}
+      this.water_quantity = {header: [], value: []}
+      this.treated_table = {header: [], value: []}
+      this.freshwater_lever_for_action = {header: [], value: []}
+      this.eutrophication_table = {header: [], value: []}
+      this.ecotoxicity_table = {header: [], value: []}
+      this.treatment_efficiency_table = {header: [], value: []}
+      this.delta_ecotox_table = {header: [], value: []}
+      this.eqs_table = {header: [], value: []}
+      this.delta_eqs_table = {header: [], value: []}
+      this.radio_industry_edit = null
+      this.open_indicator.splice(0, this.open_indicator.length)
+      this.treatment_efficiency_influent_table = {header: [], value: []}
+      this.active_indicator.splice(0, this.active_indicator.length)
 
 
       this.emissions_table = this.generate_emissions_table()
+      this.energy_use_table = this.generate_energy_use_table()
+      this.effluent_load_table = this.generate_effluent_load_table()
+
       this.water_quantity = await this.generate_water_quality_table()
+      this.treated_table = await this.generate_treated_table()
+      this.freshwater_lever_for_action = await this.generate_freshwater_lever_for_action_table()
+
+
       this.eutrophication_table = this.generate_eutrophication_table()
       this.ecotoxicity_table = this.generate_ecotoxicity_table()
-      this.pollutants_table = await this.generate_pollutants_table()
       this.reporting_indicators = await this.generate_reporting_indicators_table()
       this.treatment_efficiency_table = this.generate_treatment_efficiency_table()
       this.treatment_efficiency_influent_table = this.generate_treatment_efficiency_influent_table()
-      this.treatment_efficiency_summary_table = this.generate_treatment_efficiency_summary_table()
 
       this.layers_table = await this.generate_layers_table()
       this.simple_report_table = await this.generate_simple_report_table()
-      this.effluent_toxicity_table = this.generate_effluent_toxicity_table()
-      this.pollutant_load_table = await this.generate_pollutant_load_table()
+
 
       this.eqs_table = this.generate_eqs_table()
       this.delta_eqs_table = await this.generate_delta_eqs_table()
       this.delta_ecotox_table = await this.generate_delta_ecotox_table()
-
-
     },
 
     selected_layers: async function () {
-      /*this.layers_table = await this.generate_layers_table()
-      */
-      this.layers_table.value = [],
       this.emissions_table = this.generate_emissions_table()
+      this.energy_use_table = this.generate_energy_use_table()
+      this.effluent_load_table = this.generate_effluent_load_table()
+
       this.water_quantity = await this.generate_water_quality_table()
+      this.treated_table = await this.generate_treated_table()
+      this.freshwater_lever_for_action = await this.generate_freshwater_lever_for_action_table()
+
+
       this.eutrophication_table = this.generate_eutrophication_table()
       this.ecotoxicity_table = this.generate_ecotoxicity_table()
-      this.pollutants_table = await this.generate_pollutants_table()
       this.reporting_indicators = await this.generate_reporting_indicators_table()
       this.treatment_efficiency_table = this.generate_treatment_efficiency_table()
       this.treatment_efficiency_influent_table = this.generate_treatment_efficiency_influent_table()
-      this.treatment_efficiency_summary_table = this.generate_treatment_efficiency_summary_table()
 
       this.layers_table = await this.generate_layers_table()
       this.simple_report_table = await this.generate_simple_report_table()
-      this.effluent_toxicity_table =  this.generate_effluent_toxicity_table()
-      this.pollutant_load_table = await this.generate_pollutant_load_table()
 
 
       this.eqs_table = this.generate_eqs_table()
       this.delta_eqs_table = await this.generate_delta_eqs_table()
       this.delta_ecotox_table = await this.generate_delta_ecotox_table()
-
-
     },
-
     selected_assessments: function (new_selected_assessments, old_value){
 
       if(new_selected_assessments.length > 0){
@@ -4377,19 +4080,22 @@ export default {
 
         Vue.nextTick(async function () {
           _this.emissions_table = _this.generate_emissions_table()
+          _this.energy_use_table = _this.generate_energy_use_table()
+          _this.effluent_load_table = _this.generate_effluent_load_table()
+
           _this.water_quantity = await _this.generate_water_quality_table()
+          _this.treated_table = await _this.generate_treated_table()
+          _this.freshwater_lever_for_action = await _this.generate_freshwater_lever_for_action_table()
+
+
           _this.eutrophication_table = _this.generate_eutrophication_table()
           _this.ecotoxicity_table = _this.generate_ecotoxicity_table()
-          _this.pollutants_table = await _this.generate_pollutants_table()
           _this.reporting_indicators = await _this.generate_reporting_indicators_table()
           _this.treatment_efficiency_table = _this.generate_treatment_efficiency_table()
           _this.treatment_efficiency_influent_table = _this.generate_treatment_efficiency_influent_table()
-          _this.treatment_efficiency_summary_table = _this.generate_treatment_efficiency_summary_table()
 
           _this.layers_table = await _this.generate_layers_table()
           _this.simple_report_table = await _this.generate_simple_report_table()
-          _this.effluent_toxicity_table =  _this.generate_effluent_toxicity_table()
-          _this.pollutant_load_table = await _this.generate_pollutant_load_table()
 
 
           _this.eqs_table = _this.generate_eqs_table()
@@ -4406,98 +4112,28 @@ export default {
       }
     },
 
-    include_future: async function () {
-
-      this.emissions_table = this.generate_emissions_table()
-      this.water_quantity = await this.generate_water_quality_table()
-      this.eutrophication_table = this.generate_eutrophication_table()
-      this.ecotoxicity_table = this.generate_ecotoxicity_table()
-      this.pollutants_table = await this.generate_pollutants_table()
-      this.reporting_indicators = await this.generate_reporting_indicators_table()
-      this.treatment_efficiency_table = this.generate_treatment_efficiency_table()
-      this.treatment_efficiency_influent_table = this.generate_treatment_efficiency_influent_table()
-      this.treatment_efficiency_summary_table = this.generate_treatment_efficiency_summary_table()
-
-      this.layers_table = await this.generate_layers_table()
-      this.simple_report_table = await this.generate_simple_report_table()
-      this.effluent_toxicity_table = this.generate_effluent_toxicity_table()
-      this.pollutant_load_table = await this.generate_pollutant_load_table()
-
-
-      this.eqs_table = this.generate_eqs_table()
-      this.delta_eqs_table = await this.generate_delta_eqs_table()
-      this.delta_ecotox_table = await this.generate_delta_ecotox_table()
-
-
-    },
-
-    level_of_detail: async function () {
-
-      this.emissions_table = this.generate_emissions_table()
-      this.water_quantity = await this.generate_water_quality_table()
-      this.eutrophication_table = this.generate_eutrophication_table()
-      this.ecotoxicity_table = this.generate_ecotoxicity_table()
-      this.pollutants_table = await this.generate_pollutants_table()
-      this.reporting_indicators = await this.generate_reporting_indicators_table()
-      this.treatment_efficiency_table = this.generate_treatment_efficiency_table()
-      this.treatment_efficiency_influent_table = this.generate_treatment_efficiency_influent_table()
-      this.treatment_efficiency_summary_table = this.generate_treatment_efficiency_summary_table()
-
-      this.layers_table = await this.generate_layers_table()
-      this.simple_report_table = await this.generate_simple_report_table()
-      this.effluent_toxicity_table = this.generate_effluent_toxicity_table()
-      this.pollutant_load_table = await this.generate_pollutant_load_table()
-
-
-      this.eqs_table = this.generate_eqs_table()
-      this.delta_eqs_table = await this.generate_delta_eqs_table()
-      this.delta_ecotox_table = await this.generate_delta_ecotox_table()
-
-
-    },
-
-    period_model: async function () {
-      this.emissions_table = this.generate_emissions_table()
-      this.water_quantity = await this.generate_water_quality_table()
-      this.eutrophication_table = this.generate_eutrophication_table()
-      this.ecotoxicity_table = this.generate_ecotoxicity_table()
-      this.pollutants_table = await this.generate_pollutants_table()
-      this.reporting_indicators = await this.generate_reporting_indicators_table()
-      this.treatment_efficiency_table = this.generate_treatment_efficiency_table()
-      this.treatment_efficiency_influent_table = this.generate_treatment_efficiency_influent_table()
-      this.treatment_efficiency_summary_table = this.generate_treatment_efficiency_summary_table()
-
-      this.layers_table = await this.generate_layers_table()
-      this.simple_report_table = await this.generate_simple_report_table()
-      this.effluent_toxicity_table = this.generate_effluent_toxicity_table()
-      this.pollutant_load_table = await this.generate_pollutant_load_table()
-
-
-      this.eqs_table = this.generate_eqs_table()
-      this.delta_eqs_table = await this.generate_delta_eqs_table()
-      this.delta_ecotox_table = await this.generate_delta_ecotox_table()
-
-    },
-
     tab: async function () {
 
       let _this = this
       Vue.nextTick(async function () {
         if(_this.selected_assessments.length > 0){
           _this.emissions_table =_this.generate_emissions_table()
+          _this.energy_use_table = _this.generate_energy_use_table()
+          _this.effluent_load_table = _this.generate_effluent_load_table()
+
           _this.water_quantity = await _this.generate_water_quality_table()
+          _this.treated_table = await _this.generate_treated_table()
+          _this.freshwater_lever_for_action = await _this.generate_freshwater_lever_for_action_table()
+
+
           _this.eutrophication_table = _this.generate_eutrophication_table()
           _this.ecotoxicity_table = _this.generate_ecotoxicity_table()
-          _this.pollutants_table = await _this.generate_pollutants_table()
           _this.reporting_indicators = await _this.generate_reporting_indicators_table()
           _this.treatment_efficiency_table = _this.generate_treatment_efficiency_table()
           _this.treatment_efficiency_influent_table = _this.generate_treatment_efficiency_influent_table()
-          _this.treatment_efficiency_summary_table = _this.generate_treatment_efficiency_summary_table()
 
           _this.layers_table = await _this.generate_layers_table()
           _this.simple_report_table = await _this.generate_simple_report_table()
-          _this.effluent_toxicity_table = _this.generate_effluent_toxicity_table()
-          _this.pollutant_load_table = await _this.generate_pollutant_load_table()
 
 
           _this.eqs_table = _this.generate_eqs_table()
@@ -4513,9 +4149,85 @@ export default {
 
   },
   methods: {
-    prova(){
-      console.log(this.industry_clicked)
+
+    indicator_risk_class: function(id){
+
+      if(this.current_industry == null) return
+      //risks
+      let current_industry_name = Object.keys(this.current_industry)[0]
+      let industry = this.simple_report_table.value.filter(industry => industry.value == current_industry_name)[0]
+      let ghg_impact = this.risk_categories["global_warming"](industry["carbon_impact"])
+      let freshwater_impact = this.risk_categories["pollution"](industry["freshwater_impact"])
+      let pollution_impact = this.risk_categories["pollution"](industry["pollution_impact"])
+      let eutrophication_impact = null
+      if(this.eutrophication_table.value[0] != undefined) eutrophication_impact = this.risk_categories["eutrophication"](this.eutrophication_table.value[0][current_industry_name])
+      let delta_ecotox_impact = null
+      if(this.delta_ecotox_table.value[0] != undefined) delta_ecotox_impact = this.risk_categories["delta_ecotoxicity"](this.delta_ecotox_table.value[0][current_industry_name])
+      let delta_eqs_impact = null
+      if(this.delta_eqs_table.value.length > 0){
+        let delta_eqs_values = this.delta_eqs_table.value.map(x => x[current_industry_name])
+        delta_eqs_impact = this.risk_categories["delta_eqs"](delta_eqs_values.sum() / delta_eqs_values.length)
+      }
+      let ecotox_impact = null
+      if(this.ecotoxicity_table.value[0] != undefined) ecotox_impact = this.risk_categories["ecotoxicity"](this.ecotoxicity_table.value[0][current_industry_name])
+      let eqs_impact = null
+      if(this.eqs_table.value.length > 0){
+        let eqs_values = this.eqs_table.value.map(x => x[current_industry_name])
+        eqs_impact = this.risk_categories["eqs"](eqs_values.sum() / eqs_values.length)
+      }
+      let pollution_load_to_environment_risk = [null, null]
+      pollution_load_to_environment_risk[1] = this.return_avg_risk([eutrophication_impact, delta_eqs_impact, delta_ecotox_impact])
+      let toxicity_load_risk = [null, null]
+      toxicity_load_risk[1] = this.return_avg_risk([delta_eqs_impact, delta_ecotox_impact])
+      let effluent_toxicity_risk = [null, null]
+      effluent_toxicity_risk[1] = this.return_avg_risk([eqs_impact, ecotox_impact])
+
+
+      let return_color_class = function(value){
+        if(value == null) return null
+
+        if(value[1] == "Low impact"){
+          return 'low'
+        }else if(value[1] == "Medium impact"){
+          return "medium"
+        }else if(value[1] == "High impact"){
+          return "high"
+        }else if(value[1] == "Very high impact"){
+          return "very_high"
+        }
+        return null
+
+      }
+
+      let id_risk = [1,2,3,4,5,6,7,8,9,10,16,17,19,20]
+      if(id_risk.includes(id.id)){
+        if(id.id < 3) {
+          return return_color_class(pollution_impact)
+        }else if(id.id == 3){
+          return return_color_class(pollution_load_to_environment_risk)
+        }else if(id.id == 4){
+          return return_color_class(toxicity_load_risk)
+      }else if(id.id == 5){
+          return return_color_class(delta_ecotox_impact)
+        }else if(id.id == 6){
+          return return_color_class(delta_eqs_impact)
+        } else if(id.id == 7){
+          return return_color_class(eutrophication_impact)
+        } else if(id.id == 8){
+          return return_color_class(effluent_toxicity_risk)
+        } else if(id.id == 9){
+          return return_color_class(ecotox_impact)
+        }else if(id.id == 10){
+          return return_color_class(eqs_impact)
+        } else if(id.id < 19) {
+          return return_color_class(freshwater_impact)
+        } else {
+          return return_color_class(ghg_impact)
+        }
+      }
+
     },
+
     itemRowBackground: function (item) {
       return item.value === this.table_title.simple_table.quality_quantity || item.value === this.table_title.simple_table.pollution || item.value === this.table_title.simple_table.total_ghg ? 'impact-style' : 'lever-style'
     },
@@ -4543,20 +4255,25 @@ export default {
 
 
     click_tab(){
-      this.simple_report_table = {header: [], value: []}
-      this.reporting_indicators = {header: [], value: []}
-      this.layers_table = {header: [], value: []}
-      this.radio_industry_edit = null
-      this.effluent_toxicity_table = {header: [], value: []}
+      this.emissions_table = {header: [], value: []}
+      this.energy_use_table = {header: [], value: []}
+      this.effluent_load_table = {header: [], value: []}
+      this.water_quantity = {header: [], value: []}
+      this.treated_table = {header: [], value: []}
+      this.freshwater_lever_for_action = {header: [], value: []}
+      this.eutrophication_table = {header: [], value: []}
       this.ecotoxicity_table = {header: [], value: []}
+      this.reporting_indicators = {header: [], value: []}
+      this.treatment_efficiency_table = {header: [], value: []}
+      this.layers_table = {header: [], value: []}
+      this.simple_report_table = {header: [], value: []}
       this.delta_ecotox_table = {header: [], value: []}
       this.eqs_table = {header: [], value: []}
       this.delta_eqs_table = {header: [], value: []}
-      this.eutrophication_table = {header: [], value: []}
+      this.radio_industry_edit = null
       this.treatment_efficiency_influent_table = {header: [], value: []}
-      this.treatment_efficiency_table = {header: [], value: []}
-      this.pollutant_load_table = {header: [], value: []}
-      this.treatment_efficiency_summary_table = {header: [], value: []}
+
+
     },
 
     getBase64ImageFromURL(url) {
@@ -4608,7 +4325,7 @@ export default {
 
     simpleTableRowClick(item, row){
 
-      if(item.value == "Freshwater impact") this.dialog_quality_quantity = true
+      /*if(item.value == "Freshwater impact") this.dialog_quality_quantity = true
       else if(item.value == "Carbon impact") this.dialog_emissions = true
       else if(item.value == "Eutrophication potential") this.dialog_eutrophication = true
       else if(item.value == this.table_title.simple_table.avg_treatment_efficiency) this.dialog_efficiency = true
@@ -4625,7 +4342,9 @@ export default {
       else {
         this.industry_clicked = this.industries_aggregated[item.value]
         this.industry_info = true
-      }
+      }*/
+      this.industry_clicked = this.industries_aggregated[item.value]
+      this.industry_info = true
 
 
 
@@ -4777,7 +4496,13 @@ export default {
     },
 
     getSimpleReportColor(item, value){
-
+      if(value == "pollution_impact"){
+        return this.risk_categories["pollution"](item["pollution_impact"])
+      }else if(value == "freshwater_impact"){
+        return this.risk_categories["pollution"](item["freshwater_impact"])
+      }else if(value == "carbon_impact")
+        return this.risk_categories["global_warming"](item["carbon_impact"])
+      /*
       if (item.value == this.table_title.simple_table.quality_quantity){
         return this.risk_categories["quality_quantity"](item[value])
       }else if(item.value == this.table_title.simple_table.total_ghg){
@@ -4801,7 +4526,7 @@ export default {
         return this.risk_categories["influent_treatment_efficiency"](item[value])
       }else if(item.value == this.table_title.simple_table.pollution){
         return this.risk_categories["pollution"](item[value])
-      }
+      }*/
 
 
   return null
@@ -4810,7 +4535,6 @@ export default {
     itemRowBold: function (item) {
       return item.value == "Total" ? 'style-1' : 'style-2'
     },
-
 
     chunk(array, size){
       let R = [];
@@ -4833,11 +4557,11 @@ export default {
       let _this = this
 
 
-      if(_this.tab !== undefined){
+      if(_this.industry_clicked !== null){
 
         let emission_table = {
           header: [{text: "Emissions", value: "value", sortable: false}],
-          emissions: []
+          value: []
         }
 
         let total = {value: _this.table_title.global_warming_potential.total, unit: "kgCO2eq/day"}
@@ -4857,8 +4581,7 @@ export default {
             backgroundColor: []
           }]
         };
-
-        for (const [key, industries] of Object.entries(_this.industries_aggregated)) {
+        for (const [key, industries] of Object.entries(_this.current_industry)) {
 
           emission_table.header.push({
             text: key, value: key,
@@ -4881,14 +4604,14 @@ export default {
         }
 
         emission_table.header.push({text: "Unit", value: "unit", sortable: false,})
-        emission_table.emissions.push(total)
-        emission_table.emissions.push(elec)
-        emission_table.emissions.push(fuel)
-        emission_table.emissions.push(tre)
-        emission_table.emissions.push(biog)
-        emission_table.emissions.push(slu)
-        emission_table.emissions.push(reus)
-        emission_table.emissions.push(disc)
+        emission_table.value.push(total)
+        emission_table.value.push(elec)
+        emission_table.value.push(fuel)
+        emission_table.value.push(tre)
+        emission_table.value.push(biog)
+        emission_table.value.push(slu)
+        emission_table.value.push(reus)
+        emission_table.value.push(disc)
 
         //CHART
         const options = {
@@ -4925,16 +4648,85 @@ export default {
 
         return emission_table
       }
-      return {header: [], emissions: []}
+      return {header: [], value: []}
 
     },
+
+    generate_energy_use_table() {
+
+      let _this = this
+
+      if(_this.industry_clicked !== null){
+
+        let pollutants_table = {
+          header: [{text: "", value: "value", sortable: false}],
+          value: []
+        }
+
+        let energy = {value: "Energy used per day", unit: "kWh/day", info: "info_energy_used"}
+
+        for (const [key, industries] of Object.entries(_this.current_industry)) {
+
+          pollutants_table.header.push({
+            text: key, value: key,
+          })
+
+          energy[key] = metrics.energy_used(industries)
+        }
+
+        pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
+
+        pollutants_table.value.push(energy)
+        return pollutants_table
+      }
+      else return {header: [], value: []}
+
+    },
+
+    generate_effluent_load_table() {
+
+      let _this = this
+
+      if(_this.industry_clicked != null){
+
+        let pollutants_table = {
+          header: [{text: "", value: "value", sortable: false}],
+          value: []
+        }
+
+        let tn = {value: _this.table_title.pollutants.tn, unit: "gTN/m3", info: "info_tn_load"}
+        let tp = {value: _this.table_title.pollutants.tp, unit: "gTP/m3", info: "info_tp_load"}
+        let cod = {value: _this.table_title.pollutants.cod, unit: "gCOD/m3", info: "info_cod_load"}
+
+        for (const [key, industries] of Object.entries(_this.current_industry)) {
+
+          pollutants_table.header.push({
+            text: key, value: key,
+          })
+
+          let load = metrics.effluent_concentration(industries)
+          tn[key] = load.tn
+          cod[key] = load.cod
+          tp[key] = load.tp
+        }
+
+        pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
+
+        pollutants_table.value.push(cod)
+        pollutants_table.value.push(tn)
+        pollutants_table.value.push(tp)
+        return pollutants_table
+      }
+      else return {header: [], value: []}
+
+    },
+
 
     generate_eutrophication_table() {
 
       let _this = this
 
-
-      if(_this.tab !== undefined){
+      if(_this.industry_clicked !== null){
 
         let pollutants_table = {
           header: [{text: "", value: "value", sortable: false}],
@@ -4943,7 +4735,7 @@ export default {
 
         let tn = {value: _this.table_title.pollutants.tn, unit: "gPO4eq/m3", info: "info_tn_eutrophication"}
         let tp = {value: _this.table_title.pollutants.tp, unit: "gPO4eq/m3", info: "info_tp_eutrophication"}
-        //let total = {value: _this.table_title.pollutants.total, unit: "gPO4eq/m3"}
+        let total = {value: _this.table_title.pollutants.total, unit: "gPO4eq/m3"}
         let cod = {value: _this.table_title.pollutants.cod, unit: "gPO4eq/m3", info: "info_cod_eutrophication"}
 
 
@@ -4955,7 +4747,7 @@ export default {
           }]
         };
 
-        for (const [key, industries] of Object.entries(_this.industries_aggregated)) {
+        for (const [key, industries] of Object.entries(_this.current_industry)) {
 
           pollutants_table.header.push({
             text: key, value: key,
@@ -4966,7 +4758,7 @@ export default {
           cod[key] = eutrophication.cod
           tn[key] = eutrophication.tn
           tp[key] = eutrophication.tp
-          //total[key] = eutrophication.total
+          total[key] = eutrophication.total
 
 
           data_chart.datasets[0].data.push(eutrophication.total)
@@ -5008,7 +4800,7 @@ export default {
 
         pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
 
-        //pollutants_table.value.push(total)
+        pollutants_table.value.push(total)
         pollutants_table.value.push(cod)
         pollutants_table.value.push(tn)
         pollutants_table.value.push(tp)
@@ -5024,7 +4816,7 @@ export default {
       let _this = this
 
 
-      if(_this.tab !== undefined){
+      if(_this.industry_clicked !== null){
 
         let pollutants_table = {
           header: [{text: "", value: "value", sortable: false}],
@@ -5052,7 +4844,7 @@ export default {
           }]
         };
 
-        for (const [key, industries] of Object.entries(_this.industries_aggregated)) {
+        for (const [key, industries] of Object.entries(_this.current_industry)) {
 
           pollutants_table.header.push({
             text: key, value: key,
@@ -5111,7 +4903,7 @@ export default {
 
         pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
 
-        //pollutants_table.value.push(total)
+        pollutants_table.value.push(total)
         pollutants_table.value.push(dichloroethane)
         pollutants_table.value.push(cadmium)
         pollutants_table.value.push(hexachlorobenzene)
@@ -5135,7 +4927,7 @@ export default {
       let _this = this
 
 
-      if(_this.tab !== undefined){
+      if(_this.industry_clicked !== null){
 
 
         let pollutants_table = {
@@ -5156,7 +4948,7 @@ export default {
         let trichloroethylene = {value: _this.table_title.pollutants.tricloroetile, unit: "-", info: "info_delta_eqs_trychloroethylene"}
 
 
-        for (const [key, industries] of Object.entries(_this.industries_aggregated)) {
+        for (const [key, industries] of Object.entries(_this.current_industry)) {
 
           pollutants_table.header.push({
             text: key, value: key,
@@ -5201,7 +4993,7 @@ export default {
 
       let _this = this
 
-      if(_this.tab !== undefined){
+      if(_this.industry_clicked !== null){
 
         let pollutants_table = {
           header: [{text: "", value: "value", sortable: false}],
@@ -5230,7 +5022,7 @@ export default {
           }]
         };
 
-        for (const [key, industries] of Object.entries(_this.industries_aggregated)) {
+        for (const [key, industries] of Object.entries(_this.current_industry)) {
 
           pollutants_table.header.push({
             text: key, value: key,
@@ -5311,7 +5103,7 @@ export default {
       let _this = this
 
 
-      if(_this.tab !== undefined){
+      if(_this.industry_clicked !== null){
 
         let pollutants_table = {
           header: [{text: "", value: "value", sortable: false}],
@@ -5331,7 +5123,7 @@ export default {
         let trichloroethylene = {value: _this.table_title.pollutants.tricloroetile, unit: "-", info: "info_eqs_trychloroethylene"}
 
 
-        for (const [key, industries] of Object.entries(_this.industries_aggregated)) {
+        for (const [key, industries] of Object.entries(_this.current_industry)) {
 
           pollutants_table.header.push({
             text: key, value: key,
@@ -5434,121 +5226,7 @@ export default {
       else return {header: [], emissions: []}
 
     },
-    generate_treatment_efficiency_summary_table() {
 
-      let _this = this
-
-      if(_this.tab !== undefined){
-
-        let pollutants_table = {
-          header: [{text: "", value: "value", sortable: false}],
-          value: []
-        }
-
-        let avg_treatment_efficiency = {value: _this.table_title.simple_table.avg_treatment_efficiency, unit: "%", info: "Removal rate of pollutants in WWTP's"}
-        let avg_influent_efficiency = {value: _this.table_title.simple_table.avg_influent_efficiency, unit: "%", info: "If the value is less than 100, the industry discharges the water cleaner than when it was withdrawn."}
-
-        for (const [key, industries] of Object.entries(_this.industries_aggregated)) {
-          pollutants_table.header.push({
-            text: key, value: key,
-          })
-
-          let avg_treatment_efficiency_factor  = metrics.avg_treatment_efficiency(industries)
-          avg_treatment_efficiency[key] = avg_treatment_efficiency_factor
-
-          let avg_influent_efficiency_factor  = metrics.avg_influent_efficiency(industries)
-          avg_influent_efficiency[key] = avg_influent_efficiency_factor
-        }
-
-
-        pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
-
-        pollutants_table.value.push(avg_treatment_efficiency)
-        pollutants_table.value.push(avg_influent_efficiency)
-
-        return pollutants_table
-      }
-      else return {header: [], emissions: []}
-
-    },
-
-    generate_effluent_toxicity_table() {
-
-      let _this = this
-
-
-      if(_this.tab !== undefined){
-
-        let pollutants_table = {
-          header: [{text: "", value: "value", sortable: false}],
-          value: []
-        }
-
-
-        let ecotox_effluent = {value: this.table_title.simple_table.tu, unit: "TU/day", info: " Toxic units (TU) are used in the field of toxicology to quantify the interactions of toxicants in mixtures of chemicals. A toxic unit for a given compound is based on the concentration at which there is a 50% effect (ex. EC50) for a certain biological endpoint."}
-        let eqs = {value: this.table_title.simple_table.eqs, unit: "-", info: "Index reflecting how large the load of each pollutant in the effluent is with respect to the EQS (Environmental Quality Standards). The larger it is, the worse."}
-
-        for (const [key, industries] of Object.entries(_this.industries_aggregated)) {
-          pollutants_table.header.push({
-            text: key, value: key,
-          })
-
-          let ecotox_effluent_factor = metrics.ecotoxicity_potential_tu(industries).total
-          ecotox_effluent[key] = ecotox_effluent_factor
-          let eqs_factor = metrics.eqs_avg(industries)
-          eqs[key] = eqs_factor
-        }
-
-        pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
-        pollutants_table.value.push(ecotox_effluent)
-        pollutants_table.value.push(eqs)
-        return pollutants_table
-      }
-      else return {header: [], emissions: []}
-
-    },
-    async generate_pollutant_load_table() {
-
-      let _this = this
-
-      if(_this.tab !== undefined){
-
-        let pollutants_table = {
-          header: [{text: "", value: "value", sortable: false}],
-          value: []
-        }
-
-        let delta_ecotox = {value: this.table_title.simple_table.delta_tu, unit: "TU/day"}
-        let delta_eqs = {value: this.table_title.simple_table.delta_eqs, unit: "-"}
-        let eutrophication = {value: _this.table_title.simple_table.eutrophication, unit: "gPO4eq/m3", info: "Eutrophication potential (EP) is defined as the potential to cause over-fertilization of water and soil, which can result in increased growth of biomass. It will always have positive values; higher values indicate higher impact."}
-
-
-        for (const [key, industries] of Object.entries(_this.industries_aggregated)) {
-          pollutants_table.header.push({
-            text: key, value: key,
-          })
-
-          let delta_ecotox_factor = (await metrics.delta_tu(industries, this.global_layers)).total
-          delta_ecotox[key] = delta_ecotox_factor
-
-          let delta_eqs_factor = await metrics.delta_eqs_avg(industries, this.global_layers)
-          delta_eqs[key] = delta_eqs_factor
-
-          let eutrophication_factor = metrics.eutrophication_potential(industries).total
-          eutrophication[key] = eutrophication_factor
-
-        }
-
-        pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
-        pollutants_table.value.push(delta_ecotox)
-        pollutants_table.value.push(delta_eqs)
-        pollutants_table.value.push(eutrophication)
-
-        return pollutants_table
-      }
-      else return {header: [], emissions: []}
-
-    },
 
     async generate_simple_report_table_old() {
 
@@ -5708,7 +5386,7 @@ export default {
           let avg_influent_efficiency_factor  = metrics.avg_influent_efficiency(industries)
           let avg_influent_efficiency_risk = this.risk_categories["influent_treatment_efficiency"](avg_influent_efficiency_factor)
 
-          industry_row["pollution_impact"] = this.return_avg_risk([eutrophication_risk, ecotox_effluent_risk, delta_ecotox_risk, eqs_risk, delta_eqs_risk, avg_treatment_efficiency_risk, avg_influent_efficiency_risk])
+          industry_row["pollution_impact"] = this.return_avg_risk([eutrophication_risk, ecotox_effluent_risk, delta_ecotox_risk, eqs_risk, delta_eqs_risk])
           pollutants_table.value.push(industry_row)
         }
 
@@ -5725,7 +5403,7 @@ export default {
       let _this = this
 
 
-      if(_this.tab !== undefined){
+      if(_this.industry_clicked != null){
 
         let pollutants_table = {
           header: [{text: "", value: "value", sortable: false}],
@@ -5745,7 +5423,7 @@ export default {
           datasets: []
         };
 
-        for (const [key, industries] of Object.entries(_this.industries_aggregated)) {
+        for (const [key, industries] of Object.entries(_this.current_industry)) {
           pollutants_table.header.push({
             text: key, value: key,
           })
@@ -5810,12 +5488,93 @@ export default {
       else return {header: [], emissions: []}
 
     },
+    async generate_freshwater_lever_for_action_table() {
+
+      let _this = this
+
+      if(_this.industry_clicked != null){
+
+        let pollutants_table = {
+          header: [{text: "", value: "value", sortable: false}],
+          value: []
+        }
+
+        let recycled_factor = {value: _this.table_title.availability_quantity.recycled, unit: "%", info:"info_recycled_factor"}
+        let efficiency_factor = {value: _this.table_title.availability_quantity.specific_water_consumption, unit: "tonnes/m3", info: "info_specific_consumption"}
+
+
+        let data_chart = {
+          labels: ["Recycled water factor", "Treated water factor", "Consumption available ratio"],
+          datasets: []
+        };
+
+        for (const [key, industries] of Object.entries(_this.current_industry)) {
+          pollutants_table.header.push({
+            text: key, value: key,
+          })
+
+
+          recycled_factor[key] = metrics.recycled_water_factor(industries)
+          efficiency_factor[key] = metrics.efficiency_factor(industries)
+
+        }
+
+
+
+
+        pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
+
+        pollutants_table.value.push(recycled_factor)
+        pollutants_table.value.push(efficiency_factor)
+
+        return pollutants_table
+      }
+      else return {header: [], emissions: []}
+
+    },
+
+    async generate_treated_table() {
+
+      let _this = this
+
+
+      if(_this.industry_clicked != null){
+
+        let pollutants_table = {
+          header: [{text: "", value: "value", sortable: false}],
+          value: []
+        }
+
+        let treated_factor = {value: _this.table_title.availability_quantity.treated, unit: "%", info:"info_treated_factor"}
+
+
+        for (const [key, industries] of Object.entries(_this.current_industry)) {
+          pollutants_table.header.push({
+            text: key, value: key,
+          })
+
+          treated_factor[key] = metrics.treated_water_factor(industries)
+
+        }
+
+
+
+        pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
+
+        pollutants_table.value.push(treated_factor)
+
+        return pollutants_table
+      }
+      else return {header: [], emissions: []}
+
+    },
+
 
     generate_treatment_efficiency_table() {
 
       let _this = this
 
-      if(_this.tab !== undefined){
+      if(_this.industry_clicked !== null){
 
         let pollutants_table = {
           header: [{text: "", value: "value", sortable: false}],
@@ -5845,7 +5604,7 @@ export default {
         };
 
 
-        for (const [key, industries] of Object.entries(_this.industries_aggregated)) {
+        for (const [key, industries] of Object.entries(_this.current_industry)) {
           pollutants_table.header.push({
             text: key, value: key,
           })
@@ -5924,14 +5683,13 @@ export default {
       let _this = this
 
 
-      if(_this.tab !== undefined){
+      if(_this.industry_clicked !== null){
 
 
         let pollutants_table = {
           header: [{text: "", value: "value", sortable: false}],
           value: []
         }
-
 
         let tn = {value: "TN treatment efficiency", unit: "%", info: "info_efficiency_influent_tn"}
         let tp = {value: "TP treatment efficiency", unit: "%", info: "info_efficiency_influent_tp"}
@@ -5944,7 +5702,7 @@ export default {
         };
 
 
-        for (const [key, industries] of Object.entries(_this.industries_aggregated)) {
+        for (const [key, industries] of Object.entries(_this.current_industry)) {
           pollutants_table.header.push({
             text: key, value: key,
           })
@@ -6004,106 +5762,6 @@ export default {
         this.generating_pdf = false
 
       }
-    },
-
-    async generate_pollutants_table() {
-
-      let _this = this
-
-      if(_this.tab !== undefined){
-
-        let pollutants_table = {
-          header: [{text: "", value: "value", sortable: false}],
-          value: []
-        }
-
-        let tn = {value: _this.table_title.pollutants.tn, unit: "g/m3"}
-        let tp = {value: _this.table_title.pollutants.tp, unit: "g/m3"}
-        let dichloroethane = {value: _this.table_title.pollutants.diclo, unit: "g/m3"}
-        let cadmium = {value: _this.table_title.pollutants.cadmium, unit: "g/m3"}
-        let hexachlorobenzene = {value: _this.table_title.pollutants.hexaclorobenzene, unit: "g/m3"}
-        let mercury = {value: _this.table_title.pollutants.mercury, unit: "g/m3"}
-        let lead = {value: _this.table_title.pollutants.lead, unit: "g/m3"}
-        let nickel = {value: _this.table_title.pollutants.nickel, unit: "g/m3"}
-        let chloroalkanes = {value:_this.table_title.pollutants.chloroalkanes, unit: "g/m3"}
-        let hexaclorobutadie = {value: _this.table_title.pollutants.hexaclorobutadie, unit: "g/m3"}
-        let nonylphenols = {value:_this.table_title.pollutants.nonylphenols, unit: "g/m3"}
-        let tetrachloroethene = {value: _this.table_title.pollutants.tetrachloroethene, unit: "g/m3"}
-        let trichloroethylene = {value: _this.table_title.pollutants.tricloroetile, unit: "g/m3"}
-        let cod = {value: _this.table_title.pollutants.cod, unit: "g/m3"}
-
-        for (const [key, industries] of Object.entries(_this.industries_aggregated)) {
-          pollutants_table.header.push({
-            text: key, value: key,
-          })
-
-          let tn_value = await metrics.tn_effl(industries,this.global_layers)
-          tn[key] = tn_value
-
-          let tp_value = await metrics.tp_effl(industries, this.global_layers)
-          tp[key] = tp_value
-
-          let cod_value = await metrics.cod_effl(industries, this.global_layers)
-          cod[key] = cod_value
-
-          let dichloroethane_value = await metrics.dichloroethane_effl(industries, this.global_layers)
-          dichloroethane[key] = dichloroethane_value
-
-          let cadmium_value = await metrics.cadmium_effl(industries, this.global_layers)
-          cadmium[key] = cadmium_value
-
-          let hexaclorobenzene_value = await metrics.hexaclorobenzene_effl(industries, this.global_layers)
-          hexachlorobenzene[key] = hexaclorobenzene_value
-
-          let mercury_value = await metrics.mercury_effl(industries, this.global_layers)
-          mercury[key] = mercury_value
-
-          let lead_value = await metrics.lead_effl(industries, this.global_layers)
-          lead[key] = lead_value
-
-          let nickel_value = await metrics.nickel_effl(industries, this.global_layers)
-          nickel[key] = nickel_value
-
-          let chloroalkanes_value = await  metrics.chloroalkanes_effl(industries, this.global_layers)
-          chloroalkanes[key] = chloroalkanes_value
-
-          let hexaclorobutadie_value = await metrics.hexaclorobutadie_effl(industries,this.global_layers)
-          hexaclorobutadie[key] = hexaclorobutadie_value
-
-          let nonylphenols_value = await metrics.nonylphenols_effl(industries, this.global_layers)
-          nonylphenols[key] = nonylphenols_value
-
-          let tetrachloroethene_value = await metrics.tetrachloroethene_effl(industries, this.global_layers)
-          tetrachloroethene[key] = tetrachloroethene_value
-
-          let trichloroethylene_value = await metrics.tricloroetile_effl(industries, this.global_layers)
-          trichloroethylene[key] = trichloroethylene_value
-
-        }
-
-        pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
-
-
-        pollutants_table.value.push(cod)
-        pollutants_table.value.push(tn)
-        pollutants_table.value.push(tp)
-        pollutants_table.value.push(dichloroethane)
-        pollutants_table.value.push(cadmium)
-        pollutants_table.value.push(hexachlorobenzene)
-        pollutants_table.value.push(mercury)
-        pollutants_table.value.push(lead)
-        pollutants_table.value.push(nickel)
-        pollutants_table.value.push(chloroalkanes)
-        pollutants_table.value.push(hexaclorobutadie)
-        pollutants_table.value.push(nonylphenols)
-        pollutants_table.value.push(tetrachloroethene)
-        pollutants_table.value.push(trichloroethylene)
-
-
-        return pollutants_table
-      }
-      else return {header: [], emissions: []}
-
     },
 
     async generate_layers_table(){
@@ -6438,13 +6096,13 @@ export default {
         let dilution_factor_value = await metrics.dilution_factor(this.global_layers, industries)
         row.push( {text: dilution_factor_value, fillColor: _this.get_color(this.risk_categories.dilution_factor(dilution_factor_value))})
         let recycled_water_factor = metrics.recycled_water_factor(industries)
-        row.push({text: recycled_water_factor, fillColor: _this.get_color(this.risk_categories.recycled_water_factor(recycled_water_factor))})
+        row.push({text: recycled_water_factor })
         let treated_water_factor = metrics.treated_water_factor(industries)
-        row.push({text: treated_water_factor, fillColor: _this.get_color(this.risk_categories.water_treated(treated_water_factor))})
+        row.push({text: treated_water_factor})
         let available_ratio_value = await metrics.available_ratio(this.global_layers, industries)
         row.push({text: available_ratio_value, fillColor: _this.get_color(this.risk_categories.water_stress_ratio(available_ratio_value))})
 
-        row.push({text: metrics.efficiency_factor(industries), fillColor: _this.get_color(this.risk_categories.specific_water_consumption(available_ratio_value))})
+        row.push({text: metrics.efficiency_factor(industries)})
 
 
         data_chart.datasets.push({
@@ -6921,7 +6579,7 @@ export default {
       let _this = this
 
       dd.content.push({
-        text: "\nAverage concentration of the pollutants in the effluent (with respect to EQS) \n\n",
+        text: "\nConcentration of the pollutants in the effluent (with respect to EQS) \n\n",
         style: 'subsubheader'
       })
 
@@ -7147,7 +6805,7 @@ export default {
     async delta_eqs_pdf(dd, industries_aux) {
 
       dd.content.push({
-        text: "\nIncrease of the average concentration of the pollutants in the receiving water body after discharge (with respect to EQS)  \n\n",
+        text: "\nIncrease of the concentration of the pollutants in the receiving water body after discharge (with respect to EQS)  \n\n",
         style: 'subsubheader'
       })
 
@@ -7257,11 +6915,9 @@ export default {
 
       let _this = this
       let days_factor = 1
-      if(this.period_model === "annual") days_factor = 365
-      else if(this.period_model === "assessment") days_factor = assessment_days
 
       dd.content.push({
-        text: " Average percentage of treatment efficiency (compared to WWTP influent)\n\n",
+        text: " Percentage of treatment efficiency (compared to WWTP influent)\n\n",
         style: 'subheader'
       })
 
@@ -7327,46 +6983,46 @@ export default {
 
 
         let cod_value = metrics.cod_efficiency(industries)
-        row.push({text: cod_value, fillColor: _this.get_color(this.risk_categories.treatment_efficiency(cod_value))})
+        row.push({text: cod_value})
 
         let tn_value = metrics.tn_efficiency(industries)
-        row.push({text: tn_value, fillColor: _this.get_color(this.risk_categories.treatment_efficiency(tn_value))})
+        row.push({text: tn_value})
 
         let tp_value = metrics.tp_efficiency(industries)
-        row.push({text: tp_value, fillColor: _this.get_color(this.risk_categories.treatment_efficiency(tp_value))})
+        row.push({text: tp_value})
 
         let dichloroethane_value = metrics.dichloroethane_efficiency(industries)
-        row.push({text: dichloroethane_value, fillColor: _this.get_color(this.risk_categories.treatment_efficiency(dichloroethane_value))})
+        row.push({text: dichloroethane_value, })
 
         let cadmium_value = metrics.cadmium_efficiency(industries)
-        row.push({text: cadmium_value, fillColor: _this.get_color(this.risk_categories.treatment_efficiency(cadmium_value))})
+        row.push({text: cadmium_value, })
 
         let hexaclorobenzene_value = metrics.hexaclorobenzene_efficiency(industries)
-        row.push({text: hexaclorobenzene_value, fillColor: _this.get_color(this.risk_categories.treatment_efficiency(hexaclorobenzene_value))})
+        row.push({text: hexaclorobenzene_value, })
 
         let mercury_value = metrics.mercury_efficiency(industries)
-        row.push({text: mercury_value, fillColor: _this.get_color(this.risk_categories.treatment_efficiency(mercury_value))})
+        row.push({text: mercury_value, })
 
         let lead_value = metrics.lead_efficiency(industries)
-        row.push({text: lead_value, fillColor: _this.get_color(this.risk_categories.treatment_efficiency(lead_value))})
+        row.push({text: lead_value, })
 
         let nickel_value = metrics.nickel_efficiency(industries)
-        row.push({text: nickel_value, fillColor: _this.get_color(this.risk_categories.treatment_efficiency(nickel_value))})
+        row.push({text: nickel_value, })
 
         let chloroalkanes_value = metrics.chloroalkanes_efficiency(industries)
-        row.push({text: chloroalkanes_value, fillColor: _this.get_color(this.risk_categories.treatment_efficiency(chloroalkanes_value))})
+        row.push({text: chloroalkanes_value, })
 
         let hexaclorobutadie_value = metrics.hexaclorobutadie_efficiency(industries)
-        row_1.push({text: hexaclorobutadie_value, fillColor: _this.get_color(this.risk_categories.treatment_efficiency(hexaclorobutadie_value))})
+        row_1.push({text: hexaclorobutadie_value, })
 
         let nonylphenols_value = metrics.nonylphenols_efficiency(industries)
-        row_1.push({text: nonylphenols_value, fillColor: _this.get_color(this.risk_categories.treatment_efficiency(nonylphenols_value))})
+        row_1.push({text: nonylphenols_value, })
 
         let tetrachloroethene_value = metrics.tetrachloroethene_efficiency(industries)
-        row_1.push({text: tetrachloroethene_value, fillColor: _this.get_color(this.risk_categories.treatment_efficiency(tetrachloroethene_value))})
+        row_1.push({text: tetrachloroethene_value, })
 
         let trichloroethylene_value = metrics.tricloroetile_efficiency(industries)
-        row_1.push({text: trichloroethylene_value, fillColor: _this.get_color(this.risk_categories.treatment_efficiency(trichloroethylene_value))})
+        row_1.push({text: trichloroethylene_value, })
 
         data_chart.datasets.push({
           data: [cod_value, tn_value, tp_value, dichloroethane_value, cadmium_value, hexaclorobenzene_value, mercury_value, lead_value, nickel_value, chloroalkanes_value, hexaclorobutadie_value, nonylphenols_value, tetrachloroethene_value, trichloroethylene_value],
@@ -7418,8 +7074,6 @@ export default {
             {text: [{text: "6", sup: true, style: "asterisk"}, {text:"Trichloroethylene"}]},
           ]},
       ])
-      dd.content.push("\n")
-      _this.risk_categories.legend_impact_pdf(dd)
       dd.content.push("\n\n")
       dd.content.push({
         image: chart.toBase64Image(),
@@ -7433,7 +7087,7 @@ export default {
       let _this = this
 
       dd.content.push({
-        text: "Average percentage of treatment efficiency (compared to industry influent)\n\n",
+        text: "Percentage of treatment efficiency (compared to industry influent)\n\n",
         style: 'subheader'
       })
 
@@ -7460,11 +7114,11 @@ export default {
 
         let eff = metrics.amount_water_influent_cleaned(industries)
 
-        row.push({text: eff.cod, fillColor: _this.get_color(this.risk_categories.influent_treatment_efficiency(eff.cod))})
+        row.push({text: eff.cod, })
 
-        row.push({text: eff.tn, fillColor: _this.get_color(this.risk_categories.influent_treatment_efficiency(eff.tn))})
+        row.push({text: eff.tn, })
 
-        row.push({text: eff.tp, fillColor: _this.get_color(this.risk_categories.influent_treatment_efficiency(eff.tp))})
+        row.push({text: eff.tp, })
 
         data_chart.datasets.push({
           data: [eff.cod, eff.tn, eff.tp],
@@ -7504,8 +7158,7 @@ export default {
 
       dd.content.push(industriesEfficiency)
       dd.content.push("\n\n")
-      _this.risk_categories.legend_impact_pdf(dd)
-      dd.content.push("\n\n")
+
       dd.content.push({
         image: chart.toBase64Image(),
         fit: [450, 450]
@@ -7797,40 +7450,85 @@ export default {
       return [
         {
           id: 1,
-          name: 'Pollution :',
+          name: 'Pollution',
           children: [
-            { id: 2, name: 'Impact' },
-            { id: 3,
-              name: 'Lever of action',
+            {
+              id: 2,
+              name: 'Impact' ,
               children: [
-                { id: 4,
-                  name: 'Effluent toxicity level' ,
+                {
+                  id: 3,
+                  name: "Pollution load to the environment",
                   children: [
-                    { id: 5, name: this.table_title.simple_table.tu },
-                    { id: 6, name: this.table_title.simple_table.eqs },
+                    {
+                      id: 4,
+                      name: "Toxicity load from the effluent to the aquatic environment",
+                      children: [
+                        {id: 5, name: this.table_title.simple_table.delta_tu},
+                        {id: 6, name: this.table_title.simple_table.delta_eqs},
+                      ]
 
+                    },
+                    {
+                      id: 7,
+                      name: this.table_title.simple_table.eutrophication,
+
+                    },
                   ]
                 },
-                { id: 7,
-                  name: 'Treatment efficiency',
+                {
+                  id: 8,
+                  name: "Effluent toxicity level",
                   children: [
-                    { id: 8, name: this.table_title.simple_table.avg_treatment_efficiency },
-                    { id: 9, name: this.table_title.simple_table.avg_influent_efficiency },
-                    { id: 10, name: this.table_title.simple_table.treated },
+                    {id: 9, name: this.table_title.simple_table.tu},
+                    {id: 10, name: this.table_title.simple_table.eqs},
 
                   ]
                 },
 
               ]
             },
+            { id:11,
+              name: 'Levers for action',
+              children: [
+                { id: 12,
+                  name: 'Treatment efficiency',
+                  children: [
+                    { id: 13, name: this.table_title.simple_table.avg_treatment_efficiency },
+                    { id: 14, name: this.table_title.simple_table.avg_influent_efficiency },
+                    { id: 15, name: this.table_title.simple_table.treated },
+                  ]
+                },
+              ]
+            },
           ],
         },
+        {
+          id: 16,
+          name: "Freshwater",
+          children: [
+            {id: 17, name: "Impact",},
+            {id: 18, name: "Levers for action",}
+          ]
+        },
+        {
+          id: 19,
+          name: "Carbon",
+          children: [
+            {id: 20, name: "Impact",},
+            {
+              id: 21,
+              name: "Levers for action",
+              children: [
+                {id: 22, name: "Energy use"},
+                {id: 23, name: "Wastewater effluent concentration"},
+              ]
+
+            },
+
+          ]
+        }
       ]
-    },
-
-
-    valid_created_assessments(){
-      return this.assessments_with_industries.filter(assessment => !assessment.disabled).map(assessment => assessment.assessment)
     },
 
     assessments_with_industries(){
@@ -7854,27 +7552,6 @@ export default {
 
     industries_aggregated(){
       let _this = this
-      let industries = []
-
-      /*this.created_assessments.forEach(assessment => {
-        assessment.industries.forEach(industry => {
-          //Required items
-          if(this.is_industry_valid(industry)){
-            industries.push({
-              "industry": industry,
-              "assessment": assessment,
-              "name": industry.name
-            })
-          }
-
-        })
-
-      })
-
-        const groupedByAssessments = _.groupBy(industries, function(n) {
-        return n.assessment.name;
-      });*/
-
 
       if(_this.tab !== undefined && _this.tab !== null && _this.created_assessments.length > 0) {
 
@@ -7887,35 +7564,14 @@ export default {
       }
     },
 
-    industries_aggregated_pdf(){
-      let _this = this
-
-      const groupedByAssessments = _.groupBy(this.selected_industries, function(n) {
-        return n.assessment.name;
-      });
-
-
-      if(_this.tab !== undefined && _this.tab !== null && Object.values(groupedByAssessments)[_this.tab] != undefined) {
-
-        let industriesOfassessment = Object.values(groupedByAssessments)[_this.tab].map(industry => {
-          return industry.industry
-        })
-        if (_this.aggregation_level == "country") {
-
-          //Agrupació per països
-          const groupedByCountry = _.groupBy(industriesOfassessment, function (industry) {
-            return utils.get_country_code_from_coordinates(industry.location.lat, industry.location.lng)
-          }) //Array of arrays of industries
-          return groupedByCountry
-        } else if (_this.aggregation_level == "industry") {
-          let industries = {}
-          industriesOfassessment.forEach(industry => {
-            industries[industry.name] = [industry]
-          })
-          return industries
-        }
+    current_industry(){
+      if(this.industry_clicked != null || this.industry_clicked.length == 0) {
+        let obj = {}
+        obj[this.industry_clicked[0].name] = [this.industry_clicked[0]]
+        return obj
       }
     },
+
 
     industry_table() {
 
@@ -8036,6 +7692,10 @@ export default {
 
   .lever-style{
     border: 10px solid orange !important;
+  }
+
+  .red{
+    background-color: red;
   }
 
 
@@ -8169,10 +7829,18 @@ table {
 .hover:hover {
   text-decoration: underline;
 }
-
-
-
-
+.low {
+  background-color: #529fee;
+}
+.medium {
+  background-color: yellow;
+}
+.high {
+  background-color: orange;
+}
+.very_high {
+  background-color: red;
+}
 
 
 </style>
