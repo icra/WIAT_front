@@ -5196,6 +5196,8 @@ export default {
             text: key, value: key,
           })
 
+          console.log(indicators)
+
           g4_en8[key] = indicators["g4-en8"]
           g4_en9[key] = indicators["g4-en9"]
           g4_en10[key] = indicators["g4-en10"]

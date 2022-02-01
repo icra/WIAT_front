@@ -506,9 +506,9 @@ let metrics = {
         let tn_effl = calculate_effluent_load(industries, "wwt_tn_effl")
         let tp_effl = calculate_effluent_load(industries, "wwt_tp_effl")
 
-        let cod = cod_infl == 0 ? "-" : (100*cod_effl/cod_infl).toFixed(2)
-        let tn = tn_infl == 0 ? "-" : (100*tn_effl/tn_infl).toFixed(2)
-        let tp = tp_infl == 0 ? "-" : (100*tp_effl/tp_infl).toFixed(2)
+        let cod = (cod_infl == 0 || isNaN(cod_infl)) ? "-" : (100*cod_effl/cod_infl).toFixed(2)
+        let tn = (tn_infl == 0 || isNaN(tn_infl)) ? "-" : (100*tn_effl/tn_infl).toFixed(2)
+        let tp = (tp_infl == 0 || isNaN(tp_infl)) ? "-" : (100*tp_effl/tp_infl).toFixed(2)
 
         return {cod, tn, tp}
     },
@@ -550,20 +550,21 @@ let metrics = {
 
         let reporting_metrics = {
             "g4-en8": calculate_water_withdrawn(industries)*365,
-            "g4-en9": withdrawn_factor_value,   //mes gran que 5% mal
-            "g4-en10": _this.recycled_water_factor(industries),
+            "g4-en9": 1*withdrawn_factor_value,   //mes gran que 5% mal
+            "g4-en10": 1*_this.recycled_water_factor(industries),
             "g4-en22": calculate_water_discharged(industries)*365,
-            "g4-en26": discharged_factor_value,
+            "g4-en26": 1*discharged_factor_value,
             "wd": 365*0.001*calculate_water_withdrawn(industries), //Water withdrawn
             "dis": 365*0.001*calculate_water_discharged(industries),  //water discharged
             "re": 365*0.001*calculate_water_recycled(industries), //water reused
         }
-
         Object.keys(reporting_metrics).forEach(key => {
             let value = reporting_metrics[key]
             if(Number.isFinite(value)) reporting_metrics[key] = value.toExponential(2)
             else reporting_metrics[key] = "-"
         })
+
+
 
         reporting_metrics["highest_level_discharge"] = better_treatment(industries)
 
