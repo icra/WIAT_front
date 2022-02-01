@@ -473,7 +473,7 @@
 
                           <v-col cols="4">
                             <div>
-                              <p class="side_menu_title">1) Select the layers to include in the report</p>
+                              <p class="side_menu_title">1) Select the assessments to include in the report</p>
                               <v-checkbox
                                   v-for="assessment in assessments_with_industries"
                                   v-model="selected_assessments"
