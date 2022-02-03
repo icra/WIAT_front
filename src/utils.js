@@ -188,8 +188,11 @@ async function streamflow(industries, global_layers){
     let streamflow = global_layers["Streamflow"].layers.baseline.annual.layer
     let streamflow_value = await Promise.all(
         industries.map(async industry => {
-            let _streamflow = await streamflow.data_on_point(industry.location.lat, industry.location.lng)*86400
-            return _streamflow
+            if(industry.streamflow == null) {
+                industry.streamflow = await streamflow.data_on_point(industry.location.lat, industry.location.lng)*86400
+            }
+            return industry.streamflow
+
         })) //streamflow (m3/day)
 
 

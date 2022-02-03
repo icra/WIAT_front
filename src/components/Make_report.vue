@@ -2910,7 +2910,7 @@
                   Select an indicator
                 </div>
                 <div v-else>
-                  <div v-if="active_indicator[0] == 5">
+                  <div v-if="active_indicator[0] == 3">
                     <v-data-table
                         :headers="delta_ecotox_table.header"
                         :items="delta_ecotox_table.value"
@@ -2920,7 +2920,6 @@
                         :hide-default-footer="true"
                         dense
                     >
-
                       <template v-slot:item.value="{ item }">
               <span v-if="item.info">
                 {{item.value}}
@@ -2979,7 +2978,7 @@
                     </v-data-table>
 
                   </div>
-                  <div v-else-if="active_indicator[0] == 6">
+                  <div v-else-if="active_indicator[0] == 4">
                     <v-data-table
                         :headers="delta_eqs_table.header"
                         :items="delta_eqs_table.value"
@@ -3050,7 +3049,7 @@
                     </v-data-table>
 
                   </div>
-                  <div v-else-if="active_indicator[0] == 7">
+                  <div v-else-if="active_indicator[0] == 5">
                     <v-data-table
                         :headers="eutrophication_table.header"
                         :items="eutrophication_table.value"
@@ -3119,7 +3118,7 @@
                     </v-data-table>
 
                   </div>
-                  <div v-else-if="active_indicator[0] == 9">
+                  <div v-else-if="active_indicator[0] == 6">
                     <v-data-table
                         :headers="ecotoxicity_table.header"
                         :items="ecotoxicity_table.value"
@@ -3187,7 +3186,7 @@
                     </v-data-table>
 
                   </div>
-                  <div v-else-if="active_indicator[0] == 10">
+                  <div v-else-if="active_indicator[0] == 7">
                     <v-data-table
                         :headers="eqs_table.header"
                         :items="eqs_table.value"
@@ -3256,7 +3255,7 @@
                     </v-data-table>
 
                   </div>
-                  <div v-else-if="active_indicator[0] == 13">
+                  <div v-else-if="active_indicator[0] == 9">
                     <v-data-table
                         :headers="treatment_efficiency_table.header"
                         :items="treatment_efficiency_table.value"
@@ -3325,7 +3324,7 @@
                     </v-data-table>
 
                   </div>
-                  <div v-else-if="active_indicator[0] == 14">
+                  <div v-else-if="active_indicator[0] == 10">
                     <v-data-table
                         :headers="treatment_efficiency_influent_table.header"
                         :items="treatment_efficiency_influent_table.value"
@@ -3395,7 +3394,7 @@
                     </v-data-table>
 
                   </div>
-                  <div v-else-if="active_indicator[0] == 15">
+                  <div v-else-if="active_indicator[0] == 11">
                     <v-data-table
                         :headers="treated_table.header"
                         :items="treated_table.value"
@@ -3430,7 +3429,7 @@
                     </v-data-table>
 
                   </div>
-                  <div v-else-if="active_indicator[0] == 17">
+                  <div v-else-if="active_indicator[0] == 13">
                     <v-data-table
                         :headers="water_quantity.header"
                         :items="water_quantity.value"
@@ -3514,7 +3513,7 @@
                     </v-data-table>
 
                   </div>
-                  <div v-else-if="active_indicator[0] == 18">
+                  <div v-else-if="active_indicator[0] == 14">
                     <v-data-table
                         :headers="freshwater_lever_for_action.header"
                         :items="freshwater_lever_for_action.value"
@@ -3549,7 +3548,7 @@
                     </v-data-table>
 
                   </div>
-                  <div v-else-if="active_indicator[0] == 20">
+                  <div v-else-if="active_indicator[0] == 16">
                     <v-data-table
                         :headers="emissions_table.header"
                         :items="emissions_table.value"
@@ -3618,7 +3617,7 @@
 
                     </v-data-table>
                   </div>
-                  <div v-else-if="active_indicator[0] == 22">
+                  <div v-else-if="active_indicator[0] == 18">
                     <v-data-table
                         :headers="energy_use_table.header"
                         :items="energy_use_table.value"
@@ -3652,7 +3651,7 @@
 
                     </v-data-table>
                   </div>
-                  <div v-else-if="active_indicator[0] == 23">
+                  <div v-else-if="active_indicator[0] == 19">
                     <v-data-table
                         :headers="effluent_load_table.header"
                         :items="effluent_load_table.value"
@@ -3686,8 +3685,6 @@
 
                     </v-data-table>
                   </div>
-
-
 
                 </div>
               </v-scroll-y-transition>
@@ -3840,7 +3837,7 @@ export default {
           treated: "Treated water factor",
           consumption_available: "Consumption available ratio",
           specific_water_consumption: "Specific water consumption",
-          total_ghg: "Carbon impact",
+          total_ghg: "GHG emissions from Wastewater",
           eutrophication: "Eutrophication potential",
           tu: "Toxic units in the effluent",
           delta_tu: "Increase in toxic units in the receiving water body after discharge",
@@ -3964,7 +3961,7 @@ export default {
   watch: {
 
     open_indicator(value){
-      let impact_index = [1, 16, 19] //Index in tree-view where main categories start
+      let impact_index = [1, 12, 15] //Index in tree-view where main categories start
       let new_item = value[value.length-1]
       if(impact_index.includes(new_item)){
         if(value.length > 1){
@@ -4175,12 +4172,13 @@ export default {
         let eqs_values = this.eqs_table.value.map(x => x[current_industry_name])
         eqs_impact = this.risk_categories["eqs"](eqs_values.sum() / eqs_values.length)
       }
+      /*
       let pollution_load_to_environment_risk = [null, null]
       pollution_load_to_environment_risk[1] = this.return_avg_risk([eutrophication_impact, delta_eqs_impact, delta_ecotox_impact])
       let toxicity_load_risk = [null, null]
       toxicity_load_risk[1] = this.return_avg_risk([delta_eqs_impact, delta_ecotox_impact])
       let effluent_toxicity_risk = [null, null]
-      effluent_toxicity_risk[1] = this.return_avg_risk([eqs_impact, ecotox_impact])
+      effluent_toxicity_risk[1] = this.return_avg_risk([eqs_impact, ecotox_impact])*/
 
 
       let return_color_class = function(value){
@@ -4199,33 +4197,26 @@ export default {
 
       }
 
-      let id_risk = [1,2,3,4,5,6,7,8,9,10,16,17,19,20]
+      let id_risk = [1,2,3,4,5,6,7,12,13,15,16]
       if(id_risk.includes(id.id)){
         if(id.id < 3) {
           return return_color_class(pollution_impact)
         }else if(id.id == 3){
-          return return_color_class(pollution_load_to_environment_risk)
-        }else if(id.id == 4){
-          return return_color_class(toxicity_load_risk)
-      }else if(id.id == 5){
           return return_color_class(delta_ecotox_impact)
-        }else if(id.id == 6){
+        }else if(id.id == 4){
           return return_color_class(delta_eqs_impact)
-        } else if(id.id == 7){
+        } else if(id.id == 5){
           return return_color_class(eutrophication_impact)
-        } else if(id.id == 8){
-          return return_color_class(effluent_toxicity_risk)
-        } else if(id.id == 9){
+        } else if(id.id == 6){
           return return_color_class(ecotox_impact)
-        }else if(id.id == 10){
+        }else if(id.id == 7){
           return return_color_class(eqs_impact)
-        } else if(id.id < 19) {
+        } else if(id.id <= 13) {
           return return_color_class(freshwater_impact)
         } else {
           return return_color_class(ghg_impact)
         }
       }
-
     },
 
     itemRowBackground: function (item) {
@@ -4325,24 +4316,6 @@ export default {
 
     simpleTableRowClick(item, row){
 
-      /*if(item.value == "Freshwater impact") this.dialog_quality_quantity = true
-      else if(item.value == "Carbon impact") this.dialog_emissions = true
-      else if(item.value == "Eutrophication potential") this.dialog_eutrophication = true
-      else if(item.value == this.table_title.simple_table.avg_treatment_efficiency) this.dialog_efficiency = true
-      //else if(item.value == this.table_title.simple_table.tu) this.dialog_tu = true
-      else if(item.value == this.table_title.simple_table.delta_tu) this.dialog_delta_tu = true
-      //else if(item.value == this.table_title.simple_table.eqs) this.dialog_eqs = true
-      else if(item.value == this.table_title.simple_table.delta_eqs) this.dialog_delta_eqs = true
-      else if(item.value == this.table_title.simple_table.avg_influent_efficiency) this.dialog_influent_efficiency = true
-      else if(item.value == "Pollution impact") this.dialog_pollution = true
-      else if(item.value == this.table_title.simple_table.specific_water_consumption) this.info_specific_consumption = true
-      else if(item.value == this.table_title.simple_table.recycled) this.info_recycled_factor = true
-      else if(item.value == this.table_title.simple_table.treated) this.info_treated_factor = true
-      else if(item.value == this.table_title.simple_table.energy_used_text) this.info_energy_used = true
-      else {
-        this.industry_clicked = this.industries_aggregated[item.value]
-        this.industry_info = true
-      }*/
       this.industry_clicked = this.industries_aggregated[item.value]
       this.industry_info = true
 
@@ -4694,9 +4667,9 @@ export default {
           value: []
         }
 
-        let tn = {value: _this.table_title.pollutants.tn, unit: "gTN/m3", info: "info_tn_load"}
-        let tp = {value: _this.table_title.pollutants.tp, unit: "gTP/m3", info: "info_tp_load"}
-        let cod = {value: _this.table_title.pollutants.cod, unit: "gCOD/m3", info: "info_cod_load"}
+        let tn = {value: _this.table_title.pollutants.tn, unit: "gTN/m3", }
+        let tp = {value: _this.table_title.pollutants.tp, unit: "gTP/m3", }
+        let cod = {value: _this.table_title.pollutants.cod, unit: "gCOD/m3", }
 
         for (const [key, industries] of Object.entries(_this.current_industry)) {
 
@@ -5196,8 +5169,6 @@ export default {
             text: key, value: key,
           })
 
-          console.log(indicators)
-
           g4_en8[key] = indicators["g4-en8"]
           g4_en9[key] = indicators["g4-en9"]
           g4_en10[key] = indicators["g4-en10"]
@@ -5344,7 +5315,7 @@ export default {
       if(_this.tab !== undefined){
 
         let pollutants_table = {
-          header: [{text: "", value: "value", sortable: false}, {text: "Pollution impact", value: "pollution_impact", sortable: false}, {text: "Freshwater impact", value: "freshwater_impact", sortable: false}, {text: "Carbon impact", value: "carbon_impact", sortable: false}],
+          header: [{text: "", value: "value", sortable: false}, {text: "Pollution impact", value: "pollution_impact", sortable: false}, {text: "Freshwater impact", value: "freshwater_impact", sortable: false}, {text: "GHG emissions from Wastewater", value: "carbon_impact", sortable: false}],
           value: []
         }
 
@@ -5364,7 +5335,6 @@ export default {
           let available_factor_risk = this.risk_categories["water_stress_ratio"](available_factor)
 
           industry_row["freshwater_impact"] = this.return_avg_risk([dilution_factor_risk, available_factor_risk])
-
           industry_row["carbon_impact"] = metrics.emissions_and_descriptions(industries, 1).total
 
           let eutrophication_factor = metrics.eutrophication_potential(industries).total
@@ -5381,12 +5351,6 @@ export default {
 
           let delta_eqs_factor = await metrics.delta_eqs_avg(industries, this.global_layers)
           let delta_eqs_risk = this.risk_categories["delta_eqs"](delta_eqs_factor)
-
-          let avg_treatment_efficiency_factor  = metrics.avg_treatment_efficiency(industries)
-          let avg_treatment_efficiency_risk = this.risk_categories["treatment_efficiency"](avg_treatment_efficiency_factor)
-
-          let avg_influent_efficiency_factor  = metrics.avg_influent_efficiency(industries)
-          let avg_influent_efficiency_risk = this.risk_categories["influent_treatment_efficiency"](avg_influent_efficiency_factor)
 
           industry_row["pollution_impact"] = this.return_avg_risk([eutrophication_risk, ecotox_effluent_risk, delta_ecotox_risk, eqs_risk, delta_eqs_risk])
           pollutants_table.value.push(industry_row)
@@ -5962,7 +5926,7 @@ export default {
       let days_factor = 1
 
       dd.content.push({
-        text: "Carbon impact\n\n",
+        text: "GHG emissions from Wastewater\n\n",
         style: 'indicator_title'
       })
 
@@ -7458,72 +7422,42 @@ export default {
               id: 2,
               name: 'Impact' ,
               children: [
-                {
-                  id: 3,
-                  name: "Pollution load to the environment",
-                  children: [
-                    {
-                      id: 4,
-                      name: "Toxicity load from the effluent to the aquatic environment",
-                      children: [
-                        {id: 5, name: this.table_title.simple_table.delta_tu},
-                        {id: 6, name: this.table_title.simple_table.delta_eqs},
-                      ]
-
-                    },
-                    {
-                      id: 7,
-                      name: this.table_title.simple_table.eutrophication,
-
-                    },
-                  ]
-                },
-                {
-                  id: 8,
-                  name: "Effluent toxicity level",
-                  children: [
-                    {id: 9, name: this.table_title.simple_table.tu},
-                    {id: 10, name: this.table_title.simple_table.eqs},
-
-                  ]
-                },
-
+                {id: 3, name: this.table_title.simple_table.delta_tu,},
+                {id: 4, name: this.table_title.simple_table.delta_eqs,},
+                {id: 5, name: this.table_title.simple_table.eutrophication,},
+                {id: 6, name: this.table_title.simple_table.tu,},
+                {id: 7, name: this.table_title.simple_table.eqs,},
               ]
             },
-            { id:11,
+            { id:8,
               name: 'Levers for action',
               children: [
-                { id: 12,
-                  name: 'Treatment efficiency',
-                  children: [
-                    { id: 13, name: this.table_title.simple_table.avg_treatment_efficiency },
-                    { id: 14, name: this.table_title.simple_table.avg_influent_efficiency },
-                    { id: 15, name: this.table_title.simple_table.treated },
-                  ]
-                },
+                { id: 9, name: this.table_title.simple_table.avg_treatment_efficiency },
+                { id: 10, name: this.table_title.simple_table.avg_influent_efficiency },
+                { id: 11, name: this.table_title.simple_table.treated },
               ]
             },
           ],
         },
         {
-          id: 16,
+          id: 12,
           name: "Freshwater",
           children: [
-            {id: 17, name: "Impact",},
-            {id: 18, name: "Levers for action",}
+            {id: 13, name: "Impact",},
+            {id: 14, name: "Levers for action",}
           ]
         },
         {
-          id: 19,
+          id: 15,
           name: "Carbon",
           children: [
-            {id: 20, name: "Impact",},
+            {id: 16, name: "Impact",},
             {
-              id: 21,
+              id: 17,
               name: "Levers for action",
               children: [
-                {id: 22, name: "Energy use"},
-                {id: 23, name: "Wastewater effluent concentration"},
+                {id: 18, name: "Energy use"},
+                {id: 19, name: "Wastewater effluent concentration"},
               ]
 
             },
