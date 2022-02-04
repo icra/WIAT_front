@@ -9,14 +9,15 @@
         style="margin-left: 0px; margin-right: 0px; background-color: white"
     >
       <v-row style="background-color: white; width: 100%">
-        <v-col cols="3" class="header">
+        <v-col cols="2" class="header">
           <a href="https://www.wbcsd.org/" target="_blank">
             <div>
               <v-icon>$wbcsd_logo</v-icon>
             </div>
           </a>
         </v-col>
-        <v-col cols="9" class="header">
+
+        <v-col cols="8" class="header">
           <div >
             <v-hover
                 v-slot="{ hover }"
@@ -201,6 +202,13 @@
           </div>
 
         </v-col >
+
+        <v-col cols="2" class="header">
+          <div>
+            <v-icon>$waste_water_zero_logo</v-icon>
+          </div>
+        </v-col>
+
 
       </v-row>
     </v-app-bar>
@@ -924,6 +932,7 @@ export default {
     }
   },
   created() {
+    document.title = "WIAT";
     window.addEventListener('beforeunload', e => this.beforeunloadFn(e))
   },
 

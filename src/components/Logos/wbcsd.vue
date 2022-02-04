@@ -40,7 +40,7 @@
 </svg>
 </template>
 
-<style type="text/css">
+<style scoped type="text/css">
 .st0{fill:#242056;}
 .st1{fill:#D7D7D6;}
 .st2{fill:#04A34B;}
