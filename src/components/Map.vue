@@ -534,7 +534,6 @@ export default {
       this.adding_supply_chain = true
     },
 
-
     pan_location(location){
       this.mapDiv.panTo(location)
     },

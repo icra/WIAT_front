@@ -348,12 +348,18 @@
 
                       <div>
 
-                          <v-row
+                        <p class="side_menu_title">Layers to include in the report</p>
+                        <div class="instructions_2">
+                          *This step may require a some time, depending on the selected layers and the industries created
+                        </div>
+
+                        <v-row
                               class="pa-4"
                               justify="space-between"
                           >
+
                             <v-col cols="4">
-                              <p class="side_menu_title">Layers to include in the report</p>
+
                               <v-radio-group v-model="radio_layers">
                                 <v-radio
                                     :key="1"
@@ -404,7 +410,7 @@
                                     ></v-progress-linear>
                                   </template>
                                   <template
-                                      v-for="value in created_assessments[tab].industries.map(x => x.name)"
+                                      v-for="value in industry_and_supply_chain()"
                                       v-slot:[`item.${value}`]="{ item }"
                                   >
 
@@ -497,6 +503,9 @@
                               cols="4"
                           >
                             <p class="side_menu_title">2) Select the global indicators to include in the report (optional)</p>
+                            <div class="instructions_2">
+                              *The more layers you select, the longer it takes to download the file.
+                            </div>
                             <v-treeview
                                 :items="layer_tree"
                                 dense
@@ -3743,7 +3752,7 @@ export default {
       selected_layers: [Vue.prototype.$layers_description[1].children[0].children[3]], //layers included in the report (initially only streamflow)
       selected_layers_pdf: [], //layers included in the pdf report
 
-      tab: 0,
+      tab: null,
       main_tab: 0,
       layers_table: {header: [], value: []},
       water_quantity: {header: [], value: []},
@@ -3977,17 +3986,36 @@ export default {
       }
     },
     radio_layers: function(value){
-
       let _this = this
       if(value == 2){
         Vue.nextTick(async function () {
           _this.selected_layers.splice(0, _this.selected_layers.length, _this.layers[1].children[0].children[3])
         })
-
+      }
+    },
+    selected_assessments: function (new_selected_assessments, old_value){
+      if(new_selected_assessments.length > 0){
+        this.selected_industries = []
+        if (old_value.length == 0) this.tab = 0
+        let _this = this
+        new_selected_assessments.forEach(assessment => {
+          assessment.industries.forEach(industry => {
+            //Required items
+            if(this.is_industry_valid(industry)){
+              _this.selected_industries.push({
+                "industry": industry,
+                "assessment": assessment,
+                "name": industry.name
+              })
+            }
+          })
+        })
+      }
+      else {
+        this.selected_industries = []
       }
     },
     industry_clicked: async function () {
-
       this.emissions_table = {header: [], value: []}
       this.energy_use_table = {header: [], value: []}
       this.effluent_load_table = {header: [], value: []}
@@ -4005,7 +4033,6 @@ export default {
       this.treatment_efficiency_influent_table = {header: [], value: []}
       this.active_indicator.splice(0, this.active_indicator.length)
 
-
       this.emissions_table = this.generate_emissions_table()
       this.energy_use_table = this.generate_energy_use_table()
       this.effluent_load_table = this.generate_effluent_load_table()
@@ -4014,138 +4041,77 @@ export default {
       this.treated_table = await this.generate_treated_table()
       this.freshwater_lever_for_action = await this.generate_freshwater_lever_for_action_table()
 
-
       this.eutrophication_table = this.generate_eutrophication_table()
       this.ecotoxicity_table = this.generate_ecotoxicity_table()
       this.reporting_indicators = await this.generate_reporting_indicators_table()
       this.treatment_efficiency_table = this.generate_treatment_efficiency_table()
       this.treatment_efficiency_influent_table = this.generate_treatment_efficiency_influent_table()
 
-      this.layers_table = await this.generate_layers_table()
-      this.simple_report_table = await this.generate_simple_report_table()
-
+      //this.layers_table = await this.generate_layers_table()
+      //this.simple_report_table = await this.generate_simple_report_table()
 
       this.eqs_table = this.generate_eqs_table()
       this.delta_eqs_table = await this.generate_delta_eqs_table()
       this.delta_ecotox_table = await this.generate_delta_ecotox_table()
     },
-
     selected_layers: async function () {
-      this.emissions_table = this.generate_emissions_table()
-      this.energy_use_table = this.generate_energy_use_table()
-      this.effluent_load_table = this.generate_effluent_load_table()
+      let _this = this
+      _this.layers_table = {header: [], value: []}
+      _this.layers_table = await _this.generate_layers_table(_this.tab)
 
-      this.water_quantity = await this.generate_water_quality_table()
-      this.treated_table = await this.generate_treated_table()
-      this.freshwater_lever_for_action = await this.generate_freshwater_lever_for_action_table()
-
-
-      this.eutrophication_table = this.generate_eutrophication_table()
-      this.ecotoxicity_table = this.generate_ecotoxicity_table()
-      this.reporting_indicators = await this.generate_reporting_indicators_table()
-      this.treatment_efficiency_table = this.generate_treatment_efficiency_table()
-      this.treatment_efficiency_influent_table = this.generate_treatment_efficiency_influent_table()
-
-      this.layers_table = await this.generate_layers_table()
-      this.simple_report_table = await this.generate_simple_report_table()
-
-
-      this.eqs_table = this.generate_eqs_table()
-      this.delta_eqs_table = await this.generate_delta_eqs_table()
-      this.delta_ecotox_table = await this.generate_delta_ecotox_table()
-    },
-    selected_assessments: function (new_selected_assessments, old_value){
-
-      if(new_selected_assessments.length > 0){
-        this.selected_industries = []
-        if (old_value.length == 0) this.tab = 0
-        let _this = this
-
-        new_selected_assessments.forEach(assessment => {
-          assessment.industries.forEach(industry => {
-
-            //Required items
-            if(this.is_industry_valid(industry)){
-              _this.selected_industries.push({
-                "industry": industry,
-                "assessment": assessment,
-                "name": industry.name
-              })
-            }
-          })
-        })
-
-        Vue.nextTick(async function () {
-          _this.emissions_table = _this.generate_emissions_table()
-          _this.energy_use_table = _this.generate_energy_use_table()
-          _this.effluent_load_table = _this.generate_effluent_load_table()
-
-          _this.water_quantity = await _this.generate_water_quality_table()
-          _this.treated_table = await _this.generate_treated_table()
-          _this.freshwater_lever_for_action = await _this.generate_freshwater_lever_for_action_table()
-
-
-          _this.eutrophication_table = _this.generate_eutrophication_table()
-          _this.ecotoxicity_table = _this.generate_ecotoxicity_table()
-          _this.reporting_indicators = await _this.generate_reporting_indicators_table()
-          _this.treatment_efficiency_table = _this.generate_treatment_efficiency_table()
-          _this.treatment_efficiency_influent_table = _this.generate_treatment_efficiency_influent_table()
-
+      /*Vue.nextTick(async function () {
+        if(_this.selected_assessments.length > 0){
+          _this.layers_table = {header: [], value: []}
           _this.layers_table = await _this.generate_layers_table()
-          _this.simple_report_table = await _this.generate_simple_report_table()
 
+        }
+      })*/
 
-          _this.eqs_table = _this.generate_eqs_table()
-          _this.delta_eqs_table = await _this.generate_delta_eqs_table()
-          _this.delta_ecotox_table = await _this.generate_delta_ecotox_table()
-        })
-
-
-        //if(new_selected_industries.length > 0) this.pieChart_base64()
-
-      }
-      else {
-        this.selected_industries = []
-      }
     },
-
     tab: async function () {
 
       let _this = this
+      this.layers_table = {header: [], value: []}
+
       Vue.nextTick(async function () {
-        if(_this.selected_assessments.length > 0){
-          _this.emissions_table =_this.generate_emissions_table()
-          _this.energy_use_table = _this.generate_energy_use_table()
-          _this.effluent_load_table = _this.generate_effluent_load_table()
+        _this.emissions_table =_this.generate_emissions_table()
+        _this.energy_use_table = _this.generate_energy_use_table()
+        _this.effluent_load_table = _this.generate_effluent_load_table()
 
-          _this.water_quantity = await _this.generate_water_quality_table()
-          _this.treated_table = await _this.generate_treated_table()
-          _this.freshwater_lever_for_action = await _this.generate_freshwater_lever_for_action_table()
+        _this.water_quantity = await _this.generate_water_quality_table()
+        _this.treated_table = await _this.generate_treated_table()
+        _this.freshwater_lever_for_action = await _this.generate_freshwater_lever_for_action_table()
 
+        _this.eutrophication_table = _this.generate_eutrophication_table()
+        _this.ecotoxicity_table = _this.generate_ecotoxicity_table()
+        _this.reporting_indicators = await _this.generate_reporting_indicators_table()
+        _this.treatment_efficiency_table = _this.generate_treatment_efficiency_table()
+        _this.treatment_efficiency_influent_table = _this.generate_treatment_efficiency_influent_table()
 
-          _this.eutrophication_table = _this.generate_eutrophication_table()
-          _this.ecotoxicity_table = _this.generate_ecotoxicity_table()
-          _this.reporting_indicators = await _this.generate_reporting_indicators_table()
-          _this.treatment_efficiency_table = _this.generate_treatment_efficiency_table()
-          _this.treatment_efficiency_influent_table = _this.generate_treatment_efficiency_influent_table()
+        _this.simple_report_table = await _this.generate_simple_report_table()
 
-          _this.layers_table = await _this.generate_layers_table()
-          _this.simple_report_table = await _this.generate_simple_report_table()
+        _this.eqs_table = _this.generate_eqs_table()
+        _this.delta_eqs_table = await _this.generate_delta_eqs_table()
+        _this.delta_ecotox_table = await _this.generate_delta_ecotox_table()
+        _this.selected_layers.splice(0, _this.selected_layers.length, _this.layers[1].children[0].children[3])
+        _this.radio_layers = 2
+        _this.main_tab = 0
 
-
-          _this.eqs_table = _this.generate_eqs_table()
-          _this.delta_eqs_table = await _this.generate_delta_eqs_table()
-          _this.delta_ecotox_table = await _this.generate_delta_ecotox_table()
-
-
-        }
       })
-
-
     },
-
   },
   methods: {
+
+
+    industry_and_supply_chain(){
+      let industries = this.created_assessments[this.tab].industries.map(x => x.name)
+      let sc = this.created_assessments[this.tab].industries.map(industry => {
+        return industry.supply_chain.map(sc => {
+          return sc.name+" (Supply chain of "+industry.name+")"
+        })
+      }).flat(2)
+      return [...industries, ...sc]
+    },
 
     indicator_risk_class: function(id){
 
@@ -4153,6 +4119,10 @@ export default {
       //risks
       let current_industry_name = Object.keys(this.current_industry)[0]
       let industry = this.simple_report_table.value.filter(industry => industry.value == current_industry_name)[0]
+      if(industry == null || industry == undefined) return
+      //let ghg_impact = this.risk_categories["global_warming"](industry["carbon_impact"])
+
+      console.log(industry["carbon_impact"])
       let ghg_impact = this.risk_categories["global_warming"](industry["carbon_impact"])
       let freshwater_impact = this.risk_categories["pollution"](industry["freshwater_impact"])
       let pollution_impact = this.risk_categories["pollution"](industry["pollution_impact"])
@@ -4329,7 +4299,38 @@ export default {
     },
 
     industries_deleted(){ //An industry or assessment has been deleted, if it's the current one return to map
-      this.selected_assessments.splice(0, this.selected_assessments.length)
+
+      let _this = this
+      this.layers_table = {header: [], value: []}
+
+      Vue.nextTick(async function () {
+        _this.emissions_table =_this.generate_emissions_table()
+        _this.energy_use_table = _this.generate_energy_use_table()
+        _this.effluent_load_table = _this.generate_effluent_load_table()
+
+        _this.water_quantity = await _this.generate_water_quality_table()
+        _this.treated_table = await _this.generate_treated_table()
+        _this.freshwater_lever_for_action = await _this.generate_freshwater_lever_for_action_table()
+
+        _this.eutrophication_table = _this.generate_eutrophication_table()
+        _this.ecotoxicity_table = _this.generate_ecotoxicity_table()
+        _this.reporting_indicators = await _this.generate_reporting_indicators_table()
+        _this.treatment_efficiency_table = _this.generate_treatment_efficiency_table()
+        _this.treatment_efficiency_influent_table = _this.generate_treatment_efficiency_influent_table()
+
+        _this.simple_report_table = await _this.generate_simple_report_table()
+
+        _this.eqs_table = _this.generate_eqs_table()
+        _this.delta_eqs_table = await _this.generate_delta_eqs_table()
+        _this.delta_ecotox_table = await _this.generate_delta_ecotox_table()
+        _this.selected_layers.splice(0, _this.selected_layers.length, _this.layers[1].children[0].children[3])
+        _this.radio_layers = 2
+        _this.main_tab = 0
+        _this.tab = 2
+
+      })
+
+
 
     },
 
@@ -4392,6 +4393,9 @@ export default {
       let equals = function(name1, name2){
         return name1 == name2 || name1 == name2 + " (BAU 2030)"
       }
+      console.log(item)
+      console.log(value)
+      console.log('----')
       if (equals(item.layer, "Seasonal variability")){
         return this.risk_categories.seasonal_variability(item[value])
       }else if (equals(item.layer, "Interannual variability")){
@@ -5311,7 +5315,6 @@ export default {
 
       let _this = this
 
-
       if(_this.tab !== undefined){
 
         let pollutants_table = {
@@ -5730,7 +5733,7 @@ export default {
       }
     },
 
-    async generate_layers_table(){
+    async generate_layers_table(current_tab){
 
       let selected_layers_formatted = this.selected_layers.map(function (layer) {
         return [layer.name, layer.layer]
@@ -5776,11 +5779,19 @@ export default {
 
 
           for (let industry of industries_and_supply_chain) {
+
+            if(current_tab != this.tab) {
+              let table = await this.generate_layers_table(this.tab) //Generate table for new tab
+              return table
+          }
+
             let lat = industry.location.lat
             let lng = industry.location.lng
 
             //Baseline
+
             let baseline_data = await info.layers.baseline.annual.layer["data_for_report"](lat, lng)
+
             current_layer[industry.name] = baseline_data
 
             if (info.future && this.include_future) {
@@ -5826,7 +5837,6 @@ export default {
     },
 
     async layers_table_pdf(dd, industries, assessment_days){
-
 
 
       let selected_layers_formatted = this.selected_layers_pdf.map(function (layer) {
@@ -5890,7 +5900,6 @@ export default {
 
             //Adding rows for supply chain
             for(let supply_chain of industry.supply_chain){
-              let name = supply_chain.name
               let lat = supply_chain.location.lat
               let lng = supply_chain.location.lng
 
@@ -7408,6 +7417,7 @@ export default {
     this.assessments_with_industries.forEach(assessment => {
       if(!assessment.disabled) _this.selected_assessments.push(assessment.assessment)
     })
+    this.tab = 0
   },
 
   computed: {
@@ -7731,6 +7741,11 @@ table {
   color: grey;
   font-size: 12px;
   padding: 10px 0px 5px 30px;
+  font-weight: bold;
+}
+.instructions_2{
+  color: grey;
+  font-size: 12px;
   font-weight: bold;
 }
 
