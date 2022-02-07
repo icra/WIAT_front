@@ -20,9 +20,9 @@
             <div>
               <v-tabs v-model="tab" id="assessment_tab" v-show="main_tab != 3">
                 <v-tab
-                    v-for="assessment in assessments_with_industries"
+                    v-for="(assessment, idx) in assessments_with_industries"
                     :key="assessment.assessment.name"
-                    @click="click_tab"
+                    @click="click_tab(idx)"
                     :disabled="assessment.disabled"
                 >
                   {{assessment.assessment.name}}
@@ -3752,7 +3752,7 @@ export default {
       selected_layers: [Vue.prototype.$layers_description[1].children[0].children[3]], //layers included in the report (initially only streamflow)
       selected_layers_pdf: [], //layers included in the pdf report
 
-      tab: null,
+      tab: undefined,
       main_tab: 0,
       layers_table: {header: [], value: []},
       water_quantity: {header: [], value: []},
@@ -4069,7 +4069,6 @@ export default {
 
     },
     tab: async function () {
-
       let _this = this
       this.layers_table = {header: [], value: []}
 
@@ -4122,7 +4121,6 @@ export default {
       if(industry == null || industry == undefined) return
       //let ghg_impact = this.risk_categories["global_warming"](industry["carbon_impact"])
 
-      console.log(industry["carbon_impact"])
       let ghg_impact = this.risk_categories["global_warming"](industry["carbon_impact"])
       let freshwater_impact = this.risk_categories["pollution"](industry["freshwater_impact"])
       let pollution_impact = this.risk_categories["pollution"](industry["pollution_impact"])
@@ -4210,12 +4208,10 @@ export default {
       })
 
       return {header, items}
-
-
     },
 
-
-    click_tab(){
+    click_tab(tab_clicked){
+      if(this.tab === tab_clicked) return
       this.emissions_table = {header: [], value: []}
       this.energy_use_table = {header: [], value: []}
       this.effluent_load_table = {header: [], value: []}
@@ -4233,7 +4229,6 @@ export default {
       this.delta_eqs_table = {header: [], value: []}
       this.radio_industry_edit = null
       this.treatment_efficiency_influent_table = {header: [], value: []}
-
 
     },
 
@@ -4326,7 +4321,8 @@ export default {
         _this.selected_layers.splice(0, _this.selected_layers.length, _this.layers[1].children[0].children[3])
         _this.radio_layers = 2
         _this.main_tab = 0
-        _this.tab = 2
+        let firstIndexValid = _this.assessments_with_industries.findIndex(assessment => assessment.disabled == false)
+        _this.tab = firstIndexValid >= 0 ? firstIndexValid : undefined
 
       })
 
@@ -4393,9 +4389,7 @@ export default {
       let equals = function(name1, name2){
         return name1 == name2 || name1 == name2 + " (BAU 2030)"
       }
-      console.log(item)
-      console.log(value)
-      console.log('----')
+
       if (equals(item.layer, "Seasonal variability")){
         return this.risk_categories.seasonal_variability(item[value])
       }else if (equals(item.layer, "Interannual variability")){
@@ -5167,6 +5161,8 @@ export default {
         let highest_level_discharge = {value: "Highest level(s) to which you treat your discharge", link_text: "(CDP W1.2j)", unit: "-", link_to: "https://guidance.cdp.net/en/guidance?cid=W1.2&ctype=ExternalRef&gettags=1+&idtype=RecordExternalRef&incchild=1&microsite=1&otype=questionnaire&page=1"}
 
         for (const [key, industries] of Object.entries(_this.industries_aggregated)) {
+
+          //aaaa
           let indicators = await metrics.reporting_metrics(industries, this.global_layers)
 
           table.header.push({
@@ -7417,7 +7413,8 @@ export default {
     this.assessments_with_industries.forEach(assessment => {
       if(!assessment.disabled) _this.selected_assessments.push(assessment.assessment)
     })
-    this.tab = 0
+    let indexFirstValid = this.assessments_with_industries.findIndex(assessment => assessment.disabled == false)
+    if(indexFirstValid >= 0) this.tab = indexFirstValid
   },
 
   computed: {
@@ -7498,7 +7495,6 @@ export default {
 
     industries_aggregated(){
       let _this = this
-
       if(_this.tab !== undefined && _this.tab !== null && _this.created_assessments.length > 0) {
 
         let industries = {}
