@@ -4297,6 +4297,11 @@ export default {
 
       let _this = this
       this.layers_table = {header: [], value: []}
+      _this.radio_layers = 2
+      _this.main_tab = 0
+      let firstIndexValid = _this.assessments_with_industries.findIndex(assessment => assessment.disabled == false)
+      _this.tab = firstIndexValid >= 0 ? firstIndexValid : undefined
+
 
       Vue.nextTick(async function () {
         _this.emissions_table =_this.generate_emissions_table()
@@ -4319,15 +4324,8 @@ export default {
         _this.delta_eqs_table = await _this.generate_delta_eqs_table()
         _this.delta_ecotox_table = await _this.generate_delta_ecotox_table()
         _this.selected_layers.splice(0, _this.selected_layers.length, _this.layers[1].children[0].children[3])
-        _this.radio_layers = 2
-        _this.main_tab = 0
-        let firstIndexValid = _this.assessments_with_industries.findIndex(assessment => assessment.disabled == false)
-        _this.tab = firstIndexValid >= 0 ? firstIndexValid : undefined
 
       })
-
-
-
     },
 
     getAvailabilityColor (item, value) {
