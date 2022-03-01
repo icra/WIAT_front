@@ -7228,7 +7228,7 @@ export default {
                 [
                   {text: 'www.wiat.icradev.cat', alignment: 'right'},
                   {text: ' ', alignment: 'right'},
-                  {text: 'Page ' + pageCount, alignment: 'left'}
+                  {text: 'Page ' + currentPage, alignment: 'left'}
                 ]
               ]
             },
@@ -7354,7 +7354,7 @@ export default {
           }
 
           industry.supply_chain.forEach(x => {
-            sc.table.body.push([x.name, x.location.lat.toFixed(3), x.location.lng.toFixed(3)])
+            sc.table.body.push([x.name, parseFloat(x.location.lat).toFixed(3), parseFloat(x.location.lng).toFixed(3)])
           })
 
           arr.push(sc)

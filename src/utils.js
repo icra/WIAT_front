@@ -33,7 +33,7 @@ let utils = {
 
     get_country_code_from_coordinates(lat, lng){
         let crg = require('country-reverse-geocoding').country_reverse_geocoding();
-        let country = crg.get_country(lat, lng);
+        let country = crg.get_country(lat, lng)
         if(country == null) return null
         let code = country.code
         return code

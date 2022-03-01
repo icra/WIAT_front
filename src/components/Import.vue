@@ -835,29 +835,6 @@ export default {
 
                         new_industry.offsite_wwtp.wwt_vol_tslu = _this.parse_i(industry_input, 175)
 
-                        if(industry_input[176] != undefined){
-                          industry_input[176].replace(" ", "").replace('[', '').split("],").map(stringNameCoord => {
-                            let [name, coordString] = stringNameCoord.replace(" ", "").split(",(")
-                            let [lat, lng] = coordString.replace(')]', '').replace(' ', '').split("-").map(str => {
-                              return parseFloat(str.replace(",", "."))
-                            })
-
-                            if(utils.get_country_code_from_coordinates(lat, lng) != null) {
-                              let supply_chain = {
-                                name: name,
-                                location: {
-                                  lat: lat,
-                                  lng: lng
-                                }
-                              }
-
-                              new_industry.supply_chain.push(supply_chain)
-
-                            }
-                          })
-                        }
-
-
 
                         /*split('),').map(stringCoord => {
                           let str = stringCoord.replace('(', '').replace(')', '').replace(' ', '').replace(", ", ",")
@@ -871,6 +848,30 @@ export default {
 
 
                       }
+
+                      if(industry_input[176] != undefined){
+                        industry_input[176].replace(" ", "").replace('[', '').split("],").map(stringNameCoord => {
+                          let [name, coordString] = stringNameCoord.replace(" ", "").split(",(")
+                          let [lat, lng] = coordString.replace(')]', '').replace(' ', '').split(",")
+
+                          let latFloat = parseFloat(lat)
+                          let lngFloat = parseFloat(lng)
+
+                          if(utils.get_country_code_from_coordinates(latFloat, lngFloat) != null) {
+                            let supply_chain = {
+                              name: name,
+                              location: {
+                                lat: latFloat,
+                                lng: lngFloat
+                              }
+                            }
+
+                            new_industry.supply_chain.push(supply_chain)
+
+                          }
+                        })
+                      }
+
 
                       assessment.industries.push(new_industry)
 
