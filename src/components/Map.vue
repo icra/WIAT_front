@@ -622,8 +622,8 @@ export default {
       let _this = this
       let e = {
         latlng: {
-          lat: _this.latitudeModel,
-          lng: _this.longitudeModel
+          lat: Number.parseFloat(_this.latitudeModel),
+          lng: Number.parseFloat(_this.longitudeModel)
         }
       }
 

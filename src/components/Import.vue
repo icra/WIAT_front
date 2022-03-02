@@ -836,15 +836,6 @@ export default {
                         new_industry.offsite_wwtp.wwt_vol_tslu = _this.parse_i(industry_input, 175)
 
 
-                        /*split('),').map(stringCoord => {
-                          let str = stringCoord.replace('(', '').replace(')', '').replace(' ', '').replace(", ", ",")
-                          let [lat, lng] = str.split(",").map(str => parseFloat(str))
-                          if(utils.get_country_code_from_coordinates(lat, lng) != null) {
-                            console.log(lat, lng)
-                          }
-
-
-                        })*/
 
 
                       }
