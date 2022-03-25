@@ -215,28 +215,61 @@
 
     <!-- Main sidebar (first)-->
     <v-navigation-drawer
-          style="z-index:2; height: calc(100% - 70px); margin-top: 70px"
-          clipped
-          permanent
-          width="4rem"
-          app
-          absolute
-      >
+        style="z-index:2; height: calc(100% - 70px); margin-top: 70px"
+        clipped
+        permanent
+        width="4rem"
+        app
+        absolute
+        disable-resize-watcher
+        hide-overlay
+    >
 
-        <div class="icon_sidebar_container" style="overflow: hidden">
-          <v-list height="100%">
-            <div class="icon_sidebar_list">
-              <v-tooltip right>
+      <div class="icon_sidebar_container" style="overflow: hidden">
+        <v-list height="100%">
+          <div class="icon_sidebar_list">
+            <v-tooltip right>
+              <template v-slot:activator="{ on, attrs }">
+                <div v-on="on" v-bind="attrs">
+                  <v-hover v-slot:default="{ hover }">
+                    <v-list-item :class="hover ? 'icon_hovered_pressed' : ''" @click="secondMenu = !secondMenu" style="height: 75px; margin-top: 25px">
+                      <v-list-item-icon>
+                        <v-icon color = "#F2F4F3" v-if="secondMenu">
+                          mdi-arrow-left
+                        </v-icon>
+                        <v-icon color = "#F2F4F3" v-else>
+                          mdi-arrow-right
+                        </v-icon>
+                      </v-list-item-icon>
+                      <v-list-item-content></v-list-item-content>
+                    </v-list-item>
+                  </v-hover>
+                </div>
+
+              </template>
+              <span>Menu</span>
+            </v-tooltip>
+
+            <v-list-item-group>
+              <v-tooltip
+                  right
+                  v-for="(item, index) in items"
+                  :key="item.title"
+              >
                 <template v-slot:activator="{ on, attrs }">
                   <div v-on="on" v-bind="attrs">
-                    <v-hover v-slot:default="{ hover }">
-                      <v-list-item :class="hover ? 'icon_hovered_pressed' : ''" @click="secondMenu = !secondMenu" style="height: 75px; margin-top: 25px">
+                    <v-hover
+                        v-slot:default="{ hover }"
+                    >
+                      <v-list-item
+                          @click="left_side_menu_icon_selected(index)"
+                          :class="(hover || icon_selected === index)? 'icon_hovered_pressed' : ''"
+                          :to="{ name: item.to}"
+                          style="height: 75px" :value="index"
+                      >
                         <v-list-item-icon>
-                          <v-icon color = "#F2F4F3" v-if="secondMenu">
-                            mdi-arrow-left
-                          </v-icon>
-                          <v-icon color = "#F2F4F3" v-else>
-                            mdi-arrow-right
+                          <v-icon color = "#F2F4F3" style="display: inline-block; position: relative; left: 50%; top: 50%; transform: translate(-50%, 25%);">
+                            {{ item.icon }}
                           </v-icon>
                         </v-list-item-icon>
                         <v-list-item-content></v-list-item-content>
@@ -245,59 +278,30 @@
                   </div>
 
                 </template>
-                <span>Menu</span>
+                <span>{{item.title}}</span>
               </v-tooltip>
 
-              <v-list-item-group>
-                <v-tooltip
-                    right
-                    v-for="(item, index) in items"
-                    :key="item.title"
-                >
-                  <template v-slot:activator="{ on, attrs }">
-                    <div v-on="on" v-bind="attrs">
-                      <v-hover
-                          v-slot:default="{ hover }"
-                      >
-                        <v-list-item
-                            @click="left_side_menu_icon_selected(index)"
-                            :class="(hover || icon_selected === index)? 'icon_hovered_pressed' : ''"
-                            :to="{ name: item.to}"
-                            style="height: 75px" :value="index"
-                        >
-                          <v-list-item-icon>
-                            <v-icon color = "#F2F4F3" style="display: inline-block; position: relative; left: 50%; top: 50%; transform: translate(-50%, 25%);">
-                              {{ item.icon }}
-                            </v-icon>
-                          </v-list-item-icon>
-                          <v-list-item-content></v-list-item-content>
-                        </v-list-item>
-                      </v-hover>
-                    </div>
-
-                  </template>
-                  <span>{{item.title}}</span>
-                </v-tooltip>
-
-              </v-list-item-group>
+            </v-list-item-group>
 
 
 
 
 
 
-            </div>
-          </v-list>
-        </div>
-      </v-navigation-drawer>
+          </div>
+        </v-list>
+      </div>
+    </v-navigation-drawer>
 
     <!-- Assessment and factory sidebar (second) -->
     <v-navigation-drawer
         style="z-index:1; background-color: #F2F4F3; left: 4rem; margin-top: 70px; height: calc(100% - 70px)"
         v-model="secondMenu"
-        :width="secondMenu ? '18rem' : '0rem'"
+        :width="secondMenu ? 'max(18rem, 20vw)' : '0rem'"
         app
         clipped
+        disable-resize-watcher
+        hide-overlay
     >
       <div style="height: 100%; display: flex; flex-flow: column; width: 100%;  overflow: hidden;  border-bottom-width: 10px">
         <div style="display: flex; justify-content: flex-end;  background-color: #1C195B; width: 100%">
@@ -332,10 +336,10 @@
                             mdi-eye
                           </v-icon>
                             <v-icon
-                              v-bind="attrs"
-                              v-on="on"
-                              class="icon_clickable" :color="hover ? '#555283' : '#1C195B'" @click="hide_show_industries(assessment_index)" @click.native.stop
-                              v-else>
+                                v-bind="attrs"
+                                v-on="on"
+                                class="icon_clickable" :color="hover ? '#555283' : '#1C195B'" @click="hide_show_industries(assessment_index)" @click.native.stop
+                                v-else>
                             mdi-eye-off
                           </v-icon>
 
@@ -417,9 +421,9 @@
     </v-navigation-drawer>
 
 
-      <!-- Main content -->
+    <!-- Main content -->
     <div style="position: absolute; height: calc(100% - 70px); width: 100%; margin-top: 70px">
-      <div class="content" :class="manageContentClass">
+      <div class="content" :class="manageContentClass" style="overflow-y: auto;">
         <router-view :selected_assessment="assessment_expansion_panel" :selected_layer="selected_layer" :selected_industry="selected_industry" @createIndustry="createNewIndustry" @createSupplyChain="create_supply_chain" @editIndustry="open_edit_industry_tab"  @editSupplyChain="open_edit_supply_chain_tab" @selectLayer="toggleLayerSelection" @closeRightMenu="closeRightMenu" @closeLayer="applyLayer(selected_layer)" @changeFirstMenuTab="changeFirstMenuTab" @wrongLocation="snackbars.wrong_location.v_model = true" ref="reference"></router-view>
       </div>
     </div>
@@ -427,11 +431,13 @@
     <v-navigation-drawer
         style="background-color: white; margin-top: 70px; height: calc(100% - 70px); overflow: hidden"
         v-model="rightMenu"
-        :width="rightMenu ? '20rem' : '0rem'"
+        :width="rightMenu ? 'max(20rem, 20vw)' : '0rem'"
         flat
         app
         right
         clipped
+        disable-resize-watcher
+        hide-overlay
     >
 
       <div style="height: 100%; overflow: hidden">
@@ -1332,40 +1338,6 @@ export default {
     }
   },
   computed: {
-    assessment_tree: function () {
-
-      let _this = this
-      let items = []
-      let id = 1
-      let assessment_idx = 0
-      this.created_assessments.forEach(assessment => {
-        let obj = {
-          name: assessment.name,
-          id: id,
-          idx: assessment_idx,
-          children: []
-        }
-        id++
-        assessment_idx++
-
-        let industry_idx = 0
-        assessment.industries.forEach(industry => {
-          obj.children.push({
-            name: industry.name,
-            idx: industry_idx,
-            id: id,
-            locked: true
-          })
-        })
-        id++
-        industry_idx++
-        items.push(obj)
-      })
-
-      return items
-
-    },
-
 
     layer_tree: function () {
       let _this = this
@@ -1388,17 +1360,6 @@ export default {
         'map_sidebar_opened': this.rightMenu && !this.secondMenu && this.right_sidebar_content == 6,
       }
     },
-    /*layers_filtered: function() {
-      if(!this.search_layer_model) return this.layers_description
-      else {
-        let filtered = {}
-        for(let [key, value] of Object.entries(this.layers_description)){
-          if(key.toLowerCase().includes(this.search_layer_model.toLowerCase())) filtered[key] = value //name matches
-          else if(value.category.toLowerCase().includes(this.search_layer_model.toLowerCase())) filtered[key] = value //category matches
-        }
-        return filtered
-      }
-    }*/
   }
 }
 </script>
@@ -1407,7 +1368,7 @@ export default {
 
 
 
-@import url('https://use.typekit.net/eud5bih.css');
+/* @import url('https://use.typekit.net/eud5bih.css'); */
 
 
 html {
@@ -1416,6 +1377,7 @@ html {
   -ms-overflow-style: none;
   width: 100%;
   height:100%;
+  color: white;
 }
 html::-webkit-scrollbar {
   width: 0;
@@ -1426,22 +1388,27 @@ html::-webkit-scrollbar {
 .zero_sidebar_opened{
   left: 4rem;
   width: calc(100% - 4rem);
+  transition: 0.3s;
 }
 .left_sidebar_opened{
-  left: 22rem;
-  width: calc(100% - 22rem);
+  left: calc(4rem + max(18rem, 20vw));
+  width: calc(100% - 4rem - max(18rem, 20vw));
+  transition: 0.3s;
 }
 .right_sidebar_opened{
   left: 4rem;
   width: calc(100% - 4rem);
+  transition: 0.3s;
 }
 .map_and_left_opened{
-  left: 22rem;
-  width: calc(100% - 42rem);
+  left: calc(4rem + max(18rem, 20vw));
+  width: calc(100% - 4rem -  max(18rem, 20vw) - max(20rem, 20vw));
+  transition: 0.3s;
 }
 .map_sidebar_opened{
   left: 4rem;
-  width: calc(100% - 24rem);
+  width: calc(100% - 4rem - max(20rem, 20vw));
+  transition: 0.3s;
 }
 
 .header{
@@ -1464,7 +1431,7 @@ html::-webkit-scrollbar {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #F2F4F3;
+  background-color: white;
   position: absolute;
 
 }

@@ -201,6 +201,27 @@ async function streamflow(industries, global_layers){
 
 }
 
+async function water_stress(industries, global_layers){
+
+    let ws = global_layers["Water stress"].layers.baseline.annual.layer
+    let ws_value = await Promise.all(
+        industries.map(async industry => {
+            if(industry.water_stress == null) {
+                industry.water_stress = await ws.data_on_point(industry.location.lat, industry.location.lng)
+            }
+            return industry.water_stress
+
+        })) //water stress (%)
+
+    let filtered = ws_value.filter(x => x!= null)
+    return filtered.sum() / filtered.length
+}
+
+async function has_water_stress(industries, global_layers){
+    let ws = await water_stress(industries, global_layers)
+    return (ws > 50) ? "Yes" : "No"
+}
+
 function water_filtered(industries, industry_effluent, wwtp_effluent){
     return industries.map(industry => industry.filtered_pollutant_load(industry_effluent, wwtp_effluent))
 }
@@ -560,6 +581,7 @@ let metrics = {
             "wd": 365*0.001*calculate_water_withdrawn(industries), //Water withdrawn
             "dis": 365*0.001*calculate_water_discharged(industries),  //water discharged
             "re": 365*0.001*calculate_water_recycled(industries), //water reused
+            "consumed": 365*0.001*calculate_water_generated(industries)   //water consumed or generated
         }
         Object.keys(reporting_metrics).forEach(key => {
             let value = reporting_metrics[key]
@@ -567,9 +589,45 @@ let metrics = {
             else reporting_metrics[key] = "-"
         })
 
-
-
         reporting_metrics["highest_level_discharge"] = better_treatment(industries)
+        reporting_metrics["water_stress"] = await has_water_stress(industries, global_layers)
+
+
+        return reporting_metrics
+    },
+
+    cdp_1_2_b_indicators(industries){
+
+        let reporting_metrics = {
+            "wd": 365*0.001*calculate_water_withdrawn(industries), //Water withdrawn
+            "dis": 365*0.001*calculate_water_discharged(industries),  //water discharged
+            "consumed": 365*0.001*calculate_water_generated(industries)   //water consumed or generated
+        }
+
+        Object.keys(reporting_metrics).forEach(key => {
+            let value = reporting_metrics[key]
+            if(Number.isFinite(value)) reporting_metrics[key] = value.toExponential(2)
+            else reporting_metrics[key] = "-"
+        })
+
+        return reporting_metrics
+    },
+
+
+    async cdp_5_1_indicators(industries, global_layers){
+
+        let reporting_metrics = {
+            "wd": 365*0.001*calculate_water_withdrawn(industries), //Water withdrawn
+            "dis": 365*0.001*calculate_water_discharged(industries),  //water discharged
+            "consumed": 365*0.001*calculate_water_generated(industries)   //water consumed or generated
+        }
+        Object.keys(reporting_metrics).forEach(key => {
+            let value = reporting_metrics[key]
+            if(Number.isFinite(value)) reporting_metrics[key] = value.toExponential(2)
+            else reporting_metrics[key] = "-"
+        })
+
+        reporting_metrics["water_stress"] = await has_water_stress(industries, global_layers)
 
         return reporting_metrics
     },

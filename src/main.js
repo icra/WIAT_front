@@ -2,9 +2,12 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import vuetify from './plugins/vuetify'
+import AsyncComputed from 'vue-async-computed'
 
 
 Vue.config.productionTip = false
+
+Vue.use(AsyncComputed)
 
 import "@/assets/global.css"
 
@@ -14,8 +17,10 @@ Vue.prototype.$location_markers = []    //Location of the industries of the asse
 Vue.prototype.$clicked_point = null    //Location of the point clicked on the map
 Vue.prototype.$assessment_active = []    //active assessments shown on map
 Vue.prototype.$selected_layer = "None"
-Vue.prototype.$last_location = [41.9672203,2.8385181]
-
+Vue.prototype.$map_info = {
+  latlng: [41.9672203, 2.8385181],
+  zoom_level: 6
+},
 Vue.prototype.$layers_description = [
   {
     name: "Population",

@@ -297,7 +297,8 @@ export default {
   props: ["selected_layer", "selected_assessment", "selected_industry"],
   data() {
     return {
-      center: this.$last_location,
+      center: this.$map_info.latlng,
+      zoom: this.$map_info.zoom_level,
       location_markers: this.$location_markers,  //Created industries [{assessment, industry, location}]
       mapDiv: null,
       markers: [],
@@ -1098,7 +1099,7 @@ export default {
 
       this.mapDiv = L.map("map", {
         center: this.center,
-        zoom: 6,
+        zoom: this.zoom,
         preferCanvas: true,
         renderer: L.canvas()
       })
@@ -1362,8 +1363,8 @@ export default {
          }
         }
       `
-        let layer_i = this.define_carto_layer(monthlyWaterStressDataset, monthlyWaterStressStyle, label, own_client, "jsalo")
-        this.layers["Water stress"].layers.baseline.monthly.push(layer_i)
+        //let layer_i = this.define_carto_layer(monthlyWaterStressDataset, monthlyWaterStressStyle, label, own_client, "jsalo")
+        //this.layers["Water stress"].layers.baseline.monthly.push(layer_i)
       }
 
       //Baseline water depletion
@@ -1433,8 +1434,8 @@ export default {
          }
         }
       `
-        let layer_i = this.define_carto_layer(monthlyWaterDepletionDataset, monthlyWaterDepletionStyle, label, own_client, "jsalo")
-        this.layers["Water depletion"].layers.baseline.monthly.push(layer_i)
+        //let layer_i = this.define_carto_layer(monthlyWaterDepletionDataset, monthlyWaterDepletionStyle, label, own_client, "jsalo")
+        //this.layers["Water depletion"].layers.baseline.monthly.push(layer_i)
       }
 
       //Baseline interannual variability
@@ -1498,8 +1499,8 @@ export default {
          }
         }
       `
-        let layer_i = this.define_carto_layer(monthlyInterannualVariabilityDataset, monthlyInterannualVariabilityStyle, label, own_client, "jsalo")
-        this.layers["Interannual variability"].layers.baseline.monthly.push(layer_i)
+        //let layer_i = this.define_carto_layer(monthlyInterannualVariabilityDataset, monthlyInterannualVariabilityStyle, label, own_client, "jsalo")
+        //this.layers["Interannual variability"].layers.baseline.monthly.push(layer_i)
       }
 
       //Baseline seasonal variability
@@ -1822,7 +1823,7 @@ export default {
       //let water_rri_labels = ["Low (<25%)", "Low - Medium (25-50%)", "Medium - High (50-60%)","High (60-75%)","Extremely High (>75%)","No Data"]
 
 
-      this.layers["Peak RepRisk Country ESG Risk Index"].layers.baseline.annual.layer = this.define_carto_layer(baselineRepRiskDataset, baselineRepRiskStyle, "rri_label", own_client, "jsalo")
+      //this.layers["Peak RepRisk Country ESG Risk Index"].layers.baseline.annual.layer = this.define_carto_layer(baselineRepRiskDataset, baselineRepRiskStyle, "rri_label", own_client, "jsalo")
       //this.layers["Peak RepRisk Country ESG Risk Index"].layers.baseline.annual.layer = this.define_carto_layer_v2(baselineRepRiskDataset, baselineRepRiskStyle, "rri_raw", wri_client, "wri-rw", water_rri_colors, water_rri_labels, -9999)
 
 
@@ -2007,7 +2008,7 @@ export default {
       let color_legend_coastal_Pharmaceutical_Pollution = [' #02b5fd', '#34d10e', '#f8ee04', '#fe0000', ' #000000' ]
       let label_legend_coastal_Pharmaceutical_Pollution = ["<10 g/km*year", "10-50 g/km*year", "50-1000 g/km*year", "1000-100000 g/km*year",">100000 g/km*year"]
 
-      this.layers["Coastal Pharmaceutical Pollution"].layers.baseline.annual.layer = this.define_carto_layer_v2(coastal_pollution_dataset, coastal_pollution_style, "dn", own_client, "jsalo", color_legend_coastal_Pharmaceutical_Pollution, label_legend_coastal_Pharmaceutical_Pollution, -10000000, 1, " g/km*year")
+      //this.layers["Coastal Pharmaceutical Pollution"].layers.baseline.annual.layer = this.define_carto_layer_v2(coastal_pollution_dataset, coastal_pollution_style, "dn", own_client, "jsalo", color_legend_coastal_Pharmaceutical_Pollution, label_legend_coastal_Pharmaceutical_Pollution, -10000000, 1, " g/km*year")
 
 
     },
@@ -2020,8 +2021,9 @@ export default {
   destroyed() {
 
     let location = this.mapDiv.getCenter()
-    this.$last_location[0] = location.lat
-    this.$last_location[1] = location.lng
+    this.$map_info.latlng[0] = location.lat
+    this.$map_info.latlng[1] = location.lng
+    this.$map_info.zoom_level = this.mapDiv.getZoom()
 
   }
 };

@@ -1,39 +1,38 @@
 <template>
-  <div class="outer">
+  <div style="height: 100%;" class="outer">
+
     <div v-if="is_there_any_industry_created" style="height: 100%;">
-      <div style="height: 100%;">
+      <div>
+
         <v-tabs
-            center-active
-            grow
             id="main_tab"
             v-model="main_tab"
+            style="padding: 5px 5px 5px 5px"
+
+
         >
           <v-tabs-slider color="#b62373"></v-tabs-slider>
+
           <v-tab style="border-color: #b62373">REPORT</v-tab>
           <v-tab style="border-color: #b62373">EDIT INDUSTRY</v-tab>
           <v-tab style="border-color: #b62373">VALUES OF GLOBAL INDICATORS</v-tab>
           <v-tab style="border-color: #b62373">EXPORT IN PDF</v-tab>
 
+          <v-select
+              class="select_asessment"
+              :items="assessments_with_industries"
+              label="Selected assessment"
+              style="padding: 10px 10px 0px 10px;"
+              color="#b62373"
+              v-model="selected_assessment"
+              item-text="assessment.name"
+              item-value="assessment.name"
+              item-disabled="disabled"
+          ></v-select>
+
         </v-tabs>
-        <v-row>
-          <v-col cols="9">
-            <div>
-              <v-tabs v-model="tab" id="assessment_tab" v-show="main_tab != 3">
-                <v-tab
-                    v-for="(assessment, idx) in assessments_with_industries"
-                    :key="assessment.assessment.name"
-                    @click="click_tab(idx)"
-                    :disabled="assessment.disabled"
-                >
-                  {{assessment.assessment.name}}
-                </v-tab>
-              </v-tabs>
-            </div>
-          </v-col>
-        </v-row>
 
-        <v-row style="height: 82%" class = "border_report" v-if="is_there_any_industry_created">
-
+        <v-row style="height: 100%;" v-if="is_there_any_industry_created">
           <v-col cols="12" style="height: 100%">
             <template v-if="main_tab == 0" class="report" >
 
@@ -180,24 +179,31 @@
                               </div>
                             </v-expansion-panel-header>
                             <v-expansion-panel-content>
-                              <v-data-table
-                                  :headers="reporting_indicators.header"
-                                  :items="reporting_indicators.value"
-                                  disable-pagination
-                                  :hide-default-footer="true"
-                                  dense
-                              >
+                              <div style="width: 90%; margin: auto">
+                                <span class="cdp_key">1.2B</span>
+                                <span class="cdp_description">What are the total volumes of water withdrawn, discharged, and consumed
+                                across all your operations, and how do these volumes compare to the previous
+                                reporting year? </span>
+                                <v-data-table
+                                    :headers="cdp_1_2_b.header"
+                                    :items="cdp_1_2_b.value"
+                                    disable-pagination
+                                    :hide-default-footer="true"
+                                    dense
+                                    style="padding: 20px 20px 20px 20px"
 
-                                <template v-slot:no-data>
-                                  <v-progress-linear
-                                      indeterminate
-                                      color="#1C195B"
-                                  ></v-progress-linear>
-                                </template>
+                                >
 
-                                <template v-slot:item.value="{ item }">
-                                  <v-tooltip bottom max-width="700px" v-if="item.info">
-                                    <template v-slot:activator="{ on, attrs }">
+                                  <template v-slot:no-data>
+                                    <v-progress-linear
+                                        indeterminate
+                                        color="#1C195B"
+                                    ></v-progress-linear>
+                                  </template>
+
+                                  <template v-slot:item.value="{ item }">
+                                    <v-tooltip bottom max-width="700px" v-if="item.info">
+                                      <template v-slot:activator="{ on, attrs }">
                                       <span>
                                         {{ item.value + " "}}
                                         <a target="_blank" :href="item.link_to">
@@ -206,21 +212,21 @@
                                         </span>
                                         </a>
                                       </span>
-                                      {{" "}}
+                                        {{" "}}
 
-                                      <v-icon
-                                          color='#1C195B'
-                                          style="padding-right: 10px"
-                                          v-bind="attrs"
-                                          v-on="on"
-                                          size="18px"
-                                      >
-                                        mdi-information-outline
-                                      </v-icon>
-                                    </template>
-                                    <span>{{ item.info }}</span>
-                                  </v-tooltip>
-                                  <span v-else>
+                                        <v-icon
+                                            color='#1C195B'
+                                            style="padding-right: 10px"
+                                            v-bind="attrs"
+                                            v-on="on"
+                                            size="18px"
+                                        >
+                                          mdi-information-outline
+                                        </v-icon>
+                                      </template>
+                                      <span>{{ item.info }}</span>
+                                    </v-tooltip>
+                                    <span v-else>
                                     <span>
                                         {{ item.value + " "}}
                                         <a target="_blank" :href="item.link_to">
@@ -230,45 +236,70 @@
                                         </a>
                                       </span>
                                   </span>
-                                </template>
+                                  </template>
 
-                                <template
-                                    v-for="value in Object.keys(industries_aggregated)"
-                                    v-slot:[`item.${value}`]="{ item }"
+                                  <template
+                                      v-for="value in Object.keys(industries_aggregated)"
+                                      v-slot:[`item.${value}`]="{ item }"
+                                  >
+
+                                    <template v-if="getReportingColor(item, value) != null">
+                                      <v-tooltip bottom>
+                                        <template v-slot:activator="{ on, attrs }">
+                                          <v-chip
+                                              :color="getReportingColor(item, value)[0]"
+                                              dark
+                                              :key="value"
+                                              v-bind="attrs"
+                                              v-on="on"
+                                              text-color="#1c1c1b"
+                                          >
+                                            {{ item[value] }}
+                                          </v-chip>
+                                        </template>
+                                        <span>{{ getReportingColor(item, value)[1] }}</span>
+                                      </v-tooltip>
+                                    </template>
+                                    <template v-else>
+                                      <v-chip
+                                          color="transparent"
+                                          dark
+                                          :key="value"
+                                          text-color="#1c1c1b"
+                                          class= "chip_no_hover"
+                                      >
+                                        {{ item[value] }}
+                                      </v-chip>
+                                    </template>
+                                  </template>
+
+                                </v-data-table>
+
+                              </div>
+
+                              <div style="width: 90%; margin: auto;">
+                                <span class="cdp_key">{{external_indicators["cdp"]["5_1"]["key"]}}</span>
+                                <span class="cdp_description">{{external_indicators["cdp"]["5_1"]["text"]}}</span>
+                                <v-data-table
+                                    :headers="cdp_5_1.header"
+                                    :items="cdp_5_1.value"
+                                    disable-pagination
+                                    :hide-default-footer="true"
+                                    dense
+                                    style="padding: 20px 20px 20px 20px"
                                 >
-
-                                  <template v-if="getReportingColor(item, value) != null">
-                                    <v-tooltip bottom>
-                                      <template v-slot:activator="{ on, attrs }">
-                                        <v-chip
-                                            :color="getReportingColor(item, value)[0]"
-                                            dark
-                                            :key="value"
-                                            v-bind="attrs"
-                                            v-on="on"
-                                            text-color="#1c1c1b"
-                                        >
-                                          {{ item[value] }}
-                                        </v-chip>
-                                      </template>
-                                      <span>{{ getReportingColor(item, value)[1] }}</span>
-                                    </v-tooltip>
+                                  <template v-slot:no-data>
+                                    <v-progress-linear
+                                        indeterminate
+                                        color="#1C195B"
+                                    ></v-progress-linear>
                                   </template>
-                                  <template v-else>
-                                    <v-chip
-                                        color="transparent"
-                                        dark
-                                        :key="value"
-                                        text-color="#1c1c1b"
-                                        class= "chip_no_hover"
-                                    >
-                                      {{ item[value] }}
-                                    </v-chip>
-                                  </template>
-                                </template>
+                                </v-data-table>
+                              </div>
 
-                              </v-data-table>
                             </v-expansion-panel-content>
+
+
                           </v-expansion-panel>
                         </v-expansion-panels>
 
@@ -354,101 +385,101 @@
                         </div>
 
                         <v-row
-                              class="pa-4"
-                              justify="space-between"
-                          >
+                            class="pa-4"
+                            justify="space-between"
+                        >
 
-                            <v-col cols="4">
+                          <v-col cols="4">
 
-                              <v-radio-group v-model="radio_layers">
-                                <v-radio
-                                    :key="1"
-                                    label="Select layers"
-                                    :value="1"
-                                ></v-radio>
-                                <v-treeview
-                                    :items="layer_tree"
-                                    dense
-                                    hoverable
-                                    selectable
-                                    selection-type="leaf"
-                                    return-object
-                                    v-model="selected_layers"
-                                    open-on-click
-                                    color="#1C195B"
-                                    selected-color="#1C195B"
-                                    style="padding-left: 15px"
-                                    item-disabled="locked"
+                            <v-radio-group v-model="radio_layers">
+                              <v-radio
+                                  :key="1"
+                                  label="Select layers"
+                                  :value="1"
+                              ></v-radio>
+                              <v-treeview
+                                  :items="layer_tree"
+                                  dense
+                                  hoverable
+                                  selectable
+                                  selection-type="leaf"
+                                  return-object
+                                  v-model="selected_layers"
+                                  open-on-click
+                                  color="#1C195B"
+                                  selected-color="#1C195B"
+                                  style="padding-left: 15px"
+                                  item-disabled="locked"
+                              >
+                              </v-treeview>
+                              <v-radio
+                                  :key="2"
+                                  label="Layers used in the calculations"
+                                  :value="2"
+                                  style="padding-top: 5px"
+                              ></v-radio>
+                            </v-radio-group>
+
+                          </v-col>
+                          <v-divider vertical></v-divider>
+
+                          <v-col
+                              class="d-flex">
+                            <div style="width: 100%">
+                              <v-data-table
+                                  :headers="layers_table.header"
+                                  :items="layers_table.value"
+                                  v-if="selected_layers.length > 0 "
+                                  disable-pagination
+                                  :hide-default-footer="true"
+                                  dense
+                              >
+                                <template v-slot:no-data>
+                                  <v-progress-linear
+                                      indeterminate
+                                      color="#1C195B"
+                                  ></v-progress-linear>
+                                </template>
+                                <template
+                                    v-for="value in industry_and_supply_chain()"
+                                    v-slot:[`item.${value}`]="{ item }"
                                 >
-                                </v-treeview>
-                                <v-radio
-                                    :key="2"
-                                    label="Layers used in the calculations"
-                                    :value="2"
-                                    style="padding-top: 5px"
-                                ></v-radio>
-                              </v-radio-group>
 
-                            </v-col>
-                            <v-divider vertical></v-divider>
-
-                            <v-col
-                                class="d-flex">
-                              <div style="width: 100%">
-                                <v-data-table
-                                    :headers="layers_table.header"
-                                    :items="layers_table.value"
-                                    v-if="selected_layers.length > 0 "
-                                    disable-pagination
-                                    :hide-default-footer="true"
-                                    dense
-                                >
-                                  <template v-slot:no-data>
-                                    <v-progress-linear
-                                        indeterminate
-                                        color="#1C195B"
-                                    ></v-progress-linear>
+                                  <template v-if="getGISLayerColor(item, value) != null">
+                                    <v-tooltip bottom>
+                                      <template v-slot:activator="{ on, attrs }">
+                                        <v-chip
+                                            :color="getGISLayerColor(item, value)[0]"
+                                            dark
+                                            :key="value"
+                                            v-bind="attrs"
+                                            v-on="on"
+                                            text-color="#1c1c1b"
+                                        >
+                                          {{ item[value] }}
+                                        </v-chip>
+                                      </template>
+                                      <span>{{ getGISLayerColor(item, value)[1] }}</span>
+                                    </v-tooltip>
                                   </template>
-                                  <template
-                                      v-for="value in industry_and_supply_chain()"
-                                      v-slot:[`item.${value}`]="{ item }"
-                                  >
-
-                                    <template v-if="getGISLayerColor(item, value) != null">
-                                      <v-tooltip bottom>
-                                        <template v-slot:activator="{ on, attrs }">
-                                          <v-chip
-                                              :color="getGISLayerColor(item, value)[0]"
-                                              dark
-                                              :key="value"
-                                              v-bind="attrs"
-                                              v-on="on"
-                                              text-color="#1c1c1b"
-                                          >
-                                            {{ item[value] }}
-                                          </v-chip>
-                                        </template>
-                                        <span>{{ getGISLayerColor(item, value)[1] }}</span>
-                                      </v-tooltip>
-                                    </template>
-                                    <template v-else>
-                                      <v-chip
-                                          color="transparent"
-                                          dark
-                                          :key="value"
-                                          text-color="#1c1c1b"
-                                          class= "chip_no_hover"
-                                      >
-                                        {{ item[value] }}
-                                      </v-chip>
-                                    </template>
+                                  <template v-else>
+                                    <v-chip
+                                        color="transparent"
+                                        dark
+                                        :key="value"
+                                        text-color="#1c1c1b"
+                                        class= "chip_no_hover"
+                                    >
+                                      {{ item[value] }}
+                                    </v-chip>
                                   </template>
-                                </v-data-table>
-                                <b v-else>Select a layer</b>
-                              </div>
+                                </template>
+                              </v-data-table>
+                              <b v-else>Select a layer</b>
+                            </div>
 
-                            </v-col>
-                          </v-row>
+                          </v-col>
+                        </v-row>
 
 
                       </div>
@@ -542,19 +573,7 @@
                             </div>
                           </v-col>
 
-
-
-
-
                         </v-row>
-
-
-
-
-
-
-
-
 
                       </div>
 
@@ -566,6 +585,8 @@
             </template>
           </v-col>
         </v-row>
+
+
       </div>
 
       <br>
@@ -573,3169 +594,42 @@
       <div>
 
         <!--<PDFJSViewer class="center" v-show="selected_industries.length>0 && !generating_pdf" ref="make_pdf"/> -->
-        <div style="width: 700px; margin-top: 20px; margin-bottom: 20px">
+        <div style="width: 700px; margin-top: 20px; margin-bottom: 20px; height: 0px">
           <canvas id="chart"></canvas>
         </div>
 
       </div>
 
     </div>
+
     <div v-else>
       <p class="side_menu_title">Please create an industry first and fill in the required data to generate a report.</p>
     </div>
 
-    <br>
-
-
-    <div v-if="industry_clicked != null">
-
-      <!-- Quality and quantity -->
-      <v-dialog
-          v-model="info_energy_used"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3>Energy used</h3>
-          <br>
-          Energy used by wastewater treatment plants to treat the water sent to the treatment plant.
-          <div v-katex:display="'\\sum_{i \\in WWTPS} W_{t_{i}} \\cdot energy_{{consumed}_i}'"></div>
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'WWTPS'"></span>: Onsite and external WWTP's where industry treats water</li>
-            <li><span v-katex="'W_t'"></span>: Volume of water treated in the WWTP</li>
-            <li><span v-katex="'energy_{consumed}'"></span>: Electricity consumed from the grid for wastewater treatment per cubic meter treated</li>
-
-          </ul>
-        </div>
-
-      </v-dialog>
-
-      <v-dialog
-          v-model="info_dilution_factor"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3>Dilution factor</h3>
-          <br>
-          Ratio of concentration in the effluent to concentration in the receiving water after mixing in the receiving water. Bigger values indicate less impact of the effluent concentration to the river.
-          <div v-katex:display="'\\frac{W_a + W_{effl} - W_w}{W_{effl}}'"></div>
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'W_a'"></span>: Amount of water available in the river <b>(streamflow global indicator)</b></li>
-            <li><span v-katex="'W_w'"></span>: Amount of water withdrawn from the river</li>
-            <li><span v-katex="'W_{effl}'"></span>: Amount of water discharged into the river by industry</li>
-
-          </ul>
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_recycled_factor"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3>Recycled water factor</h3>
-          <br>
-          This metric indicates the percentage of the reused water used by the industry
-          respect the water that leaves the industry (to direct discharge, onsite industry
-          WWTP effluent and to external WWTP effluent). Values that may have this
-          metric range from 0 to 100, the larger its value the more efficient the water
-          recycled is.
-          <div v-katex:display="'\\frac{W_r}{OWWTP_{infl} + EWWTP_{infl} + DD}'"></div>
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'W_r'"></span>: Amount of water that the industry reuses/recycles from the WWTP.</li>
-
-            <li><span v-katex="'OWWTP_{infl}'"></span>: On-site industrial WWTP influent</li>
-            <li><span v-katex="'EWWTP_{infl}'"></span>: External WWTP influent </li>
-            <li><span v-katex="'DD'"></span>: Amount of water discharged into the river by industry</li>
-          </ul>
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_treated_factor"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3>Treated water factor</h3>
-          <br>
-          This metric indicates the ratio between the water remaining after the industry consumption and the water that is treated in the WWTP.
-          <div v-katex:display="'\\frac{W_t}{OWWTP_{infl} + EWWTP_{infl} + DD}'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'W_t'"></span>: Amount of water used by the industry that is treated in a WWTP</li>
-            <li><span v-katex="'OWWTP_{infl}'"></span>: On-site industrial WWTP influent</li>
-            <li><span v-katex="'EWWTP_{infl}'"></span>: External WWTP influent </li>
-            <li><span v-katex="'DD'"></span>: Amount of water discharged into the river by industry</li>
-          </ul>
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_water_stress"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3>Consumption available (level of water stress)</h3>
-          <br>
-          This metric is calculated from the relationship between the amount of water withdrawn by the industry and the amount of water available and multiplied by 100. It indicates the percentage of the available water withdrawn by the industry’s consumption. This metric may have values ranging from 0, to a value greater than 100, indicating that the demand for water is higher than the available.
-          <div v-katex:display="'100 \\cdot \\frac{W_w}{W_a}'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'W_w'"></span>: amount of water that the industry withdraws from the river.</li>
-
-            <li><span v-katex="'W_a'"></span>: amount of water available on the river <b>(streamflow global indicator)</b></li>
-          </ul>
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_specific_consumption"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3>Specific water consumption </h3>
-          <br>
-          Specific water consumption is a metric that indicates what is the amount of water from the water body needed to produce a tone of product manufactured in the industry. Higher values indicate higher water demand.
-          <div v-katex:display="'\\frac{T_{ppi}}{W_w}'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'T_{ppi}'"></span>: tons of product produced by the industry</li>
-
-            <li><span v-katex="'W_w'"></span>: amount of water that the industry withdraws from the river</li>
-          </ul>
-        </div>
-
-      </v-dialog>
-
-      <!-- GHG -->
-      <v-dialog
-          v-model="info_electricity"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3>Indirect emissions from electricity consumption </h3>
-          <br>
-          <div v-katex:display="'\\sum_{i \\in WWTPS}EF_{i} \\cdot EC_i \\cdot W_t'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'WWTPS'"></span>: onsite and external WWTP's where industry treats water</li>
-            <li><span v-katex="'EF'"></span>: emission factor for grid electricity</li>
-            <li><span v-katex="'EC'"></span>: energy consumed from the grid for wastewater treatment per cubic meter treated </li>
-            <li><span v-katex="'W_t'"></span>: Amount of water treated </li>
-
-          </ul>
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_fuel_engines"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-            <h3>Emissions from fuel engines </h3>
-          <br>
-          Direct CO2 emitted from on-site engines in wastewater stages based upon sum of CO2, CH4 and N2O emission from stationary combustion.
-          <div v-katex:display="'CO_2 = \\sum_{i \\in WWTPS} \\frac{V_i \\cdot FD \\cdot NCV \\cdot EF_{CO_2}}{1000}'"></div>
-          <div v-katex:display="'N_2O = \\sum_{i \\in WWTPS} \\frac{V_i \\cdot FD \\cdot NCV \\cdot EF_{N_2O} \\cdot EQ_{N_2O}}{1000}'"></div>
-          <div v-katex:display="'CH_{4} = \\sum_{i \\in WWTPS} \\frac{V_i \\cdot FD \\cdot NCV \\cdot EF_{CH_4} \\cdot EQ_{CH_4}}{1000}'"></div>
-          <div v-katex:display="'Total = CO_2 + N_2O + CH_4'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'WWTPS'"></span>: onsite and external WWTP's where industry treats water</li>
-            <li><span v-katex="'V'"></span>: volume of fuel consumed</li>
-            <li><span v-katex="'EQ_{N_2O}'"></span>:  conversion of N2O emissions to CO2 equivalent emissions (<b>298 kgCO2eq/kgN2O</b>) </li>
-            <li><span v-katex="'EQ_{CH_4}'"></span>:  Conversion of CH4 emissions to CO2 equivalent emissions (<b>34 kgCO2eq/kgCH4</b>) </li>
-          </ul>
-          <br>
-          <table style="width: 90%; border: 1px solid; border-collapse: collapse">
-            <tr style="border: 1px solid; border-collapse: collapse">
-              <td style="border: 1px solid; border-collapse: collapse"><b>Fuel type</b></td>
-              <td style="border: 1px solid; border-collapse: collapse"><b>EFCH4 <br> (kg/TJ) </b></td>
-              <td style="border: 1px solid; border-collapse: collapse"><b>EFN2O  <br> (kg/TJ) </b></td>
-              <td style="border: 1px solid; border-collapse: collapse"><b>EFCO2  <br> (kg/TJ) </b></td>
-              <td style="border: 1px solid; border-collapse: collapse"><b>FD  <br> (kg/L)  </b></td>
-              <td style="border: 1px solid; border-collapse: collapse"><b>NCV  <br> (TJ/Gg)  </b></td>
-            </tr>
-            <tr style="border: 1px solid; border-collapse: collapse">
-              <td style="border: 1px solid; border-collapse: collapse">Diesel</td>
-              <td style="border: 1px solid; border-collapse: collapse">3</td>
-              <td style="border: 1px solid; border-collapse: collapse">0.6</td>
-              <td style="border: 1px solid; border-collapse: collapse">74100</td>
-              <td style="border: 1px solid; border-collapse: collapse">0.84</td>
-              <td style="border: 1px solid; border-collapse: collapse">43</td>
-            </tr>
-            <tr style="border: 1px solid; border-collapse: collapse">
-              <td style="border: 1px solid; border-collapse: collapse">Gasoline/Petrol</td>
-              <td style="border: 1px solid; border-collapse: collapse">3</td>
-              <td style="border: 1px solid; border-collapse: collapse">0.6</td>
-              <td style="border: 1px solid; border-collapse: collapse">69300</td>
-              <td style="border: 1px solid; border-collapse: collapse">0.74</td>
-              <td style="border: 1px solid; border-collapse: collapse">44.3</td>
-            </tr>
-            <tr style="border: 1px solid; border-collapse: collapse">
-              <td style="border: 1px solid; border-collapse: collapse">Natural gas</td>
-              <td style="border: 1px solid; border-collapse: collapse">10</td>
-              <td style="border: 1px solid; border-collapse: collapse">0.1</td>
-              <td style="border: 1px solid; border-collapse: collapse">56100</td>
-              <td style="border: 1px solid; border-collapse: collapse">0.75</td>
-              <td style="border: 1px solid; border-collapse: collapse">48</td>
-            </tr>
-          </table>
-          <br>
-          <b>Reference:</b> <a href="docs/V2_2_Ch2_Stationary_Combustion.pdf#page=16" target="_blank">IPCC 2006, Volume 2, Chapter 2: Stationary Combustion, Table 2.2</a>
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_discharge"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3>Emissions from discharged water </h3>
-          <br>
-          <div v-katex:display="'CH_4 = \\sum_{i \\in DP} COD_{effl_i} \\cdot EF_{CH_4} \\cdot EQ_{CH_4}'"></div>
-          <div v-katex:display="'N_2O = \\sum_{i \\in DP} TN_{effl_i} \\cdot EF_{N_2O} \\cdot NtoN_2O \\cdot EQ_{N_20}'"></div>
-          <div v-katex:display="'Total = N_2O + CH_4'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and offsite WWTP and directly discharged water</li>
-            <li><span v-katex="'COD_{effl}'"></span>: load of COD in the effluent</li>
-            <li><span v-katex="'EF_{CH_4}'"></span>: CH4 emission factor</li>
-            <li><span v-katex="'EQ_{CH_4}'"></span>: conversion of CH4 emissions to CO2 equivalent emissions (<b>34 kgCO2eq/kgCH4</b>)</li>
-            <li><span v-katex="'TN_{effl}'"></span>: load of TN in the effluent </li>
-            <li><span v-katex="'EF{N_2O}'"></span>: N2O emission factor</li>
-            <li><span v-katex="'NtoN_2O'"></span>: N2O-N to N20 conversion factor (<b>1.57 gN2O/gN2O-N</b>) </li>
-            <li><span v-katex="'EQ_{N_2O}'"></span>: conversion of N2O to CO2 equivalent emissions (<b>298 kgCO2eq/kgN2O</b>)</li>
-          </ul>
-
-          <b>Reference:</b> <a href="docs/19R_V5_6_Ch06_Wastewater.pdf#page=17" target="_blank">IPCC 2019 revision, Volume 5, Chapter 6 Wastewater: equation 6.1</a>, <a href="docs/19R_V5_6_Ch06_Wastewater.pdf#page=37" target="_blank">IPCC 2019 revision, Volume 5, Chapter 6 Wastewater: equation 6.9</a>
-
-          <br>
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_reuse"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3>Water reuse transport </h3>
-          <br>
-          GHG emissions from truck transport of reused water
-          <br>
-          <div v-katex:display="'CO_2 = \\sum_{i \\in WWTPS}\\frac{V_i \\cdot FD \\cdot NCV \\cdot EF_{CO_2}}{1000}'"></div>
-          <div v-katex:display="'N_2O = \\sum_{i \\in WWTPS}\\frac{V_i \\cdot FD \\cdot NCV \\cdot EF_{N_2O} \\cdot EQ_{N_2O}}{1000}'"></div>
-          <div v-katex:display="'CH_4 = \\sum_{i \\in WWTPS}\\frac{V_i \\cdot FD \\cdot NCV \\cdot EF_{CH_4} \\cdot EQ_{CH_4}}{1000}'"></div>
-          <div v-katex:display="'Total = CO_2 + N_2O + CH_4'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'WWTPS'"></span>: onsite and external WWTP's where industry treats water</li>
-
-            <li><span v-katex="'V'"></span>: volume of fuel consumed</li>
-
-            <li><span v-katex="'EQ_{N_2O}'"></span>:  conversion of N2O emissions to CO2 equivalent emissions (<b>298 kgCO2eq/kgN2O</b>) </li>
-            <li><span v-katex="'EQ_{CH_4}'"></span>:  Conversion of CH4 emissions to CO2 equivalent emissions (<b>34 kgCO2eq/kgCH4</b>) </li>
-          </ul>
-          <br>
-          <table style="width: 90%; border: 1px solid; border-collapse: collapse">
-            <tr style="border: 1px solid; border-collapse: collapse">
-              <td style="border: 1px solid; border-collapse: collapse"><b>Fuel type</b></td>
-              <td style="border: 1px solid; border-collapse: collapse"><b>EFCH4 <br> (kg/TJ) </b></td>
-              <td style="border: 1px solid; border-collapse: collapse"><b>EFN2O  <br> (kg/TJ) </b></td>
-              <td style="border: 1px solid; border-collapse: collapse"><b>EFCO2  <br> (kg/TJ) </b></td>
-              <td style="border: 1px solid; border-collapse: collapse"><b>FD  <br> (kg/L)  </b></td>
-              <td style="border: 1px solid; border-collapse: collapse"><b>NCV  <br> (TJ/Gg)  </b></td>
-            </tr>
-            <tr style="border: 1px solid; border-collapse: collapse">
-              <td style="border: 1px solid; border-collapse: collapse">Diesel</td>
-              <td style="border: 1px solid; border-collapse: collapse">3.9</td>
-              <td style="border: 1px solid; border-collapse: collapse">3.0</td>
-              <td style="border: 1px solid; border-collapse: collapse">74100</td>
-              <td style="border: 1px solid; border-collapse: collapse">0.84</td>
-              <td style="border: 1px solid; border-collapse: collapse">43</td>
-            </tr>
-            <tr style="border: 1px solid; border-collapse: collapse">
-              <td style="border: 1px solid; border-collapse: collapse">Gasoline/Petrol</td>
-              <td style="border: 1px solid; border-collapse: collapse">3.8</td>
-              <td style="border: 1px solid; border-collapse: collapse">1.9</td>
-              <td style="border: 1px solid; border-collapse: collapse">69300</td>
-              <td style="border: 1px solid; border-collapse: collapse">0.74</td>
-              <td style="border: 1px solid; border-collapse: collapse">44.3</td>
-            </tr>
-            <tr style="border: 1px solid; border-collapse: collapse">
-              <td style="border: 1px solid; border-collapse: collapse">Natural gas</td>
-              <td style="border: 1px solid; border-collapse: collapse">92</td>
-              <td style="border: 1px solid; border-collapse: collapse">0.2</td>
-              <td style="border: 1px solid; border-collapse: collapse">56100</td>
-              <td style="border: 1px solid; border-collapse: collapse">0.75</td>
-              <td style="border: 1px solid; border-collapse: collapse">48</td>
-            </tr>
-          </table>
-          <br>
-          <br>
-          <b>Reference:</b> <a href="docs/V2_3_Ch3_Mobile_Combustion.pdf#page=21" target="_blank">IPCC 2006, Volume 2, Chapter 3: Mobile Combustion, Table 3.2.2 </a>
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_treatment"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3>Emissions from water treatment </h3>
-          <br>
-          <div v-katex:display="'CH_4 = \\sum_{i \\in WWTPS} (COD_{infl_i} - COD_{slu_i}) \\cdot EF_{CH4_i} \\cdot EQ_{CH_4}'"></div>
-          <div v-katex:display="'N_2O = \\sum_{i \\in WWTPS}TN_{infl_i} \\cdot EF_{N_2O_i} \\cdot NtoN_2O \\cdot EQ_{N_20}'"></div>
-          <div v-katex:display="'Total = N_2O + CH_4'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'WWTPS'"></span>: onsite and external wastewater treatment plants</li>
-            <li><span v-katex="'COD_{infl}'"></span>: COD load in WWTP influent</li>
-            <li><span v-katex="'COD_{slu}'"></span>: COD removed as sludge</li>
-            <li><span v-katex="'EF_{CH_4}'"></span>: CH4 emission factor</li>
-            <li><span v-katex="'EQ_{CH_4}'"></span>: conversion of CH4 emissions to CO2 equivalent emissions (<b>34 kgCO2eq/kgCH4</b>)</li>
-            <li><span v-katex="'TN_{infl}'"></span>: Total Nitrogen load in the WWTP influent </li>
-            <li><span v-katex="'EF{N_2O}'"></span>: N2O emission factor</li>
-            <li><span v-katex="'NtoN_2O'"></span>: N2O-N to N20 conversion factor (<b>1.57 gN2O/gN2O-N</b>) </li>
-            <li><span v-katex="'EQ_{N_2O}'"></span>: conversion of N2O to CO2 equivalent emissions (<b>298 kgCO2eq/kgN2O</b>)</li>
-
-
-          </ul>
-          <br>
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_sludge_management"
-          width="85%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <div v-if="dialog_biogas_stage == 0">
-            <h3>Emissions from sludge management </h3>
-            <br>
-            GHG emissions from sludge management operations (storing, composting, incineration, land application, landfilling, stockpiling and truck transport).
-            <br>
-            <br>
-
-
-            <div v-katex:display="'Total = \\sum_{i \\in WWTPS} storage_i + composting_i +incineration_i+ land\\_ application_i+landfilling_i+stockpiling_i + \\newline + storage_i+transport_i'"></div>
-            <b>Where:</b>
-            <br>
-            <ul>
-              <li><span v-katex="'WWTPS'"></span>: onsite and external WWTP's where industry treats water</li>
-              <li><span class="hover" @click="dialog_biogas_stage = 1">storage</span>: Amount of CO2eq emissions related to sludge storage</li>
-              <li><span class="hover" @click="dialog_biogas_stage = 2">composting</span>: Amount of CO2eq emissions due to sludge composted</li>
-              <li><span class="hover" @click="dialog_biogas_stage = 3">incineration</span>: Amount of CO2eq emissions due to sludge incineration</li>
-              <li><span class="hover" @click="dialog_biogas_stage = 4">land application</span>: Amount of CO2eq emissions due to land application of sludge</li>
-              <li><span class="hover" @click="dialog_biogas_stage = 5">landfilling</span>: Fugitive methane emissions from biosolids decomposition in the landfill during the first 3 years after placement, and N2O emissions from landfilled biosolids</li>
-              <li><span class="hover" @click="dialog_biogas_stage = 6">stockpiling</span>: Amount of CO2eq emissions due to sludge stockpiling</li>
-              <li><span class="hover" @click="dialog_biogas_stage = 7">transport</span>: Indirect CO2 emitted from sludge transport off-site</li>
-
-
-            </ul>
-
-            <br>
-            <b>Reference:</b> <a href="docs/beam_final_report_1432.pdf#page=169" target="_blank">Section 12.8 "Composting", Beam page 147</a>, <a href="docs/beam_final_report_1432.pdf#page=183" target="_blank">Section 12.10 "Combustion (Incineration)", Beam, page 161 </a>, <a href="docs/beam_final_report_1432.pdf#page=188" target="_blank">Section 12.11 "Land application", Beam page 166 </a>, <a href="docs/beam_final_report_1432.pdf#page=175" target="_blank">Section 12.9 "Landfill disposal", page 153 </a>, <a href="https://doi.org/10.1016/j.jenvman.2014.04.016 " target="_blank">Majumder, R., Livesley, S., Gregory, D., & Arndt, S. (2014, 05 15). Biosolids stockpiles are a significant point source for greenhouse gas emissions. Journal of Environmental Management, 143, pp. 34-43</a>, <a href="docs/V2_3_Ch3_Mobile_Combustion.pdf#page=21" target="_blank">IPCC 2006, Volume 2, Chapter 3: Mobile Combustion, Table 3.2.2 </a>
-
-          </div>
-          <div v-else>
-            <div>
-              <div
-                  style="margin: -20px !important; padding-bottom: 60px"
-              >
-                <v-icon @click="dialog_biogas_stage = 0" class="hover">
-                  mdi-undo
-                </v-icon>
-              </div>
-            </div>
-            <div v-if="dialog_biogas_stage == 1">
-              <h3>Sludge storage</h3>
-              <br>
-              Amount of CO2eq emissions due to sludge storage
-              <br>
-              <br>
-              <span v-katex:display="'TVS = \\frac{slustoTVS}{100}'"></span>
-              <span v-katex:display="'FCH_4 = \\frac{slustoFCH_4}{100}'"></span>
-              <span v-katex:display="'CH_4EF = \\frac{slustoEF}{100}'"></span>
-              <span v-katex:display="'CH_4potential = sludgemass \\cdot TVStoOC \\cdot OCtoCH_4 \\cdot FCH_4'"></span>
-              <span v-katex:display="'CH_4 = CH_4potential \\cdot CH_4EF \\cdot ctCH_4eq'"></span>
-              <span v-katex:display="'CO_2SS = CH_4 '"></span>
-
-              <br>
-              <b>Where:</b>
-              <br>
-              <ul>
-                <li><span v-katex="'sludgemass'"></span>: Amount of sludge that is sent to stored prior to disposal (dry weight)</li>
-                <li><span v-katex="'slustoEF'"></span>: Emission factor due to storage</li>
-                <li><span v-katex="'slustoTVS'"></span>: Total Volatile Solids (TVS) content of sludge stored (% of dry weight)</li>
-                <li><span v-katex="'slustoFCH_4'"></span>: CH_4 potential factor</li>
-                <li><span v-katex="'TVStoOC'"></span>: Organic Carbon content in Volatile Solids (0.56gOC/gVS)</li>
-                <li><span v-katex="'OCtoCH_4'"></span>: Organic C to CH4 conversion factor (=16/12 gCH4/gOC)</li>
-                <li><span v-katex="'ctCH_4eq'"></span>: Conversion of CH4 emissions to CO2 equivalent emissions (34 kgCO2eq/kgCH4)</li>
-                <li><span v-katex="'CO_2SS'"></span>: Amount of CO_2eq due to sludge storage</li>
-              </ul>
-              <br>
-
-            </div>
-            <div v-else-if="dialog_biogas_stage == 2">
-              <h3>Sludge composted</h3>
-              <br>
-              Amount of CO2eq emissions due to sludge composted
-              <br>
-              <br>
-              <span v-katex:display="'TVS = \\frac{slucompTVS}{100}'"></span>
-              <span v-katex:display="'Ncont = \\frac{slucompNcont}{100}'"></span>
-              <span v-katex:display="'\\begin{cases}\n'+
-                'CH_4=0 &\\text{if emissions are treated or covered}\\\\\n'+
-                'CH_4= sludgemass \\cdot TVS \\cdot TVStoOC \\cdot upEf \\cdot OCtoCH_4 \\cdot ctCH_4eq &\\text{otherwise}\\\\\n'+
-                '\\end{cases}'">
-              </span>
-              <span v-katex:display="'\\begin{cases}\n'+
-                'N_2O=0 &\\text{if } ratioCN>30\\\\\n'+
-                'N_2O=0 &\\text{if solid content of compost}>50 \\\\\n'+
-                'N_2O= sludgemass \\cdot Ncont \\cdot lowCNEF \\cdot ctNtoN_2O4428 \\cdot ctN_2Oeq &\\text{otherwise}\\\\\n'+
-                '\\end{cases}'">
-              </span>
-              <span v-katex:display="'CO_2SC = CH_4 + N_2O'"></span>
-
-
-              <b>Where:</b>
-              <br>
-              <ul>
-                <li><span v-katex="'sludgemass'"></span>: Amount of sludge that is sent to composting (dry weight)</li>
-                <li><span v-katex="'slucompTVS'"></span>: Total Volatile Solids (TVS) content of sludge composted (% of dry weight).</li>
-                <li><span v-katex="'TVStoOC'"></span>: Organic Carbon content in Volatile Solids (0.56 gOC/gVS)</li>
-                <li><span v-katex="'upEF'"></span>: CH4 emission factor for uncovered pile (fraction of initial C in solids)</li>
-                <li><span v-katex="'OCtoCH_4'"></span>: Organic C to CH4 conversion factor (16/12gCH4/gOC)</li>
-                <li><span v-katex="'ctCH_4eq'"></span>: Conversion of CH4 emissions to CO2 equivalent emissions (34 kgCO2eq/kgCH4)</li>
-                <li><span v-katex="'slucompNcont'"></span>: N content of sludge stored (% of dry weight)</li>
-                <li><span v-katex="'lowCNEF'"></span>: N2O emission factor for low C:N ratio</li>
-                <li><span v-katex="'ctNtoN_2O4428'"></span>: N2O-N to N2O conversion factor (44/28 gN2O/gN2O-N)</li>
-                <li><span v-katex="'ctN_2Oeq'"></span>: Conversion of N2O emissions to CO2 equivalent emissions(=298 kgCO2eq/kgN2O)</li>
-                <li><span v-katex="'CO_2SC'"></span>: Amount of CO2eq emissions due to sludge composted</li>
-              </ul>
-              <br>
-              <b>Reference:</b> <a href="docs/beam_final_report_1432.pdf#page=169" target="_blank">Section 12.8 "Composting", Beam page 147</a>
-
-
-            </div>
-            <div v-else-if="dialog_biogas_stage == 3">
-              <h3>Sludge incinerated</h3>
-              <br>
-              Amount of CO2eq emissions due to sludge incineration
-              <br>
-              <br>
-              <span v-katex:display="'CH_4 = 4.85\\cdot 10^{-5} \\cdot sludgemass \\cdot ctCH4_{eq}'"></span>
-              <span v-katex:display="'n = \\frac{161.3 - 0.14 \\cdot Tf}{100}'"></span>
-              <span v-katex:display="'\\begin{cases}\n'+
-                'Tf=1023 &\\text{if }Tf<1023\\\\\n'+
-                '\\end{cases}'">
-              </span>
-              <span v-katex:display="'\\begin{cases}\n'+
-                'n=0 &\\text{if }n<0\\\\\n'+
-                '\\end{cases}'">
-              </span>
-              <span v-katex:display="'N_2O = 1.2 \\cdot sludgemass \\cdot Ncont \\cdot n \\cdot ctN_2Oeq'"></span>
-              <span v-katex:display="'CO_2SI = CH_4 + N_2O'"></span>
-
-              <b>Where:</b>
-              <br>
-              <ul>
-                <li><span v-katex="'sludgemass'"></span>: Amount of sludge that is sent to incineration  (dry weight)</li>
-                <li><span v-katex="'ctCH4'"></span>: Conversion of CH4 emissions to CO2 equivalent emissions (34 kgCO2eq/kgCH4)</li>
-                <li><span v-katex="'Ncont'"></span>: N content of sludge incinerated (% of dry weight)</li>
-                <li><span v-katex="'Tf'"></span>: Average highest temperature of combustion achieved in a Fluidized Bed incinerator</li>
-                <li><span v-katex="'ctN_2Oeq'"></span>: Conversion of N2O emissions to CO2 equivalent emissions (298 kgCO2eq/kgN2O)</li>
-                <li><span v-katex="'CO_2SI'"></span>: Amount of CO2eq emissions due to sludge incineration</li>
-              </ul>
-              <br>
-              <b>Reference:</b> <a href="docs/beam_final_report_1432.pdf#page=183" target="_blank">Section 12.10 "Combustion (Incineration)", Beam, page 161 </a>
-
-
-            </div>
-            <div v-else-if="dialog_biogas_stage == 4">
-              <h3>Land application of sludge</h3>
-              <br>
-              Amount of CO2eq emissions due to land application of sludge
-              <br>
-              <br>
-              <span v-katex:display="'TVS = \\frac{slucompTVS}{100}'"></span>
-              <span v-katex:display="'Ncont = \\frac{slulaNcont}{100}'"></span>
-
-              <span v-katex:display="'Ccontent = sludgemass \\cdot TVS \\cdot TVStoOC'"></span>
-              <span v-katex:display="'Ncontent = sludgemass \\cdot Ncont'"></span>
-              <span v-katex:display="'racioCN = \\frac{Ccontent}{Ncontent}'"></span>
-
-              <span v-katex:display="'\\begin{cases}\n'+
-                'N_2O=0 &\\text{if }ratioCN>30\\\\\n'+
-                'N_2O=0.5 \\cdot sludgemass \\cdot Ncont \\cdot EF \\cdot ctNtoN_2O4428 \\cdot ctN_2Oeq &\\text{if biosolids }>80\\%\\\\\n'+
-                'N_2O=sludgemass \\cdot Ncont \\cdot EF \\cdot ctNtoN_2O4428 \\cdot ctN_2Oeq &\\text{otherwise }\\\\\n'+
-
-                '\\end{cases}'">
-              </span>
-              <span v-katex:display="'CO_2LA = N_2O'"></span>
-
-              <b>Where:</b>
-              <br>
-              <ul>
-                <li><span v-katex="'sludgemass'"></span>: Amount of sludge that is sent to land application (dry weight)</li>
-                <li><span v-katex="'TVStoOC'"></span>: Organic Carbon content in Volatile Solids (0.56 gOC/gVS)</li>
-                <li><span v-katex="'slulaNcont'"></span>: N content of sludge sent to land application (% of dry weight)</li>
-                <li><span v-katex="'SlucompTVS'"></span>: Total Volatile Solids (TVS) content of sludge composted (% of dry weight)</li>
-                <li><span v-katex="'EF'"></span>: Amount of Nitrogen converted to N2O</li>
-                <li><span v-katex="'ctNtoN_2O4428'"></span>: N2O-N to N2O conversion factor (=44/28 gN2O/gN2O-N)</li>
-                <li><span v-katex="'ctN2Oeq'"></span>: Conversion of N2O emissions to CO2 equivalent emissions (298 kgCO2eq/kgN2O</li>
-                <li><span v-katex="'CO_2LA'"></span>: Amount of CO2eq emissions due to land application of sludge</li>
-              </ul>
-              <br>
-              <b>Reference:</b> <a href="docs/beam_final_report_1432.pdf#page=188" target="_blank">Section 12.11 "Land application", Beam page 166 </a>
-
-
-            </div>
-            <div v-else-if="dialog_biogas_stage == 5">
-              <h3>Landfilling of sludge</h3>
-              <br>
-              Fugitive methane emissions from biosolids decomposition in the landfill during the first 3 years after placement, and N2O emissions from landfilled biosolids
-              <br>
-              <br>
-              <span v-katex:display="'TVS = \\frac{slucompTVS}{100}'"></span>
-              <span v-katex:display="'CH_4gas = \\frac{slulfCH_4ingas}{100}'"></span>
-              <span v-katex:display="'DOCf = \\frac{slulfDOCf}{100}'"></span>
-              <span v-katex:display="'dc3yrs = \\frac{slulfdecomp3yr}{100}'"></span>
-              <span v-katex:display="'Ncont = \\frac{slulfcont}{100}'"></span>
-
-              <span v-katex:display="'Ccontent = sludgemass \\cdot TVS \\cdot TVStoOC'"></span>
-              <span v-katex:display="'Ncontent = sludgemass \\cdot Ncont'"></span>
-              <span v-katex:display="'racioCN = \\frac{Ccontent}{Ncontent}'"></span>
-
-              <span v-katex:display="'CH_4 = sludgemass \\cdot TVS \\cdot TVStoOC \\cdot un \\cdot OCtoCH_4 \\cdot CH_4gas \\cdot DOCF \\cdot dc3yrs \\cdot MCF \\cdot ctCH_4eq'"></span>
-              <span v-katex:display="'N_2O = sludgemass \\cdot Ncont \\cdot lowCNEF \\cdot NtoN_2O \\cdot ctN_2Oeq'"></span>
-              <span v-katex:display="'CO_2LFS = N_2O + CH_4'"></span>
-
-
-              <b>Where:</b>
-              <br>
-              <ul>
-                <li><span v-katex="'sludgemass'"></span>: Amount of sludge that is sent to landfilling  (dry weight)</li>
-                <li><span v-katex="'slucompTVS'"></span>: Total Volatile Solids (TVS) content of sludge composted (% of dry weight)</li>
-                <li><span v-katex="'TVStoOC'"></span>: Organic Carbon content in Volatile Solids (0.56gOC/gVS)</li>
-                <li><span v-katex="'un'"></span>: Model uncertainty factor</li>
-                <li><span v-katex="'OCtoCH_4'"></span>: Organic C to CH4 conversion factor (=16/12 gCH4/gOC)</li>
-                <li><span v-katex="'slulfCH_4ingas'"></span>: CH4 in landfill gas</li>
-                <li><span v-katex="'slulfDOC_f'"></span>: Decomposable organic fraction of raw wastewater solids</li>
-                <li><span v-katex="'slulfdecomp3yr'"></span>: Percentage decomposed in first 3 years of the decomposable organic fraction of raw wastewater solids</li>
-                <li><span v-katex="'MCF'"></span>: Methane correction for anaerobic managed landfills</li>
-                <li><span v-katex="'ctCH_4eq'"></span>: Conversion of CH4 emissions to CO2 equivalent emissions (34 kgCO2eq/kgCH4)</li>
-                <li><span v-katex="'slulfNcont'"></span>: N content of sludge sent to landfilling (% of dry weight)</li>
-                <li><span v-katex="'lowCNEF'"></span>: N2O emission factor for low C:N ratio</li>
-                <li><span v-katex="'NtoN_2O'"></span>: N2O-N to N2O conversion factor (=44/28 gN2O/gN2O-N)</li>
-                <li><span v-katex="'ctN_2Oeq'"></span>: Conversion of N2O emissions to CO2 equivalent emissions (298 kgCO2eq/kgN2O)</li>
-                <li><span v-katex="'CO_2LFS'"></span>: Landfilling of sludge CO2 equivalent</li>
-              </ul>
-              <br>
-              <b>Reference:</b>  <a href="docs/beam_final_report_1432.pdf#page=175" target="_blank">Section 12.9 "Landfill disposal", page 153 </a>
-
-
-            </div>
-            <div v-else-if="dialog_biogas_stage == 6">
-              <h3>Sludge stockpiling</h3>
-              <br>
-              Amount of CO2eq emissions due to sludge stockpiling
-              <br>
-              <br>
-              <span v-katex:display="'lifespan\\_ int = \\lfloor lifespan \\rfloor'"></span>
-              <span v-katex:display="'lifespan\\_ dec = lifespan - lifespan\\_ dec'"></span>
-              <span v-katex:display="'rate_{CH4}(i) = \\begin{cases}\n'+
-                'sludgemass \\cdot 0.2 \\cdot 10^{-3} &\\text{if }i<1\\\\\n'+
-                'sludgemass \\cdot 2 \\cdot 10^{-3} &\\text{if }1<=i<3\\\\\n'+
-                'sludgemass \\cdot 9.8 \\cdot 10^{-3} &\\text{if }3<=i<20\\\\\n'+
-                '0 &\\text{if }i>=20\\\\\n'+
-                '\\end{cases}'">
-              </span>
-              <span v-katex:display="'rate_{N2O}(i) = \\begin{cases}\n'+
-                'sludgemass \\cdot 60 \\cdot 10^{-3} &\\text{if }i<1\\\\\n'+
-                'sludgemass \\cdot 26.8 \\cdot 10^{-3} &\\text{if }1<=i<3\\\\\n'+
-                'sludgemass \\cdot 17.4 \\cdot 10^{-3} &\\text{if }3<=i<20\\\\\n'+
-                '0 &\\text{if }i>=20\\\\\n'+
-                '\\end{cases}'">
-              </span>
-              <span v-katex:display="'rate_{CO2}(i) = \\begin{cases}\n'+
-                'sludgemass \\cdot 30.1 \\cdot 10^{-3} &\\text{if }i<1\\\\\n'+
-                'sludgemass \\cdot 30.5 \\cdot 10^{-3} &\\text{if }1<=i<3\\\\\n'+
-                'sludgemass \\cdot 10.1 \\cdot 10^{-3} &\\text{if }3<=i<20\\\\\n'+
-                '0 &\\text{if }i>=20\\\\\n'+
-                '\\end{cases}'">
-              </span>
-              <span v-katex:display="'CH_4 = lifespan\\_ dec \\cdot rate_{CH4}(lifespan\\_ int) + \\sum _{i=0} ^{lifespan\\_ int -1} rate_{CH4}(i)'"></span>
-              <span v-katex:display="'N_2O = lifespan\\_ dec \\cdot rate_{N2O}(lifespan\\_ int) + \\sum _{i=0} ^{lifespan\\_ int -1} rate_{N2O}(i)'"></span>
-              <span v-katex:display="'CO_2 = lifespan\\_ dec \\cdot rate_{CO2}(lifespan\\_ int) + \\sum _{i=0} ^{lifespan\\_ int -1} rate_{CO2}(i)'"></span>
-
-              <span v-katex:display="'CO_2SP = CH_4 + N_2O + CO_2'"></span>
-
-
-              <b>Where:</b>
-              <br>
-              <ul>
-                <li><span v-katex="'sludgemass'"></span>: Amount of sludge that is stockpiled (dry weight)</li>
-                <li><span v-katex="'lifespan'"></span>: Expected timespan that the biosolid stockpile (BSP) will be emitting GHGs</li>
-                <li><span v-katex="'CO_2SP'"></span>: Amount of CO2eq emissions due to sludge composted</li>
-              </ul>
-              <br>
-              <b>Reference:</b> <a href="https://doi.org/10.1016/j.jenvman.2014.04.016 " target="_blank">Majumder, R., Livesley, S., Gregory, D., & Arndt, S. (2014, 05 15). Biosolids stockpiles are a significant point source for greenhouse gas emissions. Journal of Environmental Management, 143, pp. 34-43</a>
-
-
-            </div>
-            <div v-else-if="dialog_biogas_stage == 7">
-              <h3>Water reuse transport </h3>
-              <br>
-              Indirect CO2 emitted from sludge transport off-site
-              <br>
-              <br>
-              <span v-katex:display="'ECO_2 = \\frac{V \\cdot FD_{CO2} \\cdot NCV_{CO2} \\cdot EF_{CO2}}{1000}'"></span>
-              <span v-katex:display="'ECH_4 = \\frac{V \\cdot FD_{CH4} \\cdot NCV_{CH4} \\cdot EF_{CH4} \\cdot EQ_{CH4}}{1000}'"></span>
-              <span v-katex:display="'EN_2O = \\frac{V \\cdot FD_{N2O} \\cdot NCV_{N2O} \\cdot EF_{N2O} \\cdot EQ_{N2O}}{1000}'"></span>
-              <span v-katex:display="'E_{total} = ECO_2 + N_2O + CH_4'"></span>
-
-
-              <b>Where:</b>
-              <br>
-              <ul>
-                <li><span v-katex="'V'"></span>: Volume of fuel consumed</li>
-                <li><span v-katex="'EQ_{N2O}'"></span>: Conversion of N2O emissions to CO2 equivalent emissions </li>
-                <li><span v-katex="'EQ_{CH_4}'"></span>: Conversion of CH4 emissions to CO2 equivalent emissions</li>
-                <li><span v-katex="'EQ_{CH_4}'"></span>: Conversion of CH4 emissions to CO2 equivalent emissions</li>
-                <li><span v-katex="'CO_2LFS'"></span>: Landfilling of sludge CO2 equivalent</li>
-              </ul>
-              <br>
-              <table style="width: 90%; border: 1px solid; border-collapse: collapse">
-                <tr style="border: 1px solid; border-collapse: collapse">
-                  <td style="border: 1px solid; border-collapse: collapse"><b>Fuel type</b></td>
-                  <td style="border: 1px solid; border-collapse: collapse"><b>EFCH4 <br> (kg/TJ) </b></td>
-                  <td style="border: 1px solid; border-collapse: collapse"><b>EFN2O  <br> (kg/TJ) </b></td>
-                  <td style="border: 1px solid; border-collapse: collapse"><b>EFCO2  <br> (kg/TJ) </b></td>
-                  <td style="border: 1px solid; border-collapse: collapse"><b>FD  <br> (kg/L)  </b></td>
-                  <td style="border: 1px solid; border-collapse: collapse"><b>NCV  <br> (TJ/Gg)  </b></td>
-                </tr>
-                <tr style="border: 1px solid; border-collapse: collapse">
-                  <td style="border: 1px solid; border-collapse: collapse">Diesel</td>
-                  <td style="border: 1px solid; border-collapse: collapse">3.9</td>
-                  <td style="border: 1px solid; border-collapse: collapse">3.9</td>
-                  <td style="border: 1px solid; border-collapse: collapse">74100</td>
-                  <td style="border: 1px solid; border-collapse: collapse">0.84</td>
-                  <td style="border: 1px solid; border-collapse: collapse">43</td>
-                </tr>
-                <tr style="border: 1px solid; border-collapse: collapse">
-                  <td style="border: 1px solid; border-collapse: collapse">Gasoline/Petrol</td>
-                  <td style="border: 1px solid; border-collapse: collapse">3.8</td>
-                  <td style="border: 1px solid; border-collapse: collapse">1.9</td>
-                  <td style="border: 1px solid; border-collapse: collapse">69300</td>
-                  <td style="border: 1px solid; border-collapse: collapse">0.74</td>
-                  <td style="border: 1px solid; border-collapse: collapse">44.3</td>
-                </tr>
-                <tr style="border: 1px solid; border-collapse: collapse">
-                  <td style="border: 1px solid; border-collapse: collapse">Natural gas</td>
-                  <td style="border: 1px solid; border-collapse: collapse">92</td>
-                  <td style="border: 1px solid; border-collapse: collapse">0.2</td>
-                  <td style="border: 1px solid; border-collapse: collapse">56100</td>
-                  <td style="border: 1px solid; border-collapse: collapse">0.75</td>
-                  <td style="border: 1px solid; border-collapse: collapse">48</td>
-                </tr>
-              </table>
-              <br>
-              <b>Reference:</b> <a href="docs/V2_3_Ch3_Mobile_Combustion.pdf#page=21" target="_blank">IPCC 2006, Volume 2, Chapter 3: Mobile Combustion, Table 3.2.2 </a>
-
-
-
-            </div>
-
-          </div>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_biogas"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3>Biogas (anaerobic digestion of sludge) </h3>
-          <br>
-          Sum of emissions from biogas production (biogas flared, valorized and leaked)
-          <div v-katex:display="'biogas_{flared} = \\sum_{i \\in WWTPS} \\frac{P \\cdot V_i}{R \\cdot T} \\cdot \\frac{biog_{flared_i}}{100} \\cdot \\frac{biog_{CH4_i}}{100} \\cdot \\frac{44}{1000}'"></div>
-          <div v-katex:display="'biogas_{valorised} = \\sum_{i \\in WWTPS} \\frac{P \\cdot V_i}{R \\cdot T} \\cdot \\frac{biog_{val_i}}{100} \\cdot \\frac{biog_{CH4_i}}{100} \\cdot \\frac{44}{1000}'"></div>
-          <div v-katex:display="'biogas_{leaked} = \\sum_{i \\in WWTPS} \\frac{P \\cdot V_i}{R \\cdot T} \\cdot \\frac{biog_{leaked_i}}{100} \\cdot \\frac{biog_{CH4_i}}{100} \\cdot \\frac{16}{1000}'"></div>
-          <div v-katex:display="'Total = biogas_{flared} + biogas_{valorised} + biogas_{leaked}'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'WWTPS'"></span>: onsite and external WWTP's where industry treats water</li>
-            <li><span v-katex="'P : 1.013 \\cdot 10^{5}'"></span> Pa </li>
-            <li><span v-katex="'V'"></span>: Volume of biogas produced in the WWTP</li>
-            <li><span v-katex="'R'"></span>: 8.31446261815324 J/K·mol </li>
-            <li><span v-katex="'T'"></span>: 273.15K</li>
-            <li><span v-katex="'biog_{flared}'"></span>: Biogas flared (% volume)</li>
-            <li><span v-katex="'biog_{CH4}'"></span>: Percent of the methane content in the produced biogas</li>
-            <li><span v-katex="'biog_{val}'"></span>: Biogas valorized in the treatment plant to heat the digesters or the building and/or to run a Co-generator to generate heat and electricity</li>
-            <li><span v-katex="'biog_{leaked}'"></span>: Biogas leaked to the atmosphere (% volume)</li>
-
-
-          </ul>
-
-
-        </div>
-
-      </v-dialog>
-
-      <!-- Eutrophication -->
-      <v-dialog
-          v-model="info_tn_eutrophication"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3>Eutrophication potential (Total Nitrogen) </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} TN_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot EQ_{TN} '"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'TN_{effl}'"></span>: load of TN in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EQ_{TN}'"></span>: conversion of TN to PO4 equivalent (<b>0.42 gPO4eq/gTN </b>) </li>
-          </ul>
-          <br>
-          <b>Reference:</b> <a href="https://www.universiteitleiden.nl/en/research/research-output/science/cml-ia-characterisation-factors" target="_blank">CML-IA Characterisation Factors - Leiden University</a>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_cod_eutrophication"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3>Eutrophication potential (Chemical Oxygen Demand) </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} COD_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot EQ_{COD} '"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'COD_{effl}'"></span>: load of COD in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EQ_{COD}'"></span>: conversion of COD to PO4 equivalent (<b>0.022 gPO4eq/gCOD </b>) </li>
-          </ul>
-          <br>
-          <b>Reference:</b> <a href="https://www.universiteitleiden.nl/en/research/research-output/science/cml-ia-characterisation-factors" target="_blank">CML-IA Characterisation Factors - Leiden University</a>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_tp_eutrophication"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3>Eutrophication potential (Total Phosphorus) </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} TP_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot EQ_{TP} '"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'TP_{effl}'"></span>: load of TP in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EQ_{TP}'"></span>: Conversion of TP to PO4 equivalent (<b>3.06 gPO4eq/gTP </b>) </li>
-          </ul>
-          <br>
-          <b>Reference:</b> <a href="https://www.universiteitleiden.nl/en/research/research-output/science/cml-ia-characterisation-factors" target="_blank">CML-IA Characterisation Factors - Leiden University</a>
-
-
-        </div>
-
-      </v-dialog>
-
-      <!-- TU -->
-      <v-dialog
-          v-model="info_tu_diclo"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for 1,2-Dichloroethane  </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} 1,2-Dichloroethane_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EC50_{1,2-Dichloroethane} \\cdot 10^{-3}}'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'1,2-Dichloroethane_{effl}'"></span>: load of 1,2-Dichloroethane in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EC50_{1,2-Dichloroethane}: 150000 \\mu g/L'"></span></li>
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_tu_cadmium"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for cadmium  </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} cadmium_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EC50_{cadmium}\\cdot 10^{-6}}'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'cadmium_{effl}'"></span>: load of cadmium in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EC50_{cadmium}: 9.5 \\mu g/L'"></span></li>
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_tu_hexaclorobenzene"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for hexachlorobenzene   </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} hexachlorobenzene_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EC50_{hexachlorobenzene} \\cdot 10^{-3}}'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'hexachlorobenzene_{effl}'"></span>: load of hexachlorobenzene in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EC50_{hexachlorobenzene}: 30 \\mu g/L'"></span></li>
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_tu_mercury"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for mercury   </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} mercury_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EC50_{mercury} \\cdot 10^{-3}}'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'mercury_{effl}'"></span>: load of mercury in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EC50_{mercury}: 1.4 \\mu g/L'"></span></li>
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_tu_lead"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for lead   </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} lead_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EC50_{lead} \\cdot 10^{-3}}'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'lead_{effl}'"></span>: load of lead in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EC50_{lead}: 440 \\mu g/L'"></span></li>
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_tu_nickel"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for nickel   </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} nickel_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EC50_{nickel} \\cdot 10^{-3}}'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'nickel_{effl}'"></span>: load of nickel in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EC50_{nickel}: 1000 \\mu g/L'"></span></li>
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_tu_chloroalkanes"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for chloroalkanes   </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} chloroalkanes_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EC50_{chloroalkanes} \\cdot 10^{-3}}'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'chloroalkanes_{effl}'"></span>: load of chloroalkanes in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EC50_{chloroalkanes}: 65000 \\mu g/L'"></span></li>
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_tu_hexaclorobutadiene"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for hexachlorobutadiene    </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} hexachlorobutadiene_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EC50_{hexachlorobutadiene} \\cdot 10^{-3}}'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'hexachlorobutadiene_{effl}'"></span>: load of hexachlorobutadiene in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EC50_{hexachlorobutadiene}: 500 \\mu g/L'"></span></li>
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_tu_nonylphenols"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for nonylphenols     </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} nonylphenol_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EC50_{nonylphenol} \\cdot 10^{-3}}'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'nonylphenol_{effl}'"></span>: load of nonylphenol in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EC50_{nonylphenol}: 150 \\mu g/L'"></span></li>
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_tu_tetrachloroethene"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for tetrachloroethylene      </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} tetrachloroethylene_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EC50_{tetrachloroethylene} \\cdot 10^{-3}}'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'tetrachloroethylene_{effl}'"></span>: load of tetrachloroethylene in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EC50_{tetrachloroethylene}: 3200 \\mu g/L'"></span></li>
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_tu_trychloroethylene"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for trichloroethylene  </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} trichloroethylene_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EC50_{trichloroethylene} \\cdot 10^{-3}}'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'trichloroethylene_{effl}'"></span>: load of trichloroethylene in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EC50_{trichloroethylene}: 76000 \\mu g/L'"></span></li>
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-
-
-      <!-- Delta TU -->
-      <v-dialog
-          v-model="info_delta_tu_diclo"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for 1,2-Dichloroethane  </h3>
-          <br>
-          <div v-katex:display="' \\frac{ \\sum_{i \\in DP} 1,2-Dichloroethane_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EC50_{1,2-Dichloroethane}\\cdot 10^{-3}} '"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'1,2-Dichloroethane_{effl}'"></span>: load of 1,2-Dichloroethane in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EC50_{1,2-Dichloroethane}: 150000 \\mu g/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river <b>(streamflow global indicator)</b></li>
-            <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
-
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_delta_tu_cadmium"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for cadmium  </h3>
-          <br>
-          <div v-katex:display="' \\frac{ \\sum_{i \\in DP} cadmium_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EC50_{cadmium}\\cdot 10^{-3}} '"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'cadmium_{effl}'"></span>: load of cadmium in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EC50_{cadmium}: 9.5 \\mu g/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river <b>(streamflow global indicator)</b></li>
-            <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
-
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_delta_tu_hexaclorobenzene"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for hexachlorobenzene  </h3>
-          <br>
-          <div v-katex:display="' \\frac{ \\sum_{i \\in DP} hexachlorobenzene_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EC50_{hexachlorobenzene}\\cdot 10^{-3}} '"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'hexachlorobenzene_{effl}'"></span>: load of hexachlorobenzene in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EC50_{hexachlorobenzene}: 30 \\mu g/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river <b>streamflow global indicator</b></li>
-            <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
-
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_delta_tu_mercury"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for mercury  </h3>
-          <br>
-          <div v-katex:display="' \\frac{ \\sum_{i \\in DP} mercury_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EC50_{mercury}\\cdot 10^{-3}} '"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'mercury_{effl}'"></span>: load of mercury in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EC50_{mercury}: 1.4 \\mu g/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river <b>(streamflow global indicator)</b></li>
-            <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
-
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-        v-model="info_delta_tu_lead"
-        width="60%"
-    >
-      <div class="dialog_detail" style="background-color: white">
-        <h3> Ecotoxicity profile for lead  </h3>
-        <br>
-        <div v-katex:display="' \\frac{ \\sum_{i \\in DP} lead_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EC50_{lead}\\cdot 10^{-3}} '"></div>
-
-        <b>Where:</b>
-        <br>
-        <ul>
-          <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-          <li><span v-katex="'lead_{effl}'"></span>: load of lead in the effluent </li>
-          <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-          <li><span v-katex="'EC50_{lead}: 440 \\mu g/L'"></span></li>
-          <li><span v-katex="'W_{a}'"></span>: amount of water available in the river <b>(streamflow global indicator)</b></li>
-          <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
-
-        </ul>
-        <br>
-
-
-      </div>
-
-    </v-dialog>
-      <v-dialog
-          v-model="info_delta_tu_nickel"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for nickel  </h3>
-          <br>
-          <div v-katex:display="' \\frac{ \\sum_{i \\in DP} nickel_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EC50_{nickel}\\cdot 10^{-3}} '"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'nickel_{effl}'"></span>: load of nickel in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EC50_{nickel}: 1000 \\mu g/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river <b>(streamflow global indicator)</b></li>
-            <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
-
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_delta_tu_chloroalkanes"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for chloroalkanes  </h3>
-          <br>
-          <div v-katex:display="' \\frac{ \\sum_{i \\in DP} chloroalkanes_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EC50_{chloroalkanes}\\cdot 10^{-3}} '"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'chloroalkanes_{effl}'"></span>: load of chloroalkanes in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EC50_{chloroalkanes}: 65000 \\mu g/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river <b>(streamflow global indicator)</b></li>
-            <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
-
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_delta_tu_hexaclorobutadiene"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for hexachlorobutadiene   </h3>
-          <br>
-          <div v-katex:display="' \\frac{ \\sum_{i \\in DP} hexachlorobutadiene_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EC50_{hexachlorobutadiene}\\cdot 10^{-3}} '"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'hexachlorobutadiene_{effl}'"></span>: load of hexachlorobutadiene in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EC50_{hexachlorobutadiene}: 500 \\mu g/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river <b>(streamflow global indicator)</b></li>
-            <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
-
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_delta_tu_nonylphenols"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for nonylphenols    </h3>
-          <br>
-          <div v-katex:display="' \\frac{ \\sum_{i \\in DP} nonylphenol_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EC50_{nonylphenol}\\cdot 10^{-3}} '"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'nonylphenol_{effl}'"></span>: load of nonylphenol in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EC50_{nonylphenol}: 150 \\mu g/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river <b>(streamflow global indicator)</b></li>
-            <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
-
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_delta_tu_tetrachloroethene"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for tetrachloroethylene     </h3>
-          <br>
-          <div v-katex:display="' \\frac{ \\sum_{i \\in DP} tetrachloroethylene_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EC50_{tetrachloroethylene}\\cdot 10^{-3}} '"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'tetrachloroethylene_{effl}'"></span>: load of tetrachloroethylene in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EC50_{tetrachloroethylene}: 3200 \\mu g/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river <b>(streamflow global indicator)</b></li>
-            <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
-
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_delta_tu_trychloroethylene"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for trichloroethylene      </h3>
-          <br>
-          <div v-katex:display="' \\frac{ \\sum_{i \\in DP} trichloroethylene_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EC50_{trichloroethylene}\\cdot 10^{-3}} '"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'trichloroethylene_{effl}'"></span>: load of trichloroethylene in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EC50_{trichloroethylene}: 76000 \\mu g/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river <b>(streamflow global indicator)</b></li>
-            <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
-
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-
-
-      <!-- EQS -->
-      <v-dialog
-          v-model="info_eqs_diclo"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for 1,2-Dichloroethane  </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} 1,2-Dichloroethane_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EQS_{1,2-Dichloroethane}}'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'1,2-Dichloroethane_{effl}'"></span>: load of 1,2-Dichloroethane in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EQS_{1,2-Dichloroethane}: 0.01 mg/L'"></span></li>
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_eqs_cadmium"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for cadmium  </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} cadmium_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EQS_{cadmium}}'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'cadmium_{effl}'"></span>: load of cadmium in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EQS_{cadmium}: 0.001 mg/L'"></span></li>
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_eqs_hexaclorobenzene"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for hexachlorobenzene   </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} hexachlorobenzene_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EQS_{hexachlorobenzene}}'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'hexachlorobenzene_{effl}'"></span>: load of hexachlorobenzene in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EQS_{hexachlorobenzene}: 0.0005 mg/L'"></span></li>
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_eqs_mercury"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for mercury   </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} mercury_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EQS_{mercury} \\cdot }'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'mercury_{effl}'"></span>: load of mercury in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EQS_{mercury}: 0.00007 mg/L'"></span></li>
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_eqs_lead"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for lead   </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} lead_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EQS_{lead}}'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'lead_{effl}'"></span>: load of lead in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EQS_{lead}: 0.0072 mg/L'"></span></li>
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_eqs_nickel"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for nickel   </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} nickel_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EQS_{nickel}}'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'nickel_{effl}'"></span>: load of nickel in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EQS_{nickel}: 0.02 mg/L'"></span></li>
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_eqs_chloroalkanes"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for chloroalkanes   </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} chloroalkanes_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EQS_{chloroalkanes}}'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'chloroalkanes_{effl}'"></span>: load of chloroalkanes in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EQS_{chloroalkanes}: 0.0014 mg/L'"></span></li>
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_eqs_hexaclorobutadiene"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for hexachlorobutadiene    </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} hexachlorobutadiene_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EQS_{hexachlorobutadiene}}'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'hexachlorobutadiene_{effl}'"></span>: load of hexachlorobutadiene in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EQS_{hexachlorobutadiene}: 0.0006 mg/L'"></span></li>
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_eqs_nonylphenols"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for nonylphenols     </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} nonylphenol_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EQS_{nonylphenol} }'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'nonylphenol_{effl}'"></span>: load of nonylphenol in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EQS_{nonylphenol}: 0.002 mg/L'"></span></li>
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_eqs_tetrachloroethene"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for tetrachloroethylene      </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} tetrachloroethylene_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EQS_{tetrachloroethylene}}'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'tetrachloroethylene_{effl}'"></span>: load of tetrachloroethylene in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EQS_{tetrachloroethylene}: 0.01 mg/L'"></span></li>
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_eqs_trychloroethylene"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for trichloroethylene  </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} trichloroethylene_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EQS_{trichloroethylene}}'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'trichloroethylene_{effl}'"></span>: load of trichloroethylene in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EQS_{trichloroethylene}: 0.01 mg/L'"></span></li>
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-
-
-      <!-- Delta EQS -->
-      <v-dialog
-          v-model="info_delta_eqs_diclo"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for 1,2-Dichloroethane  </h3>
-          <br>
-          <div v-katex:display="' \\frac{ \\sum_{i \\in DP} 1,2-Dichloroethane_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EQS_{1,2-Dichloroethane}} '"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'1,2-Dichloroethane_{effl}'"></span>: load of 1,2-Dichloroethane in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EQS_{1,2-Dichloroethane}: 0.01 Mg/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river <b>(streamflow global indicator)</b></li>
-            <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
-
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_delta_eqs_cadmium"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for cadmium  </h3>
-          <br>
-          <div v-katex:display="' \\frac{ \\sum_{i \\in DP} cadmium_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EQS_{cadmium}} '"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'cadmium_{effl}'"></span>: load of cadmium in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EQS_{cadmium}: 0.001 Mg/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river <b>(streamflow global indicator)</b></li>
-            <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
-
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_delta_eqs_hexaclorobenzene"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for hexachlorobenzene  </h3>
-          <br>
-          <div v-katex:display="' \\frac{ \\sum_{i \\in DP} hexachlorobenzene_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EQS_{hexachlorobenzene}} '"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'hexachlorobenzene_{effl}'"></span>: load of hexachlorobenzene in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EQS_{hexachlorobenzene}: 0.0005 mg/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river <b>(streamflow global indicator)</b></li>
-            <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
-
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_delta_eqs_mercury"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for mercury  </h3>
-          <br>
-          <div v-katex:display="' \\frac{ \\sum_{i \\in DP} mercury_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EQS_{mercury}} '"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'mercury_{effl}'"></span>: load of mercury in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EQS_{mercury}: 0.00007 mg/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river <b>(streamflow global indicator)</b></li>
-            <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
-
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_delta_eqs_lead"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for lead  </h3>
-          <br>
-          <div v-katex:display="' \\frac{ \\sum_{i \\in DP} lead_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EQS_{lead}} '"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'lead_{effl}'"></span>: load of lead in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EQS_{lead}: 0.0072 mg/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river <b>(streamflow global indicator)</b></li>
-            <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
-
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_delta_eqs_nickel"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for nickel  </h3>
-          <br>
-          <div v-katex:display="' \\frac{ \\sum_{i \\in DP} nickel_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EQS_{nickel}} '"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'nickel_{effl}'"></span>: load of nickel in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EQS_{nickel}: 0.02 mg/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river <b>(streamflow global indicator)</b></li>
-            <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
-
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_delta_eqs_chloroalkanes"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for chloroalkanes  </h3>
-          <br>
-          <div v-katex:display="' \\frac{ \\sum_{i \\in DP} chloroalkanes_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EQS_{chloroalkanes}} '"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'chloroalkanes_{effl}'"></span>: load of chloroalkanes in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EQS_{chloroalkanes}: 0.0014 mg/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river <b>(streamflow global indicator)</b></li>
-            <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
-
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_delta_eqs_hexaclorobutadiene"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for hexachlorobutadiene   </h3>
-          <br>
-          <div v-katex:display="' \\frac{ \\sum_{i \\in DP} hexachlorobutadiene_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EQS_{hexachlorobutadiene}} '"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'hexachlorobutadiene_{effl}'"></span>: load of hexachlorobutadiene in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EQS_{hexachlorobutadiene}: 0.0006mg/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river <b>(streamflow global indicator)</b></li>
-            <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
-
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_delta_eqs_nonylphenols"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for nonylphenols    </h3>
-          <br>
-          <div v-katex:display="' \\frac{ \\sum_{i \\in DP} nonylphenol_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EQS_{nonylphenol}} '"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'nonylphenol_{effl}'"></span>: load of nonylphenol in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EQS_{nonylphenol}: 0.002 mg/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river <b>(streamflow global indicator)</b></li>
-            <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
-
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_delta_eqs_tetrachloroethene"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for tetrachloroethylene     </h3>
-          <br>
-          <div v-katex:display="' \\frac{ \\sum_{i \\in DP} tetrachloroethylene_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EQS_{tetrachloroethylene}} '"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'tetrachloroethylene_{effl}'"></span>: load of tetrachloroethylene in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EQS_{tetrachloroethylene}: 0.01 mg/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river <b>(streamflow global indicator)</b></li>
-            <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
-
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_delta_eqs_trychloroethylene"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Ecotoxicity profile for trichloroethylene      </h3>
-          <br>
-          <div v-katex:display="' \\frac{ \\sum_{i \\in DP} trichloroethylene_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EQS_{trichloroethylene}} '"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'trichloroethylene_{effl}'"></span>: load of trichloroethylene in the effluent </li>
-            <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body </li>
-            <li><span v-katex="'EQS_{trichloroethylene}: 0.01 mg/L'"></span></li>
-            <li><span v-katex="'W_{a}'"></span>: amount of water available in the river <b>(streamflow global indicator)</b></li>
-            <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river </li>
-
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-
-      <!-- Treatment efficiency -->
-      <v-dialog
-          v-model="info_efficiency_cod"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Treatment efficiency for COD  </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} COD_{infl_i} - COD_{effl_i}}{\\sum_{i \\in DP} COD_{infl_i}}\\cdot 100'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'COD_{effl}'"></span>: load of COD in the effluent </li>
-            <li><span v-katex="'COD_{infl}'"></span>: load of COD in the influent </li>
-
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_efficiency_tn"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Treatment efficiency for TN  </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} TN_{infl_i} - TN_{effl_i}}{\\sum_{i \\in DP} TN_{infl_i}}\\cdot 100'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'TN_{effl}'"></span>: load of TN in the effluent </li>
-            <li><span v-katex="'TN_{infl}'"></span>: load of TN in the influent </li>
-
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_efficiency_tp"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Treatment efficiency for TP  </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} TP_{infl_i} - TP_{effl_i}}{\\sum_{i \\in DP} TP_{infl_i}}\\cdot 100'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'TP_{effl}'"></span>: load of TP in the effluent </li>
-            <li><span v-katex="'TP_{infl}'"></span>: load of TP in the influent </li>
-
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_efficiency_diclo"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Treatment efficiency for for 1,2-Dichloroethane  </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} 1,2-Dichloroethane_{infl_i} - 1,2-Dichloroethane_{effl_i}}{\\sum_{i \\in DP} 1,2-Dichloroethane_{infl_i}}\\cdot 100'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'1,2-Dichloroethane_{effl}'"></span>: load of 1,2-Dichloroethane in the effluent </li>
-            <li><span v-katex="'1,2-Dichloroethane_{infl}'"></span>: load of 1,2-Dichloroethane in the influent </li>
-
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_efficiency_cadmium"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Treatment efficiency for Cadmium  </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} cadmium_{infl_i} - cadmium_{effl_i}}{\\sum_{i \\in DP} cadmium_{infl_i}}\\cdot 100'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'cadmium_{effl}'"></span>: load of cadmium in the effluent </li>
-            <li><span v-katex="'cadmium_{infl}'"></span>: load of cadmium in the influent </li>
-
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_efficiency_hexaclorobenzene"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Treatment efficiency for hexachlorobenzene  </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} hexachlorobenzene_{infl_i} - hexachlorobenzene_{effl_i}}{\\sum_{i \\in DP} hexachlorobenzene_{infl_i}}\\cdot 100'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'hexachlorobenzene_{effl}'"></span>: load of hexachlorobenzene in the effluent </li>
-            <li><span v-katex="'hexachlorobenzene_{infl}'"></span>: load of hexachlorobenzene in the influent </li>
-
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_efficiency_mercury"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Treatment efficiency for mercury  </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} mercury_{infl_i} - mercury_{effl_i}}{\\sum_{i \\in DP} mercury_{infl_i}}\\cdot 100'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'mercury_{effl}'"></span>: load of mercury in the effluent </li>
-            <li><span v-katex="'mercury_{infl}'"></span>: load of mercury in the influent </li>
-
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_efficiency_lead"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Treatment efficiency for lead  </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} lead_{infl_i} - lead_{effl_i}}{\\sum_{i \\in DP} lead_{infl_i}}\\cdot 100'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'lead_{effl}'"></span>: load of lead in the effluent </li>
-            <li><span v-katex="'lead_{infl}'"></span>: load of lead in the influent </li>
-
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_efficiency_nickel"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Treatment efficiency for nickel  </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} nickel_{infl_i} - nickel_{effl_i}}{\\sum_{i \\in DP} nickel_{infl_i}}\\cdot 100'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'nickel_{effl}'"></span>: load of nickel in the effluent </li>
-            <li><span v-katex="'nickel_{infl}'"></span>: load of nickel in the influent </li>
-
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_efficiency_chloroalkanes"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Treatment efficiency for Chloroalkanes  </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} chloroalkanes_{infl_i} - chloroalkanes_{effl_i}}{\\sum_{i \\in DP} chloroalkanes_{infl_i}}\\cdot 100'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'chloroalkanes_{effl}'"></span>: load of chloroalkanes in the effluent </li>
-            <li><span v-katex="'chloroalkanes_{infl}'"></span>: load of chloroalkanes in the influent </li>
-
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_efficiency_hexaclorobutadiene"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Treatment efficiency for Hexachlorobutadiene   </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} hexachlorobutadiene_{infl_i} - hexachlorobutadiene_{effl_i}}{\\sum_{i \\in DP} hexachlorobutadiene_{infl_i}}\\cdot 100'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'hexachlorobutadiene_{effl}'"></span>: load of Hexachlorobutadiene in the effluent </li>
-            <li><span v-katex="'hexachlorobutadiene_{infl}'"></span>: load of Hexachlorobutadiene in the influent </li>
-
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_efficiency_nonylphenols"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Treatment efficiency for Nonylphenols    </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} nonylphenols_{infl_i} - nonylphenols_{effl_i}}{\\sum_{i \\in DP} nonylphenols_{infl_i}}\\cdot 100'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'nonylphenols_{effl}'"></span>: load of Nonylphenols in the effluent </li>
-            <li><span v-katex="'nonylphenols_{infl}'"></span>: load of Nonylphenols in the influent </li>
-
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_efficiency_tetrachloroethene"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Treatment efficiency for Tetrachloroethylene     </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} tetrachloroethylene_{infl_i} - tetrachloroethylene_{effl_i}}{\\sum_{i \\in DP} tetrachloroethylene_{infl_i}}\\cdot 100'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'tetrachloroethylene_{effl}'"></span>: load of Tetrachloroethylene in the effluent </li>
-            <li><span v-katex="'tetrachloroethylene_{infl}'"></span>: load of Tetrachloroethylene in the influent </li>
-
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_efficiency_trychloroethylene"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Treatment efficiency for Trichloroethylene      </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} trichloroethylene_{infl_i} - trichloroethylene_{effl_i}}{\\sum_{i \\in DP} trichloroethylene_{infl_i}}\\cdot 100'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'trichloroethylene_{effl}'"></span>: load of Trichloroethylene in the effluent </li>
-            <li><span v-katex="'trichloroethylene_{infl}'"></span>: load of Trichloroethylene in the influent </li>
-
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-
-      <!-- Treatment efficiency influent-->
-      <v-dialog
-          v-model="info_efficiency_influent_cod"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Treatment efficiency for COD  </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} COD_{effl_i}}{COD_{infl}}\\cdot 100'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'COD_{effl}'"></span>: load of COD in the effluent </li>
-            <li><span v-katex="'COD_{infl}'"></span>: load of COD in the influent of the industry</li>
-
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_efficiency_influent_tn"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Treatment efficiency for TN  </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} TN_{effl_i}}{TN_{infl}}\\cdot 100'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'TN_{effl}'"></span>: load of TN in the effluent </li>
-            <li><span v-katex="'TN_{infl}'"></span>: load of TN in the influent of the industry</li>
-
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-      <v-dialog
-          v-model="info_efficiency_influent_tp"
-          width="60%"
-      >
-        <div class="dialog_detail" style="background-color: white">
-          <h3> Treatment efficiency for TP  </h3>
-          <br>
-          <div v-katex:display="'\\frac{\\sum_{i \\in DP} TP_{effl_i}}{TP_{infl}}\\cdot 100'"></div>
-
-          <b>Where:</b>
-          <br>
-          <ul>
-            <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water </li>
-            <li><span v-katex="'TP_{effl}'"></span>: load of TP in the effluent </li>
-            <li><span v-katex="'TP_{infl}'"></span>: load of TP in the influent of the industry</li>
-
-          </ul>
-          <br>
-
-
-        </div>
-
-      </v-dialog>
-
-      <v-dialog
-          v-model="industry_info"
-          width="80%"
-      >
-        <div class="dialog_detail" v-if="industry_clicked != null" style="background-color: white">
-          <h3>{{ industry_clicked[0].name }} </h3>
-          <br>
-
-          <v-row
-              class="pa-4"
-              justify="space-between"
-          >
-            <v-col cols="5">
-              <v-treeview
-                  :active.sync="active_indicator"
-                  :items="indicators_industry"
-                  activatable
-                  open-on-click
-                  transition
-                  dense
-                  :open.sync="open_indicator"
-              >
-                <template v-slot:prepend="{ item, open }" style="height: 100%;">
-                  <div
-                      style="width: 5px; margin-left: 40px"
-                      :class="indicator_risk_class(item)"
-                  >
-                    &nbsp
-                  </div>
-
-                </template>
-
-
-              </v-treeview>
-            </v-col>
-
-            <v-divider vertical></v-divider>
-
-            <v-col
-                class="d-flex text-center"
-            >
-              <v-scroll-y-transition mode="out-in">
-                <div
-                    class="text-h6 grey--text text--lighten-1 font-weight-light"
-                    style="align-self: center;"
-                    v-if="active_indicator.length == 0"
-                >
-                  Select an indicator
-                </div>
-                <div v-else>
-                  <div v-if="active_indicator[0] == 3">
-                    <v-data-table
-                        :headers="delta_ecotox_table.header"
-                        :items="delta_ecotox_table.value"
-                        class="expanded_table_hover"
-                        :item-class="itemRowBold"
-                        disable-pagination
-                        :hide-default-footer="true"
-                        dense
-                    >
-                      <template v-slot:item.value="{ item }">
-              <span v-if="item.info">
-                {{item.value}}
-                <v-btn
-                    icon
-                    @click="$data[item.info] = true"
-                    class="icon_clickable"
-                    x-small
-                >
-                  <v-icon
-                      color='#1C195B'
-                  >
-                    mdi-information-outline
-                  </v-icon>
-                </v-btn>
-
-
-              </span>
-                        <span v-else>{{item.value}}</span>
-                      </template>
-
-                      <template
-                          v-for="value in Object.keys(industries_aggregated)"
-                          v-slot:[`item.${value}`]="{ item }"
-                      >
-
-                        <template v-if="getDeltaEcotoxColor(item, value) != null">
-                          <v-tooltip bottom>
-                            <template v-slot:activator="{ on, attrs }">
-                              <v-chip
-                                  :color="getDeltaEcotoxColor(item, value)[0]"
-                                  dark
-                                  :key="value"
-                                  v-bind="attrs"
-                                  v-on="on"
-                                  text-color="#1c1c1b"
-                              >
-                                {{ item[value] }}
-                              </v-chip>
-                            </template>
-                            <span>{{ getDeltaEcotoxColor(item, value)[1] }}</span>
-                          </v-tooltip>
-                        </template>
-                        <template v-else>
-                          <v-chip
-                              color="transparent"
-                              dark
-                              :key="value"
-                              text-color="#1c1c1b"
-                              class= "chip_no_hover"
-                          >
-                            {{ item[value] }}
-                          </v-chip>
-                        </template>
-                      </template>
-                    </v-data-table>
-
-                  </div>
-                  <div v-else-if="active_indicator[0] == 4">
-                    <v-data-table
-                        :headers="delta_eqs_table.header"
-                        :items="delta_eqs_table.value"
-                        class="expanded_table_hover"
-
-                        disable-pagination
-                        :hide-default-footer="true"
-                        dense
-                    >
-
-                      <template v-slot:item.value="{ item }">
-              <span v-if="item.info">
-                {{item.value}}
-                <v-btn
-                    icon
-                    @click="$data[item.info] = true"
-                    class="icon_clickable"
-                    x-small
-                >
-                  <v-icon
-                      color='#1C195B'
-                  >
-                    mdi-information-outline
-                  </v-icon>
-                </v-btn>
-
-
-              </span>
-                        <span v-else>{{item.value}}</span>
-                      </template>
-
-                      <template
-                          v-for="value in Object.keys(industries_aggregated)"
-                          v-slot:[`item.${value}`]="{ item }"
-                      >
-
-                        <template v-if="getDeltaEQSColor(item, value) != null">
-                          <v-tooltip bottom>
-                            <template v-slot:activator="{ on, attrs }">
-                              <v-chip
-                                  :color="getDeltaEQSColor(item, value)[0]"
-                                  dark
-                                  :key="value"
-                                  v-bind="attrs"
-                                  v-on="on"
-                                  text-color="#1c1c1b"
-                              >
-                                {{ item[value] }}
-                              </v-chip>
-                            </template>
-                            <span>{{ getDeltaEQSColor(item, value)[1] }}</span>
-                          </v-tooltip>
-                        </template>
-                        <template v-else>
-                          <v-chip
-                              color="transparent"
-                              dark
-                              :key="value"
-                              text-color="#1c1c1b"
-                              class= "chip_no_hover"
-                          >
-                            {{ item[value] }}
-                          </v-chip>
-                        </template>
-                      </template>
-
-
-                    </v-data-table>
-
-                  </div>
-                  <div v-else-if="active_indicator[0] == 5">
-                    <v-data-table
-                        :headers="eutrophication_table.header"
-                        :items="eutrophication_table.value"
-                        class="expanded_table_hover"
-                        :item-class="itemRowBold"
-                        disable-pagination
-                        :hide-default-footer="true"
-                        dense
-                    >
-                      <template v-slot:item.value="{ item }">
-              <span v-if="item.info">
-                {{item.value}}
-                <v-btn
-                    icon
-                    @click="$data[item.info] = true"
-                    class="icon_clickable"
-                    x-small
-                >
-                  <v-icon
-                      color='#1C195B'
-                  >
-                    mdi-information-outline
-                  </v-icon>
-                </v-btn>
-
-
-              </span>
-                        <span v-else>{{item.value}}</span>
-                      </template>
-
-                      <template
-                          v-for="value in Object.keys(industries_aggregated)"
-                          v-slot:[`item.${value}`]="{ item }"
-                      >
-
-                        <template v-if="getEutrophicationColor(item, value) != null">
-                          <v-tooltip bottom>
-                            <template v-slot:activator="{ on, attrs }">
-                              <v-chip
-                                  :color="getEutrophicationColor(item, value)[0]"
-                                  dark
-                                  :key="value"
-                                  v-bind="attrs"
-                                  v-on="on"
-                                  text-color="#1c1c1b"
-                              >
-                                {{ item[value] }}
-                              </v-chip>
-                            </template>
-                            <span>{{ getEutrophicationColor(item, value)[1] }}</span>
-                          </v-tooltip>
-                        </template>
-                        <template v-else>
-                          <v-chip
-                              color="transparent"
-                              dark
-                              :key="value"
-                              text-color="#1c1c1b"
-                              class= "chip_no_hover"
-                          >
-                            {{ item[value] }}
-                          </v-chip>
-                        </template>
-                      </template>
-
-                    </v-data-table>
-
-                  </div>
-                  <div v-else-if="active_indicator[0] == 6">
-                    <v-data-table
-                        :headers="ecotoxicity_table.header"
-                        :items="ecotoxicity_table.value"
-                        disable-pagination
-                        :hide-default-footer="true"
-                        dense
-                        class="expanded_table_hover"
-                        :item-class="itemRowBold"
-                    >
-                      <template v-slot:item.value="{ item }">
-              <span v-if="item.info">
-                {{item.value}}
-                <v-btn
-                    icon
-                    @click="$data[item.info] = true"
-                    class="icon_clickable"
-                    x-small
-                >
-                  <v-icon
-                      color='#1C195B'
-                  >
-                    mdi-information-outline
-                  </v-icon>
-                </v-btn>
-
-
-              </span>
-                        <span v-else>{{item.value}}</span>
-                      </template>
-                      <template
-                          v-for="value in Object.keys(industries_aggregated)"
-                          v-slot:[`item.${value}`]="{ item }"
-                      >
-
-                        <template v-if="getEcotoxicity(item, value) != null">
-                          <v-tooltip bottom>
-                            <template v-slot:activator="{ on, attrs }">
-                              <v-chip
-                                  :color="getEcotoxicity(item, value)[0]"
-                                  dark
-                                  :key="value"
-                                  v-bind="attrs"
-                                  v-on="on"
-                                  text-color="#1c1c1b"
-                              >
-                                {{ item[value] }}
-                              </v-chip>
-                            </template>
-                            <span>{{ getEcotoxicity(item, value)[1] }}</span>
-                          </v-tooltip>
-                        </template>
-                        <template v-else>
-                          <v-chip
-                              color="transparent"
-                              dark
-                              :key="value"
-                              text-color="#1c1c1b"
-                              class= "chip_no_hover"
-                          >
-                            {{ item[value] }}
-                          </v-chip>
-                        </template>
-                      </template>
-
-                    </v-data-table>
-
-                  </div>
-                  <div v-else-if="active_indicator[0] == 7">
-                    <v-data-table
-                        :headers="eqs_table.header"
-                        :items="eqs_table.value"
-                        disable-pagination
-                        :hide-default-footer="true"
-                        dense
-                        class="expanded_table_hover"
-                    >
-
-                      <template v-slot:item.value="{ item }">
-              <span v-if="item.info">
-                {{item.value}}
-                <v-btn
-                    icon
-                    @click="$data[item.info] = true"
-                    class="icon_clickable"
-                    x-small
-                >
-                  <v-icon
-                      color='#1C195B'
-                  >
-                    mdi-information-outline
-                  </v-icon>
-                </v-btn>
-
-
-              </span>
-                        <span v-else>{{item.value}}</span>
-                      </template>
-                      <template
-                          v-for="value in Object.keys(industries_aggregated)"
-                          v-slot:[`item.${value}`]="{ item }"
-                      >
-
-                        <template v-if="getEQSColor(item, value) != null">
-                          <v-tooltip bottom>
-                            <template v-slot:activator="{ on, attrs }">
-                              <v-chip
-                                  :color="getEQSColor(item, value)[0]"
-                                  dark
-                                  :key="value"
-                                  v-bind="attrs"
-                                  v-on="on"
-                                  text-color="#1c1c1b"
-                              >
-                                {{ item[value] }}
-                              </v-chip>
-                            </template>
-                            <span>{{ getEQSColor(item, value)[1] }}</span>
-                          </v-tooltip>
-                        </template>
-                        <template v-else>
-                          <v-chip
-                              color="transparent"
-                              dark
-                              :key="value"
-                              text-color="#1c1c1b"
-                              class= "chip_no_hover"
-                          >
-                            {{ item[value] }}
-                          </v-chip>
-                        </template>
-                      </template>
-
-
-                    </v-data-table>
-
-                  </div>
-                  <div v-else-if="active_indicator[0] == 9">
-                    <v-data-table
-                        :headers="treatment_efficiency_table.header"
-                        :items="treatment_efficiency_table.value"
-                        class="expanded_table_hover"
-
-                        disable-pagination
-                        :hide-default-footer="true"
-                        dense
-                    >
-
-                      <template v-slot:item.value="{ item }">
-              <span v-if="item.info">
-                {{item.value}}
-                <v-btn
-                    icon
-                    @click="$data[item.info] = true"
-                    class="icon_clickable"
-                    x-small
-                >
-                  <v-icon
-                      color='#1C195B'
-                  >
-                    mdi-information-outline
-                  </v-icon>
-                </v-btn>
-
-
-              </span>
-                        <span v-else>{{item.value}}</span>
-                      </template>
-                      <template
-                          v-for="value in Object.keys(industries_aggregated)"
-                          v-slot:[`item.${value}`]="{ item }"
-                      >
-
-                        <template v-if="getTreatmentEfficiencyColor(item, value) != null">
-                          <v-tooltip bottom>
-                            <template v-slot:activator="{ on, attrs }">
-                              <v-chip
-                                  :color="getTreatmentEfficiencyColor(item, value)[0]"
-                                  dark
-                                  :key="value"
-                                  v-bind="attrs"
-                                  v-on="on"
-                                  text-color="#1c1c1b"
-                              >
-                                {{ item[value] }}
-                              </v-chip>
-                            </template>
-                            <span>{{ getTreatmentEfficiencyColor(item, value)[1] }}</span>
-                          </v-tooltip>
-                        </template>
-                        <template v-else>
-                          <v-chip
-                              color="transparent"
-                              dark
-                              :key="value"
-                              text-color="#1c1c1b"
-                              class= "chip_no_hover"
-                          >
-                            {{ item[value] }}
-                          </v-chip>
-                        </template>
-                      </template>
-
-                    </v-data-table>
-
-                  </div>
-                  <div v-else-if="active_indicator[0] == 10">
-                    <v-data-table
-                        :headers="treatment_efficiency_influent_table.header"
-                        :items="treatment_efficiency_influent_table.value"
-                        disable-pagination
-                        :hide-default-footer="true"
-                        dense
-                        class="expanded_table_hover"
-
-                    >
-
-                      <template v-slot:item.value="{ item }">
-              <span v-if="item.info">
-                {{item.value}}
-                <v-btn
-                    icon
-                    @click="$data[item.info] = true"
-                    class="icon_clickable"
-                    x-small
-                >
-                  <v-icon
-                      color='#1C195B'
-                  >
-                    mdi-information-outline
-                  </v-icon>
-                </v-btn>
-
-
-              </span>
-                        <span v-else>{{item.value}}</span>
-                      </template>
-
-                      <template
-                          v-for="value in Object.keys(industries_aggregated)"
-                          v-slot:[`item.${value}`]="{ item }"
-                      >
-
-                        <template v-if="getTreatmentEfficiencyInfluentColor(item, value) != null">
-                          <v-tooltip bottom>
-                            <template v-slot:activator="{ on, attrs }">
-                              <v-chip
-                                  :color="getTreatmentEfficiencyInfluentColor(item, value)[0]"
-                                  dark
-                                  :key="value"
-                                  v-bind="attrs"
-                                  v-on="on"
-                                  text-color="#1c1c1b"
-                              >
-                                {{ item[value] }}
-                              </v-chip>
-                            </template>
-                            <span>{{ getTreatmentEfficiencyInfluentColor(item, value)[1] }}</span>
-                          </v-tooltip>
-                        </template>
-                        <template v-else>
-                          <v-chip
-                              color="transparent"
-                              dark
-                              :key="value"
-                              text-color="#1c1c1b"
-                              class= "chip_no_hover"
-                          >
-                            {{ item[value] }}
-                          </v-chip>
-                        </template>
-                      </template>
-
-                    </v-data-table>
-
-                  </div>
-                  <div v-else-if="active_indicator[0] == 11">
-                    <v-data-table
-                        :headers="treated_table.header"
-                        :items="treated_table.value"
-                        disable-pagination
-                        :hide-default-footer="true"
-                        dense
-                        class="expanded_table_hover"
-
-                    >
-
-                      <template v-slot:item.value="{ item }">
-              <span v-if="item.info">
-                {{item.value}}
-                <v-btn
-                    icon
-                    @click="$data[item.info] = true"
-                    class="icon_clickable"
-                    x-small
-                >
-                  <v-icon
-                      color='#1C195B'
-                  >
-                    mdi-information-outline
-                  </v-icon>
-                </v-btn>
-
-
-              </span>
-                        <span v-else>{{item.value}}</span>
-                      </template>
-
-                    </v-data-table>
-
-                  </div>
-                  <div v-else-if="active_indicator[0] == 13">
-                    <v-data-table
-                        :headers="water_quantity.header"
-                        :items="water_quantity.value"
-
-                        disable-pagination
-                        :hide-default-footer="true"
-                        dense
-                    >
-                      <template v-slot:item.value="{ item }">
-                        <!--<v-tooltip bottom max-width="700px" v-if="item.info">
-                          <template v-slot:activator="{ on, attrs }">
-                            {{item.value}}
-                            <v-icon
-                                color='#1C195B'
-                                style="padding-right: 10px"
-                                v-bind="attrs"
-                                v-on="on"
-                                size="18px"
-                            >
-                              mdi-information-outline
-                            </v-icon>
-                          </template>
-                          <span>{{ item.info }}</span>
-                        </v-tooltip>
-                        <span v-else>{{item.value}}</span>-->
-                        <span v-if="item.info">
-                {{item.value}}
-                <v-btn
-                    icon
-                    @click="$data[item.info] = true"
-                    class="icon_clickable"
-                    x-small
-                >
-                  <v-icon
-                      color='#1C195B'
-                  >
-                    mdi-information-outline
-                  </v-icon>
-                </v-btn>
-
-
-
-              </span>
-                        <span v-else>{{item.value}}</span>
-                      </template>
-
-                      <template
-                          v-for="value in Object.keys(industries_aggregated)"
-                          v-slot:[`item.${value}`]="{ item }"
-                      >
-
-                        <template v-if="getAvailabilityColor(item, value) != null">
-                          <v-tooltip bottom>
-                            <template v-slot:activator="{ on, attrs }">
-                              <v-chip
-                                  :color="getAvailabilityColor(item, value)[0]"
-                                  dark
-                                  :key="value"
-                                  v-bind="attrs"
-                                  v-on="on"
-                                  text-color="#1c1c1b"
-                              >
-                                {{ item[value] }}
-                              </v-chip>
-                            </template>
-                            <span>{{ getAvailabilityColor(item, value)[1] }}</span>
-                          </v-tooltip>
-                        </template>
-                        <template v-else>
-                          <v-chip
-                              color="transparent"
-                              dark
-                              :key="value"
-                              text-color="#1c1c1b"
-                              class= "chip_no_hover"
-                          >
-                            {{ item[value] }}
-                          </v-chip>
-                        </template>
-                      </template>
-                    </v-data-table>
-
-                  </div>
-                  <div v-else-if="active_indicator[0] == 14">
-                    <v-data-table
-                        :headers="freshwater_lever_for_action.header"
-                        :items="freshwater_lever_for_action.value"
-                        disable-pagination
-                        :hide-default-footer="true"
-                        dense
-                        class="expanded_table_hover"
-
-                    >
-
-                      <template v-slot:item.value="{ item }">
-              <span v-if="item.info">
-                {{item.value}}
-                <v-btn
-                    icon
-                    @click="$data[item.info] = true"
-                    class="icon_clickable"
-                    x-small
-                >
-                  <v-icon
-                      color='#1C195B'
-                  >
-                    mdi-information-outline
-                  </v-icon>
-                </v-btn>
-
-
-              </span>
-                        <span v-else>{{item.value}}</span>
-                      </template>
-
-                    </v-data-table>
-
-                  </div>
-                  <div v-else-if="active_indicator[0] == 16">
-                    <v-data-table
-                        :headers="emissions_table.header"
-                        :items="emissions_table.value"
-
-                        :item-class="itemRowBold"
-                        disable-pagination
-                        :hide-default-footer="true"
-                        dense
-                    >
-                      <template v-slot:item.value="{ item }">
-              <span v-if="item.info">
-                {{item.value}}
-                <v-btn
-                    icon
-                    @click="$data[item.info] = true"
-                    class="icon_clickable"
-                    x-small
-                >
-                  <v-icon
-                      color='#1C195B'
-                  >
-                    mdi-information-outline
-                  </v-icon>
-                </v-btn>
-
-
-              </span>
-                        <span v-else>{{item.value}}</span>
-                      </template>
-
-                      <template
-                          v-for="value in Object.keys(industries_aggregated)"
-                          v-slot:[`item.${value}`]="{ item }"
-                      >
-
-                        <template v-if="getGlobalWarming(item, value) != null">
-                          <v-tooltip bottom>
-                            <template v-slot:activator="{ on, attrs }">
-                              <v-chip
-                                  :color="getGlobalWarming(item, value)[0]"
-                                  dark
-                                  :key="value"
-                                  v-bind="attrs"
-                                  v-on="on"
-                                  text-color="#1c1c1b"
-                              >
-                                {{ item[value] }}
-                              </v-chip>
-                            </template>
-                            <span>{{ getGlobalWarming(item, value)[1] }}</span>
-                          </v-tooltip>
-                        </template>
-                        <template v-else>
-                          <v-chip
-                              color="transparent"
-                              dark
-                              :key="value"
-                              text-color="#1c1c1b"
-                              class= "chip_no_hover"
-                          >
-                            {{ item[value] }}
-                          </v-chip>
-                        </template>
-                      </template>
-
-
-                    </v-data-table>
-                  </div>
-                  <div v-else-if="active_indicator[0] == 18">
-                    <v-data-table
-                        :headers="energy_use_table.header"
-                        :items="energy_use_table.value"
-
-                        :item-class="itemRowBold"
-                        disable-pagination
-                        :hide-default-footer="true"
-                        dense
-                    >
-                      <template v-slot:item.value="{ item }">
-              <span v-if="item.info">
-                {{item.value}}
-                <v-btn
-                    icon
-                    @click="$data[item.info] = true"
-                    class="icon_clickable"
-                    x-small
-                >
-                  <v-icon
-                      color='#1C195B'
-                  >
-                    mdi-information-outline
-                  </v-icon>
-                </v-btn>
-
-
-              </span>
-                        <span v-else>{{item.value}}</span>
-                      </template>
-
-
-                    </v-data-table>
-                  </div>
-                  <div v-else-if="active_indicator[0] == 19">
-                    <v-data-table
-                        :headers="effluent_load_table.header"
-                        :items="effluent_load_table.value"
-
-                        :item-class="itemRowBold"
-                        disable-pagination
-                        :hide-default-footer="true"
-                        dense
-                    >
-                      <template v-slot:item.value="{ item }">
-              <span v-if="item.info">
-                {{item.value}}
-                <v-btn
-                    icon
-                    @click="$data[item.info] = true"
-                    class="icon_clickable"
-                    x-small
-                >
-                  <v-icon
-                      color='#1C195B'
-                  >
-                    mdi-information-outline
-                  </v-icon>
-                </v-btn>
-
-
-              </span>
-                        <span v-else>{{item.value}}</span>
-                      </template>
-
-
-                    </v-data-table>
-                  </div>
-
-                </div>
-              </v-scroll-y-transition>
-            </v-col>
-          </v-row>
-
-        </div>
-
-      </v-dialog>
-
-
-    </div>
-
   </div>
+
 </template>
 
 <script>
 
-import BarChart from "@/components/BarChart";
+import BarChart from "../components/BarChart";
 let _ = require('lodash');
-import PDFJSViewer from "@/components/PDFJSViewer";
 import pdfMake from 'pdfmake/build/pdfmake.js'
 import Vue from "vue";
 import {utils, metrics} from "../utils"
 import standard_industrial_classification from "../standard_industrial_classification"
-import RadarChart from "@/components/RadarChart";
+import external_indicators from "../external_indicators"
+
+import RadarChart from "../components/RadarChart";
 import colors from "../colors"
-import risk_thereshold from "../risk_categories"
-import * as Excel from "exceljs";
-import VueKatex from 'vue-katex';
-import 'katex/dist/katex.min.css';
-
-Vue.use(VueKatex, {
-});
-
+import risk_thereshold from "..//risk_categories"
+import { Chart, scaleService } from 'chart.js'
 
 export default {
   name: "Make_report",
   components: {
     RadarChart,
     BarChart,
-    PDFJSViewer
   },
   data() {
     return {
@@ -3752,32 +646,17 @@ export default {
       selected_layers: [Vue.prototype.$layers_description[1].children[0].children[3]], //layers included in the report (initially only streamflow)
       selected_layers_pdf: [], //layers included in the pdf report
 
-      tab: undefined,
       main_tab: 0,
       layers_table: {header: [], value: []},
-      water_quantity: {header: [], value: []},
-      treated_table: {header: [], value: []},
-      freshwater_lever_for_action: {header: [], value: []},
-
-      treatment_efficiency_table: {header: [], value: []},
-      treatment_efficiency_influent_table: {header: [], value: []},
 
       reporting_indicators: {header: [], value: []},
-      ecotoxicity_table: {header: [], value: []},
-      eqs_table: {header: [], value: []},
-      delta_ecotox_table: {header: [], value: []},
-      delta_eqs_table: {header: [], value: []},
-
-      eutrophication_table:  {header: [], value: []},
-      emissions_table: {header: [], value: []},
-      energy_use_table: {header: [], value: []},
-      effluent_load_table: {header: [], value: []},
-
       simple_report_table: {header: [], value: []},
-      include_future: true,
+      cdp_5_1: {header: [], value: []},
+      cdp_1_2_b: {header: [], value: []},
+      external_indicators: external_indicators,
 
+      include_future: true,
       aggregation_level: "industry",
-      aggregation_items: [{text: "Industry", value: "industry"}, {text: "Country", value: "country"}],
 
       ghg_emission_chart: {
         chartData: null,
@@ -3862,99 +741,6 @@ export default {
         },
       },
       imported_file_excel: null,
-      dialog_quality_quantity: false,
-      dialog_emissions: false,
-      dialog_eutrophication: false,
-      dialog_ecotox: false,
-      dialog_efficiency: false,
-      dialog_tu: false,
-      dialog_eqs: false,
-      dialog_delta_tu: false,
-      dialog_delta_eqs: false,
-      dialog_influent_efficiency: false,
-      dialog_ecotoxicity_and_biodiversity: false,
-      dialog_pollution: false,
-
-      biodiversity_models: [],
-      info_energy_used: false,
-
-      info_dilution_factor: false,
-      info_recycled_factor: false,
-      info_treated_factor: false,
-      info_water_stress: false,
-      info_specific_consumption: false,
-      info_electricity: false,
-      info_fuel_engines: false,
-      info_treatment: false,
-      info_reuse: false,
-      info_discharge: false,
-      info_sludge_management: false,
-      info_biogas: false,
-      info_tn_eutrophication: false,
-      info_cod_eutrophication: false,
-      info_tp_eutrophication: false,
-      info_tu_diclo: false,
-      info_tu_cadmium: false,
-      info_tu_hexaclorobenzene: false,
-      info_tu_mercury: false,
-      info_tu_lead: false,
-      info_tu_nickel: false,
-      info_tu_chloroalkanes: false,
-      info_tu_hexaclorobutadiene: false,
-      info_tu_nonylphenols: false,
-      info_tu_tetrachloroethene: false,
-      info_tu_trychloroethylene: false,
-      info_delta_tu_diclo: false,
-      info_delta_tu_cadmium: false,
-      info_delta_tu_hexaclorobenzene: false,
-      info_delta_tu_mercury: false,
-      info_delta_tu_lead: false,
-      info_delta_tu_nickel: false,
-      info_delta_tu_chloroalkanes: false,
-      info_delta_tu_hexaclorobutadiene: false,
-      info_delta_tu_nonylphenols: false,
-      info_delta_tu_tetrachloroethene: false,
-      info_delta_tu_trychloroethylene: false,
-      info_eqs_diclo: false,
-      info_eqs_cadmium: false,
-      info_eqs_hexaclorobenzene: false,
-      info_eqs_mercury: false,
-      info_eqs_lead: false,
-      info_eqs_nickel: false,
-      info_eqs_chloroalkanes: false,
-      info_eqs_hexaclorobutadiene: false,
-      info_eqs_nonylphenols: false,
-      info_eqs_tetrachloroethene: false,
-      info_eqs_trychloroethylene: false,
-      info_delta_eqs_diclo: false,
-      info_delta_eqs_cadmium: false,
-      info_delta_eqs_hexaclorobenzene: false,
-      info_delta_eqs_mercury: false,
-      info_delta_eqs_lead: false,
-      info_delta_eqs_nickel: false,
-      info_delta_eqs_chloroalkanes: false,
-      info_delta_eqs_hexaclorobutadiene: false,
-      info_delta_eqs_nonylphenols: false,
-      info_delta_eqs_tetrachloroethene: false,
-      info_delta_eqs_trychloroethylene: false,
-
-      info_efficiency_cod: false,
-      info_efficiency_tn: false,
-      info_efficiency_tp: false,
-      info_efficiency_diclo: false,
-      info_efficiency_cadmium: false,
-      info_efficiency_hexaclorobenzene: false,
-      info_efficiency_mercury: false,
-      info_efficiency_lead: false,
-      info_efficiency_nickel: false,
-      info_efficiency_chloroalkanes: false,
-      info_efficiency_hexaclorobutadiene: false,
-      info_efficiency_nonylphenols: false,
-      info_efficiency_tetrachloroethene: false,
-      info_efficiency_trychloroethylene: false,
-      info_efficiency_influent_cod: false,
-      info_efficiency_influent_tn: false,
-      info_efficiency_influent_tp: false,
       radio_layers: 2,
       radio_industry_edit: null,
       tab_pollutant: 0,
@@ -3963,28 +749,13 @@ export default {
       industry_info: false,
       active_indicator: [],
       open_indicator: [],
+      selected_assessment: null,
 
     }
 
   },
   watch: {
 
-    open_indicator(value){
-      let impact_index = [1, 12, 15] //Index in tree-view where main categories start
-      let new_item = value[value.length-1]
-      if(impact_index.includes(new_item)){
-        if(value.length > 1){
-          Vue.nextTick(async function () {
-            value.splice(0, value[value.length-1], new_item) //Close all categories previously opened          })
-          })
-        }
-      }
-    },
-    info_sludge_management: function(value){
-      if(value){
-        this.dialog_biogas_stage = 0
-      }
-    },
     radio_layers: function(value){
       let _this = this
       if(value == 2){
@@ -4015,92 +786,104 @@ export default {
         this.selected_industries = []
       }
     },
-    industry_clicked: async function () {
-      this.emissions_table = {header: [], value: []}
-      this.energy_use_table = {header: [], value: []}
-      this.effluent_load_table = {header: [], value: []}
-      this.water_quantity = {header: [], value: []}
-      this.treated_table = {header: [], value: []}
-      this.freshwater_lever_for_action = {header: [], value: []}
-      this.eutrophication_table = {header: [], value: []}
-      this.ecotoxicity_table = {header: [], value: []}
-      this.treatment_efficiency_table = {header: [], value: []}
-      this.delta_ecotox_table = {header: [], value: []}
-      this.eqs_table = {header: [], value: []}
-      this.delta_eqs_table = {header: [], value: []}
-      this.radio_industry_edit = null
-      this.open_indicator.splice(0, this.open_indicator.length)
-      this.treatment_efficiency_influent_table = {header: [], value: []}
-      this.active_indicator.splice(0, this.active_indicator.length)
-
-      this.emissions_table = this.generate_emissions_table()
-      this.energy_use_table = this.generate_energy_use_table()
-      this.effluent_load_table = this.generate_effluent_load_table()
-
-      this.water_quantity = await this.generate_water_quality_table()
-      this.treated_table = await this.generate_treated_table()
-      this.freshwater_lever_for_action = await this.generate_freshwater_lever_for_action_table()
-
-      this.eutrophication_table = this.generate_eutrophication_table()
-      this.ecotoxicity_table = this.generate_ecotoxicity_table()
-      this.reporting_indicators = await this.generate_reporting_indicators_table()
-      this.treatment_efficiency_table = this.generate_treatment_efficiency_table()
-      this.treatment_efficiency_influent_table = this.generate_treatment_efficiency_influent_table()
-
-      //this.layers_table = await this.generate_layers_table()
-      //this.simple_report_table = await this.generate_simple_report_table()
-
-      this.eqs_table = this.generate_eqs_table()
-      this.delta_eqs_table = await this.generate_delta_eqs_table()
-      this.delta_ecotox_table = await this.generate_delta_ecotox_table()
-    },
     selected_layers: async function () {
       let _this = this
       _this.layers_table = {header: [], value: []}
       _this.layers_table = await _this.generate_layers_table(_this.tab)
 
-      /*Vue.nextTick(async function () {
-        if(_this.selected_assessments.length > 0){
-          _this.layers_table = {header: [], value: []}
-          _this.layers_table = await _this.generate_layers_table()
-
-        }
-      })*/
-
     },
-    tab: async function () {
+    selected_assessment: async function () {
       let _this = this
       this.layers_table = {header: [], value: []}
+      this.simple_report_table = {header: [], value: []}
+      this.cdp_5_1 = {header: [], value: []}
+      this.cdp_1_2_b = {header: [], value: []}
+
 
       Vue.nextTick(async function () {
-        _this.emissions_table =_this.generate_emissions_table()
-        _this.energy_use_table = _this.generate_energy_use_table()
-        _this.effluent_load_table = _this.generate_effluent_load_table()
-
-        _this.water_quantity = await _this.generate_water_quality_table()
-        _this.treated_table = await _this.generate_treated_table()
-        _this.freshwater_lever_for_action = await _this.generate_freshwater_lever_for_action_table()
-
-        _this.eutrophication_table = _this.generate_eutrophication_table()
-        _this.ecotoxicity_table = _this.generate_ecotoxicity_table()
-        _this.reporting_indicators = await _this.generate_reporting_indicators_table()
-        _this.treatment_efficiency_table = _this.generate_treatment_efficiency_table()
-        _this.treatment_efficiency_influent_table = _this.generate_treatment_efficiency_influent_table()
-
+        //Taules a mantenir
         _this.simple_report_table = await _this.generate_simple_report_table()
-
-        _this.eqs_table = _this.generate_eqs_table()
-        _this.delta_eqs_table = await _this.generate_delta_eqs_table()
-        _this.delta_ecotox_table = await _this.generate_delta_ecotox_table()
         _this.selected_layers.splice(0, _this.selected_layers.length, _this.layers[1].children[0].children[3])
         _this.radio_layers = 2
         _this.main_tab = 0
+        _this.cdp_5_1 = await _this.generate_cdp_5_1_table()
+        _this.cdp_1_2_b = await _this.generate_cdp_1_2_b_table()
 
       })
     },
   },
   methods: {
 
+    async generate_cdp_5_1_table() {
+      let assessment = this.assessments_with_industries[this.tab]
+
+      let header = [
+        {
+          text: 'Facility name',
+          align: 'start',
+          value: 'name',
+        },
+        { text: 'Country', value: 'country' },
+        { text: 'Latitude', value: 'lat' },
+        { text: 'Longitude', value: 'lng' },
+        { text: 'Located in area of water stress', value: 'water_stress' },
+        { text: 'Total water withdrawals at this facility (ML/yr)', value: 'withdrawals' },
+        { text: 'Total water discharges at this facility (ML/yr)', value: 'discharges' },
+        { text: 'Total water consumption at this facility (ML/yr)', value: 'consumption' },
+      ]
+      let value = []
+
+      for (let industry of assessment.assessment.industries){
+
+        let indicators = await metrics.cdp_5_1_indicators([industry], this.global_layers)
+
+        value.push({
+          name: industry.name,
+          country: utils.get_country_code_from_coordinates(industry.location.lat, industry.location.lng),
+          lat: industry.location.lat.toFixed(2),
+          lng: industry.location.lng.toFixed(2),
+          withdrawals: indicators["dis"],
+          discharges: indicators["wd"],
+          consumption: indicators["consumed"],
+          water_stress: indicators["water_stress"],
+
+        })
+      }
+
+      return {
+        header, value
+      }
+
+    },
+
+    async generate_cdp_1_2_b_table() {
+      let assessment = this.assessments_with_industries[this.tab]
+
+      let header = [
+        { text: 'Water aspect', value: 'water_aspect' },
+        { text: 'Volume (megaliters/year)', value: 'volume' },
+      ]
+      let value = []
+
+      let indicators = metrics.cdp_1_2_b_indicators(assessment.assessment.industries)
+      value.push({
+        water_aspect: "Total withdrawals",
+        volume: indicators.wd,
+      })
+      value.push({
+        water_aspect: "Total discharges",
+        volume: indicators.dis,
+      })
+      value.push({
+        water_aspect: "Total consumption",
+        volume: indicators.consumed,
+      })
+
+      return {
+        header, value
+      }
+
+    },
 
     industry_and_supply_chain(){
       let industries = this.created_assessments[this.tab].industries.map(x => x.name)
@@ -4210,28 +993,6 @@ export default {
       return {header, items}
     },
 
-    click_tab(tab_clicked){
-      if(this.tab === tab_clicked) return
-      this.emissions_table = {header: [], value: []}
-      this.energy_use_table = {header: [], value: []}
-      this.effluent_load_table = {header: [], value: []}
-      this.water_quantity = {header: [], value: []}
-      this.treated_table = {header: [], value: []}
-      this.freshwater_lever_for_action = {header: [], value: []}
-      this.eutrophication_table = {header: [], value: []}
-      this.ecotoxicity_table = {header: [], value: []}
-      this.reporting_indicators = {header: [], value: []}
-      this.treatment_efficiency_table = {header: [], value: []}
-      this.layers_table = {header: [], value: []}
-      this.simple_report_table = {header: [], value: []}
-      this.delta_ecotox_table = {header: [], value: []}
-      this.eqs_table = {header: [], value: []}
-      this.delta_eqs_table = {header: [], value: []}
-      this.radio_industry_edit = null
-      this.treatment_efficiency_influent_table = {header: [], value: []}
-
-    },
-
     getBase64ImageFromURL(url) {
       return fetch(url)
           .then((response) => response.blob())
@@ -4281,8 +1042,10 @@ export default {
 
     simpleTableRowClick(item, row){
 
-      this.industry_clicked = this.industries_aggregated[item.value]
-      this.industry_info = true
+
+      //this.industry_clicked = this.industries_aggregated[item.value]
+      //this.industry_info = true
+      this.$router.push({ name: 'statistics'})
 
 
 
@@ -4298,34 +1061,17 @@ export default {
       let _this = this
       this.layers_table = {header: [], value: []}
       _this.radio_layers = 2
-      _this.main_tab = 0
+      //_this.main_tab = 0
       let firstIndexValid = _this.assessments_with_industries.findIndex(assessment => assessment.disabled == false)
-      _this.tab = firstIndexValid >= 0 ? firstIndexValid : undefined
-
-
-      Vue.nextTick(async function () {
-        _this.emissions_table =_this.generate_emissions_table()
-        _this.energy_use_table = _this.generate_energy_use_table()
-        _this.effluent_load_table = _this.generate_effluent_load_table()
-
-        _this.water_quantity = await _this.generate_water_quality_table()
-        _this.treated_table = await _this.generate_treated_table()
-        _this.freshwater_lever_for_action = await _this.generate_freshwater_lever_for_action_table()
-
-        _this.eutrophication_table = _this.generate_eutrophication_table()
-        _this.ecotoxicity_table = _this.generate_ecotoxicity_table()
-        _this.reporting_indicators = await _this.generate_reporting_indicators_table()
-        _this.treatment_efficiency_table = _this.generate_treatment_efficiency_table()
-        _this.treatment_efficiency_influent_table = _this.generate_treatment_efficiency_influent_table()
-
-        _this.simple_report_table = await _this.generate_simple_report_table()
-
-        _this.eqs_table = _this.generate_eqs_table()
-        _this.delta_eqs_table = await _this.generate_delta_eqs_table()
-        _this.delta_ecotox_table = await _this.generate_delta_ecotox_table()
-        _this.selected_layers.splice(0, _this.selected_layers.length, _this.layers[1].children[0].children[3])
-
-      })
+      if(firstIndexValid >= 0) {
+        this.selected_assessment = _this.assessments_with_industries[firstIndexValid].assessment.name
+        Vue.nextTick(async function () {
+          _this.simple_report_table = await _this.generate_simple_report_table()
+          _this.cdp_5_1 = await _this.generate_cdp_5_1_table()
+          _this.cdp_1_2_b = await _this.generate_cdp_1_2_b_table()
+          _this.selected_layers.splice(0, _this.selected_layers.length, _this.layers[1].children[0].children[3])
+        })
+      }
     },
 
     getAvailabilityColor (item, value) {
@@ -4348,11 +1094,7 @@ export default {
     },
 
     getDeltaEcotoxColor(item, value) {
-      /*if (item.value == this.table_title.pollutants.total){
-        return this.risk_categories["delta_ecotoxicity"](item[value] / 11)
-      } else {
-        return this.risk_categories["delta_ecotoxicity"](item[value])
-      }*/
+
       return this.risk_categories["delta_ecotoxicity"](item[value])
     },
 
@@ -4496,9 +1238,7 @@ export default {
       }else if(item.value == this.table_title.simple_table.pollution){
         return this.risk_categories["pollution"](item[value])
       }*/
-
-
-  return null
+      return null
     },
 
     itemRowBold: function (item) {
@@ -4521,619 +1261,6 @@ export default {
       return ADLER32.str(s)
     },
 
-    generate_emissions_table() {
-
-      let _this = this
-
-
-      if(_this.industry_clicked !== null){
-
-        let emission_table = {
-          header: [{text: "Emissions", value: "value", sortable: false}],
-          value: []
-        }
-
-        let total = {value: _this.table_title.global_warming_potential.total, unit: "kgCO2eq/day"}
-        let elec = {value: _this.table_title.global_warming_potential.elec, unit: "kgCO2eq/day", info:"info_electricity"}
-        let fuel = {value: _this.table_title.global_warming_potential.fuel, unit: "kgCO2eq/day", info:"info_fuel_engines"}
-        let tre = {value: _this.table_title.global_warming_potential.treatment, unit: "kgCO2eq/day", info:"info_treatment"}
-        let biog = {value: _this.table_title.global_warming_potential.biogas, unit: "kgCO2eq/day", info: "info_biogas"}
-        let slu = {value: _this.table_title.global_warming_potential.sludge, unit: "kgCO2eq/day", info: "info_sludge_management"}
-        let reus = {value: _this.table_title.global_warming_potential.reuse, unit: "kgCO2eq/day", info:"info_reuse"}
-        let disc = {value: _this.table_title.global_warming_potential.discharged, unit: "kgCO2eq/day", info:"info_discharge"}
-
-
-        const data_chart = {
-          labels: [],
-          datasets: [{
-            data: [],
-            backgroundColor: []
-          }]
-        };
-        for (const [key, industries] of Object.entries(_this.current_industry)) {
-
-          emission_table.header.push({
-            text: key, value: key,
-          })
-          let emissions = metrics.emissions_and_descriptions(industries, 1)
-
-          total[key] = emissions["total"]
-          elec[key] = emissions["elec"]
-          fuel[key] = emissions["fuel"]
-          tre[key] = emissions["treatment"]
-          biog[key] = emissions["biog"]
-          slu[key] = emissions["slu"]
-          reus[key] = emissions["reuse"]
-          disc[key] = emissions["disc"]
-
-
-          data_chart.datasets[0].data.push(emissions["total"])
-          data_chart.labels.push(key)
-          data_chart.datasets[0].backgroundColor.push(this.chooseColor(key))
-        }
-
-        emission_table.header.push({text: "Unit", value: "unit", sortable: false,})
-        emission_table.value.push(total)
-        emission_table.value.push(elec)
-        emission_table.value.push(fuel)
-        emission_table.value.push(tre)
-        emission_table.value.push(biog)
-        emission_table.value.push(slu)
-        emission_table.value.push(reus)
-        emission_table.value.push(disc)
-
-        //CHART
-        const options = {
-          animation: false,
-          legend: {
-            display: false
-          },
-          scales: {
-            yAxes: [{
-              ticks: {
-                beginAtZero: true
-              },
-              scaleLabel: {
-                display: true,
-                labelString: 'kgCO2eq emission'
-              }
-            }],
-            xAxes: [{
-              scaleLabel: {
-                display: true,
-                labelString: 'Industry'
-              }
-            }]
-          }
-        }
-
-
-        _this.ghg_emission_chart = {
-          chartData: data_chart,
-          options: options
-        }
-
-
-
-        return emission_table
-      }
-      return {header: [], value: []}
-
-    },
-
-    generate_energy_use_table() {
-
-      let _this = this
-
-      if(_this.industry_clicked !== null){
-
-        let pollutants_table = {
-          header: [{text: "", value: "value", sortable: false}],
-          value: []
-        }
-
-        let energy = {value: "Energy used per day", unit: "kWh/day", info: "info_energy_used"}
-
-        for (const [key, industries] of Object.entries(_this.current_industry)) {
-
-          pollutants_table.header.push({
-            text: key, value: key,
-          })
-
-          energy[key] = metrics.energy_used(industries)
-        }
-
-        pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
-
-        pollutants_table.value.push(energy)
-        return pollutants_table
-      }
-      else return {header: [], value: []}
-
-    },
-
-    generate_effluent_load_table() {
-
-      let _this = this
-
-      if(_this.industry_clicked != null){
-
-        let pollutants_table = {
-          header: [{text: "", value: "value", sortable: false}],
-          value: []
-        }
-
-        let tn = {value: _this.table_title.pollutants.tn, unit: "gTN/m3", }
-        let tp = {value: _this.table_title.pollutants.tp, unit: "gTP/m3", }
-        let cod = {value: _this.table_title.pollutants.cod, unit: "gCOD/m3", }
-
-        for (const [key, industries] of Object.entries(_this.current_industry)) {
-
-          pollutants_table.header.push({
-            text: key, value: key,
-          })
-
-          let load = metrics.effluent_concentration(industries)
-          tn[key] = load.tn
-          cod[key] = load.cod
-          tp[key] = load.tp
-        }
-
-        pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
-
-        pollutants_table.value.push(cod)
-        pollutants_table.value.push(tn)
-        pollutants_table.value.push(tp)
-        return pollutants_table
-      }
-      else return {header: [], value: []}
-
-    },
-
-
-    generate_eutrophication_table() {
-
-      let _this = this
-
-      if(_this.industry_clicked !== null){
-
-        let pollutants_table = {
-          header: [{text: "", value: "value", sortable: false}],
-          value: []
-        }
-
-        let tn = {value: _this.table_title.pollutants.tn, unit: "gPO4eq/m3", info: "info_tn_eutrophication"}
-        let tp = {value: _this.table_title.pollutants.tp, unit: "gPO4eq/m3", info: "info_tp_eutrophication"}
-        let total = {value: _this.table_title.pollutants.total, unit: "gPO4eq/m3"}
-        let cod = {value: _this.table_title.pollutants.cod, unit: "gPO4eq/m3", info: "info_cod_eutrophication"}
-
-
-        const data_chart = {
-          labels: [],
-          datasets: [{
-            data: [],
-            backgroundColor: []
-          }]
-        };
-
-        for (const [key, industries] of Object.entries(_this.current_industry)) {
-
-          pollutants_table.header.push({
-            text: key, value: key,
-          })
-
-          let eutrophication = metrics.eutrophication_potential(industries)
-
-          cod[key] = eutrophication.cod
-          tn[key] = eutrophication.tn
-          tp[key] = eutrophication.tp
-          total[key] = eutrophication.total
-
-
-          data_chart.datasets[0].data.push(eutrophication.total)
-          data_chart.labels.push(key)
-          data_chart.datasets[0].backgroundColor.push('rgba(210,109,9,0.93)')
-
-        }
-
-        //CHART
-        const options = {
-          animation: false,
-          legend: {
-            display: false
-          },
-          scales: {
-            yAxes: [{
-              ticks: {
-                beginAtZero: true
-              },
-              scaleLabel: {
-                display: true,
-                labelString: 'gPO4eq/m3'
-              }
-            }],
-            xAxes: [{
-              scaleLabel: {
-                display: true,
-                labelString: 'Industry'
-              }
-            }]
-          }
-        }
-
-
-        _this.eutrophication_chart = {
-          chartData: data_chart,
-          options: options
-        }
-
-        pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
-
-        pollutants_table.value.push(total)
-        pollutants_table.value.push(cod)
-        pollutants_table.value.push(tn)
-        pollutants_table.value.push(tp)
-
-        return pollutants_table
-      }
-      else return {header: [], emissions: []}
-
-    },
-
-    generate_ecotoxicity_table() {
-
-      let _this = this
-
-
-      if(_this.industry_clicked !== null){
-
-        let pollutants_table = {
-          header: [{text: "", value: "value", sortable: false}],
-          value: []
-        }
-
-        let dichloroethane = {value: _this.table_title.pollutants.diclo, unit: "TU/day", info:"info_tu_diclo"}
-        let cadmium = {value: _this.table_title.pollutants.cadmium, unit: "TU/day", info:"info_tu_cadmium"}
-        let hexachlorobenzene = {value: _this.table_title.pollutants.hexaclorobenzene, unit: "TU/day", info:"info_tu_hexaclorobenzene"}
-        let mercury = {value: _this.table_title.pollutants.mercury, unit: "TU/day", info:"info_tu_mercury"}
-        let lead = {value: _this.table_title.pollutants.lead, unit: "TU/day", info:"info_tu_lead"}
-        let nickel = {value: _this.table_title.pollutants.nickel, unit: "TU/day", info:"info_tu_nickel"}
-        let chloroalkanes = {value: _this.table_title.pollutants.chloroalkanes, unit: "TU/day", info:"info_tu_chloroalkanes"}
-        let hexaclorobutadie = {value: _this.table_title.pollutants.hexaclorobutadie, unit: "TU/day", info:"info_tu_hexaclorobutadiene"}
-        let nonylphenols = {value: _this.table_title.pollutants.nonylphenols, unit: "TU/day", info:"info_tu_nonylphenols"}
-        let tetrachloroethene = {value: _this.table_title.pollutants.tetrachloroethene, unit: "TU/day", info:"info_tu_tetrachloroethene"}
-        let trichloroethylene = {value: _this.table_title.pollutants.tricloroetile, unit: "TU/day", info:"info_tu_trychloroethylene"}
-        let total = {value: _this.table_title.pollutants.total, unit: "TU/day"}
-
-        const data_chart = {
-          labels: [],
-          datasets: [{
-            data: [],
-            backgroundColor: []
-          }]
-        };
-
-        for (const [key, industries] of Object.entries(_this.current_industry)) {
-
-          pollutants_table.header.push({
-            text: key, value: key,
-          })
-
-          let tu = metrics.ecotoxicity_potential_tu(industries)
-          dichloroethane[key] = tu.diclo
-          cadmium[key] = tu.cadmium
-          hexachlorobenzene[key] = tu.hexaclorobenzene
-          mercury[key] = tu.mercury
-          lead[key] = tu.lead
-          nickel[key] = tu.nickel
-          chloroalkanes[key] = tu.chloroalkanes
-          hexaclorobutadie[key] = tu.hexaclorobutadie
-          nonylphenols[key] = tu.nonylphenols
-          tetrachloroethene[key] = tu.tetracloroetile
-          trichloroethylene[key] = tu.tricloroetile
-          total[key] = tu.total
-
-          data_chart.datasets[0].data.push(total[key])
-          data_chart.labels.push(key)
-          data_chart.datasets[0].backgroundColor.push('rgba(210,109,9,0.93)')
-
-        }
-
-        const options = {
-          animation: false,
-          legend: {
-            display: false
-          },
-          scales: {
-            yAxes: [{
-              ticks: {
-                beginAtZero: true
-              },
-              scaleLabel: {
-                display: true,
-                labelString: 'TU'
-              }
-            }],
-            xAxes: [{
-              scaleLabel: {
-                display: true,
-                labelString: 'Industry'
-              }
-            }]
-          }
-        }
-
-
-        _this.ecotoxicity_chart = {
-          chartData: data_chart,
-          options: options
-        }
-
-
-        pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
-
-        pollutants_table.value.push(total)
-        pollutants_table.value.push(dichloroethane)
-        pollutants_table.value.push(cadmium)
-        pollutants_table.value.push(hexachlorobenzene)
-        pollutants_table.value.push(mercury)
-        pollutants_table.value.push(lead)
-        pollutants_table.value.push(nickel)
-        pollutants_table.value.push(chloroalkanes)
-        pollutants_table.value.push(hexaclorobutadie)
-        pollutants_table.value.push(nonylphenols)
-        pollutants_table.value.push(tetrachloroethene)
-        pollutants_table.value.push(trichloroethylene)
-
-        return pollutants_table
-      }
-      else return {header: [], emissions: []}
-
-    },
-
-    async generate_delta_eqs_table() {
-
-      let _this = this
-
-
-      if(_this.industry_clicked !== null){
-
-
-        let pollutants_table = {
-          header: [{text: "", value: "value", sortable: false}],
-          value: []
-        }
-
-        let dichloroethane = {value: _this.table_title.pollutants.diclo, unit: "-", info: "info_delta_eqs_diclo"}
-        let cadmium = {value: _this.table_title.pollutants.cadmium, unit: "-", info: "info_delta_eqs_cadmium"}
-        let hexachlorobenzene = {value: _this.table_title.pollutants.hexaclorobenzene, unit: "-", info: "info_delta_eqs_hexaclorobenzene"}
-        let mercury = {value: _this.table_title.pollutants.mercury, unit: "-", info: "info_delta_eqs_mercury"}
-        let lead = {value: _this.table_title.pollutants.lead, unit: "-", info: "info_delta_eqs_lead"}
-        let nickel = {value: _this.table_title.pollutants.nickel, unit: "-", info: "info_delta_eqs_nickel"}
-        let chloroalkanes = {value: _this.table_title.pollutants.chloroalkanes, unit: "-", info: "info_delta_eqs_chloroalkanes"}
-        let hexaclorobutadie = {value: _this.table_title.pollutants.hexaclorobutadie, unit: "-", info: "info_delta_eqs_hexaclorobutadiene"}
-        let nonylphenols = {value: _this.table_title.pollutants.nonylphenols, unit: "-", info: "info_delta_eqs_nonylphenols"}
-        let tetrachloroethene = {value: _this.table_title.pollutants.tetrachloroethene, unit: "-", info: "info_delta_eqs_tetrachloroethene"}
-        let trichloroethylene = {value: _this.table_title.pollutants.tricloroetile, unit: "-", info: "info_delta_eqs_trychloroethylene"}
-
-
-        for (const [key, industries] of Object.entries(_this.current_industry)) {
-
-          pollutants_table.header.push({
-            text: key, value: key,
-          })
-
-          let tu = await metrics.delta_eqs(industries, _this.global_layers)
-          dichloroethane[key] = tu.diclo
-          cadmium[key] = tu.cadmium
-          hexachlorobenzene[key] = tu.hexaclorobenzene
-          mercury[key] = tu.mercury
-          lead[key] = tu.lead
-          nickel[key] = tu.nickel
-          chloroalkanes[key] = tu.chloroalkanes
-          hexaclorobutadie[key] = tu.hexaclorobutadie
-          nonylphenols[key] = tu.nonylphenols
-          tetrachloroethene[key] = tu.tetracloroetile
-          trichloroethylene[key] = tu.tricloroetile
-
-        }
-
-
-        pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
-
-        pollutants_table.value.push(dichloroethane)
-        pollutants_table.value.push(cadmium)
-        pollutants_table.value.push(hexachlorobenzene)
-        pollutants_table.value.push(mercury)
-        pollutants_table.value.push(lead)
-        pollutants_table.value.push(nickel)
-        pollutants_table.value.push(chloroalkanes)
-        pollutants_table.value.push(hexaclorobutadie)
-        pollutants_table.value.push(nonylphenols)
-        pollutants_table.value.push(tetrachloroethene)
-        pollutants_table.value.push(trichloroethylene)
-
-        return pollutants_table
-      }
-      else return {header: [], emissions: []}
-
-    },
-    async generate_delta_ecotox_table() {
-
-      let _this = this
-
-      if(_this.industry_clicked !== null){
-
-        let pollutants_table = {
-          header: [{text: "", value: "value", sortable: false}],
-          value: []
-        }
-
-        let dichloroethane = {value: _this.table_title.pollutants.diclo, unit: "TU/day", info:"info_delta_tu_diclo"}
-        let cadmium = {value: _this.table_title.pollutants.cadmium, unit: "TU/day", info:"info_delta_tu_cadmium"}
-        let hexachlorobenzene = {value: _this.table_title.pollutants.hexaclorobenzene, unit: "TU/day", info:"info_delta_tu_hexaclorobenzene"}
-        let mercury = {value: _this.table_title.pollutants.mercury, unit: "TU/day", info:"info_delta_tu_mercury"}
-        let lead = {value: _this.table_title.pollutants.lead, unit: "TU/day", info:"info_delta_tu_lead"}
-        let nickel = {value: _this.table_title.pollutants.nickel, unit: "TU/day", info:"info_delta_tu_nickel"}
-        let chloroalkanes = {value: _this.table_title.pollutants.chloroalkanes, unit: "TU/day", info:"info_delta_tu_chloroalkanes"}
-        let hexaclorobutadie = {value: _this.table_title.pollutants.hexaclorobutadie, unit: "TU/day", info:"info_delta_tu_hexaclorobutadiene"}
-        let nonylphenols = {value: _this.table_title.pollutants.nonylphenols, unit: "TU/day", info:"info_delta_tu_nonylphenols"}
-        let tetrachloroethene = {value: _this.table_title.pollutants.tetrachloroethene, unit: "TU/day", info:"info_delta_tu_tetrachloroethene"}
-        let trichloroethylene = {value: _this.table_title.pollutants.tricloroetile, unit: "TU/day", info:"info_delta_tu_trychloroethylene"}
-        let total = {value: _this.table_title.pollutants.total, unit: "TU/day"}
-
-
-        const data_chart = {
-          labels: [],
-          datasets: [{
-            data: [],
-            backgroundColor: []
-          }]
-        };
-
-        for (const [key, industries] of Object.entries(_this.current_industry)) {
-
-          pollutants_table.header.push({
-            text: key, value: key,
-          })
-
-          let tu = await metrics.delta_tu(industries, _this.global_layers)
-          dichloroethane[key] = tu.diclo
-          cadmium[key] = tu.cadmium
-          hexachlorobenzene[key] = tu.hexaclorobenzene
-          mercury[key] = tu.mercury
-          lead[key] = tu.lead
-          nickel[key] = tu.nickel
-          chloroalkanes[key] = tu.chloroalkanes
-          hexaclorobutadie[key] = tu.hexaclorobutadie
-          nonylphenols[key] = tu.nonylphenols
-          tetrachloroethene[key] = tu.tetracloroetile
-          trichloroethylene[key] = tu.tricloroetile
-          total[key] = tu.total
-
-          data_chart.datasets[0].data.push(total[key])
-          data_chart.labels.push(key)
-          data_chart.datasets[0].backgroundColor.push('rgba(210,109,9,0.93)')
-
-        }
-
-        const options = {
-          animation: false,
-          legend: {
-            display: false
-          },
-          scales: {
-            yAxes: [{
-              ticks: {
-                beginAtZero: true
-              },
-              scaleLabel: {
-                display: true,
-                labelString: 'TU'
-              }
-            }],
-            xAxes: [{
-              scaleLabel: {
-                display: true,
-                labelString: 'Industry'
-              }
-            }]
-          }
-        }
-
-        _this.ecotoxicity_chart = {
-          chartData: data_chart,
-          options: options
-        }
-
-        pollutants_table.value.push(total)
-        pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
-        pollutants_table.value.push(dichloroethane)
-        pollutants_table.value.push(cadmium)
-        pollutants_table.value.push(hexachlorobenzene)
-        pollutants_table.value.push(mercury)
-        pollutants_table.value.push(lead)
-        pollutants_table.value.push(nickel)
-        pollutants_table.value.push(chloroalkanes)
-        pollutants_table.value.push(hexaclorobutadie)
-        pollutants_table.value.push(nonylphenols)
-        pollutants_table.value.push(tetrachloroethene)
-        pollutants_table.value.push(trichloroethylene)
-
-        return pollutants_table
-      }
-      else return {header: [], emissions: []}
-
-    },
-
-
-    generate_eqs_table() {
-
-      let _this = this
-
-
-      if(_this.industry_clicked !== null){
-
-        let pollutants_table = {
-          header: [{text: "", value: "value", sortable: false}],
-          value: []
-        }
-
-        let dichloroethane = {value: _this.table_title.pollutants.diclo, unit: "-", info: "info_eqs_diclo"}
-        let cadmium = {value: _this.table_title.pollutants.cadmium, unit: "-", info: "info_eqs_cadmium"}
-        let hexachlorobenzene = {value: _this.table_title.pollutants.hexaclorobenzene, unit: "-", info: "info_eqs_hexaclorobenzene"}
-        let mercury = {value: _this.table_title.pollutants.mercury, unit: "-", info: "info_eqs_mercury"}
-        let lead = {value: _this.table_title.pollutants.lead, unit: "-", info: "info_eqs_lead"}
-        let nickel = {value: _this.table_title.pollutants.nickel, unit: "-", info: "info_eqs_nickel"}
-        let chloroalkanes = {value: _this.table_title.pollutants.chloroalkanes, unit: "-", info: "info_eqs_chloroalkanes"}
-        let hexaclorobutadie = {value: _this.table_title.pollutants.hexaclorobutadie, unit: "-", info: "info_eqs_hexaclorobutadiene"}
-        let nonylphenols = {value: _this.table_title.pollutants.nonylphenols, unit: "-", info: "info_eqs_nonylphenols"}
-        let tetrachloroethene = {value: _this.table_title.pollutants.tetrachloroethene, unit: "-", info: "info_eqs_tetrachloroethene"}
-        let trichloroethylene = {value: _this.table_title.pollutants.tricloroetile, unit: "-", info: "info_eqs_trychloroethylene"}
-
-
-        for (const [key, industries] of Object.entries(_this.current_industry)) {
-
-          pollutants_table.header.push({
-            text: key, value: key,
-          })
-
-          let tu = metrics.environmental_quality_standards(industries)
-          dichloroethane[key] = tu.diclo
-          cadmium[key] = tu.cadmium
-          hexachlorobenzene[key] = tu.hexaclorobenzene
-          mercury[key] = tu.mercury
-          lead[key] = tu.lead
-          nickel[key] = tu.nickel
-          chloroalkanes[key] = tu.chloroalkanes
-          hexaclorobutadie[key] = tu.hexaclorobutadie
-          nonylphenols[key] = tu.nonylphenols
-          tetrachloroethene[key] = tu.tetracloroetile
-          trichloroethylene[key] = tu.tricloroetile
-
-        }
-
-
-        pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
-
-
-        pollutants_table.value.push(dichloroethane)
-        pollutants_table.value.push(cadmium)
-        pollutants_table.value.push(hexachlorobenzene)
-        pollutants_table.value.push(mercury)
-        pollutants_table.value.push(lead)
-        pollutants_table.value.push(nickel)
-        pollutants_table.value.push(chloroalkanes)
-        pollutants_table.value.push(hexaclorobutadie)
-        pollutants_table.value.push(nonylphenols)
-        pollutants_table.value.push(tetrachloroethene)
-        pollutants_table.value.push(trichloroethylene)
-
-        return pollutants_table
-      }
-      else return {header: [], emissions: []}
-
-    },
 
     async generate_reporting_indicators_table() {
 
@@ -5160,7 +1287,6 @@ export default {
 
         for (const [key, industries] of Object.entries(_this.industries_aggregated)) {
 
-          //aaaa
           let indicators = await metrics.reporting_metrics(industries, this.global_layers)
 
           table.header.push({
@@ -5198,113 +1324,6 @@ export default {
 
     },
 
-
-    async generate_simple_report_table_old() {
-
-      let _this = this
-
-
-      if(_this.tab !== undefined){
-
-        let pollutants_table = {
-          header: [{text: "", value: "value", sortable: false}],
-          value: []
-        }
-
-        let quality_quantity = {value: _this.table_title.simple_table.quality_quantity, unit: "-"}
-        let total_ghg = {value: _this.table_title.simple_table.total_ghg, unit: "kgCO2eq/day", info: "This metric indicates the CO2e emissions from the industry. It will always have positive values; higher values indicate higher impact."}
-        let pollution = {value: _this.table_title.simple_table.pollution, unit: "-"}
-        let recycled_factor = {value: _this.table_title.availability_quantity.recycled, unit: "%", info:"This metric indicates the percentage of the reused water used by the industry respect the water that leaves the industry"}
-        let efficiency_factor = {value: _this.table_title.availability_quantity.specific_water_consumption, unit: "tonnes/m3", info: "Specific water consumption is a metric that indicates what is the amount of water from the water body needed to produce a tone of product manufactured in the industry"}
-        let treated_factor = {value: _this.table_title.availability_quantity.treated, unit: "%", info:"This metric indicates the ratio between the water remaining after the industry consumption and the water that is treated in the WWTP"}
-        let energy_used_row = {value: "Energy used", unit: "kWh/day", info: "Energy used by wastewater treatment plants to treat the water sent to the treatment plant"}
-
-
-        /*
-        let eutrophication = {value: _this.table_title.simple_table.eutrophication, unit: "gPO4eq/m3", info: "Eutrophication potential (EP) is defined as the potential to cause over-fertilization of water and soil, which can result in increased growth of biomass. It will always have positive values; higher values indicate higher impact."}
-        let ecotox_effluent = {value: this.table_title.simple_table.tu, unit: "TU/day", info: " Toxic units (TU) are used in the field of toxicology to quantify the interactions of toxicants in mixtures of chemicals. A toxic unit for a given compound is based on the concentration at which there is a 50% effect (ex. EC50) for a certain biological endpoint."}
-        let delta_ecotox = {value: this.table_title.simple_table.delta_tu, unit: "TU/day"}
-        let eqs = {value: this.table_title.simple_table.eqs, unit: "-", info: "Index reflecting how large the load of each pollutant in the effluent is with respect to the EQS (Environmental Quality Standards). The larger it is, the worse."}
-        let delta_eqs = {value: this.table_title.simple_table.delta_eqs, unit: "-"}
-        let avg_treatment_efficiency = {value: _this.table_title.simple_table.avg_treatment_efficiency, unit: "%", info: "Removal rate of pollutants in WWTP's"}
-        let avg_influent_efficiency = {value: _this.table_title.simple_table.avg_influent_efficiency, unit: "%", info: "If the value is less than 100, the industry discharges the water cleaner than when it was withdrawn."}
-        */
-
-        for (const [key, industries] of Object.entries(_this.industries_aggregated)) {
-          pollutants_table.header.push({
-            text: key, value: key,
-          })
-
-          let dilution_factor_value = await metrics.dilution_factor(this.global_layers, industries)
-          let dilution_factor_risk = this.risk_categories["dilution_factor"](dilution_factor_value)
-
-          recycled_factor[key] =  metrics.recycled_water_factor(industries)
-          //let recycled_factor_risk = this.risk_categories["recycled_water_factor"](recycled_factor)
-
-          let available_factor = await metrics.available_ratio(this.global_layers, industries)
-          let available_factor_risk = this.risk_categories["water_stress_ratio"](available_factor)
-
-          efficiency_factor[key] = metrics.efficiency_factor(industries)
-          //let efficiency_factor_risk = this.risk_categories["specific_water_consumption"](efficiency_factor)
-
-          //quality_quantity[key] = this.return_avg_risk([dilution_factor_risk, recycled_factor_risk, treated_factor_risk, available_factor_risk, efficiency_factor_risk])
-          quality_quantity[key] = this.return_avg_risk([dilution_factor_risk, available_factor_risk])
-
-          total_ghg[key] = metrics.emissions_and_descriptions(industries, 1).total
-          energy_used_row[key] = metrics.energy_used(industries)
-
-          let eutrophication_factor = metrics.eutrophication_potential(industries).total
-          let eutrophication_risk = this.risk_categories["eutrophication"](eutrophication_factor)
-
-          let ecotox_effluent_factor = metrics.ecotoxicity_potential_tu(industries).total
-          let ecotox_effluent_risk = this.risk_categories["ecotoxicity"](ecotox_effluent_factor)
-
-          let delta_ecotox_factor = (await metrics.delta_tu(industries, this.global_layers)).total
-          let delta_ecotox_risk = this.risk_categories["delta_ecotoxicity"](delta_ecotox_factor)
-
-          let eqs_factor = metrics.eqs_avg(industries)
-          let eqs_risk = this.risk_categories["eqs"](eqs_factor)
-
-          let delta_eqs_factor = await metrics.delta_eqs_avg(industries, this.global_layers)
-          let delta_eqs_risk = this.risk_categories["delta_eqs"](delta_eqs_factor)
-
-          let avg_treatment_efficiency_factor  = metrics.avg_treatment_efficiency(industries)
-          let avg_treatment_efficiency_risk = this.risk_categories["treatment_efficiency"](avg_treatment_efficiency_factor)
-
-          let avg_influent_efficiency_factor  = metrics.avg_influent_efficiency(industries)
-          let avg_influent_efficiency_risk = this.risk_categories["influent_treatment_efficiency"](avg_influent_efficiency_factor)
-
-          pollution[key] = this.return_avg_risk([eutrophication_risk, ecotox_effluent_risk, delta_ecotox_risk, eqs_risk, delta_eqs_risk, avg_treatment_efficiency_risk, avg_influent_efficiency_risk])
-          treated_factor[key] = metrics.treated_water_factor(industries)
-
-
-        }
-
-
-        pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
-        pollutants_table.value.push(quality_quantity)
-        pollutants_table.value.push(recycled_factor)
-        pollutants_table.value.push(efficiency_factor)
-        pollutants_table.value.push(total_ghg)
-        pollutants_table.value.push(energy_used_row)
-        pollutants_table.value.push(pollution)
-        pollutants_table.value.push(treated_factor)
-
-
-        /*pollutants_table.value.push(eutrophication)
-        pollutants_table.value.push(ecotox_effluent)
-        pollutants_table.value.push(delta_ecotox)
-        pollutants_table.value.push(eqs)
-        pollutants_table.value.push(delta_eqs)
-        pollutants_table.value.push(avg_treatment_efficiency)
-        pollutants_table.value.push(avg_influent_efficiency)*/
-
-        return pollutants_table
-      }
-      else return {header: [], emissions: []}
-
-    },
-
     async generate_simple_report_table() {
 
       let _this = this
@@ -5312,7 +1331,7 @@ export default {
       if(_this.tab !== undefined){
 
         let pollutants_table = {
-          header: [{text: "", value: "value", sortable: false}, {text: "Pollution impact", value: "pollution_impact", sortable: false}, {text: "Freshwater impact", value: "freshwater_impact", sortable: false}, {text: "GHG emissions from Wastewater", value: "carbon_impact", sortable: false}],
+          header: [{text: "Name", value: "value"}, {text: "Country", value: "country"}, {text: "Number of suppliers", value: "supply_chain_number"}, {text: "Pollution impact", value: "pollution_impact", sortable: false}, {text: "Freshwater impact", value: "freshwater_impact", sortable: false}, {text: "GHG emissions from Wastewater", value: "carbon_impact", sortable: false}],
           value: []
         }
 
@@ -5350,366 +1369,17 @@ export default {
           let delta_eqs_risk = this.risk_categories["delta_eqs"](delta_eqs_factor)
 
           industry_row["pollution_impact"] = this.return_avg_risk([eutrophication_risk, ecotox_effluent_risk, delta_ecotox_risk, eqs_risk, delta_eqs_risk])
+
+          let industry = industries[0]
+
+          industry_row["country"] = utils.get_country_code_from_coordinates(industry.location.lat, industry.location.lng)
+          industry_row["supply_chain_number"] = industry.supply_chain.length
+
           pollutants_table.value.push(industry_row)
-        }
 
-
-        return pollutants_table
-      }
-      else return {header: [], emissions: []}
-
-    },
-
-
-    async generate_water_quality_table() {
-
-      let _this = this
-
-
-      if(_this.industry_clicked != null){
-
-        let pollutants_table = {
-          header: [{text: "", value: "value", sortable: false}],
-          value: []
-        }
-
-        let dilution_factor_row = {value: _this.table_title.availability_quantity.dilution_factor, unit: "-", info: "info_dilution_factor"}
-        let treated_factor = {value: _this.table_title.availability_quantity.treated, unit: "%", info:"info_treated_factor"}
-        let available_ratio = {value: _this.table_title.availability_quantity.consumption_available, unit: "%", info: "info_water_stress"}
-        let recycled_factor = {value: _this.table_title.availability_quantity.recycled, unit: "%", info:"info_recycled_factor"}
-        let efficiency_factor = {value: _this.table_title.availability_quantity.specific_water_consumption, unit: "tonnes/m3", info: "info_specific_consumption"}
-        //let water_quality_standards = {value: "Environmental quality standards", unit: "%", info: "Percentage of emitted pollutants exceeding the maximum allowable concentration"}
-
-
-        let data_chart = {
-          labels: ["Recycled water factor", "Treated water factor", "Consumption available ratio"],
-          datasets: []
-        };
-
-        for (const [key, industries] of Object.entries(_this.current_industry)) {
-          pollutants_table.header.push({
-            text: key, value: key,
-          })
-
-          let dilution_factor_value = await metrics.dilution_factor(this.global_layers, industries)
-          dilution_factor_row[key] = dilution_factor_value
-
-          recycled_factor[key] = metrics.recycled_water_factor(industries)
-
-          treated_factor[key] = metrics.treated_water_factor(industries)
-
-          let available_ratio_value = await metrics.available_ratio(this.global_layers, industries)
-          available_ratio[key] = available_ratio_value
-
-          efficiency_factor[key] = metrics.efficiency_factor(industries)
-
-          //water_quality_standards[key] = metrics.nqa(industries)
-
-          data_chart.datasets.push({
-            data: [recycled_factor[key], treated_factor[key], available_ratio_value],
-            label: key,
-            backgroundColor: this.chooseColor(key).concat("70"),
-          })
-        }
-
-        const options = {
-          animation: false,
-          scale: {
-            ticks: {
-              min: 0
-            }
-          },
-          "tooltips": {
-            "callbacks": {
-              "title": (tooltipItem, data) => {
-                //return data.labels[tooltipItem[0].index]
-                return Object.values(tooltipItem).map(item => {
-                  return data.labels[item.index]
-                }).toString()
-              }
-            }
-          }
-        }
-
-        _this.quantity_chart = {
-          chartData: data_chart,
-          options: options
-        }
-
-        pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
-
-        pollutants_table.value.push(dilution_factor_row)
-        //pollutants_table.value.push(recycled_factor)
-        //pollutants_table.value.push(treated_factor)
-        pollutants_table.value.push(available_ratio)
-        //pollutants_table.value.push(efficiency_factor)
-        //pollutants_table.value.push(water_quality_standards)
-
-
-        return pollutants_table
-      }
-      else return {header: [], emissions: []}
-
-    },
-    async generate_freshwater_lever_for_action_table() {
-
-      let _this = this
-
-      if(_this.industry_clicked != null){
-
-        let pollutants_table = {
-          header: [{text: "", value: "value", sortable: false}],
-          value: []
-        }
-
-        let recycled_factor = {value: _this.table_title.availability_quantity.recycled, unit: "%", info:"info_recycled_factor"}
-        let efficiency_factor = {value: _this.table_title.availability_quantity.specific_water_consumption, unit: "tonnes/m3", info: "info_specific_consumption"}
-
-
-        let data_chart = {
-          labels: ["Recycled water factor", "Treated water factor", "Consumption available ratio"],
-          datasets: []
-        };
-
-        for (const [key, industries] of Object.entries(_this.current_industry)) {
-          pollutants_table.header.push({
-            text: key, value: key,
-          })
-
-
-          recycled_factor[key] = metrics.recycled_water_factor(industries)
-          efficiency_factor[key] = metrics.efficiency_factor(industries)
 
         }
 
-
-
-
-        pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
-
-        pollutants_table.value.push(recycled_factor)
-        pollutants_table.value.push(efficiency_factor)
-
-        return pollutants_table
-      }
-      else return {header: [], emissions: []}
-
-    },
-
-    async generate_treated_table() {
-
-      let _this = this
-
-
-      if(_this.industry_clicked != null){
-
-        let pollutants_table = {
-          header: [{text: "", value: "value", sortable: false}],
-          value: []
-        }
-
-        let treated_factor = {value: _this.table_title.availability_quantity.treated, unit: "%", info:"info_treated_factor"}
-
-
-        for (const [key, industries] of Object.entries(_this.current_industry)) {
-          pollutants_table.header.push({
-            text: key, value: key,
-          })
-
-          treated_factor[key] = metrics.treated_water_factor(industries)
-
-        }
-
-
-
-        pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
-
-        pollutants_table.value.push(treated_factor)
-
-        return pollutants_table
-      }
-      else return {header: [], emissions: []}
-
-    },
-
-
-    generate_treatment_efficiency_table() {
-
-      let _this = this
-
-      if(_this.industry_clicked !== null){
-
-        let pollutants_table = {
-          header: [{text: "", value: "value", sortable: false}],
-          value: []
-        }
-
-
-        let tn = {value: "TN treatment efficiency", unit: "%", info: "info_efficiency_tn"}
-        let tp = {value: "TP treatment efficiency", unit: "%", info: "info_efficiency_tp"}
-        let dichloroethane = {value: "1,2-Dichloroethane treatment efficiency", unit: "%", info: "info_efficiency_diclo"}
-        let cadmium = {value: "Cadmium treatment efficiency", unit: "%", info: "info_efficiency_hexaclorobenzene"}
-        let hexachlorobenzene = {value: "Hexachlorobenzene treatment efficiency", unit: "%", info: "info_efficiency_hexaclorobenzene"}
-        let mercury = {value: "Mercury treatment efficiency", unit: "%", info: "info_efficiency_mercury"}
-        let lead = {value: "Lead treatment efficiency", unit: "%", info: "info_efficiency_lead"}
-        let nickel = {value: "Nickel treatment efficiency", unit: "%", info: "info_efficiency_nickel"}
-        let chloroalkanes = {value: "Chloroalkanes treatment efficiency", unit: "%", info: "info_efficiency_chloroalkanes"}
-        let hexaclorobutadie = {value: "Hexachlorobutadiene treatment efficiency", unit: "%", info: "info_efficiency_hexaclorobutadiene"}
-        let nonylphenols = {value: "Nonylphenols treatment efficiency", unit: "%", info: "info_efficiency_nonylphenols"}
-        let tetrachloroethene = {value: "Tetrachloroethene treatment efficiency", unit: "%", info: "info_efficiency_tetrachloroethene"}
-        let trichloroethylene = {value: "Trichloroethylene treatment efficiency", unit: "%", info: "info_efficiency_trychloroethylene"}
-        let cod = {value: "COD treatment efficiency", unit: "%", info: "info_efficiency_cod"}
-
-
-        let data_chart = {
-          labels: ["COD", "TN", "TP", "1,2-Dichloroethane", "Cadmium", "Hexachlorobenzene", "Mercury", "Lead", "Nickel", "Chloroalkanes", "Hexachlorobutadiene", "Nonylphenols", "Tetrachloroethene", "Trichloroethylene"],
-          datasets: []
-        };
-
-
-        for (const [key, industries] of Object.entries(_this.current_industry)) {
-          pollutants_table.header.push({
-            text: key, value: key,
-          })
-
-          tn[key] = metrics.tn_efficiency(industries)
-          tp[key] = metrics.tp_efficiency(industries)
-          cod[key] = metrics.cod_efficiency(industries)
-          dichloroethane[key] = metrics.dichloroethane_efficiency(industries)
-          cadmium[key] = metrics.cadmium_efficiency(industries)
-          hexachlorobenzene[key] = metrics.hexaclorobenzene_efficiency(industries)
-          mercury[key] = metrics.mercury_efficiency(industries)
-          lead[key] = metrics.lead_efficiency(industries)
-          nickel[key] = metrics.nickel_efficiency(industries)
-          chloroalkanes[key] = metrics.chloroalkanes_efficiency(industries)
-          hexaclorobutadie[key] = metrics.hexaclorobutadie_efficiency(industries)
-          nonylphenols[key] = metrics.nonylphenols_efficiency(industries)
-          tetrachloroethene[key] = metrics.tetrachloroethene_efficiency(industries)
-          trichloroethylene[key] = metrics.tricloroetile_efficiency(industries)
-
-
-          data_chart.datasets.push({
-
-            data: [cod[key], tn[key], tp[key], dichloroethane[key], cadmium[key], hexachlorobenzene[key], mercury[key], lead[key], nickel[key], chloroalkanes[key], hexaclorobutadie[key], nonylphenols[key], tetrachloroethene[key], trichloroethylene[key]],
-            label: key,
-            backgroundColor: this.chooseColor(key).concat("70"),
-
-          })
-        }
-
-
-        const options = {
-          animation: false,
-          scale: {
-            ticks: {
-              min: 0
-            }
-          },
-          "tooltips": {
-
-          }
-        }
-
-        _this.treatment_efficiency_chart = {
-          chartData: data_chart,
-          options: options
-        }
-
-        pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
-
-
-        pollutants_table.value.push(cod)
-        pollutants_table.value.push(tn)
-        pollutants_table.value.push(tp)
-        pollutants_table.value.push(dichloroethane)
-        pollutants_table.value.push(cadmium)
-        pollutants_table.value.push(hexachlorobenzene)
-        pollutants_table.value.push(mercury)
-        pollutants_table.value.push(lead)
-        pollutants_table.value.push(nickel)
-        pollutants_table.value.push(chloroalkanes)
-        pollutants_table.value.push(hexaclorobutadie)
-        pollutants_table.value.push(nonylphenols)
-        pollutants_table.value.push(tetrachloroethene)
-        pollutants_table.value.push(trichloroethylene)
-
-
-
-        return pollutants_table
-      }
-      else return {header: [], emissions: []}
-
-    },
-
-    generate_treatment_efficiency_influent_table() {
-
-      let _this = this
-
-
-      if(_this.industry_clicked !== null){
-
-
-        let pollutants_table = {
-          header: [{text: "", value: "value", sortable: false}],
-          value: []
-        }
-
-        let tn = {value: "TN treatment efficiency", unit: "%", info: "info_efficiency_influent_tn"}
-        let tp = {value: "TP treatment efficiency", unit: "%", info: "info_efficiency_influent_tp"}
-        let cod = {value: "COD treatment efficiency", unit: "%", info: "info_efficiency_influent_cod"}
-
-
-        let data_chart = {
-          labels: ["COD", "TN", "TP"],
-          datasets: []
-        };
-
-
-        for (const [key, industries] of Object.entries(_this.current_industry)) {
-          pollutants_table.header.push({
-            text: key, value: key,
-          })
-
-          let eff = metrics.amount_water_influent_cleaned(industries)
-
-          tn[key] = eff.tn
-          tp[key] = eff.tp
-          cod[key] = eff.cod
-
-
-          data_chart.datasets.push({
-
-            data: [cod[key], tn[key], tp[key]],
-            label: key,
-            backgroundColor: this.chooseColor(key).concat("70"),
-
-          })
-        }
-
-
-        const options = {
-          animation: false,
-          scale: {
-            ticks: {
-              min: 0
-            }
-          },
-          "tooltips": {
-
-          }
-        }
-
-        _this.treatment_efficiency_influent_chart = {
-          chartData: data_chart,
-          options: options
-        }
-
-        pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
-
-
-        pollutants_table.value.push(cod)
-        pollutants_table.value.push(tn)
-        pollutants_table.value.push(tp)
 
         return pollutants_table
       }
@@ -6009,12 +1679,12 @@ export default {
         }]
       }
     }
-      const ctx = document.getElementById('chart');
+      /*const ctx = document.getElementById('chart');
       let chart = new Chart(ctx, {
         type: "bar",
         data: data_chart,
         options: options
-      });
+      });*/
 
       dd.content.push(industriesEmission)
       dd.content.push("\n")
@@ -6022,10 +1692,10 @@ export default {
       dd.content.push("\n\n")
 
 
-      dd.content.push({
+      /*dd.content.push({
         image: chart.toBase64Image(),
         fit: [450, 450]
-      })
+      })*/
 
     },
 
@@ -6096,23 +1766,22 @@ export default {
       }
 
       const ctx = document.getElementById('chart');
-      let chart = new Chart(ctx, {
+      /*let chart = new Chart(ctx, {
         type: "radar",
         data: data_chart,
         options: options
-      });
+      });*/
 
       dd.content.push(industriesIndicator)
       dd.content.push("\n")
       this.risk_categories.legend_impact_pdf(dd)
       dd.content.push("\n\n")
-      dd.content.push({
+      /*dd.content.push({
         image: chart.toBase64Image(),
         fit: [450, 450]
-      })
+      })*/
 
     },
-
 
     eutrophication_pdf(dd, industries_aux, assessment_days) {
 
@@ -6201,20 +1870,20 @@ export default {
         }
       }
       const ctx = document.getElementById('chart');
-      let chart = new Chart(ctx, {
+      /*let chart = new Chart(ctx, {
         type: "bar",
         data: data_chart,
         options: options
-      });
+      });*/
 
       dd.content.push(industriesEutrophication)
       dd.content.push("\n")
       _this.risk_categories.legend_impact_pdf(dd)
       dd.content.push("\n\n")
-      dd.content.push({
+      /*dd.content.push({
         image: chart.toBase64Image(),
         fit: [450, 450]
-      })
+      })*/
 
     },
 
@@ -6357,11 +2026,11 @@ export default {
         }
       }
       const ctx = document.getElementById('chart');
-      let chart = new Chart(ctx, {
+      /*let chart = new Chart(ctx, {
         type: "bar",
         data: data_chart,
         options: options
-      });
+      });*/
 
       dd.content.push(industriesEcotoxicity)
       dd.content.push("\n")
@@ -6380,10 +2049,10 @@ export default {
       dd.content.push("\n")
       this.risk_categories.legend_impact_pdf(dd)
       dd.content.push("\n\n")
-      dd.content.push({
+      /*dd.content.push({
         image: chart.toBase64Image(),
         fit: [450, 450]
-      })
+      })*/
 
       this.eqs_pdf(dd, industries_aux)
       await this.delta_pdf(dd, industries_aux, assessment_days)
@@ -6770,7 +2439,6 @@ export default {
       dd.content.push("\n\n")
     },
 
-
     async delta_eqs_pdf(dd, industries_aux) {
 
       dd.content.push({
@@ -7024,11 +2692,11 @@ export default {
       }
 
       const ctx = document.getElementById('chart');
-      let chart = new Chart(ctx, {
+      /*let chart = new Chart(ctx, {
         type: "radar",
         data: data_chart,
         options: options
-      });
+      });*/
 
       dd.content.push(industriesEfficiency)
       dd.content.push("\n\n")
@@ -7044,10 +2712,10 @@ export default {
           ]},
       ])
       dd.content.push("\n\n")
-      dd.content.push({
+      /*dd.content.push({
         image: chart.toBase64Image(),
         fit: [450, 450]
-      })
+      })*/
 
     },
 
@@ -7119,19 +2787,19 @@ export default {
       }
 
       const ctx = document.getElementById('chart');
-      let chart = new Chart(ctx, {
+      /*let chart = new Chart(ctx, {
         type: "radar",
         data: data_chart,
         options: options
-      });
+      });*/
 
       dd.content.push(industriesEfficiency)
       dd.content.push("\n\n")
 
-      dd.content.push({
+      /*dd.content.push({
         image: chart.toBase64Image(),
         fit: [450, 450]
-      })
+      })*/
 
     },
 
@@ -7203,7 +2871,6 @@ export default {
       dd.content.push("\n\n")
 
     },
-
 
     async generate_pdf(){
       let _this = this
@@ -7412,10 +3079,19 @@ export default {
       if(!assessment.disabled) _this.selected_assessments.push(assessment.assessment)
     })
     let indexFirstValid = this.assessments_with_industries.findIndex(assessment => assessment.disabled == false)
-    if(indexFirstValid >= 0) this.tab = indexFirstValid
+    if(indexFirstValid >= 0) {
+      this.selected_assessment = this.assessments_with_industries[indexFirstValid].assessment.name
+    }
   },
 
   computed: {
+
+    tab(){
+      let _this = this
+      let index = this.assessments_with_industries.findIndex(assessment => assessment.assessment.name == _this.selected_assessment)
+      if(index  == -1) return undefined
+      else return index
+    },
 
     indicators_industry(){
       return [
@@ -7511,7 +3187,6 @@ export default {
         return obj
       }
     },
-
 
     industry_table() {
 
@@ -7648,10 +3323,6 @@ export default {
   font-size: 18px;
 }
 
-.outer{
-  overflow: hidden;
-}
-
 .center {
   margin: auto;
   padding: 10px;
@@ -7666,11 +3337,7 @@ export default {
   height: 100%;
   margin-bottom: 50px;
 }
-.v-tabs-items {
-  padding: 20px;
-  overflow-y:scroll !important;
-  height: 100%;
-}
+
 
 
 #assessment_tab .v-tab.v-tab--active{
@@ -7690,7 +3357,6 @@ export default {
 
 .menu{
   border-left: 3px solid #1C195B;
-  overflow-y:scroll !important;
   height: 100%;
   padding-top: 30px;
   padding-bottom: 30px;
@@ -7763,9 +3429,6 @@ table {
   transform: scale(1.2);
 }
 
-.no_scroll{
-  overflow-y: hidden !important;
-}
 
 .hover {
   color: #b62373;
@@ -7811,6 +3474,20 @@ table {
       cursor: default;
     }
   }
+}
+
+.select_asessment {
+  color: #b62373 !important
+}
+
+.cdp_key {
+  color: #b62373;
+  font-size: 1.4rem;
+  font-weight: bold;
+  padding-right: 10px;
+}
+.cdp_description {
+  font-weight: bold;
 }
 
 

@@ -63,6 +63,7 @@ export class Industry{
         this.name = "new industry";
         this.location = null
         this.streamflow = null
+        this.water_stress = null
         this.onsite_wwtp = new WWTP()
         this.has_onsite_wwtp = null
         this.has_offsite_wwtp = null

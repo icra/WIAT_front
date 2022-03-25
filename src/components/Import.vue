@@ -1,8 +1,6 @@
 <template>
   <div class="outer">
 
-
-
     <h1 style="color: #b62373">Load and save file</h1>
     <div style="display: flex">
       <div class= "load_and_save" style="width: 65%">
