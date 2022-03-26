@@ -241,7 +241,6 @@
 import {
   Assessment,
   Industry,
-  Direct_discharge,
 } from "../ecam_backend";
 
 import * as Excel from "exceljs";

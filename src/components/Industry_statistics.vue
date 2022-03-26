@@ -1,8 +1,8 @@
 <template>
   <div style="height: 100%;" class="outer">
 
-    <div class="dialog_detail" v-if="industry_clicked != null" style="background-color: white">
-      <h3>{{ industry_clicked[0].name }} </h3>
+    <div class="dialog_detail" v-if="industry != null" style="background-color: white">
+      <h3>{{ industry.name }} </h3>
       <br>
 
       <v-row
@@ -79,7 +79,7 @@
                   </template>
 
                   <template
-                      v-for="value in Object.keys(industries_aggregated)"
+                      v-for="value in [industry]"
                       v-slot:[`item.${value}`]="{ item }"
                   >
 
@@ -148,7 +148,7 @@
                   </template>
 
                   <template
-                      v-for="value in Object.keys(industries_aggregated)"
+                      v-for="value in [industry]"
                       v-slot:[`item.${value}`]="{ item }"
                   >
 
@@ -218,7 +218,7 @@
                   </template>
 
                   <template
-                      v-for="value in Object.keys(industries_aggregated)"
+                      v-for="value in [industry]"
                       v-slot:[`item.${value}`]="{ item }"
                   >
 
@@ -286,7 +286,7 @@
                     <span v-else>{{item.value}}</span>
                   </template>
                   <template
-                      v-for="value in Object.keys(industries_aggregated)"
+                      v-for="value in [industry]"
                       v-slot:[`item.${value}`]="{ item }"
                   >
 
@@ -354,7 +354,7 @@
                     <span v-else>{{item.value}}</span>
                   </template>
                   <template
-                      v-for="value in Object.keys(industries_aggregated)"
+                      v-for="value in [industry]"
                       v-slot:[`item.${value}`]="{ item }"
                   >
 
@@ -424,7 +424,7 @@
                     <span v-else>{{item.value}}</span>
                   </template>
                   <template
-                      v-for="value in Object.keys(industries_aggregated)"
+                      v-for="value in [industry]"
                       v-slot:[`item.${value}`]="{ item }"
                   >
 
@@ -494,7 +494,7 @@
                   </template>
 
                   <template
-                      v-for="value in Object.keys(industries_aggregated)"
+                      v-for="value in [industry]"
                       v-slot:[`item.${value}`]="{ item }"
                   >
 
@@ -614,7 +614,7 @@
                   </template>
 
                   <template
-                      v-for="value in Object.keys(industries_aggregated)"
+                      v-for="value in [industry]"
                       v-slot:[`item.${value}`]="{ item }"
                   >
 
@@ -717,7 +717,7 @@
                   </template>
 
                   <template
-                      v-for="value in Object.keys(industries_aggregated)"
+                      v-for="value in [industry]"
                       v-slot:[`item.${value}`]="{ item }"
                   >
 
@@ -830,8 +830,7 @@
 
     </div>
 
-
-    <div v-if="industry_clicked != null">
+    <div v-if="industry != null">
 
       <!-- Quality and quantity -->
       <v-dialog
@@ -3123,12 +3122,6 @@
 
     </div>
 
-
-
-
-
-
-
   </div>
 
 </template>
@@ -3137,11 +3130,8 @@
 
 import BarChart from "@/components/BarChart";
 let _ = require('lodash');
-import PDFJSViewer from "@/components/PDFJSViewer";
-import pdfMake from 'pdfmake/build/pdfmake.js'
 import Vue from "vue";
 import {utils, metrics} from "../utils"
-import standard_industrial_classification from "../standard_industrial_classification"
 import external_indicators from "../external_indicators"
 
 import RadarChart from "@/components/RadarChart";
@@ -3154,29 +3144,21 @@ Vue.use(VueKatex, {});
 
 
 export default {
-  name: "Make_report",
+  name: "Industry_statistics",
   components: {
     RadarChart,
     BarChart,
-    PDFJSViewer
   },
+  props: ['assessment_id', 'industry_id'],
   data() {
     return {
+      industry: null,
       expanded: [],
-      singleExpand: true,
       risk_categories: risk_thereshold,
       created_assessments: this.$assessments,  //Created assessments
-      selected_industries: [],
-      selected_assessments: [],
-      doc: null,
       layers: Vue.prototype.$layers_description,
-      generating_pdf: false,
       global_layers: utils.format_layer_description(Vue.prototype.$layers_description),
-      selected_layers: [Vue.prototype.$layers_description[1].children[0].children[3]], //layers included in the report (initially only streamflow)
-      selected_layers_pdf: [], //layers included in the pdf report
 
-      main_tab: 0,
-      layers_table: {header: [], value: []},
       water_quantity: {header: [], value: []},
       treated_table: {header: [], value: []},
       freshwater_lever_for_action: {header: [], value: []},
@@ -3184,7 +3166,6 @@ export default {
       treatment_efficiency_table: {header: [], value: []},
       treatment_efficiency_influent_table: {header: [], value: []},
 
-      reporting_indicators: {header: [], value: []},
       ecotoxicity_table: {header: [], value: []},
       eqs_table: {header: [], value: []},
       delta_ecotox_table: {header: [], value: []},
@@ -3196,39 +3177,8 @@ export default {
       effluent_load_table: {header: [], value: []},
 
       simple_report_table: {header: [], value: []},
-      cdp_5_1: {header: [], value: []},
-      cdp_1_2_b: {header: [], value: []},
       external_indicators: external_indicators,
 
-      include_future: true,
-
-      aggregation_level: "industry",
-      aggregation_items: [{text: "Industry", value: "industry"}, {text: "Country", value: "country"}],
-
-      ghg_emission_chart: {
-        chartData: null,
-        options: null
-      },
-      quantity_chart: {
-        chartData: null,
-        options: null
-      },
-      eutrophication_chart: {
-        chartData: null,
-        options: null
-      },
-      ecotoxicity_chart: {
-        chartData: null,
-        options: null
-      },
-      treatment_efficiency_chart: {
-        chartData: null,
-        options: null
-      },
-      treatment_efficiency_influent_chart: {
-        chartData: null,
-        options: null
-      },
 
       table_title: {
         global_warming_potential: {
@@ -3287,21 +3237,7 @@ export default {
 
         },
       },
-      imported_file_excel: null,
-      dialog_quality_quantity: false,
-      dialog_emissions: false,
-      dialog_eutrophication: false,
-      dialog_ecotox: false,
-      dialog_efficiency: false,
-      dialog_tu: false,
-      dialog_eqs: false,
-      dialog_delta_tu: false,
-      dialog_delta_eqs: false,
-      dialog_influent_efficiency: false,
-      dialog_ecotoxicity_and_biodiversity: false,
-      dialog_pollution: false,
 
-      biodiversity_models: [],
       info_energy_used: false,
 
       info_dilution_factor: false,
@@ -3381,11 +3317,7 @@ export default {
       info_efficiency_influent_cod: false,
       info_efficiency_influent_tn: false,
       info_efficiency_influent_tp: false,
-      radio_layers: 2,
-      radio_industry_edit: null,
-      tab_pollutant: 0,
       dialog_biogas_stage: 0,
-      industry_clicked: [],
       industry_info: false,
       active_indicator: [],
       open_indicator: [],
@@ -3395,7 +3327,6 @@ export default {
 
   },
   watch: {
-
     open_indicator(value){
       let impact_index = [1, 12, 15] //Index in tree-view where main categories start
       let new_item = value[value.length-1]
@@ -3412,208 +3343,21 @@ export default {
         this.dialog_biogas_stage = 0
       }
     },
-    radio_layers: function(value){
-      let _this = this
-      if(value == 2){
-        Vue.nextTick(async function () {
-          _this.selected_layers.splice(0, _this.selected_layers.length, _this.layers[1].children[0].children[3])
-        })
-      }
+    assessment_id: function(value){
+      this.industry = this.created_assessments[value][this.industry_id]
     },
-    selected_assessments: function (new_selected_assessments, old_value){
-      if(new_selected_assessments.length > 0){
-        this.selected_industries = []
-        if (old_value.length == 0) this.tab = 0
-        let _this = this
-        new_selected_assessments.forEach(assessment => {
-          assessment.industries.forEach(industry => {
-            //Required items
-            if(this.is_industry_valid(industry)){
-              _this.selected_industries.push({
-                "industry": industry,
-                "assessment": assessment,
-                "name": industry.name
-              })
-            }
-          })
-        })
-      }
-      else {
-        this.selected_industries = []
-      }
+    industry_id: function(value){
+      this.industry = this.created_assessments[this.assessment_id][value]
     },
-    industry_clicked: async function () {
-      this.emissions_table = {header: [], value: []}
-      this.energy_use_table = {header: [], value: []}
-      this.effluent_load_table = {header: [], value: []}
-      this.water_quantity = {header: [], value: []}
-      this.treated_table = {header: [], value: []}
-      this.freshwater_lever_for_action = {header: [], value: []}
-      this.eutrophication_table = {header: [], value: []}
-      this.ecotoxicity_table = {header: [], value: []}
-      this.treatment_efficiency_table = {header: [], value: []}
-      this.delta_ecotox_table = {header: [], value: []}
-      this.eqs_table = {header: [], value: []}
-      this.delta_eqs_table = {header: [], value: []}
-      this.radio_industry_edit = null
-      this.open_indicator.splice(0, this.open_indicator.length)
-      this.treatment_efficiency_influent_table = {header: [], value: []}
-      this.active_indicator.splice(0, this.active_indicator.length)
 
-      this.emissions_table = this.generate_emissions_table()
-      this.energy_use_table = this.generate_energy_use_table()
-      this.effluent_load_table = this.generate_effluent_load_table()
-
-      this.water_quantity = await this.generate_water_quality_table()
-      this.treated_table = await this.generate_treated_table()
-      this.freshwater_lever_for_action = await this.generate_freshwater_lever_for_action_table()
-
-      this.eutrophication_table = this.generate_eutrophication_table()
-      this.ecotoxicity_table = this.generate_ecotoxicity_table()
-      this.reporting_indicators = await this.generate_reporting_indicators_table()
-      this.treatment_efficiency_table = this.generate_treatment_efficiency_table()
-      this.treatment_efficiency_influent_table = this.generate_treatment_efficiency_influent_table()
-
-      //this.layers_table = await this.generate_layers_table()
-      //this.simple_report_table = await this.generate_simple_report_table()
-
-      this.eqs_table = this.generate_eqs_table()
-      this.delta_eqs_table = await this.generate_delta_eqs_table()
-      this.delta_ecotox_table = await this.generate_delta_ecotox_table()
-    },
-    selected_layers: async function () {
-      let _this = this
-      _this.layers_table = {header: [], value: []}
-      _this.layers_table = await _this.generate_layers_table(_this.tab)
-
-    },
-    tab: async function () {
-      let _this = this
-      this.layers_table = {header: [], value: []}
-      this.simple_report_table = {header: [], value: []}
-      this.cdp_5_1 = {header: [], value: []}
-      this.cdp_1_2_b = {header: [], value: []}
-
-
-      Vue.nextTick(async function () {
-        _this.emissions_table =_this.generate_emissions_table()
-        _this.energy_use_table = _this.generate_energy_use_table()
-        _this.effluent_load_table = _this.generate_effluent_load_table()
-
-        _this.water_quantity = await _this.generate_water_quality_table()
-        _this.treated_table = await _this.generate_treated_table()
-        _this.freshwater_lever_for_action = await _this.generate_freshwater_lever_for_action_table()
-
-        _this.eutrophication_table = _this.generate_eutrophication_table()
-        _this.ecotoxicity_table = _this.generate_ecotoxicity_table()
-        _this.reporting_indicators = await _this.generate_reporting_indicators_table()
-        _this.treatment_efficiency_table = _this.generate_treatment_efficiency_table()
-        _this.treatment_efficiency_influent_table = _this.generate_treatment_efficiency_influent_table()
-
-        _this.eqs_table = _this.generate_eqs_table()
-        _this.delta_eqs_table = await _this.generate_delta_eqs_table()
-        _this.delta_ecotox_table = await _this.generate_delta_ecotox_table()
-
-
-        //Taules a mantenir
-        _this.simple_report_table = await _this.generate_simple_report_table()
-        _this.selected_layers.splice(0, _this.selected_layers.length, _this.layers[1].children[0].children[3])
-        _this.radio_layers = 2
-        _this.main_tab = 0
-        _this.cdp_5_1 = await _this.generate_cdp_5_1_table()
-        _this.cdp_1_2_b = await _this.generate_cdp_1_2_b_table()
-
-      })
-    },
   },
   methods: {
 
-    async generate_cdp_5_1_table() {
-      let assessment = this.assessments_with_industries[this.tab]
-
-      let header = [
-        {
-          text: 'Facility name',
-          align: 'start',
-          value: 'name',
-        },
-        { text: 'Country', value: 'country' },
-        { text: 'Latitude', value: 'lat' },
-        { text: 'Longitude', value: 'lng' },
-        { text: 'Located in area of water stress', value: 'water_stress' },
-        { text: 'Total water withdrawals at this facility (ML/yr)', value: 'withdrawals' },
-        { text: 'Total water discharges at this facility (ML/yr)', value: 'discharges' },
-        { text: 'Total water consumption at this facility (ML/yr)', value: 'consumption' },
-      ]
-      let value = []
-
-      for (let industry of assessment.assessment.industries){
-
-        let indicators = await metrics.cdp_5_1_indicators([industry], this.global_layers)
-
-        value.push({
-          name: industry.name,
-          country: utils.get_country_code_from_coordinates(industry.location.lat, industry.location.lng),
-          lat: industry.location.lat.toFixed(2),
-          lng: industry.location.lng.toFixed(2),
-          withdrawals: indicators["dis"],
-          discharges: indicators["wd"],
-          consumption: indicators["consumed"],
-          water_stress: indicators["water_stress"],
-
-        })
-      }
-
-      return {
-        header, value
-      }
-
-    },
-
-    async generate_cdp_1_2_b_table() {
-      let assessment = this.assessments_with_industries[this.tab]
-
-      let header = [
-        { text: 'Water aspect', value: 'water_aspect' },
-        { text: 'Volume (megaliters/year)', value: 'volume' },
-      ]
-      let value = []
-
-      let indicators = metrics.cdp_1_2_b_indicators(assessment.assessment.industries)
-      value.push({
-        water_aspect: "Total withdrawals",
-        volume: indicators.wd,
-      })
-      value.push({
-        water_aspect: "Total discharges",
-        volume: indicators.dis,
-      })
-      value.push({
-        water_aspect: "Total consumption",
-        volume: indicators.consumed,
-      })
-
-      return {
-        header, value
-      }
-
-    },
-
-    industry_and_supply_chain(){
-      let industries = this.created_assessments[this.tab].industries.map(x => x.name)
-      let sc = this.created_assessments[this.tab].industries.map(industry => {
-        return industry.supply_chain.map(sc => {
-          return sc.name+" (Supply chain of "+industry.name+")"
-        })
-      }).flat(2)
-      return [...industries, ...sc]
-    },
-
     indicator_risk_class: function(id){
 
-      if(this.current_industry == null) return
+      if(this.industry == null) return
       //risks
-      let current_industry_name = Object.keys(this.current_industry)[0]
+      let current_industry_name = this.industry.name
       let industry = this.simple_report_table.value.filter(industry => industry.value == current_industry_name)[0]
       if(industry == null || industry == undefined) return
       //let ghg_impact = this.risk_categories["global_warming"](industry["carbon_impact"])
@@ -3684,64 +3428,6 @@ export default {
       }
     },
 
-    itemRowBackground: function (item) {
-      return item.value === this.table_title.simple_table.quality_quantity || item.value === this.table_title.simple_table.pollution || item.value === this.table_title.simple_table.total_ghg ? 'impact-style' : 'lever-style'
-    },
-    get_supply_chain(industry){
-      let header = [
-        {text: "Supply chain", value: "name"},
-        {text: "Latitude", value: "lat"},
-        {text: "Longitude", value: "lng"}
-      ]
-
-      let items = []
-
-      industry.supply_chain.forEach(supply_chain => {
-        items.push({
-          name: supply_chain.name,
-          lat: supply_chain.location.lat,
-          lng: supply_chain.location.lng
-        })
-      })
-
-      return {header, items}
-    },
-
-    click_tab(tab_clicked){
-      if(this.tab === tab_clicked) return
-      this.emissions_table = {header: [], value: []}
-      this.energy_use_table = {header: [], value: []}
-      this.effluent_load_table = {header: [], value: []}
-      this.water_quantity = {header: [], value: []}
-      this.treated_table = {header: [], value: []}
-      this.freshwater_lever_for_action = {header: [], value: []}
-      this.eutrophication_table = {header: [], value: []}
-      this.ecotoxicity_table = {header: [], value: []}
-      this.reporting_indicators = {header: [], value: []}
-      this.treatment_efficiency_table = {header: [], value: []}
-      this.layers_table = {header: [], value: []}
-      this.simple_report_table = {header: [], value: []}
-      this.delta_ecotox_table = {header: [], value: []}
-      this.eqs_table = {header: [], value: []}
-      this.delta_eqs_table = {header: [], value: []}
-      this.radio_industry_edit = null
-      this.treatment_efficiency_influent_table = {header: [], value: []}
-
-    },
-
-    getBase64ImageFromURL(url) {
-      return fetch(url)
-          .then((response) => response.blob())
-          .then(
-              (blob) =>
-                  new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onloadend = () => resolve(reader.result);
-                    reader.onerror = reject;
-                    reader.readAsDataURL(blob);
-                  })
-          );
-    },
     is_industry_valid(industry){
       if(industry.volume_withdrawn!=null && industry.product_produced!=null && industry.has_onsite_wwtp!=null && industry.has_offsite_wwtp!=null && industry.has_direct_discharge!=null && industry.industry_type!=null){
         let arr = [true]
@@ -3777,53 +3463,9 @@ export default {
     },
 
     simpleTableRowClick(item, row){
-
-      this.industry_clicked = this.industries_aggregated[item.value]
       this.industry_info = true
-
-
-
     },
 
-
-    get_color(color){
-      return color == null ? null : color[0]
-    },
-
-    industries_deleted(){ //An industry or assessment has been deleted, if it's the current one return to map
-
-      let _this = this
-      this.layers_table = {header: [], value: []}
-      _this.radio_layers = 2
-      _this.main_tab = 0
-      let firstIndexValid = _this.assessments_with_industries.findIndex(assessment => assessment.disabled == false)
-      _this.tab = firstIndexValid >= 0 ? firstIndexValid : undefined
-
-
-      Vue.nextTick(async function () {
-        _this.emissions_table =_this.generate_emissions_table()
-        _this.energy_use_table = _this.generate_energy_use_table()
-        _this.effluent_load_table = _this.generate_effluent_load_table()
-
-        _this.water_quantity = await _this.generate_water_quality_table()
-        _this.treated_table = await _this.generate_treated_table()
-        _this.freshwater_lever_for_action = await _this.generate_freshwater_lever_for_action_table()
-
-        _this.eutrophication_table = _this.generate_eutrophication_table()
-        _this.ecotoxicity_table = _this.generate_ecotoxicity_table()
-        _this.reporting_indicators = await _this.generate_reporting_indicators_table()
-        _this.treatment_efficiency_table = _this.generate_treatment_efficiency_table()
-        _this.treatment_efficiency_influent_table = _this.generate_treatment_efficiency_influent_table()
-
-        _this.simple_report_table = await _this.generate_simple_report_table()
-
-        _this.eqs_table = _this.generate_eqs_table()
-        _this.delta_eqs_table = await _this.generate_delta_eqs_table()
-        _this.delta_ecotox_table = await _this.generate_delta_ecotox_table()
-        _this.selected_layers.splice(0, _this.selected_layers.length, _this.layers[1].children[0].children[3])
-
-      })
-    },
 
     getAvailabilityColor (item, value) {
       if (item.value == this.table_title.availability_quantity.dilution_factor){
@@ -3879,134 +3521,8 @@ export default {
       return this.risk_categories["influent_treatment_efficiency"](item[value])
     },
 
-    getGISLayerColor(item, value){
-
-      let equals = function(name1, name2){
-        return name1 == name2 || name1 == name2 + " (BAU 2030)"
-      }
-
-      if (equals(item.layer, "Seasonal variability")){
-        return this.risk_categories.seasonal_variability(item[value])
-      }else if (equals(item.layer, "Interannual variability")){
-        return this.risk_categories.interannual_variability(item[value])
-      }else if (equals(item.layer, "Water stress")){
-        return this.risk_categories.water_stress(item[value])
-      }else if (equals(item.layer, "Water depletion")){
-        return this.risk_categories.water_depletion(item[value])
-      }else if (equals(item.layer, "Aridity index")){
-        return this.risk_categories.aridity_index(item[value])
-      }else if (equals(item.layer, "Groundwater table decline")){
-        return this.risk_categories.groundwater_table_decline(item[value])
-      }else if (equals(item.layer, "Riverine flood risk")){
-        return this.risk_categories.riverine_flood_risk(item[value])
-      }else if (equals(item.layer, "Coastal flood risk")){
-        return this.risk_categories.coastal_flood_risk(item[value])
-      }else if (equals(item.layer, "Drought risk")){
-        return this.risk_categories.drought_risk(item[value])
-      }else if (equals(item.layer, "Coastal eutrophication potential")){
-        return this.risk_categories.coastal_eutrophication_potential(item[value])
-      }else if (equals(item.layer, "Peak RepRisk Country ESG Risk Index")){
-        return this.risk_categories.reprisk(item[value])
-      }else if (equals(item.layer, "Unimproved/No Sanitation")){
-        return this.risk_categories.no_sanitation(item[value])
-      } else if (equals(item.layer, "Unimproved/No Drinking Water")){
-        return this.risk_categories.no_drinking(item[value])
-      }
-    },
-
-    getGISLayerColorPDF(layer, value){
-
-      let equals = function(name1, name2){
-        return name1 == name2 || name1 == name2 + " (BAU 2030)"
-      }
-
-      let ret = null
-
-      if (equals(layer, "Seasonal variability")){
-        ret =  this.risk_categories.seasonal_variability(value)
-      }else if (equals(layer, "Interannual variability")){
-        ret = this.risk_categories.interannual_variability(value)
-      }else if (equals(layer, "Water stress")){
-        ret = this.risk_categories.water_stress(value)
-      }else if (equals(layer, "Water depletion")){
-        ret = this.risk_categories.water_depletion(value)
-      }else if (equals(layer, "Aridity index")){
-        ret = this.risk_categories.aridity_index(value)
-      }else if (equals(layer, "Groundwater table decline")){
-        ret = this.risk_categories.groundwater_table_decline(value)
-      }else if (equals(layer, "Riverine flood risk")){
-        ret = this.risk_categories.riverine_flood_risk(value)
-      }else if (equals(layer, "Coastal flood risk")){
-        ret = this.risk_categories.coastal_flood_risk(value)
-      }else if (equals(layer, "Drought risk")){
-        ret = this.risk_categories.drought_risk(value)
-      }else if (equals(layer, "Coastal eutrophication potential")){
-        ret = this.risk_categories.coastal_eutrophication_potential(value)
-      }else if (equals(layer, "Peak RepRisk Country ESG Risk Index")){
-        ret = this.risk_categories.reprisk(value)
-      }else if (equals(layer, "Unimproved/No Sanitation")){
-        ret = this.risk_categories.no_sanitation(value)
-      } else if (equals(layer, "Unimproved/No Drinking Water")){
-        ret = this.risk_categories.no_drinking(value)
-      }
-
-      return ret == null ? null : ret[0]
-    },
-
-    getReportingColor(item, value) {
-      if (item.value == "Effect of water withdrawal on the water body"){
-        return this.risk_categories["withdrawal_effect"](item[value])
-      } else if (item.value == "Effect of water discharges on the water body"){
-        return this.risk_categories["discharge_effect"](item[value])
-      }
-    },
-
-    getSimpleReportColor(item, value){
-      if(value == "pollution_impact"){
-        return this.risk_categories["pollution"](item["pollution_impact"])
-      }else if(value == "freshwater_impact"){
-        return this.risk_categories["pollution"](item["freshwater_impact"])
-      }else if(value == "carbon_impact")
-        return this.risk_categories["global_warming"](item["carbon_impact"])
-      /*
-      if (item.value == this.table_title.simple_table.quality_quantity){
-        return this.risk_categories["quality_quantity"](item[value])
-      }else if(item.value == this.table_title.simple_table.total_ghg){
-        return this.risk_categories["global_warming"](item[value])
-      }else if(item.value == this.table_title.simple_table.eutrophication){
-        return this.risk_categories["eutrophication"](item[value])
-      }else if (item.value == this.table_title.simple_table.tu){
-        return this.risk_categories["ecotoxicity"](item[value])
-      }
-      else if (item.value == this.table_title.simple_table.impact_biodiversity){
-        return this.risk_categories["impact_biodiversity"](item[value])
-      } else if(item.value == this.table_title.simple_table.avg_treatment_efficiency){
-        return this.risk_categories["treatment_efficiency"](item[value])
-      } else if(item.value == this.table_title.simple_table.delta_tu){
-        return this.risk_categories["delta_ecotoxicity"](item[value])
-      }else if(item.value == this.table_title.simple_table.eqs){
-        return this.risk_categories["eqs"](item[value])
-      }else if(item.value == this.table_title.simple_table.delta_eqs){
-        return this.risk_categories["delta_eqs"](item[value])
-      }else if(item.value == this.table_title.simple_table.avg_influent_efficiency){
-        return this.risk_categories["influent_treatment_efficiency"](item[value])
-      }else if(item.value == this.table_title.simple_table.pollution){
-        return this.risk_categories["pollution"](item[value])
-      }*/
-
-
-  return null
-    },
-
     itemRowBold: function (item) {
       return item.value == "Total" ? 'style-1' : 'style-2'
-    },
-
-    chunk(array, size){
-      let R = [];
-      for (let i = 0; i < array.length; i += size)
-        R.push(array.slice(i, i + size));
-      return R;
     },
 
     chooseColor(str){
@@ -4023,7 +3539,7 @@ export default {
       let _this = this
 
 
-      if(_this.industry_clicked !== null){
+      if(_this.industry !== null){
 
         let emission_table = {
           header: [{text: "Emissions", value: "value", sortable: false}],
@@ -4047,27 +3563,28 @@ export default {
             backgroundColor: []
           }]
         };
-        for (const [key, industries] of Object.entries(_this.current_industry)) {
 
-          emission_table.header.push({
-            text: key, value: key,
-          })
-          let emissions = metrics.emissions_and_descriptions(industries, 1)
+        let key = this.industry.name
+        let industries = [this.industry]
 
-          total[key] = emissions["total"]
-          elec[key] = emissions["elec"]
-          fuel[key] = emissions["fuel"]
-          tre[key] = emissions["treatment"]
-          biog[key] = emissions["biog"]
-          slu[key] = emissions["slu"]
-          reus[key] = emissions["reuse"]
-          disc[key] = emissions["disc"]
+        emission_table.header.push({
+          text: key, value: key,
+        })
+        let emissions = metrics.emissions_and_descriptions(industries, 1)
+
+        total[key] = emissions["total"]
+        elec[key] = emissions["elec"]
+        fuel[key] = emissions["fuel"]
+        tre[key] = emissions["treatment"]
+        biog[key] = emissions["biog"]
+        slu[key] = emissions["slu"]
+        reus[key] = emissions["reuse"]
+        disc[key] = emissions["disc"]
 
 
-          data_chart.datasets[0].data.push(emissions["total"])
-          data_chart.labels.push(key)
-          data_chart.datasets[0].backgroundColor.push(this.chooseColor(key))
-        }
+        data_chart.datasets[0].data.push(emissions["total"])
+        data_chart.labels.push(key)
+        data_chart.datasets[0].backgroundColor.push(this.chooseColor(key))
 
         emission_table.header.push({text: "Unit", value: "unit", sortable: false,})
         emission_table.value.push(total)
@@ -4122,7 +3639,7 @@ export default {
 
       let _this = this
 
-      if(_this.industry_clicked !== null){
+      if(_this.industry !== null){
 
         let pollutants_table = {
           header: [{text: "", value: "value", sortable: false}],
@@ -4131,14 +3648,14 @@ export default {
 
         let energy = {value: "Energy used per day", unit: "kWh/day", info: "info_energy_used"}
 
-        for (const [key, industries] of Object.entries(_this.current_industry)) {
+        let key = this.industry.name
+        let industries = [this.industry]
 
-          pollutants_table.header.push({
-            text: key, value: key,
-          })
+        pollutants_table.header.push({
+          text: key, value: key,
+        })
 
-          energy[key] = metrics.energy_used(industries)
-        }
+        energy[key] = metrics.energy_used(industries)
 
         pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
 
@@ -4153,7 +3670,7 @@ export default {
 
       let _this = this
 
-      if(_this.industry_clicked != null){
+      if(_this.industry != null){
 
         let pollutants_table = {
           header: [{text: "", value: "value", sortable: false}],
@@ -4164,17 +3681,17 @@ export default {
         let tp = {value: _this.table_title.pollutants.tp, unit: "gTP/m3", }
         let cod = {value: _this.table_title.pollutants.cod, unit: "gCOD/m3", }
 
-        for (const [key, industries] of Object.entries(_this.current_industry)) {
+        let key = this.industry.name
+        let industries = [this.industry]
 
-          pollutants_table.header.push({
-            text: key, value: key,
-          })
+        pollutants_table.header.push({
+          text: key, value: key,
+        })
 
-          let load = metrics.effluent_concentration(industries)
-          tn[key] = load.tn
-          cod[key] = load.cod
-          tp[key] = load.tp
-        }
+        let load = metrics.effluent_concentration(industries)
+        tn[key] = load.tn
+        cod[key] = load.cod
+        tp[key] = load.tp
 
         pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
 
@@ -4187,12 +3704,11 @@ export default {
 
     },
 
-
     generate_eutrophication_table() {
 
       let _this = this
 
-      if(_this.industry_clicked !== null){
+      if(_this.industry !== null){
 
         let pollutants_table = {
           header: [{text: "", value: "value", sortable: false}],
@@ -4213,25 +3729,24 @@ export default {
           }]
         };
 
-        for (const [key, industries] of Object.entries(_this.current_industry)) {
+        let key = this.industry.name
+        let industries = [this.industry]
 
-          pollutants_table.header.push({
-            text: key, value: key,
-          })
+        pollutants_table.header.push({
+          text: key, value: key,
+        })
 
-          let eutrophication = metrics.eutrophication_potential(industries)
+        let eutrophication = metrics.eutrophication_potential(industries)
 
-          cod[key] = eutrophication.cod
-          tn[key] = eutrophication.tn
-          tp[key] = eutrophication.tp
-          total[key] = eutrophication.total
+        cod[key] = eutrophication.cod
+        tn[key] = eutrophication.tn
+        tp[key] = eutrophication.tp
+        total[key] = eutrophication.total
 
 
-          data_chart.datasets[0].data.push(eutrophication.total)
-          data_chart.labels.push(key)
-          data_chart.datasets[0].backgroundColor.push('rgba(210,109,9,0.93)')
-
-        }
+        data_chart.datasets[0].data.push(eutrophication.total)
+        data_chart.labels.push(key)
+        data_chart.datasets[0].backgroundColor.push('rgba(210,109,9,0.93)')
 
         //CHART
         const options = {
@@ -4282,7 +3797,7 @@ export default {
       let _this = this
 
 
-      if(_this.industry_clicked !== null){
+      if(_this.industry !== null){
 
         let pollutants_table = {
           header: [{text: "", value: "value", sortable: false}],
@@ -4310,31 +3825,30 @@ export default {
           }]
         };
 
-        for (const [key, industries] of Object.entries(_this.current_industry)) {
+        let key = this.industry.name
+        let industries = [this.industry]
 
-          pollutants_table.header.push({
-            text: key, value: key,
-          })
+        pollutants_table.header.push({
+          text: key, value: key,
+        })
 
-          let tu = metrics.ecotoxicity_potential_tu(industries)
-          dichloroethane[key] = tu.diclo
-          cadmium[key] = tu.cadmium
-          hexachlorobenzene[key] = tu.hexaclorobenzene
-          mercury[key] = tu.mercury
-          lead[key] = tu.lead
-          nickel[key] = tu.nickel
-          chloroalkanes[key] = tu.chloroalkanes
-          hexaclorobutadie[key] = tu.hexaclorobutadie
-          nonylphenols[key] = tu.nonylphenols
-          tetrachloroethene[key] = tu.tetracloroetile
-          trichloroethylene[key] = tu.tricloroetile
-          total[key] = tu.total
+        let tu = metrics.ecotoxicity_potential_tu(industries)
+        dichloroethane[key] = tu.diclo
+        cadmium[key] = tu.cadmium
+        hexachlorobenzene[key] = tu.hexaclorobenzene
+        mercury[key] = tu.mercury
+        lead[key] = tu.lead
+        nickel[key] = tu.nickel
+        chloroalkanes[key] = tu.chloroalkanes
+        hexaclorobutadie[key] = tu.hexaclorobutadie
+        nonylphenols[key] = tu.nonylphenols
+        tetrachloroethene[key] = tu.tetracloroetile
+        trichloroethylene[key] = tu.tricloroetile
+        total[key] = tu.total
 
-          data_chart.datasets[0].data.push(total[key])
-          data_chart.labels.push(key)
-          data_chart.datasets[0].backgroundColor.push('rgba(210,109,9,0.93)')
-
-        }
+        data_chart.datasets[0].data.push(total[key])
+        data_chart.labels.push(key)
+        data_chart.datasets[0].backgroundColor.push('rgba(210,109,9,0.93)')
 
         const options = {
           animation: false,
@@ -4393,7 +3907,7 @@ export default {
       let _this = this
 
 
-      if(_this.industry_clicked !== null){
+      if(_this.industry !== null){
 
 
         let pollutants_table = {
@@ -4414,26 +3928,25 @@ export default {
         let trichloroethylene = {value: _this.table_title.pollutants.tricloroetile, unit: "-", info: "info_delta_eqs_trychloroethylene"}
 
 
-        for (const [key, industries] of Object.entries(_this.current_industry)) {
+        let key = this.industry.name
+        let industries = [this.industry]
 
-          pollutants_table.header.push({
-            text: key, value: key,
-          })
+        pollutants_table.header.push({
+          text: key, value: key,
+        })
 
-          let tu = await metrics.delta_eqs(industries, _this.global_layers)
-          dichloroethane[key] = tu.diclo
-          cadmium[key] = tu.cadmium
-          hexachlorobenzene[key] = tu.hexaclorobenzene
-          mercury[key] = tu.mercury
-          lead[key] = tu.lead
-          nickel[key] = tu.nickel
-          chloroalkanes[key] = tu.chloroalkanes
-          hexaclorobutadie[key] = tu.hexaclorobutadie
-          nonylphenols[key] = tu.nonylphenols
-          tetrachloroethene[key] = tu.tetracloroetile
-          trichloroethylene[key] = tu.tricloroetile
-
-        }
+        let tu = await metrics.delta_eqs(industries, _this.global_layers)
+        dichloroethane[key] = tu.diclo
+        cadmium[key] = tu.cadmium
+        hexachlorobenzene[key] = tu.hexaclorobenzene
+        mercury[key] = tu.mercury
+        lead[key] = tu.lead
+        nickel[key] = tu.nickel
+        chloroalkanes[key] = tu.chloroalkanes
+        hexaclorobutadie[key] = tu.hexaclorobutadie
+        nonylphenols[key] = tu.nonylphenols
+        tetrachloroethene[key] = tu.tetracloroetile
+        trichloroethylene[key] = tu.tricloroetile
 
 
         pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
@@ -4455,11 +3968,12 @@ export default {
       else return {header: [], emissions: []}
 
     },
+
     async generate_delta_ecotox_table() {
 
       let _this = this
 
-      if(_this.industry_clicked !== null){
+      if(_this.industry !== null){
 
         let pollutants_table = {
           header: [{text: "", value: "value", sortable: false}],
@@ -4488,31 +4002,32 @@ export default {
           }]
         };
 
-        for (const [key, industries] of Object.entries(_this.current_industry)) {
+        let key = this.industry.name
+        let industries = [this.industry]
 
-          pollutants_table.header.push({
-            text: key, value: key,
-          })
 
-          let tu = await metrics.delta_tu(industries, _this.global_layers)
-          dichloroethane[key] = tu.diclo
-          cadmium[key] = tu.cadmium
-          hexachlorobenzene[key] = tu.hexaclorobenzene
-          mercury[key] = tu.mercury
-          lead[key] = tu.lead
-          nickel[key] = tu.nickel
-          chloroalkanes[key] = tu.chloroalkanes
-          hexaclorobutadie[key] = tu.hexaclorobutadie
-          nonylphenols[key] = tu.nonylphenols
-          tetrachloroethene[key] = tu.tetracloroetile
-          trichloroethylene[key] = tu.tricloroetile
-          total[key] = tu.total
+        pollutants_table.header.push({
+          text: key, value: key,
+        })
 
-          data_chart.datasets[0].data.push(total[key])
-          data_chart.labels.push(key)
-          data_chart.datasets[0].backgroundColor.push('rgba(210,109,9,0.93)')
+        let tu = await metrics.delta_tu(industries, _this.global_layers)
+        dichloroethane[key] = tu.diclo
+        cadmium[key] = tu.cadmium
+        hexachlorobenzene[key] = tu.hexaclorobenzene
+        mercury[key] = tu.mercury
+        lead[key] = tu.lead
+        nickel[key] = tu.nickel
+        chloroalkanes[key] = tu.chloroalkanes
+        hexaclorobutadie[key] = tu.hexaclorobutadie
+        nonylphenols[key] = tu.nonylphenols
+        tetrachloroethene[key] = tu.tetracloroetile
+        trichloroethylene[key] = tu.tricloroetile
+        total[key] = tu.total
 
-        }
+        data_chart.datasets[0].data.push(total[key])
+        data_chart.labels.push(key)
+        data_chart.datasets[0].backgroundColor.push('rgba(210,109,9,0.93)')
+
 
         const options = {
           animation: false,
@@ -4563,13 +4078,12 @@ export default {
 
     },
 
-
     generate_eqs_table() {
 
       let _this = this
 
 
-      if(_this.industry_clicked !== null){
+      if(_this.industry !== null){
 
         let pollutants_table = {
           header: [{text: "", value: "value", sortable: false}],
@@ -4589,26 +4103,26 @@ export default {
         let trichloroethylene = {value: _this.table_title.pollutants.tricloroetile, unit: "-", info: "info_eqs_trychloroethylene"}
 
 
-        for (const [key, industries] of Object.entries(_this.current_industry)) {
+        let key = this.industry.name
+        let industries = [this.industry]
 
-          pollutants_table.header.push({
-            text: key, value: key,
-          })
+        pollutants_table.header.push({
+          text: key, value: key,
+        })
 
-          let tu = metrics.environmental_quality_standards(industries)
-          dichloroethane[key] = tu.diclo
-          cadmium[key] = tu.cadmium
-          hexachlorobenzene[key] = tu.hexaclorobenzene
-          mercury[key] = tu.mercury
-          lead[key] = tu.lead
-          nickel[key] = tu.nickel
-          chloroalkanes[key] = tu.chloroalkanes
-          hexaclorobutadie[key] = tu.hexaclorobutadie
-          nonylphenols[key] = tu.nonylphenols
-          tetrachloroethene[key] = tu.tetracloroetile
-          trichloroethylene[key] = tu.tricloroetile
+        let tu = metrics.environmental_quality_standards(industries)
+        dichloroethane[key] = tu.diclo
+        cadmium[key] = tu.cadmium
+        hexachlorobenzene[key] = tu.hexaclorobenzene
+        mercury[key] = tu.mercury
+        lead[key] = tu.lead
+        nickel[key] = tu.nickel
+        chloroalkanes[key] = tu.chloroalkanes
+        hexaclorobutadie[key] = tu.hexaclorobutadie
+        nonylphenols[key] = tu.nonylphenols
+        tetrachloroethene[key] = tu.tetracloroetile
+        trichloroethylene[key] = tu.tricloroetile
 
-        }
 
 
         pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
@@ -4632,229 +4146,53 @@ export default {
 
     },
 
-    async generate_reporting_indicators_table() {
-
-      let _this = this
-
-
-      if(_this.tab !== undefined){
-
-        let table = {
-          header: [{text: "", value: "value", sortable: false}],
-          value: []
-        }
-
-        let g4_en8 = {value: "Water withdrawal", unit: "m3/year", link_text: "(GRI 303-1)", link_to: "https://www.globalreporting.org/standards/media/1909/gri-303-water-and-effluents-2018.pdf"}
-        let g4_en9 = {value: "Effect of water withdrawal on the water body", link_text: "(GRI 303-2)", link_to: "https://www.globalreporting.org/standards/media/1909/gri-303-water-and-effluents-2018.pdf", unit: "%", info: "If the value is greater than 5%, it means that the withdrawals significantly affect the water source"}
-        let g4_en10 = {value: "Water recycled and reused", link_text: "(GRI 303-3)", link_to: "https://www.globalreporting.org/standards/media/1909/gri-303-water-and-effluents-2018.pdf", unit: "%"}
-        let g4_en22 = {value: "Water discharge", link_text: "(GRI 306-1)", link_to: "https://www.globalreporting.org/standards/media/2573/gri-306-waste-2020.pdf", unit: "m3/year"}
-        let g4_en26 = {value: "Effect of water discharges on the water body", link_text: "(GRI 306-5)", unit: "%", link_to: "https://www.globalreporting.org/standards/media/2573/gri-306-waste-2020.pdf", info: "If the value is greater than 5%, it means that the discharges significantly affect the water source"}
-
-        let wd = {value: "Water withdrawn", link_text: "(CDP W1.2b)", unit: "ML/year", link_to: "https://guidance.cdp.net/en/guidance?cid=W1.2&ctype=ExternalRef&gettags=1+&idtype=RecordExternalRef&incchild=1&microsite=1&otype=questionnaire&page=1"}
-        let dis = {value: "Water discharged", link_text: "(CDP W1.2b)", unit: "ML/year", link_to: "https://guidance.cdp.net/en/guidance?cid=W1.2&ctype=ExternalRef&gettags=1+&idtype=RecordExternalRef&incchild=1&microsite=1&otype=questionnaire&page=1"}
-        let re = {value: "Water reused", link_text: "(CDP W1.2b)", unit: "ML/year", link_to: "https://guidance.cdp.net/en/guidance?cid=W1.2&ctype=ExternalRef&gettags=1+&idtype=RecordExternalRef&incchild=1&microsite=1&otype=questionnaire&page=1"}
-        let highest_level_discharge = {value: "Highest level(s) to which you treat your discharge", link_text: "(CDP W1.2j)", unit: "-", link_to: "https://guidance.cdp.net/en/guidance?cid=W1.2&ctype=ExternalRef&gettags=1+&idtype=RecordExternalRef&incchild=1&microsite=1&otype=questionnaire&page=1"}
-
-        for (const [key, industries] of Object.entries(_this.industries_aggregated)) {
-
-          let indicators = await metrics.reporting_metrics(industries, this.global_layers)
-
-          table.header.push({
-            text: key, value: key,
-          })
-
-          g4_en8[key] = indicators["g4-en8"]
-          g4_en9[key] = indicators["g4-en9"]
-          g4_en10[key] = indicators["g4-en10"]
-          g4_en22[key] = indicators["g4-en22"]
-          g4_en26[key] = indicators["g4-en26"]
-
-          wd[key] = indicators["wd"]
-          dis[key] = indicators["dis"]
-          re[key] = indicators["re"]
-          highest_level_discharge[key] = indicators["highest_level_discharge"]
-
-        }
-
-        table.header.push({text: "Unit", value: "unit", sortable: false,})
-
-        table.value.push(g4_en8)
-        table.value.push(g4_en9)
-        table.value.push(g4_en10)
-        table.value.push(g4_en22)
-        table.value.push(g4_en26)
-        table.value.push(wd)
-        table.value.push(dis)
-        table.value.push(re)
-        table.value.push(highest_level_discharge)
-
-        return table
-      }
-      else return {header: [], emissions: []}
-
-    },
-
-    async generate_simple_report_table_old() {
-
-      let _this = this
-
-
-      if(_this.tab !== undefined){
-
-        let pollutants_table = {
-          header: [{text: "", value: "value", sortable: false}],
-          value: []
-        }
-
-        let quality_quantity = {value: _this.table_title.simple_table.quality_quantity, unit: "-"}
-        let total_ghg = {value: _this.table_title.simple_table.total_ghg, unit: "kgCO2eq/day", info: "This metric indicates the CO2e emissions from the industry. It will always have positive values; higher values indicate higher impact."}
-        let pollution = {value: _this.table_title.simple_table.pollution, unit: "-"}
-        let recycled_factor = {value: _this.table_title.availability_quantity.recycled, unit: "%", info:"This metric indicates the percentage of the reused water used by the industry respect the water that leaves the industry"}
-        let efficiency_factor = {value: _this.table_title.availability_quantity.specific_water_consumption, unit: "tonnes/m3", info: "Specific water consumption is a metric that indicates what is the amount of water from the water body needed to produce a tone of product manufactured in the industry"}
-        let treated_factor = {value: _this.table_title.availability_quantity.treated, unit: "%", info:"This metric indicates the ratio between the water remaining after the industry consumption and the water that is treated in the WWTP"}
-        let energy_used_row = {value: "Energy used", unit: "kWh/day", info: "Energy used by wastewater treatment plants to treat the water sent to the treatment plant"}
-
-
-        /*
-        let eutrophication = {value: _this.table_title.simple_table.eutrophication, unit: "gPO4eq/m3", info: "Eutrophication potential (EP) is defined as the potential to cause over-fertilization of water and soil, which can result in increased growth of biomass. It will always have positive values; higher values indicate higher impact."}
-        let ecotox_effluent = {value: this.table_title.simple_table.tu, unit: "TU/day", info: " Toxic units (TU) are used in the field of toxicology to quantify the interactions of toxicants in mixtures of chemicals. A toxic unit for a given compound is based on the concentration at which there is a 50% effect (ex. EC50) for a certain biological endpoint."}
-        let delta_ecotox = {value: this.table_title.simple_table.delta_tu, unit: "TU/day"}
-        let eqs = {value: this.table_title.simple_table.eqs, unit: "-", info: "Index reflecting how large the load of each pollutant in the effluent is with respect to the EQS (Environmental Quality Standards). The larger it is, the worse."}
-        let delta_eqs = {value: this.table_title.simple_table.delta_eqs, unit: "-"}
-        let avg_treatment_efficiency = {value: _this.table_title.simple_table.avg_treatment_efficiency, unit: "%", info: "Removal rate of pollutants in WWTP's"}
-        let avg_influent_efficiency = {value: _this.table_title.simple_table.avg_influent_efficiency, unit: "%", info: "If the value is less than 100, the industry discharges the water cleaner than when it was withdrawn."}
-        */
-
-        for (const [key, industries] of Object.entries(_this.industries_aggregated)) {
-          pollutants_table.header.push({
-            text: key, value: key,
-          })
-
-          let dilution_factor_value = await metrics.dilution_factor(this.global_layers, industries)
-          let dilution_factor_risk = this.risk_categories["dilution_factor"](dilution_factor_value)
-
-          recycled_factor[key] =  metrics.recycled_water_factor(industries)
-          //let recycled_factor_risk = this.risk_categories["recycled_water_factor"](recycled_factor)
-
-          let available_factor = await metrics.available_ratio(this.global_layers, industries)
-          let available_factor_risk = this.risk_categories["water_stress_ratio"](available_factor)
-
-          efficiency_factor[key] = metrics.efficiency_factor(industries)
-          //let efficiency_factor_risk = this.risk_categories["specific_water_consumption"](efficiency_factor)
-
-          //quality_quantity[key] = this.return_avg_risk([dilution_factor_risk, recycled_factor_risk, treated_factor_risk, available_factor_risk, efficiency_factor_risk])
-          quality_quantity[key] = this.return_avg_risk([dilution_factor_risk, available_factor_risk])
-
-          total_ghg[key] = metrics.emissions_and_descriptions(industries, 1).total
-          energy_used_row[key] = metrics.energy_used(industries)
-
-          let eutrophication_factor = metrics.eutrophication_potential(industries).total
-          let eutrophication_risk = this.risk_categories["eutrophication"](eutrophication_factor)
-
-          let ecotox_effluent_factor = metrics.ecotoxicity_potential_tu(industries).total
-          let ecotox_effluent_risk = this.risk_categories["ecotoxicity"](ecotox_effluent_factor)
-
-          let delta_ecotox_factor = (await metrics.delta_tu(industries, this.global_layers)).total
-          let delta_ecotox_risk = this.risk_categories["delta_ecotoxicity"](delta_ecotox_factor)
-
-          let eqs_factor = metrics.eqs_avg(industries)
-          let eqs_risk = this.risk_categories["eqs"](eqs_factor)
-
-          let delta_eqs_factor = await metrics.delta_eqs_avg(industries, this.global_layers)
-          let delta_eqs_risk = this.risk_categories["delta_eqs"](delta_eqs_factor)
-
-          let avg_treatment_efficiency_factor  = metrics.avg_treatment_efficiency(industries)
-          let avg_treatment_efficiency_risk = this.risk_categories["treatment_efficiency"](avg_treatment_efficiency_factor)
-
-          let avg_influent_efficiency_factor  = metrics.avg_influent_efficiency(industries)
-          let avg_influent_efficiency_risk = this.risk_categories["influent_treatment_efficiency"](avg_influent_efficiency_factor)
-
-          pollution[key] = this.return_avg_risk([eutrophication_risk, ecotox_effluent_risk, delta_ecotox_risk, eqs_risk, delta_eqs_risk, avg_treatment_efficiency_risk, avg_influent_efficiency_risk])
-          treated_factor[key] = metrics.treated_water_factor(industries)
-
-
-        }
-
-
-        pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
-        pollutants_table.value.push(quality_quantity)
-        pollutants_table.value.push(recycled_factor)
-        pollutants_table.value.push(efficiency_factor)
-        pollutants_table.value.push(total_ghg)
-        pollutants_table.value.push(energy_used_row)
-        pollutants_table.value.push(pollution)
-        pollutants_table.value.push(treated_factor)
-
-
-        /*pollutants_table.value.push(eutrophication)
-        pollutants_table.value.push(ecotox_effluent)
-        pollutants_table.value.push(delta_ecotox)
-        pollutants_table.value.push(eqs)
-        pollutants_table.value.push(delta_eqs)
-        pollutants_table.value.push(avg_treatment_efficiency)
-        pollutants_table.value.push(avg_influent_efficiency)*/
-
-        return pollutants_table
-      }
-      else return {header: [], emissions: []}
-
-    },
-
     async generate_simple_report_table() {
 
-      let _this = this
-
-      if(_this.tab !== undefined){
+      if(this.industry !== undefined){
 
         let pollutants_table = {
           header: [{text: "Name", value: "value"}, {text: "Country", value: "country"}, {text: "Number of suppliers", value: "supply_chain_number"}, {text: "Pollution impact", value: "pollution_impact", sortable: false}, {text: "Freshwater impact", value: "freshwater_impact", sortable: false}, {text: "GHG emissions from Wastewater", value: "carbon_impact", sortable: false}],
           value: []
         }
 
-        //let quality_quantity = {value: _this.table_title.simple_table.quality_quantity, unit: "-"}
-        //let total_ghg = {value: _this.table_title.simple_table.total_ghg, unit: "kgCO2eq/day", info: "This metric indicates the CO2e emissions from the industry. It will always have positive values; higher values indicate higher impact."}
-        //let pollution = {value: _this.table_title.simple_table.pollution, unit: "-"}
+        let key = this.industry.name
+        let industries = [this.industry]
 
+        let industry_row = {value: key}
 
-        for (const [key, industries] of Object.entries(_this.industries_aggregated)) {
+        let dilution_factor_value = await metrics.dilution_factor(this.global_layers, industries)
+        let dilution_factor_risk = this.risk_categories["dilution_factor"](dilution_factor_value)
 
-          let industry_row = {value: key}
+        let available_factor = await metrics.available_ratio(this.global_layers, industries)
+        let available_factor_risk = this.risk_categories["water_stress_ratio"](available_factor)
 
-          let dilution_factor_value = await metrics.dilution_factor(this.global_layers, industries)
-          let dilution_factor_risk = this.risk_categories["dilution_factor"](dilution_factor_value)
+        industry_row["freshwater_impact"] = this.return_avg_risk([dilution_factor_risk, available_factor_risk])
+        industry_row["carbon_impact"] = metrics.emissions_and_descriptions(industries, 1).total
 
-          let available_factor = await metrics.available_ratio(this.global_layers, industries)
-          let available_factor_risk = this.risk_categories["water_stress_ratio"](available_factor)
+        let eutrophication_factor = metrics.eutrophication_potential(industries).total
+        let eutrophication_risk = this.risk_categories["eutrophication"](eutrophication_factor)
 
-          industry_row["freshwater_impact"] = this.return_avg_risk([dilution_factor_risk, available_factor_risk])
-          industry_row["carbon_impact"] = metrics.emissions_and_descriptions(industries, 1).total
+        let ecotox_effluent_factor = metrics.ecotoxicity_potential_tu(industries).total
+        let ecotox_effluent_risk = this.risk_categories["ecotoxicity"](ecotox_effluent_factor)
 
-          let eutrophication_factor = metrics.eutrophication_potential(industries).total
-          let eutrophication_risk = this.risk_categories["eutrophication"](eutrophication_factor)
+        let delta_ecotox_factor = (await metrics.delta_tu(industries, this.global_layers)).total
+        let delta_ecotox_risk = this.risk_categories["delta_ecotoxicity"](delta_ecotox_factor)
 
-          let ecotox_effluent_factor = metrics.ecotoxicity_potential_tu(industries).total
-          let ecotox_effluent_risk = this.risk_categories["ecotoxicity"](ecotox_effluent_factor)
+        let eqs_factor = metrics.eqs_avg(industries)
+        let eqs_risk = this.risk_categories["eqs"](eqs_factor)
 
-          let delta_ecotox_factor = (await metrics.delta_tu(industries, this.global_layers)).total
-          let delta_ecotox_risk = this.risk_categories["delta_ecotoxicity"](delta_ecotox_factor)
+        let delta_eqs_factor = await metrics.delta_eqs_avg(industries, this.global_layers)
+        let delta_eqs_risk = this.risk_categories["delta_eqs"](delta_eqs_factor)
 
-          let eqs_factor = metrics.eqs_avg(industries)
-          let eqs_risk = this.risk_categories["eqs"](eqs_factor)
+        industry_row["pollution_impact"] = this.return_avg_risk([eutrophication_risk, ecotox_effluent_risk, delta_ecotox_risk, eqs_risk, delta_eqs_risk])
 
-          let delta_eqs_factor = await metrics.delta_eqs_avg(industries, this.global_layers)
-          let delta_eqs_risk = this.risk_categories["delta_eqs"](delta_eqs_factor)
+        let industry = industries[0]
 
-          industry_row["pollution_impact"] = this.return_avg_risk([eutrophication_risk, ecotox_effluent_risk, delta_ecotox_risk, eqs_risk, delta_eqs_risk])
+        industry_row["country"] = utils.get_country_code_from_coordinates(industry.location.lat, industry.location.lng)
+        industry_row["supply_chain_number"] = industry.supply_chain.length
 
-          let industry = industries[0]
+        pollutants_table.value.push(industry_row)
 
-          industry_row["country"] = utils.get_country_code_from_coordinates(industry.location.lat, industry.location.lng)
-          industry_row["supply_chain_number"] = industry.supply_chain.length
-
-          pollutants_table.value.push(industry_row)
-
-
-        }
 
 
         return pollutants_table
@@ -4867,8 +4205,7 @@ export default {
 
       let _this = this
 
-
-      if(_this.industry_clicked != null){
+      if(_this.industry != null){
 
         let pollutants_table = {
           header: [{text: "", value: "value", sortable: false}],
@@ -4888,31 +4225,34 @@ export default {
           datasets: []
         };
 
-        for (const [key, industries] of Object.entries(_this.current_industry)) {
-          pollutants_table.header.push({
-            text: key, value: key,
-          })
 
-          let dilution_factor_value = await metrics.dilution_factor(this.global_layers, industries)
-          dilution_factor_row[key] = dilution_factor_value
+        let key = this.industry.name
+        let industries = [this.industry]
 
-          recycled_factor[key] = metrics.recycled_water_factor(industries)
+        pollutants_table.header.push({
+          text: key, value: key,
+        })
 
-          treated_factor[key] = metrics.treated_water_factor(industries)
+        let dilution_factor_value = await metrics.dilution_factor(this.global_layers, industries)
+        dilution_factor_row[key] = dilution_factor_value
 
-          let available_ratio_value = await metrics.available_ratio(this.global_layers, industries)
-          available_ratio[key] = available_ratio_value
+        recycled_factor[key] = metrics.recycled_water_factor(industries)
 
-          efficiency_factor[key] = metrics.efficiency_factor(industries)
+        treated_factor[key] = metrics.treated_water_factor(industries)
 
-          //water_quality_standards[key] = metrics.nqa(industries)
+        let available_ratio_value = await metrics.available_ratio(this.global_layers, industries)
+        available_ratio[key] = available_ratio_value
 
-          data_chart.datasets.push({
-            data: [recycled_factor[key], treated_factor[key], available_ratio_value],
-            label: key,
-            backgroundColor: this.chooseColor(key).concat("70"),
-          })
-        }
+        efficiency_factor[key] = metrics.efficiency_factor(industries)
+
+        //water_quality_standards[key] = metrics.nqa(industries)
+
+        data_chart.datasets.push({
+          data: [recycled_factor[key], treated_factor[key], available_ratio_value],
+          label: key,
+          backgroundColor: this.chooseColor(key).concat("70"),
+        })
+
 
         const options = {
           animation: false,
@@ -4953,11 +4293,12 @@ export default {
       else return {header: [], emissions: []}
 
     },
+
     async generate_freshwater_lever_for_action_table() {
 
       let _this = this
 
-      if(_this.industry_clicked != null){
+      if(_this.industry != null){
 
         let pollutants_table = {
           header: [{text: "", value: "value", sortable: false}],
@@ -4973,19 +4314,15 @@ export default {
           datasets: []
         };
 
-        for (const [key, industries] of Object.entries(_this.current_industry)) {
-          pollutants_table.header.push({
-            text: key, value: key,
-          })
+        let key = this.industry.name
+        let industries = [this.industry]
 
+        pollutants_table.header.push({
+          text: key, value: key,
+        })
 
-          recycled_factor[key] = metrics.recycled_water_factor(industries)
-          efficiency_factor[key] = metrics.efficiency_factor(industries)
-
-        }
-
-
-
+        recycled_factor[key] = metrics.recycled_water_factor(industries)
+        efficiency_factor[key] = metrics.efficiency_factor(industries)
 
         pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
 
@@ -5003,7 +4340,7 @@ export default {
       let _this = this
 
 
-      if(_this.industry_clicked != null){
+      if(_this.industry != null){
 
         let pollutants_table = {
           header: [{text: "", value: "value", sortable: false}],
@@ -5013,16 +4350,14 @@ export default {
         let treated_factor = {value: _this.table_title.availability_quantity.treated, unit: "%", info:"info_treated_factor"}
 
 
-        for (const [key, industries] of Object.entries(_this.current_industry)) {
-          pollutants_table.header.push({
-            text: key, value: key,
-          })
+        let key = this.industry.name
+        let industries = [this.industry]
 
-          treated_factor[key] = metrics.treated_water_factor(industries)
+        pollutants_table.header.push({
+          text: key, value: key,
+        })
 
-        }
-
-
+        treated_factor[key] = metrics.treated_water_factor(industries)
 
         pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
 
@@ -5034,12 +4369,11 @@ export default {
 
     },
 
-
     generate_treatment_efficiency_table() {
 
       let _this = this
 
-      if(_this.industry_clicked !== null){
+      if(_this.industry !== null){
 
         let pollutants_table = {
           header: [{text: "", value: "value", sortable: false}],
@@ -5069,35 +4403,37 @@ export default {
         };
 
 
-        for (const [key, industries] of Object.entries(_this.current_industry)) {
-          pollutants_table.header.push({
-            text: key, value: key,
-          })
+        let key = this.industry.name
+        let industries = [this.industry]
 
-          tn[key] = metrics.tn_efficiency(industries)
-          tp[key] = metrics.tp_efficiency(industries)
-          cod[key] = metrics.cod_efficiency(industries)
-          dichloroethane[key] = metrics.dichloroethane_efficiency(industries)
-          cadmium[key] = metrics.cadmium_efficiency(industries)
-          hexachlorobenzene[key] = metrics.hexaclorobenzene_efficiency(industries)
-          mercury[key] = metrics.mercury_efficiency(industries)
-          lead[key] = metrics.lead_efficiency(industries)
-          nickel[key] = metrics.nickel_efficiency(industries)
-          chloroalkanes[key] = metrics.chloroalkanes_efficiency(industries)
-          hexaclorobutadie[key] = metrics.hexaclorobutadie_efficiency(industries)
-          nonylphenols[key] = metrics.nonylphenols_efficiency(industries)
-          tetrachloroethene[key] = metrics.tetrachloroethene_efficiency(industries)
-          trichloroethylene[key] = metrics.tricloroetile_efficiency(industries)
+        pollutants_table.header.push({
+          text: key, value: key,
+        })
+
+        tn[key] = metrics.tn_efficiency(industries)
+        tp[key] = metrics.tp_efficiency(industries)
+        cod[key] = metrics.cod_efficiency(industries)
+        dichloroethane[key] = metrics.dichloroethane_efficiency(industries)
+        cadmium[key] = metrics.cadmium_efficiency(industries)
+        hexachlorobenzene[key] = metrics.hexaclorobenzene_efficiency(industries)
+        mercury[key] = metrics.mercury_efficiency(industries)
+        lead[key] = metrics.lead_efficiency(industries)
+        nickel[key] = metrics.nickel_efficiency(industries)
+        chloroalkanes[key] = metrics.chloroalkanes_efficiency(industries)
+        hexaclorobutadie[key] = metrics.hexaclorobutadie_efficiency(industries)
+        nonylphenols[key] = metrics.nonylphenols_efficiency(industries)
+        tetrachloroethene[key] = metrics.tetrachloroethene_efficiency(industries)
+        trichloroethylene[key] = metrics.tricloroetile_efficiency(industries)
 
 
-          data_chart.datasets.push({
+        data_chart.datasets.push({
 
-            data: [cod[key], tn[key], tp[key], dichloroethane[key], cadmium[key], hexachlorobenzene[key], mercury[key], lead[key], nickel[key], chloroalkanes[key], hexaclorobutadie[key], nonylphenols[key], tetrachloroethene[key], trichloroethylene[key]],
-            label: key,
-            backgroundColor: this.chooseColor(key).concat("70"),
+          data: [cod[key], tn[key], tp[key], dichloroethane[key], cadmium[key], hexachlorobenzene[key], mercury[key], lead[key], nickel[key], chloroalkanes[key], hexaclorobutadie[key], nonylphenols[key], tetrachloroethene[key], trichloroethylene[key]],
+          label: key,
+          backgroundColor: this.chooseColor(key).concat("70"),
 
-          })
-        }
+        })
+
 
 
         const options = {
@@ -5148,7 +4484,7 @@ export default {
       let _this = this
 
 
-      if(_this.industry_clicked !== null){
+      if(_this.industry !== null){
 
 
         let pollutants_table = {
@@ -5167,26 +4503,27 @@ export default {
         };
 
 
-        for (const [key, industries] of Object.entries(_this.current_industry)) {
-          pollutants_table.header.push({
-            text: key, value: key,
-          })
+        let key = this.industry.name
+        let industries = [this.industry]
+        pollutants_table.header.push({
+          text: key, value: key,
+        })
 
-          let eff = metrics.amount_water_influent_cleaned(industries)
+        let eff = metrics.amount_water_influent_cleaned(industries)
 
-          tn[key] = eff.tn
-          tp[key] = eff.tp
-          cod[key] = eff.cod
+        tn[key] = eff.tn
+        tp[key] = eff.tp
+        cod[key] = eff.cod
 
 
-          data_chart.datasets.push({
+        data_chart.datasets.push({
 
-            data: [cod[key], tn[key], tp[key]],
-            label: key,
-            backgroundColor: this.chooseColor(key).concat("70"),
+          data: [cod[key], tn[key], tp[key]],
+          label: key,
+          backgroundColor: this.chooseColor(key).concat("70"),
 
-          })
-        }
+        })
+
 
 
         const options = {
@@ -5218,1719 +4555,42 @@ export default {
       else return {header: [], emissions: []}
 
     },
-
-
-    async button_generate_pdf_clicked(){
-      if (this.selected_industries.length > 0) {
-        this.generating_pdf = true
-        await this.generate_pdf()
-        this.generating_pdf = false
-
-      }
-    },
-
-    async generate_layers_table(current_tab){
-
-      let selected_layers_formatted = this.selected_layers.map(function (layer) {
-        return [layer.name, layer.layer]
-      })
-
-      let _this = this
-
-      if(_this.tab !== undefined){
-
-        let layer_table = {
-          header: [{text: "Layer", value: "layer", sortable: false}],
-          value: []
-        }
-        let industries_and_supply_chain = []
-
-        this.created_assessments[_this.tab].industries.forEach(industry => {
-
-          if(_this.is_industry_valid(industry)){
-
-            industries_and_supply_chain.push({
-              name: industry.name,
-              location: industry.location
-            })
-            industry.supply_chain.forEach(sc => {
-              industries_and_supply_chain.push({
-                name: sc.name + " (Supply chain of "+industry.name+")",
-                location: sc.location
-              })
-            })
-          }
-        })
-
-
-
-        for (const industry of industries_and_supply_chain) {
-          layer_table.header.push({text: industry.name, value: industry.name})
-        }
-        layer_table.header.push({text: "Unit", value: "unit"})
-
-        for (let [layer_name, info] of selected_layers_formatted) {
-          let current_layer = {layer: layer_name}
-          let future_layer = {layer: layer_name + " (BAU 2030)"}
-
-
-          for (let industry of industries_and_supply_chain) {
-
-            if(current_tab != this.tab) {
-              let table = await this.generate_layers_table(this.tab) //Generate table for new tab
-              return table
-          }
-
-            let lat = industry.location.lat
-            let lng = industry.location.lng
-
-            //Baseline
-
-            let baseline_data = await info.layers.baseline.annual.layer["data_for_report"](lat, lng)
-
-            current_layer[industry.name] = baseline_data
-
-            if (info.future && this.include_future) {
-              let future_data = await info.layers.future.layer["data_for_report"](lat, lng)
-              future_layer[industry.name] = future_data
-            }
-
-          }
-          current_layer["unit"] = (info.layers.baseline.annual.layer["unit"]())
-          layer_table.value.push(current_layer)
-
-          if(info.future && this.include_future){
-            future_layer["unit"] = (info.layers.future.layer["unit"]())
-            layer_table.value.push(future_layer)
-
-            //layers_description.table.body.push(future_layer)
-
-          }
-
-          //layer_table.value.push(current_layer)
-        }
-        return layer_table
-      }
-      else return {header: [], value: []}
-
-
-    },
-
-    add_identifier: function (category, id){
-      let _this = this
-      category.id = id
-      category.locked = (_this.radio_layers === 2)
-      id++
-
-      if(category.hasOwnProperty("children")){
-        category.children.forEach(subcategory => {
-          id = _this.add_identifier(subcategory, id)
-        })
-
-      }
-
-      return id
-    },
-
-    async layers_table_pdf(dd, industries, assessment_days){
-
-
-      let selected_layers_formatted = this.selected_layers_pdf.map(function (layer) {
-        return [layer.name, layer.layer]
-      })
-
-      if (selected_layers_formatted.length > 0) { //Layer values on industry
-
-        dd.content.push({
-          text: "Global GIS Indicators\n\n",
-          style: 'indicator_title'
-        })
-
-
-        let layers_to_include_in_report = [] //Layers to include in report (even the future)
-        for (let [layer_name, info] of selected_layers_formatted) {
-          layers_to_include_in_report.push([layer_name, info.layers.baseline.annual.layer])
-          if (info.future && this.include_future){
-            layers_to_include_in_report.push([layer_name+" (BAU 2030)", info.layers.future.layer])
-          }
-        }
-
-        let layers_chunked = this.chunk(layers_to_include_in_report, 7)
-        for(let chunk of layers_chunked){
-          let col_widths = []
-          Array.from(Array(10).keys()).forEach(x => {
-            col_widths.push("*")
-          })
-          let layers_description = {
-            table: {
-              widths:col_widths,
-              body: [
-                [
-                  {text:'Industry', style: "bold"},
-                ]
-              ]
-            }
-          }
-          for (let [layer_name, layer] of chunk) {
-            let units = "("+layer["unit"]()+")"
-            if (units == "()") units = ""
-            if(units[1] == " ") units = " ("+units.substring(2)
-            let text = layer_name + units
-            layers_description.table.body[0].push({text:text, style: "bold"})
-          }
-
-          let industries_aux = [].concat(...industries.map(x => x[1]))
-          for(const industry of industries_aux) {
-
-            let lat = industry.location.lat
-            let lng = industry.location.lng
-
-            let row = [industry.name]
-            for (let [layer_name, layer] of chunk) {
-              //Baseline
-              let baseline_data = await layer["data_for_report"](lat, lng)
-              row.push({text: baseline_data, fillColor: this.getGISLayerColorPDF(layer_name, baseline_data)})
-
-            }
-            layers_description.table.body.push(row)
-
-            //Adding rows for supply chain
-            for(let supply_chain of industry.supply_chain){
-              let lat = supply_chain.location.lat
-              let lng = supply_chain.location.lng
-
-              let row = [supply_chain.name + " (Supply chain of "+industry.name+")"]
-              for (let [layer_name, layer] of chunk) {
-                let baseline_data = await layer["data_for_report"](lat, lng)
-                row.push({text: baseline_data, fillColor: this.getGISLayerColorPDF(layer_name, baseline_data)})
-
-              }
-              layers_description.table.body.push(row)
-            }
-
-
-          }
-
-          dd.content.push(layers_description)
-
-          dd.content.push("\n")
-          this.risk_categories.legend_risk_pdf(dd)
-          dd.content.push("\n\n")
-
-
-        }
-
-      }
-
-    },
-
-    emissions_table_pdf(dd, industries_aux, assessment_days) {
-
-      let _this = this
-
-      let days_factor = 1
-
-      dd.content.push({
-        text: "GHG emissions from Wastewater\n\n",
-        style: 'indicator_title'
-      })
-
-
-      let industriesEmission = {
-        table: {
-          body: [
-            [
-              {text:'Industry', style: "bold"},
-              {text:"Total (kgCO2eq/day)",style: "bold"},
-              {text:'Electricity consumption (kgCO2eq/day)',style: "bold"},
-              {text:'Fuel engines (kgCO2eq/day)',style: "bold"},
-              {text:"Water treatment (kgCO2eq/day)",style: "bold"},
-              {text:"Biogas (kgCO2eq/day)",style: "bold"},
-              {text:"Sludge management (kgCO2eq/day)",style: "bold"},
-              {text:"Water reuse transport (kgCO2eq/day)",style: "bold"},
-              {text:"Water discharged (kgCO2eq/day)",style: "bold"},
-
-            ]
-          ]
-        }
-      }
-
-      const data_chart = {
-        labels: [],
-        datasets: [{
-          data: [],
-          backgroundColor: []
-        }]
-      };
-
-
-      for (const [key, industries] of industries_aux) {
-        let total = 0
-        let emissions = metrics.emissions_and_descriptions(industries, days_factor)
-        let row = [key]
-
-        row.push({text: emissions.total, style: "bold", fillColor: _this.get_color(this.risk_categories.global_warming(emissions.total))})
-        row.push({text: emissions.elec, fillColor: _this.get_color(this.risk_categories.global_warming(emissions.elec))})
-        row.push({text: emissions.fuel, fillColor: _this.get_color(this.risk_categories.global_warming(emissions.fuel))})
-        row.push({text: emissions.treatment, fillColor: _this.get_color(this.risk_categories.global_warming(emissions.treatment))})
-        row.push({text: emissions.biog, fillColor: _this.get_color(this.risk_categories.global_warming(emissions.biog))})
-        row.push({text: emissions.slu, fillColor: _this.get_color(this.risk_categories.global_warming(emissions.slu))})
-        row.push({text: emissions.reuse, fillColor: _this.get_color(this.risk_categories.global_warming(emissions.reuse))})
-        row.push({text: emissions.disc, fillColor: _this.get_color(this.risk_categories.global_warming(emissions.disc))})
-
-
-        industriesEmission.table.body.push(row)
-
-        data_chart.datasets[0].data.push(total)
-        data_chart.labels.push(row[0])
-        data_chart.datasets[0].backgroundColor.push(this.chooseColor(row[0]))
-
-      }
-
-      //CHART
-      const options = {
-      animation: false,
-      legend: {
-        display: false
-      },
-      scales: {
-        yAxes: [{
-          ticks: {
-            beginAtZero: true
-          },
-          scaleLabel: {
-            display: true,
-            labelString: 'kgCO2eq emission'
-          }
-        }],
-        xAxes: [{
-          scaleLabel: {
-            display: true,
-            labelString: 'Industry'
-          }
-        }]
-      }
-    }
-      const ctx = document.getElementById('chart');
-      let chart = new Chart(ctx, {
-        type: "bar",
-        data: data_chart,
-        options: options
-      });
-
-      dd.content.push(industriesEmission)
-      dd.content.push("\n")
-      this.risk_categories.legend_impact_pdf(dd)
-      dd.content.push("\n\n")
-
-
-      dd.content.push({
-        image: chart.toBase64Image(),
-        fit: [450, 450]
-      })
-
-    },
-
-    async quality_quantity_indicators(dd, industries_aux, assessment_days) {
-
-      let _this = this
-
-      dd.content.push({
-        text: "Freshwater impact\n\n",
-        style: 'indicator_title'
-      })
-
-
-      let industriesIndicator = {
-        table: {
-          body: [
-            [
-              {text:'Industry', style: "bold"},
-              {text:'Dilution factor (%)',style: "bold"},
-              {text:'Recycled water factor (%)',style: "bold"},
-              {text:"Treated water factor (%)",style: "bold"},
-              {text:"Consumption available ratio (%)",style: "bold"},
-              {text:"Specific water consumption (tonnes/m3)",style: "bold"},
-            ]
-          ]
-        }
-      }
-
-      let data_chart = {
-        labels: ["Recycled water factor", "Treated water factor", "Consumption available ratio"],
-        datasets: []
-      };
-
-      for (const [key, industries] of industries_aux) {
-        let row = [key]
-
-        let dilution_factor_value = await metrics.dilution_factor(this.global_layers, industries)
-        row.push( {text: dilution_factor_value, fillColor: _this.get_color(this.risk_categories.dilution_factor(dilution_factor_value))})
-        let recycled_water_factor = metrics.recycled_water_factor(industries)
-        row.push({text: recycled_water_factor })
-        let treated_water_factor = metrics.treated_water_factor(industries)
-        row.push({text: treated_water_factor})
-        let available_ratio_value = await metrics.available_ratio(this.global_layers, industries)
-        row.push({text: available_ratio_value, fillColor: _this.get_color(this.risk_categories.water_stress_ratio(available_ratio_value))})
-
-        row.push({text: metrics.efficiency_factor(industries)})
-
-
-        data_chart.datasets.push({
-          data: [recycled_water_factor, metrics.treated_water_factor(industries), available_ratio_value],
-          label: row[0],
-          backgroundColor: this.chooseColor(key).concat("70"),
-        })
-
-        industriesIndicator.table.body.push(row)
-
-      }
-
-      //CHART
-      const options = {
-        animation: false,
-        scale: {
-          ticks: {
-            min: 0
-          }
-        },
-        "tooltips": {}
-      }
-
-      const ctx = document.getElementById('chart');
-      let chart = new Chart(ctx, {
-        type: "radar",
-        data: data_chart,
-        options: options
-      });
-
-      dd.content.push(industriesIndicator)
-      dd.content.push("\n")
-      this.risk_categories.legend_impact_pdf(dd)
-      dd.content.push("\n\n")
-      dd.content.push({
-        image: chart.toBase64Image(),
-        fit: [450, 450]
-      })
-
-    },
-
-
-    eutrophication_pdf(dd, industries_aux, assessment_days) {
-
-      let _this = this
-
-      let days_factor = 1
-      if(this.period_model === "annual") days_factor = 365
-      else if(this.period_model === "assessment") days_factor = assessment_days
-
-      dd.content.push({
-        text: "Eutrophication Potential\n\n",
-        style: 'subsubheader'
-      })
-
-
-      let industriesEutrophication = {
-        table: {
-          body: [
-            [
-              {text:'Industry', style: "bold"},
-              {text:"Total (gPO4eq/m3)",style: "bold"},
-              {text: "COD (gPO4eq/m3)" , style: "bold"},
-              {text:'TN (gPO4eq/m3)',style: "bold"},
-              {text:'TP (gPO4eq/m3)',style: "bold"},
-            ]
-          ]
-        }
-      }
-
-      const data_chart = {
-        labels: [],
-        datasets: [{
-          data: [],
-          backgroundColor: []
-        }]
-      };
-
-
-      for (const [key, industries] of industries_aux) {
-
-        let eutrophication = metrics.eutrophication_potential(industries)
-        let row = [key]
-
-        let total_value = eutrophication.total
-        row.push({text: total_value, style: "bold", fillColor: _this.get_color(this.risk_categories.eutrophication(total_value)),})
-
-        let cod_value = eutrophication.cod
-        row.push({text: cod_value, fillColor: _this.get_color(this.risk_categories.eutrophication(cod_value)),})
-
-        let tn_value = eutrophication.tn
-        row.push({text: tn_value, fillColor: _this.get_color(this.risk_categories.eutrophication(tn_value)),})
-
-        let tp_value = eutrophication.tp
-        row.push({text: tp_value, fillColor: _this.get_color(this.risk_categories.eutrophication(tp_value)),})
-
-
-        industriesEutrophication.table.body.push(row)
-
-        data_chart.datasets[0].data.push(total_value)
-        data_chart.labels.push(row[0])
-        data_chart.datasets[0].backgroundColor.push(this.chooseColor(row[0]))
-      }
-
-      //CHART
-      const options = {
-        animation: false,
-        legend: {
-          display: false
-        },
-        scales: {
-          yAxes: [{
-            ticks: {
-              beginAtZero: true
-            },
-            scaleLabel: {
-              display: true,
-              labelString: 'gPO4eq/m3'
-            }
-          }],
-          xAxes: [{
-            scaleLabel: {
-              display: true,
-              labelString: 'Industry'
-            }
-          }]
-        }
-      }
-      const ctx = document.getElementById('chart');
-      let chart = new Chart(ctx, {
-        type: "bar",
-        data: data_chart,
-        options: options
-      });
-
-      dd.content.push(industriesEutrophication)
-      dd.content.push("\n")
-      _this.risk_categories.legend_impact_pdf(dd)
-      dd.content.push("\n\n")
-      dd.content.push({
-        image: chart.toBase64Image(),
-        fit: [450, 450]
-      })
-
-    },
-
-    async ecotoxicity_pdf(dd, industries_aux, assessment_days) {
-
-      let days_factor = 1
-
-      let _this = this
-
-      dd.content.push({
-        text: "Effluent toxicity level\n\n",
-        style: 'subheader_big'
-      })
-
-      dd.content.push({
-        text: "Toxic units in the effluent\n\n",
-        style: 'subsubheader'
-      })
-
-      let industriesEcotoxicity = {
-        table: {
-          body: [
-            [
-              {text:'Industry', style: "bold"},
-              {text:"Total (TU/day)",style: "bold"},
-              [
-                {text: [{text: "1,2-DCE", style: "bold"}, {text: "1" , sup: true, style: "asterisk"},]},
-                {text: "(TU/day)", style: "bold"},
-              ], //1,2-Dichloroethane
-              {text:'Cadmium (TU/day)',style: "bold"},
-              [
-                {text: [{text: "HBC", style: "bold"}, {text: "2" , sup: true, style: "asterisk"},]},
-                {text: "(TU/day)", style: "bold"},
-              ], //Hexachlorobenzene
-              {text:"Mercury (TU/day)",style: "bold"},
-              {text:"Lead (TU/day)",style: "bold"},
-              {text:"Nickel (TU/day)",style: "bold"},
-              {text:"Chloroalkanes (TU/day)",style: "bold"},
-              [
-                {text: [{text: "HCBD", style: "bold"}, {text: "3" , sup: true, style: "asterisk"},]},
-                {text: "(TU/day)", style: "bold"},
-              ], //Hexachlorobutadiene
-              [
-                {text: [{text: "NP", style: "bold"}, {text: "4" , sup: true, style: "asterisk"},]},
-                {text: "(TU/day)", style: "bold"},
-              ], //Nonylphenols
-              [
-                {text: [{text: "PCE", style: "bold"}, {text: "5" , sup: true, style: "asterisk"},]},
-                {text: "(TU/day)", style: "bold"},
-              ], //Tetrachloroethene
-              [
-                {text: [{text: "TCE", style: "bold"}, {text: "6" , sup: true, style: "asterisk"},]},
-                {text: "(TU/day)", style: "bold"},
-              ], //trichloroethylene
-
-            ]
-          ]
-        }
-      }
-
-      const data_chart = {
-        labels: [],
-        datasets: [{
-          data: [],
-          backgroundColor: []
-        }]
-      };
-
-      for (const [key, industries] of industries_aux) {
-
-        let row = [key]
-        let tu = metrics.ecotoxicity_potential_tu(industries)
-
-        let total_value = tu.total
-        row.push({text: total_value, style: "bold", fillColor: _this.get_color(this.risk_categories["ecotoxicity"](total_value))})
-
-        let dichloroethane_value = tu.diclo
-        row.push({text: dichloroethane_value, fillColor: _this.get_color(this.risk_categories["ecotoxicity"](dichloroethane_value))})
-
-        let cadmium_value = tu.cadmium
-        row.push({text: cadmium_value, fillColor: _this.get_color(this.risk_categories["ecotoxicity"](cadmium_value))})
-
-        let hexaclorobenzene_value = tu.hexaclorobenzene
-        row.push({text: hexaclorobenzene_value, fillColor: _this.get_color(this.risk_categories["ecotoxicity"](hexaclorobenzene_value))})
-
-        let mercury_value = tu.mercury
-        row.push({text: mercury_value, fillColor: _this.get_color(this.risk_categories["ecotoxicity"](mercury_value))})
-
-        let lead_value = tu.lead
-        row.push({text: lead_value, fillColor: _this.get_color(this.risk_categories["ecotoxicity"](lead_value))})
-
-        let nickel_value = tu.nickel
-        row.push({text: nickel_value, fillColor: _this.get_color(this.risk_categories["ecotoxicity"](nickel_value))})
-
-        let chloroalkanes_value = tu.chloroalkanes
-        row.push({text: chloroalkanes_value, fillColor: _this.get_color(this.risk_categories["ecotoxicity"](chloroalkanes_value))})
-
-        let hexaclorobutadie_value = tu.hexaclorobutadie
-        row.push({text: hexaclorobutadie_value, fillColor: _this.get_color(this.risk_categories["ecotoxicity"](hexaclorobutadie_value))})
-
-        let nonylphenols_value = tu.nonylphenols
-        row.push({text: nonylphenols_value, fillColor: _this.get_color(this.risk_categories["ecotoxicity"](nonylphenols_value))})
-
-        let tetrachloroethene_value = tu.tetracloroetile
-        row.push({text: tetrachloroethene_value, fillColor: _this.get_color(this.risk_categories["ecotoxicity"](tetrachloroethene_value))})
-
-        let trichloroethylene_value = tu.tricloroetile
-        row.push({text: trichloroethylene_value, fillColor: _this.get_color(this.risk_categories["ecotoxicity"](trichloroethylene_value))})
-
-
-        industriesEcotoxicity.table.body.push(row)
-
-        data_chart.datasets[0].data.push(total_value)
-        data_chart.labels.push(row[0])
-        data_chart.datasets[0].backgroundColor.push(this.chooseColor(row[0]))
-      }
-
-      //CHART
-      const options = {
-        animation: false,
-        legend: {
-          display: false
-        },
-        scales: {
-          yAxes: [{
-            ticks: {
-              beginAtZero: true
-            },
-            scaleLabel: {
-              display: true,
-              labelString: 'gPO4eq/m3'
-            }
-          }],
-          xAxes: [{
-            scaleLabel: {
-              display: true,
-              labelString: 'Industry'
-            }
-          }]
-        }
-      }
-      const ctx = document.getElementById('chart');
-      let chart = new Chart(ctx, {
-        type: "bar",
-        data: data_chart,
-        options: options
-      });
-
-      dd.content.push(industriesEcotoxicity)
-      dd.content.push("\n")
-
-      dd.content.push("\n")
-      dd.content.push([
-        {text: [{text: "1", sup: true, style: "asterisk"}, {text:"1,2-Dichloroethane, "},
-            {text: [{text: "2", sup: true, style: "asterisk"}, {text:"Hexachlorobenzene, "}]},
-            {text: [{text: "3", sup: true, style: "asterisk"}, {text:"Hexachlorobutadiene, "}]},
-            {text: [{text: "4", sup: true, style: "asterisk"}, {text:"Nonylphenols, "}]},
-            {text: [{text: "5", sup: true, style: "asterisk"}, {text:"Tetrachloroethene, "}]},
-            {text: [{text: "6", sup: true, style: "asterisk"}, {text:"Trichloroethylene"}]},
-          ]},
-      ])
-
-      dd.content.push("\n")
-      this.risk_categories.legend_impact_pdf(dd)
-      dd.content.push("\n\n")
-      dd.content.push({
-        image: chart.toBase64Image(),
-        fit: [450, 450]
-      })
-
-      this.eqs_pdf(dd, industries_aux)
-      await this.delta_pdf(dd, industries_aux, assessment_days)
-
-      await this.delta_tu_pdf(dd, industries_aux)
-      await this.delta_eqs_pdf(dd, industries_aux)
-
-
-
-    },
-
-    async delta_pdf(dd, industries_aux, assessment_days) {
-
-      let _this = this
-      let days_factor = 1
-      if(this.period_model === "annual") days_factor = 365
-      else if(this.period_model === "assessment") days_factor = assessment_days
-
-      dd.content.push({
-        text: "Effluent toxicity level\n\n",
-        style: 'subheader_big'
-      })
-      /*dd.content.push({
-        text: "Pollution load to the environment \n\n",
-        style: 'subsubheader'
-      })*/
-
-
-      let industriesDelta = {
-        table: {
-          body: [
-            [
-              {text:'Industry', style: "bold"},
-              {text: "COD (g/m3)",style: "bold"},
-              {text:"TN (g/m3)",style: "bold"},
-              {text:"TP (g/m3)",style: "bold"},
-
-              [
-                {text: [{text: "1,2-DCE", style: "bold"}, {text: "1" , sup: true, style: "asterisk"}, {text: "(g/m3)", style: "bold"}]},
-
-              ], //1,2-Dichloroethane
-              {text:'Cadmium (g/m3)',style: "bold"},
-              [
-                {text: [{text: "HBC", style: "bold"}, {text: "2" , sup: true, style: "asterisk"}, {text: "(g/m3)", style: "bold"}]},
-
-              ], //Hexachlorobenzene
-
-              {text:"Mercury (g/m3)",style: "bold"},
-              {text:"Lead (g/m3)",style: "bold"},
-              {text:"Nickel (g/m3)",style: "bold"},
-              {text:"Chloroalkanes (g/m3)",style: "bold"},
-            ]
-          ]
-        },
-      }
-
-      let industriesDelta_1 = {
-        table: {
-          body: [
-            [
-              {text:'Industry', style: "bold"},
-              [
-                {text: [{text: "HCBD", style: "bold",}, {text: "3" , sup: true, style: "asterisk"}, {text: "(g/m3)", style: "bold"}]},
-
-              ], //Hexachlorobutadiene
-              [
-                {text: [{text: "NP", style: "bold"}, {text: "4" , sup: true, style: "asterisk"}, {text: "(g/m3)", style: "bold"}]},
-
-              ], //Nonylphenols
-              [
-                {text: [{text: "PCE", style: "bold"}, {text: "5" , sup: true, style: "asterisk"}, {text: "(g/m3)", style: "bold"}]},
-              ], //Tetrachloroethene
-              [
-                {text: [{text: "TCE", style: "bold"}, {text: "6" , sup: true, style: "asterisk"}, {text: "(g/m3)", style: "bold"}]},
-              ], //trichloroethylene
-            ]
-          ]
-        }
-      }
-
-
-
-      for (const [key, industries] of industries_aux) {
-
-        let row = [key]
-        let row_1 = [key]
-
-        let cod_value = await metrics.cod_effl(industries, this.global_layers)
-
-        //row.push({text: total_value, fillColor: _this.get_color(this.risk_categories.delta_ecotoxicity(total_value)), style: "bold"})
-
-        row.push({text: cod_value, fillColor: _this.get_color(this.risk_categories.delta(cod_value)), style: "bold"})
-
-        let tn_value = await metrics.tn_effl(industries,this.global_layers)
-        row.push({text: tn_value, fillColor: _this.get_color(this.risk_categories.delta(tn_value)), style: "bold"})
-
-        let tp_value = await metrics.tp_effl(industries, this.global_layers)
-        row.push({text: tp_value, fillColor: _this.get_color(this.risk_categories.delta(tp_value)), style: "bold"})
-
-        let dichloroethane_value = await metrics.dichloroethane_effl(industries, this.global_layers)
-        row.push({text: dichloroethane_value, fillColor: _this.get_color(this.risk_categories.delta(dichloroethane_value)), style: "bold"})
-
-        let cadmium_value = await metrics.cadmium_effl(industries, this.global_layers)
-        row.push({text: cadmium_value, fillColor: _this.get_color(this.risk_categories.delta(cadmium_value)), style: "bold"})
-
-        let hexaclorobenzene_value = await metrics.hexaclorobenzene_effl(industries, this.global_layers)
-        row.push({text: hexaclorobenzene_value, fillColor: _this.get_color(this.risk_categories.delta(hexaclorobenzene_value)), style: "bold"})
-
-        let mercury_value = await metrics.mercury_effl(industries, this.global_layers)
-        row.push({text: mercury_value, fillColor: _this.get_color(this.risk_categories.delta(mercury_value)), style: "bold"})
-
-        let lead_value = await metrics.lead_effl(industries, this.global_layers)
-        row.push({text: lead_value, fillColor: _this.get_color(this.risk_categories.delta(lead_value)), style: "bold"})
-
-        let nickel_value = await metrics.nickel_effl(industries, this.global_layers)
-        row.push({text: nickel_value, fillColor: _this.get_color(this.risk_categories.delta(nickel_value)), style: "bold"})
-
-        let chloroalkanes_value = await  metrics.chloroalkanes_effl(industries, this.global_layers)
-        row.push({text: chloroalkanes_value, fillColor: _this.get_color(this.risk_categories.delta(chloroalkanes_value)), style: "bold"})
-
-        let hexaclorobutadie_value = await metrics.hexaclorobutadie_effl(industries,this.global_layers)
-        row_1.push({text: hexaclorobutadie_value, fillColor: _this.get_color(this.risk_categories.delta(hexaclorobutadie_value)), style: "bold"})
-
-        let nonylphenols_value = await metrics.nonylphenols_effl(industries, this.global_layers)
-        row_1.push({text: nonylphenols_value, fillColor: _this.get_color(this.risk_categories.delta(nonylphenols_value)), style: "bold"})
-
-        let tetrachloroethene_value = await metrics.tetrachloroethene_effl(industries, this.global_layers)
-        row_1.push({text: tetrachloroethene_value, fillColor: _this.get_color(this.risk_categories.delta(tetrachloroethene_value)), style: "bold"})
-
-        let trichloroethylene_value = await metrics.tricloroetile_effl(industries, this.global_layers)
-        row_1.push({text: trichloroethylene_value, fillColor: _this.get_color(this.risk_categories.delta(trichloroethylene_value)), style: "bold"})
-
-
-        industriesDelta.table.body.push(row)
-        industriesDelta_1.table.body.push(row_1)
-
-      }
-
-      /*dd.content.push(industriesDelta)
-      dd.content.push("\n")
-      dd.content.push(industriesDelta_1)
-      dd.content.push("\n")
-      dd.content.push([
-        {text: [{text: "1", sup: true, style: "asterisk"}, {text:"1,2-Dichloroethane, "},
-            {text: [{text: "2", sup: true, style: "asterisk"}, {text:"Hexachlorobenzene, "}]},
-            {text: [{text: "3", sup: true, style: "asterisk"}, {text:"Hexachlorobutadiene, "}]},
-            {text: [{text: "4", sup: true, style: "asterisk"}, {text:"Nonylphenols, "}]},
-            {text: [{text: "5", sup: true, style: "asterisk"}, {text:"Tetrachloroethene, "}]},
-            {text: [{text: "6", sup: true, style: "asterisk"}, {text:"Trichloroethylene"}]},
-          ]},
-      ])
-      dd.content.push("\n")
-      _this.risk_categories.legend_impact_pdf(dd)
-      dd.content.push("\n\n")*/
-
-
-    },
-
-    eqs_pdf(dd, industries_aux) {
-
-
-      let _this = this
-
-      dd.content.push({
-        text: "\nConcentration of the pollutants in the effluent (with respect to EQS) \n\n",
-        style: 'subsubheader'
-      })
-
-      let industriesEcotoxicity = {
-        table: {
-          body: [
-            [
-              {text:'Industry', style: "bold"},
-              [
-                {text: [{text: "1,2-DCE", style: "bold"}, {text: "1" , sup: true, style: "asterisk"},]},
-
-              ], //1,2-Dichloroethane
-              {text:'Cadmium',style: "bold"},
-              [
-                {text: [{text: "HBC", style: "bold"}, {text: "2" , sup: true, style: "asterisk"},]},
-
-              ], //Hexachlorobenzene
-
-              {text:"Mercury",style: "bold"},
-              {text:"Lead",style: "bold"},
-              {text:"Nickel",style: "bold"},
-              {text:"Chloroalkanes",style: "bold"},
-              [
-                {text: [{text: "HCBD", style: "bold"}, {text: "3" , sup: true, style: "asterisk"},]},
-
-              ], //Hexachlorobutadiene
-              [
-                {text: [{text: "NP", style: "bold"}, {text: "4" , sup: true, style: "asterisk"},]},
-
-              ], //Nonylphenols
-              [
-                {text: [{text: "PCE", style: "bold"}, {text: "5" , sup: true, style: "asterisk"},]},
-              ], //Tetrachloroethene
-              [
-                {text: [{text: "TCE", style: "bold"}, {text: "6" , sup: true, style: "asterisk"},]},
-              ], //trichloroethylene
-            ]
-          ]
-        }
-      }
-
-      for (const [key, industries] of industries_aux) {
-
-        let row = [key]
-        let tu = metrics.environmental_quality_standards(industries)
-
-
-
-        let dichloroethane_value = tu.diclo
-        row.push({text: dichloroethane_value, fillColor: _this.get_color(this.risk_categories.eqs(dichloroethane_value))})
-
-        let cadmium_value = tu.cadmium
-        row.push({text: cadmium_value, fillColor: _this.get_color(this.risk_categories.eqs(cadmium_value))})
-
-        let hexaclorobenzene_value = tu.hexaclorobenzene
-        row.push({text: hexaclorobenzene_value, fillColor: _this.get_color(this.risk_categories.eqs(hexaclorobenzene_value))})
-
-        let mercury_value = tu.mercury
-        row.push({text: mercury_value, fillColor: _this.get_color(this.risk_categories.eqs(mercury_value))})
-
-        let lead_value = tu.lead
-        row.push({text: lead_value, fillColor: _this.get_color(this.risk_categories.eqs(lead_value))})
-
-        let nickel_value = tu.nickel
-        row.push({text: nickel_value, fillColor: _this.get_color(this.risk_categories.eqs(nickel_value))})
-
-        let chloroalkanes_value = tu.chloroalkanes
-        row.push({text: chloroalkanes_value, fillColor: _this.get_color(this.risk_categories.eqs(chloroalkanes_value))})
-
-        let hexaclorobutadie_value = tu.hexaclorobutadie
-        row.push({text: hexaclorobutadie_value, fillColor: _this.get_color(this.risk_categories.eqs(hexaclorobutadie_value))})
-
-        let nonylphenols_value = tu.nonylphenols
-        row.push({text: nonylphenols_value, fillColor: _this.get_color(this.risk_categories.eqs(nonylphenols_value))})
-
-        let tetrachloroethene_value = tu.tetracloroetile
-        row.push({text: tetrachloroethene_value, fillColor: _this.get_color(this.risk_categories.eqs(tetrachloroethene_value))})
-
-        let trichloroethylene_value = tu.tricloroetile
-        row.push({text: trichloroethylene_value, fillColor: _this.get_color(this.risk_categories.eqs(trichloroethylene_value))})
-
-
-        industriesEcotoxicity.table.body.push(row)
-      }
-
-
-      dd.content.push(industriesEcotoxicity)
-      dd.content.push("\n")
-      dd.content.push([
-        {text: [{text: "1", sup: true, style: "asterisk"}, {text:"1,2-Dichloroethane, "},
-            {text: [{text: "2", sup: true, style: "asterisk"}, {text:"Hexachlorobenzene, "}]},
-            {text: [{text: "3", sup: true, style: "asterisk"}, {text:"Hexachlorobutadiene, "}]},
-            {text: [{text: "4", sup: true, style: "asterisk"}, {text:"Nonylphenols, "}]},
-            {text: [{text: "5", sup: true, style: "asterisk"}, {text:"Tetrachloroethene, "}]},
-            {text: [{text: "6", sup: true, style: "asterisk"}, {text:"Trichloroethylene"}]},
-          ]},
-      ])
-      dd.content.push("\n")
-      _this.risk_categories.legend_impact_pdf(dd)
-      dd.content.push("\n")
-
-    },
-
-    async delta_tu_pdf(dd, industries_aux) {
-
-      let _this = this
-
-      dd.content.push({
-        text: "Increase in toxic units in the receiving water body after discharge \n\n",
-        style: 'subsubheader'
-      })
-
-      let industriesEcotoxicity = {
-        table: {
-          body: [
-            [
-              {text:'Industry', style: "bold"},
-              {text:"Total (TU/day)",style: "bold"},
-              [
-                {text: [{text: "1,2-DCE", style: "bold"}, {text: "1" , sup: true, style: "asterisk"},]},
-                {text: "(TU/day)", style: "bold"},
-
-              ], //1,2-Dichloroethane
-              {text:'Cadmium (TU/day)',style: "bold"},
-              [
-                {text: [{text: "HBC", style: "bold"}, {text: "2" , sup: true, style: "asterisk"},]},
-                {text: "(TU/day)", style: "bold"},
-
-              ], //Hexachlorobenzene
-
-              {text:"Mercury (TU/day)",style: "bold"},
-              {text:"Lead (TU/day)",style: "bold"},
-              {text:"Nickel (TU/day)",style: "bold"},
-              {text:"Chloroalkanes (TU/day)",style: "bold"},
-              [
-                {text: [{text: "HCBD", style: "bold"}, {text: "3" , sup: true, style: "asterisk"},]},
-                {text: "(TU/day)", style: "bold"},
-
-              ], //Hexachlorobutadiene
-              [
-                {text: [{text: "NP", style: "bold"}, {text: "4" , sup: true, style: "asterisk"},]},
-                {text: "(TU/day)", style: "bold"},
-
-              ], //Nonylphenols
-              [
-                {text: [{text: "PCE", style: "bold"}, {text: "5" , sup: true, style: "asterisk"},]},
-                {text: "(TU/day)", style: "bold"},
-              ], //Tetrachloroethene
-              [
-                {text: [{text: "TCE", style: "bold"}, {text: "6" , sup: true, style: "asterisk"},]},
-                {text: "(TU/day)", style: "bold"},
-              ], //trichloroethylene
-            ]
-          ]
-        }
-      }
-
-
-      for (const [key, industries] of industries_aux) {
-
-        let row = [key]
-        let tu = await metrics.delta_tu(industries, this.global_layers)
-
-        let total_value = tu.total
-        row.push({text: total_value, fillColor: _this.get_color(this.risk_categories.delta_ecotoxicity(total_value)), style: "bold"})
-
-
-        let dichloroethane_value = tu.diclo
-        row.push({text: dichloroethane_value, fillColor: _this.get_color(this.risk_categories.delta_ecotoxicity(dichloroethane_value))})
-
-        let cadmium_value = tu.cadmium
-        row.push({text: cadmium_value, fillColor: _this.get_color(this.risk_categories.delta_ecotoxicity(cadmium_value))})
-
-        let hexaclorobenzene_value = tu.hexaclorobenzene
-        row.push({text: hexaclorobenzene_value, fillColor: _this.get_color(this.risk_categories.delta_ecotoxicity(hexaclorobenzene_value))})
-
-        let mercury_value = tu.mercury
-        row.push({text: mercury_value, fillColor: _this.get_color(this.risk_categories.delta_ecotoxicity(mercury_value))})
-
-        let lead_value = tu.lead
-        row.push({text: lead_value, fillColor: _this.get_color(this.risk_categories.delta_ecotoxicity(lead_value))})
-
-        let nickel_value = tu.nickel
-        row.push({text: nickel_value, fillColor: _this.get_color(this.risk_categories.delta_ecotoxicity(nickel_value))})
-
-        let chloroalkanes_value = tu.chloroalkanes
-        row.push({text: chloroalkanes_value, fillColor: _this.get_color(this.risk_categories.delta_ecotoxicity(chloroalkanes_value))})
-
-        let hexaclorobutadie_value = tu.hexaclorobutadie
-        row.push({text: hexaclorobutadie_value, fillColor: _this.get_color(this.risk_categories.delta_ecotoxicity(hexaclorobutadie_value))})
-
-        let nonylphenols_value = tu.nonylphenols
-        row.push({text: nonylphenols_value, fillColor: _this.get_color(this.risk_categories.delta_ecotoxicity(nonylphenols_value))})
-
-        let tetrachloroethene_value = tu.tetracloroetile
-        row.push({text: tetrachloroethene_value, fillColor: _this.get_color(this.risk_categories.delta_ecotoxicity(tetrachloroethene_value))})
-
-        let trichloroethylene_value = tu.tricloroetile
-        row.push({text: trichloroethylene_value, fillColor: _this.get_color(this.risk_categories.delta_ecotoxicity(trichloroethylene_value))})
-
-
-        industriesEcotoxicity.table.body.push(row)
-
-      }
-
-      dd.content.push(industriesEcotoxicity)
-      dd.content.push("\n")
-      dd.content.push([
-        {text: [{text: "1", sup: true, style: "asterisk"}, {text:"1,2-Dichloroethane, "},
-            {text: [{text: "2", sup: true, style: "asterisk"}, {text:"Hexachlorobenzene, "}]},
-            {text: [{text: "3", sup: true, style: "asterisk"}, {text:"Hexachlorobutadiene, "}]},
-            {text: [{text: "4", sup: true, style: "asterisk"}, {text:"Nonylphenols, "}]},
-            {text: [{text: "5", sup: true, style: "asterisk"}, {text:"Tetrachloroethene, "}]},
-            {text: [{text: "6", sup: true, style: "asterisk"}, {text:"Trichloroethylene"}]},
-          ]},
-      ])
-      dd.content.push("\n")
-      this.risk_categories.legend_impact_pdf(dd)
-      dd.content.push("\n\n")
-    },
-
-
-    async delta_eqs_pdf(dd, industries_aux) {
-
-      dd.content.push({
-        text: "\nIncrease of the concentration of the pollutants in the receiving water body after discharge (with respect to EQS)  \n\n",
-        style: 'subsubheader'
-      })
-
-      let _this = this
-
-      let industriesEcotoxicity = {
-        table: {
-          body: [
-            [
-              {text:'Industry', style: "bold"},
-              [
-                {text: [{text: "1,2-DCE", style: "bold"}, {text: "1" , sup: true, style: "asterisk"},]},
-
-              ], //1,2-Dichloroethane
-              {text:'Cadmium (TU/day)',style: "bold"},
-              [
-                {text: [{text: "HBC", style: "bold"}, {text: "2" , sup: true, style: "asterisk"},]},
-
-              ], //Hexachlorobenzene
-
-              {text:"Mercury",style: "bold"},
-              {text:"Lead",style: "bold"},
-              {text:"Nickel",style: "bold"},
-              {text:"Chloroalkanes",style: "bold"},
-              [
-                {text: [{text: "HCBD", style: "bold"}, {text: "3" , sup: true, style: "asterisk"},]},
-
-              ], //Hexachlorobutadiene
-              [
-                {text: [{text: "NP", style: "bold"}, {text: "4" , sup: true, style: "asterisk"},]},
-
-              ], //Nonylphenols
-              [
-                {text: [{text: "PCE", style: "bold"}, {text: "5" , sup: true, style: "asterisk"},]},
-              ], //Tetrachloroethene
-              [
-                {text: [{text: "TCE", style: "bold"}, {text: "6" , sup: true, style: "asterisk"},]},
-              ], //trichloroethylene
-            ]
-          ]
-        }
-      }
-
-      for (const [key, industries] of industries_aux) {
-
-        let row = [key]
-        let tu = await metrics.delta_eqs(industries, this.global_layers)
-
-        let dichloroethane_value = tu.diclo
-        row.push({text: dichloroethane_value, fillColor: _this.get_color(this.risk_categories.delta_eqs(dichloroethane_value))})
-
-        let cadmium_value = tu.cadmium
-        row.push({text: cadmium_value, fillColor: _this.get_color(this.risk_categories.delta_eqs(cadmium_value))})
-
-        let hexaclorobenzene_value = tu.hexaclorobenzene
-        row.push({text: hexaclorobenzene_value, fillColor: _this.get_color(this.risk_categories.delta_eqs(hexaclorobenzene_value))})
-
-        let mercury_value = tu.mercury
-        row.push({text: mercury_value, fillColor: _this.get_color(this.risk_categories.delta_eqs(mercury_value))})
-
-        let lead_value = tu.lead
-        row.push({text: lead_value, fillColor: _this.get_color(this.risk_categories.delta_eqs(lead_value))})
-
-        let nickel_value = tu.nickel
-        row.push({text: nickel_value, fillColor: _this.get_color(this.risk_categories.delta_eqs(nickel_value))})
-
-        let chloroalkanes_value = tu.chloroalkanes
-        row.push({text: chloroalkanes_value, fillColor: _this.get_color(this.risk_categories.delta_eqs(chloroalkanes_value))})
-
-        let hexaclorobutadie_value = tu.hexaclorobutadie
-        row.push({text: hexaclorobutadie_value, fillColor: _this.get_color(this.risk_categories.delta_eqs(hexaclorobutadie_value))})
-
-        let nonylphenols_value = tu.nonylphenols
-        row.push({text: nonylphenols_value, fillColor: _this.get_color(this.risk_categories.delta_eqs(nonylphenols_value))})
-
-        let tetrachloroethene_value = tu.tetracloroetile
-        row.push({text: tetrachloroethene_value, fillColor: _this.get_color(this.risk_categories.delta_eqs(tetrachloroethene_value))})
-
-        let trichloroethylene_value = tu.tricloroetile
-        row.push({text: trichloroethylene_value, fillColor: _this.get_color(this.risk_categories.delta_eqs(trichloroethylene_value))})
-
-
-        industriesEcotoxicity.table.body.push(row)
-      }
-
-
-      dd.content.push(industriesEcotoxicity)
-      dd.content.push("\n")
-      dd.content.push([
-        {text: [{text: "1", sup: true, style: "asterisk"}, {text:"1,2-Dichloroethane, "},
-            {text: [{text: "2", sup: true, style: "asterisk"}, {text:"Hexachlorobenzene, "}]},
-            {text: [{text: "3", sup: true, style: "asterisk"}, {text:"Hexachlorobutadiene, "}]},
-            {text: [{text: "4", sup: true, style: "asterisk"}, {text:"Nonylphenols, "}]},
-            {text: [{text: "5", sup: true, style: "asterisk"}, {text:"Tetrachloroethene, "}]},
-            {text: [{text: "6", sup: true, style: "asterisk"}, {text:"Trichloroethylene"}]},
-          ]},
-      ])
-      dd.content.push("\n")
-      this.risk_categories.legend_impact_pdf(dd)
-      dd.content.push("\n")
-
-
-    },
-
-    efficiency_pdf(dd, industries_aux, assessment_days) {
-
-
-      let _this = this
-      let days_factor = 1
-
-      dd.content.push({
-        text: " Percentage of treatment efficiency (compared to WWTP influent)\n\n",
-        style: 'subheader'
-      })
-
-      let industriesEfficiency = {
-        table: {
-          body: [
-            [
-              {text:'Industry', style: "bold"},
-              {text: "COD (%)",style: "bold"},
-              {text:"TN (%)",style: "bold"},
-              {text:"TP (%)",style: "bold"},
-
-              [
-                {text: [{text: "1,2-DCE", style: "bold"}, {text: "1" , sup: true, style: "asterisk"}, {text: "(%)", style: "bold"}]},
-
-              ], //1,2-Dichloroethane
-              {text:'Cadmium (%)',style: "bold"},
-              [
-                {text: [{text: "HBC", style: "bold"}, {text: "2" , sup: true, style: "asterisk"}, {text: "(%)", style: "bold"}]},
-
-              ], //Hexachlorobenzene
-
-              {text:"Mercury (%)",style: "bold", },
-              {text:"Lead (%)",style: "bold"},
-              {text:"Nickel (%)",style: "bold"},
-              {text:"Chloroalkanes (%)",style: "bold"},
-            ]
-          ]
-        },
-      }
-      let industriesEfficiency_1 = {
-        table: {
-          body: [
-            [
-              {text:'Industry', style: "bold"},
-              [
-                {text: [{text: "HCBD", style: "bold"}, {text: "3" , sup: true, style: "asterisk"}, {text: "(%)", style: "bold"}]},
-
-              ], //Hexachlorobutadiene
-              [
-                {text: [{text: "NP", style: "bold"}, {text: "4" , sup: true, style: "asterisk"}, {text: "(%)", style: "bold"}]},
-
-              ], //Nonylphenols
-              [
-                {text: [{text: "PCE", style: "bold"}, {text: "5" , sup: true, style: "asterisk"}, {text: "(%)", style: "bold"}]},
-              ], //Tetrachloroethene
-              [
-                {text: [{text: "TCE", style: "bold"}, {text: "6" , sup: true, style: "asterisk"}, {text: "(%)", style: "bold"}]},
-              ], //trichloroethylene
-            ]
-          ]
-        }
-      }
-
-      let data_chart = {
-        labels: ["COD", "TN", "TP", "1,2-Dichloroethane", "Cadmium", "Hexachlorobenzene", "Mercury", "Lead", "Nickel", "Chloroalkanes", "Hexachlorobutadiene", "Nonylphenols", "Tetrachloroethene", "Trichloroethylene"],
-        datasets: []
-      };
-
-      for (const [key, industries] of industries_aux) {
-        let row = [key]
-        let row_1 = [key]
-
-
-        let cod_value = metrics.cod_efficiency(industries)
-        row.push({text: cod_value})
-
-        let tn_value = metrics.tn_efficiency(industries)
-        row.push({text: tn_value})
-
-        let tp_value = metrics.tp_efficiency(industries)
-        row.push({text: tp_value})
-
-        let dichloroethane_value = metrics.dichloroethane_efficiency(industries)
-        row.push({text: dichloroethane_value, })
-
-        let cadmium_value = metrics.cadmium_efficiency(industries)
-        row.push({text: cadmium_value, })
-
-        let hexaclorobenzene_value = metrics.hexaclorobenzene_efficiency(industries)
-        row.push({text: hexaclorobenzene_value, })
-
-        let mercury_value = metrics.mercury_efficiency(industries)
-        row.push({text: mercury_value, })
-
-        let lead_value = metrics.lead_efficiency(industries)
-        row.push({text: lead_value, })
-
-        let nickel_value = metrics.nickel_efficiency(industries)
-        row.push({text: nickel_value, })
-
-        let chloroalkanes_value = metrics.chloroalkanes_efficiency(industries)
-        row.push({text: chloroalkanes_value, })
-
-        let hexaclorobutadie_value = metrics.hexaclorobutadie_efficiency(industries)
-        row_1.push({text: hexaclorobutadie_value, })
-
-        let nonylphenols_value = metrics.nonylphenols_efficiency(industries)
-        row_1.push({text: nonylphenols_value, })
-
-        let tetrachloroethene_value = metrics.tetrachloroethene_efficiency(industries)
-        row_1.push({text: tetrachloroethene_value, })
-
-        let trichloroethylene_value = metrics.tricloroetile_efficiency(industries)
-        row_1.push({text: trichloroethylene_value, })
-
-        data_chart.datasets.push({
-          data: [cod_value, tn_value, tp_value, dichloroethane_value, cadmium_value, hexaclorobenzene_value, mercury_value, lead_value, nickel_value, chloroalkanes_value, hexaclorobutadie_value, nonylphenols_value, tetrachloroethene_value, trichloroethylene_value],
-          label: key,
-          backgroundColor: this.chooseColor(key).concat("70"),
-        })
-
-        industriesEfficiency.table.body.push(row)
-        industriesEfficiency_1.table.body.push(row_1)
-      }
-
-      //CHART
-      const options = {
-        animation: false,
-        scale: {
-          ticks: {
-            min: 0
-          }
-        },
-        "tooltips": {
-          "callbacks": {
-            "title": (tooltipItem, data) => {
-              //return data.labels[tooltipItem[0].index]
-              return Object.values(tooltipItem).map(item => {
-                return data.labels[item.index]
-              }).toString()
-            }
-          }
-        }
-      }
-
-      const ctx = document.getElementById('chart');
-      let chart = new Chart(ctx, {
-        type: "radar",
-        data: data_chart,
-        options: options
-      });
-
-      dd.content.push(industriesEfficiency)
-      dd.content.push("\n\n")
-      dd.content.push(industriesEfficiency_1)
-      dd.content.push("\n")
-      dd.content.push([
-        {text: [{text: "1", sup: true, style: "asterisk"}, {text:"1,2-Dichloroethane, "},
-            {text: [{text: "2", sup: true, style: "asterisk"}, {text:"Hexachlorobenzene, "}]},
-            {text: [{text: "3", sup: true, style: "asterisk"}, {text:"Hexachlorobutadiene, "}]},
-            {text: [{text: "4", sup: true, style: "asterisk"}, {text:"Nonylphenols, "}]},
-            {text: [{text: "5", sup: true, style: "asterisk"}, {text:"Tetrachloroethene, "}]},
-            {text: [{text: "6", sup: true, style: "asterisk"}, {text:"Trichloroethylene"}]},
-          ]},
-      ])
-      dd.content.push("\n\n")
-      dd.content.push({
-        image: chart.toBase64Image(),
-        fit: [450, 450]
-      })
-
-    },
-
-    influent_efficiency_pdf(dd, industries_aux, assessment_days) {
-
-      let _this = this
-
-      dd.content.push({
-        text: "Percentage of treatment efficiency (compared to industry influent)\n\n",
-        style: 'subheader'
-      })
-
-      let industriesEfficiency = {
-        table: {
-          body: [
-            [
-              {text:'Industry', style: "bold"},
-              {text: "COD (%)",style: "bold"},
-              {text:"TN (%)",style: "bold"},
-              {text:"TP (%)",style: "bold"},
-            ]
-          ]
-        },
-      }
-
-      let data_chart = {
-        labels: ["COD", "TN", "TP"],
-        datasets: []
-      };
-
-      for (const [key, industries] of industries_aux) {
-        let row = [key]
-
-        let eff = metrics.amount_water_influent_cleaned(industries)
-
-        row.push({text: eff.cod, })
-
-        row.push({text: eff.tn, })
-
-        row.push({text: eff.tp, })
-
-        data_chart.datasets.push({
-          data: [eff.cod, eff.tn, eff.tp],
-          label: key,
-          backgroundColor: this.chooseColor(key).concat("70"),
-        })
-
-        industriesEfficiency.table.body.push(row)
-      }
-
-      //CHART
-      const options = {
-        animation: false,
-        scale: {
-          ticks: {
-            min: 0
-          }
-        },
-        "tooltips": {
-          "callbacks": {
-            "title": (tooltipItem, data) => {
-              //return data.labels[tooltipItem[0].index]
-              return Object.values(tooltipItem).map(item => {
-                return data.labels[item.index]
-              }).toString()
-            }
-          }
-        }
-      }
-
-      const ctx = document.getElementById('chart');
-      let chart = new Chart(ctx, {
-        type: "radar",
-        data: data_chart,
-        options: options
-      });
-
-      dd.content.push(industriesEfficiency)
-      dd.content.push("\n\n")
-
-      dd.content.push({
-        image: chart.toBase64Image(),
-        fit: [450, 450]
-      })
-
-    },
-
-    async reporting_pdf(dd, industries_aux, assessment_days) {
-
-      let days_factor = 1
-      if(this.period_model === "annual") days_factor = 365
-      else if(this.period_model === "assessment") days_factor = assessment_days
-
-      let _this = this
-
-      dd.content.push({
-        text: "Indicators for external reporting\n\n",
-        style: 'indicator_title'
-      })
-
-      let industriesIndicator = {
-        table: {
-          body: [
-            [
-              {text:'Industry', style: "bold"},
-              {text:[{text: 'Water withdrawal (', style: "bold",}, {text: 'GRI 303-1', style: "bold", color: "blue", link: "https://www.globalreporting.org/standards/media/1909/gri-303-water-and-effluents-2018.pdf"}, {text: ') (m3/year)', style: "bold",}], },
-              {text:[{text: 'Effect of water withdrawal on the water body (', style: "bold",}, {text: 'GRI 303-2', style: "bold", color: "blue", link: "https://www.globalreporting.org/standards/media/1909/gri-303-water-and-effluents-2018.pdf"}, {text: ') (%)', style: "bold",}], },
-              {text:[{text: 'Water recycled and reused (', style: "bold",}, {text: 'GRI 303-3', style: "bold", color: "blue", link: "https://www.globalreporting.org/standards/media/1909/gri-303-water-and-effluents-2018.pdf"}, {text: ') (%)', style: "bold",}], },
-              {text:[{text: 'Water discharge (', style: "bold",}, {text: 'GRI 306-1', style: "bold", color: "blue", link: "https://www.globalreporting.org/standards/media/2573/gri-306-waste-2020.pdf"}, {text: ') (m3/year)', style: "bold",}], },
-              {text:[{text: 'Effect of water discharges on the water body (', style: "bold",}, {text: 'GRI 306-5', style: "bold", color: "blue", link: "https://www.globalreporting.org/standards/media/2573/gri-306-waste-2020.pdf"}, {text: ') (%)', style: "bold",}], },
-              {text:[{text: 'Water withdrawn (', style: "bold",}, {text: 'CDP W1.2b', style: "bold", color: "blue", link: "https://guidance.cdp.net/en/guidance?cid=W1.2&ctype=ExternalRef&gettags=1+&idtype=RecordExternalRef&incchild=1&microsite=1&otype=questionnaire&page=1"}, {text: ') (ML/yr)', style: "bold",}], },
-              {text:[{text: 'Water discharged (', style: "bold",}, {text: 'CDP W1.2b', style: "bold", color: "blue", link: "https://guidance.cdp.net/en/guidance?cid=W1.2&ctype=ExternalRef&gettags=1+&idtype=RecordExternalRef&incchild=1&microsite=1&otype=questionnaire&page=1"}, {text: ') (ML/yr)', style: "bold",}], },
-              {text:[{text: 'Water reused (', style: "bold",}, {text: 'CDP W1.2b', style: "bold", color: "blue", link: "https://guidance.cdp.net/en/guidance?cid=W1.2&ctype=ExternalRef&gettags=1+&idtype=RecordExternalRef&incchild=1&microsite=1&otype=questionnaire&page=1"}, {text: ') (ML/yr)', style: "bold",}], },
-              {text:[{text: 'Highest level(s) to which you treat your discharge (', style: "bold",}, {text: 'CDP W1.2j', style: "bold", color: "blue", link: "https://guidance.cdp.net/en/guidance?cid=W1.2&ctype=ExternalRef&gettags=1+&idtype=RecordExternalRef&incchild=1&microsite=1&otype=questionnaire&page=1"}, {text: ')', style: "bold",}], },
-
-            ]
-          ]
-        }
-      }
-
-      for (const [key, industries] of industries_aux) {
-        let row = [key]
-
-        let indicators = await metrics.reporting_metrics(industries, this.global_layers)
-
-        let en8 = indicators["g4-en8"]
-        row.push(en8)
-        let en9 = indicators["g4-en9"]
-
-        row.push({text: en9, fillColor: _this.get_color(this.risk_categories.withdrawal_effect(en9))})
-        let en10 = indicators["g4-en10"]
-        row.push(en10)
-        let en22 = indicators["g4-en22"]
-        row.push(en22)
-        let en26 = indicators["g4-en26"]
-        row.push({text: en26, fillColor: _this.get_color(this.risk_categories.discharge_effect(en26))})
-        let wd_value = indicators["wd"]
-        row.push(wd_value)
-        let dis_value = indicators["dis"]
-        row.push(dis_value)
-        let re_value = indicators["re"]
-        row.push(re_value)
-        let highest_level_discharge = indicators["highest_level_discharge"]
-        row.push(highest_level_discharge)
-
-        industriesIndicator.table.body.push(row)
-
-      }
-
-      dd.content.push(industriesIndicator)
-      dd.content.push("\n")
-      this.risk_categories.legend_impact_pdf(dd)
-      dd.content.push("\n\n")
-
-    },
-
-
-    async generate_pdf(){
-      let _this = this
-      this.generating_pdf = true
-
-      if (pdfMake.vfs == undefined){
-        let pdfFonts = require('pdfmake/build/vfs_fonts.js')
-        pdfMake.vfs = pdfFonts.pdfMake.vfs;
-      }
-
-      let img = await _this.getBase64ImageFromURL("wbcsd.png")
-
-      let dd = {
-        pageSize: 'A4',
-        pageOrientation: 'landscape',
-          pageMargins: [67, 60, 30, 42],
-        footer: function (currentPage, pageCount) {
-          return {
-            table: {
-              widths: [150, '*', 100],
-              body: [
-                [
-                  {text: 'www.wiat.icradev.cat', alignment: 'right'},
-                  {text: ' ', alignment: 'right'},
-                  {text: 'Page ' + currentPage, alignment: 'left'}
-                ]
-              ]
-            },
-            layout: 'noBorders'
-          };
-        },
-        header: function(currentPage, pageCount, pageSize) {
-          return {
-            margin: [20, 20],
-            layout: 'noBorders',
-            table: {
-              widths: ['*',200],
-              body: [
-                ['', {image: img, fit:[50,50], alignment: 'right'}],
-
-              ]
-            }
-          };
-        },
-        content: [],
-        styles: {
-          header: {
-            fontSize: 18,
-            bold: true
-          },
-          indicator_title: {
-            fontSize: 14,
-            bold: true,
-            decoration: 'underline',
-          },
-          subheader_big: {
-            fontSize: 13,
-            bold: true
-          },
-          subheader: {
-            fontSize: 12,
-          },
-          subsubheader: {
-            fontSize: 11,
-            bold: true
-          },
-          legend: {
-            fontSize: 7,
-          },
-
-          tableHeader: {
-            bold: true,
-            fontSize: 10,
-            color: '#1c1c1b'
-          },
-          bold: {
-            bold: true
-          },
-          asterisk: {
-            color: "red"
-          },
-          defaultStyle: {
-            fontSize: 10,
-          }
-
-        },
-
-      }
-
-      const groupedByAssessments = _.groupBy(this.selected_industries, function(n) {
-        return n.assessment.name;
-      });
-
-
-      for(const [assessment_name, industries] of Object.entries(groupedByAssessments)){
-        dd.content.push({
-          text: "Assessment "+assessment_name+"\n\n",
-          style: 'header'
-        })
-
-        let assessment = industries[0].assessment
-
-        let assessment_days = utils.daysBetween(assessment.assessment_period_start, assessment.assessment_period_end)
-
-        dd.content.push({
-          text: [
-            {
-              text:"Assessment period: ",
-              bold: true
-            },
-            assessment.assessment_period_start + " to "+ assessment.assessment_period_end + " ("+ utils.daysBetween(assessment.assessment_period_start, assessment.assessment_period_end) +" days)\n\n"
-          ]
-        })
-
-        let industriesSummary = {
-          style: 'tableExample',
-          table: {
-            body: [
-                [
-                  {text:'Name', style: "bold"},
-                  {text:'Latitude', style: "bold"},
-                  {text:'Longitude', style: "bold"},
-                  {text:"Standard Industrial Classification", style: "bold"},
-                  {text:"Assessment period (days)", style: "bold"},
-                  {text:"Supply chain", style: "bold"}
-                ]
-            ]
-          }
-        }
-
-        industries.forEach(industryAux => {
-          let industry = industryAux.industry
-
-          let arr = [
-            industry.name,
-            industry.location.lat.toFixed(3),
-            industry.location.lng.toFixed(3),
-            industry.industry_type === null ? "-" : standard_industrial_classification.find(category => category.value == industry.industry_type).text,
-            assessment_days,
-          ]
-
-          let sc = {
-            table: {
-              body: [
-                ['Name', 'Latitude', 'Longitude'],
-              ]
-            },
-          }
-
-          industry.supply_chain.forEach(x => {
-            sc.table.body.push([x.name, parseFloat(x.location.lat).toFixed(3), parseFloat(x.location.lng).toFixed(3)])
-          })
-
-          arr.push(sc)
-
-          industriesSummary.table.body.push(arr)
-        })
-
-        dd.content.push(industriesSummary)
-        dd.content.push("\n\n")
-
-        let industries_aggregated = industries.map(industry => [industry.industry.name, [industry.industry]])
-
-        this.emissions_table_pdf(dd, industries_aggregated, assessment_days)
-        dd.content.push("\n\n")
-        await this.quality_quantity_indicators(dd, industries_aggregated, assessment_days)
-        dd.content.push("\n\n")
-
-        dd.content.push({
-          text: "Pollution impact\n\n",
-          style: 'indicator_title'
-        })
-
-        await this.ecotoxicity_pdf(dd, industries_aggregated, assessment_days)
-        dd.content.push("\n\n")
-
-        this.eutrophication_pdf(dd, industries_aggregated, assessment_days)
-        dd.content.push("\n\n")
-
-        dd.content.push({
-          text: "Treatment efficiency\n\n",
-          style: 'subheader_big'
-        })
-
-        this.efficiency_pdf(dd, industries_aggregated, assessment_days)
-        dd.content.push("\n\n")
-        this.influent_efficiency_pdf(dd, industries_aggregated, assessment_days)
-        dd.content.push("\n\n")
-
-        await this.reporting_pdf(dd, industries_aggregated, assessment_days)
-        dd.content.push("\n\n")
-
-        await this.layers_table_pdf(dd, industries_aggregated, assessment_days)
-      }
-
-
-      this.generating_pdf = false
-      pdfMake.createPdf(dd).download();
-
-    },
   },
 
   created(){
     let _this = this
-    this.assessments_with_industries.forEach(assessment => {
-      if(!assessment.disabled) _this.selected_assessments.push(assessment.assessment)
-    })
-    let indexFirstValid = this.assessments_with_industries.findIndex(assessment => assessment.disabled == false)
-    if(indexFirstValid >= 0) {
-      this.selected_assessment = this.assessments_with_industries[indexFirstValid].assessment.name
-    }
-    console.log(this.assessments_with_industries)
-    this.industry_clicked.push(this.assessments_with_industries[0].assessment.industries[0])
+
+    this.selected_assessment = this.created_assessments[this.assessment_id].name
+
+  },
+  async mounted() {
+
+    let _this = this
+
+    this.industry = this.created_assessments[this.assessment_id].industries[this.industry_id]
+
+    _this.emissions_table =_this.generate_emissions_table()
+    _this.energy_use_table = _this.generate_energy_use_table()
+    _this.effluent_load_table = _this.generate_effluent_load_table()
+
+    _this.water_quantity = await _this.generate_water_quality_table()
+    _this.treated_table = await _this.generate_treated_table()
+    _this.freshwater_lever_for_action = await _this.generate_freshwater_lever_for_action_table()
+
+    _this.eutrophication_table = _this.generate_eutrophication_table()
+    _this.ecotoxicity_table = _this.generate_ecotoxicity_table()
+    _this.treatment_efficiency_table = _this.generate_treatment_efficiency_table()
+    _this.treatment_efficiency_influent_table = _this.generate_treatment_efficiency_influent_table()
+
+    _this.eqs_table = _this.generate_eqs_table()
+    _this.delta_eqs_table = await _this.generate_delta_eqs_table()
+    _this.delta_ecotox_table = await _this.generate_delta_ecotox_table()
+
+    _this.simple_report_table = await _this.generate_simple_report_table()
+
   },
 
   computed: {
-
-
-
-    tab(){
-      let _this = this
-      let index = this.assessments_with_industries.findIndex(assessment => assessment.assessment.name == _this.selected_assessment)
-      if(index  == -1) return undefined
-      else return index
-    },
 
     indicators_industry(){
       return [
@@ -6987,142 +4647,6 @@ export default {
       ]
     },
 
-    assessments_with_industries(){
-      let _this = this
-
-      let disabled = this.created_assessments.map(assessment => {
-        if(assessment.industries.length == 0){
-          return {
-            assessment: assessment,
-            disabled: true,
-          }
-        }else{
-          return {
-            assessment: assessment,
-            disabled: !assessment.industries.map(industry => {return _this.is_industry_valid(industry)}).includes(true)
-          }
-        }
-      })
-      return disabled
-    },
-
-    industries_aggregated(){
-      let _this = this
-      if(_this.tab !== undefined && _this.tab !== null && _this.created_assessments.length > 0) {
-
-        let industries = {}
-        this.created_assessments[_this.tab].industries.forEach(industry => {
-          if(_this.is_industry_valid(industry))
-          industries[industry.name] = [industry]
-        })
-        return industries
-      }
-    },
-
-    current_industry(){
-      if(this.industry_clicked != null || this.industry_clicked.length == 0) {
-        let obj = {}
-        obj[this.industry_clicked[0].name] = [this.industry_clicked[0]]
-        return obj
-      }
-    },
-
-
-    industry_table() {
-
-      let _this = this
-
-      if(_this.tab !== undefined){
-
-        let assessment = this.created_assessments[_this.tab]
-        let assessment_days = utils.daysBetween(assessment.assessment_period_start, assessment.assessment_period_end)
-
-        let table = {
-          header: [
-            {text: "Name", value: "industry_name"},
-            {text: "Latitude", value: "lat"},
-            {text: "Longitude", value: "lon"},
-            {text: "Standard Industrial Classification", value: "industry_type"},
-            {text: "Assessment period (days)", value: "assessment_period"},
-            { text: 'Supply chain', value: 'data-table-expand'},
-          ],
-          industries: []
-        }
-
-        assessment.industries.forEach(industry => {
-
-          if(_this.is_industry_valid(industry)){
-            table.industries.push({
-              industry_name: industry.name,
-              lat: industry.location.lat.toFixed(3),
-              lon: industry.location.lng.toFixed(3),
-              industry_type: industry.industry_type === null ? "-" : standard_industrial_classification.find(category => category.value == industry.industry_type).text,
-              assessment_period: assessment_days,
-              industry: industry,
-            })
-          }
-
-
-        })
-        return table
-      }
-      else return {header: [], industries: []}
-    },
-
-    assessment_names: function() {
-      return this.assessments_with_industries.map(assessment => assessment.assessment.name)
-
-      //return this.assessments_with_industries.filter(assessment => !assessment.disabled).map(assessment => assessment.assessment.name)
-    },
-
-    layer_tree: function () {
-      let _this = this
-      let id = 1
-      this.layers.forEach(category => {
-        id = _this.add_identifier(category, id)  //id has the new id to add
-      })
-
-      return this.layers
-    },
-
-    is_there_any_industry_created: function () {
-
-      let _this = this
-      let industries = []
-      this.assessments_and_industries_tree.forEach(assessment => {
-        industries.push(...assessment.children)
-      })
-      return industries.filter(industry => {
-        return _this.is_industry_valid(industry.industry)
-      }).length > 0
-
-
-    },
-
-    assessments_and_industries_tree: function () {  //Assessments without any industry are ignored
-      let id = 0
-      let items = []
-      this.created_assessments.forEach(assessment => {
-        let obj = {}
-        obj["name"] = assessment.name
-        obj["children"] = []
-        obj["id"] = id
-        id++
-        assessment.industries.forEach(industry => {
-          obj["children"].push({
-            "industry": industry,
-            "id": id,
-            "assessment": assessment,
-            "name": industry.name
-          })
-          id++
-        })
-        if (obj["children"].length > 0) items.push(obj)
-      })
-
-
-      return items
-    }
   }
 
   }

@@ -8,8 +8,6 @@
             id="main_tab"
             v-model="main_tab"
             style="padding: 5px 5px 5px 5px"
-
-
         >
           <v-tabs-slider color="#b62373"></v-tabs-slider>
 
@@ -612,25 +610,18 @@
 
 <script>
 
-import BarChart from "../components/BarChart";
 let _ = require('lodash');
-import pdfMake from 'pdfmake/build/pdfmake.js'
+import pdfMake from 'pdfmake/build/pdfmake.min'
 import Vue from "vue";
 import {utils, metrics} from "../utils"
 import standard_industrial_classification from "../standard_industrial_classification"
 import external_indicators from "../external_indicators"
 
-import RadarChart from "../components/RadarChart";
 import colors from "../colors"
 import risk_thereshold from "..//risk_categories"
-import { Chart, scaleService } from 'chart.js'
 
 export default {
   name: "Make_report",
-  components: {
-    RadarChart,
-    BarChart,
-  },
   data() {
     return {
       expanded: [],
@@ -649,39 +640,12 @@ export default {
       main_tab: 0,
       layers_table: {header: [], value: []},
 
-      reporting_indicators: {header: [], value: []},
       simple_report_table: {header: [], value: []},
       cdp_5_1: {header: [], value: []},
       cdp_1_2_b: {header: [], value: []},
       external_indicators: external_indicators,
 
       include_future: true,
-      aggregation_level: "industry",
-
-      ghg_emission_chart: {
-        chartData: null,
-        options: null
-      },
-      quantity_chart: {
-        chartData: null,
-        options: null
-      },
-      eutrophication_chart: {
-        chartData: null,
-        options: null
-      },
-      ecotoxicity_chart: {
-        chartData: null,
-        options: null
-      },
-      treatment_efficiency_chart: {
-        chartData: null,
-        options: null
-      },
-      treatment_efficiency_influent_chart: {
-        chartData: null,
-        options: null
-      },
 
       table_title: {
         global_warming_potential: {
@@ -740,15 +704,9 @@ export default {
 
         },
       },
-      imported_file_excel: null,
       radio_layers: 2,
       radio_industry_edit: null,
-      tab_pollutant: 0,
-      dialog_biogas_stage: 0,
       industry_clicked: null,
-      industry_info: false,
-      active_indicator: [],
-      open_indicator: [],
       selected_assessment: null,
 
     }
@@ -895,81 +853,6 @@ export default {
       return [...industries, ...sc]
     },
 
-    indicator_risk_class: function(id){
-
-      if(this.current_industry == null) return
-      //risks
-      let current_industry_name = Object.keys(this.current_industry)[0]
-      let industry = this.simple_report_table.value.filter(industry => industry.value == current_industry_name)[0]
-      if(industry == null || industry == undefined) return
-      //let ghg_impact = this.risk_categories["global_warming"](industry["carbon_impact"])
-
-      let ghg_impact = this.risk_categories["global_warming"](industry["carbon_impact"])
-      let freshwater_impact = this.risk_categories["pollution"](industry["freshwater_impact"])
-      let pollution_impact = this.risk_categories["pollution"](industry["pollution_impact"])
-      let eutrophication_impact = null
-      if(this.eutrophication_table.value[0] != undefined) eutrophication_impact = this.risk_categories["eutrophication"](this.eutrophication_table.value[0][current_industry_name])
-      let delta_ecotox_impact = null
-      if(this.delta_ecotox_table.value[0] != undefined) delta_ecotox_impact = this.risk_categories["delta_ecotoxicity"](this.delta_ecotox_table.value[0][current_industry_name])
-      let delta_eqs_impact = null
-      if(this.delta_eqs_table.value.length > 0){
-        let delta_eqs_values = this.delta_eqs_table.value.map(x => x[current_industry_name])
-        delta_eqs_impact = this.risk_categories["delta_eqs"](delta_eqs_values.sum() / delta_eqs_values.length)
-      }
-      let ecotox_impact = null
-      if(this.ecotoxicity_table.value[0] != undefined) ecotox_impact = this.risk_categories["ecotoxicity"](this.ecotoxicity_table.value[0][current_industry_name])
-      let eqs_impact = null
-      if(this.eqs_table.value.length > 0){
-        let eqs_values = this.eqs_table.value.map(x => x[current_industry_name])
-        eqs_impact = this.risk_categories["eqs"](eqs_values.sum() / eqs_values.length)
-      }
-      /*
-      let pollution_load_to_environment_risk = [null, null]
-      pollution_load_to_environment_risk[1] = this.return_avg_risk([eutrophication_impact, delta_eqs_impact, delta_ecotox_impact])
-      let toxicity_load_risk = [null, null]
-      toxicity_load_risk[1] = this.return_avg_risk([delta_eqs_impact, delta_ecotox_impact])
-      let effluent_toxicity_risk = [null, null]
-      effluent_toxicity_risk[1] = this.return_avg_risk([eqs_impact, ecotox_impact])*/
-
-
-      let return_color_class = function(value){
-        if(value == null) return null
-
-        if(value[1] == "Low impact"){
-          return 'low'
-        }else if(value[1] == "Medium impact"){
-          return "medium"
-        }else if(value[1] == "High impact"){
-          return "high"
-        }else if(value[1] == "Very high impact"){
-          return "very_high"
-        }
-        return null
-
-      }
-
-      let id_risk = [1,2,3,4,5,6,7,12,13,15,16]
-      if(id_risk.includes(id.id)){
-        if(id.id < 3) {
-          return return_color_class(pollution_impact)
-        }else if(id.id == 3){
-          return return_color_class(delta_ecotox_impact)
-        }else if(id.id == 4){
-          return return_color_class(delta_eqs_impact)
-        } else if(id.id == 5){
-          return return_color_class(eutrophication_impact)
-        } else if(id.id == 6){
-          return return_color_class(ecotox_impact)
-        }else if(id.id == 7){
-          return return_color_class(eqs_impact)
-        } else if(id.id <= 13) {
-          return return_color_class(freshwater_impact)
-        } else {
-          return return_color_class(ghg_impact)
-        }
-      }
-    },
-
     itemRowBackground: function (item) {
       return item.value === this.table_title.simple_table.quality_quantity || item.value === this.table_title.simple_table.pollution || item.value === this.table_title.simple_table.total_ghg ? 'impact-style' : 'lever-style'
     },
@@ -1045,7 +928,12 @@ export default {
 
       //this.industry_clicked = this.industries_aggregated[item.value]
       //this.industry_info = true
-      this.$router.push({ name: 'statistics'})
+
+      let assessment_index = this.tab
+      let industry_index = this.created_assessments[assessment_index].industries.findIndex(x => x.name == item.value)
+
+
+      this.$router.push({ name: 'statistics', params: {assessment_id: assessment_index.toString(), industry_id: industry_index.toString()}})
 
 
 
@@ -1070,58 +958,9 @@ export default {
           _this.cdp_5_1 = await _this.generate_cdp_5_1_table()
           _this.cdp_1_2_b = await _this.generate_cdp_1_2_b_table()
           _this.selected_layers.splice(0, _this.selected_layers.length, _this.layers[1].children[0].children[3])
+          _this.selected_layers.splice(0, _this.selected_layers.length, _this.layers[1].children[0].children[3])
         })
       }
-    },
-
-    getAvailabilityColor (item, value) {
-      if (item.value == this.table_title.availability_quantity.dilution_factor){
-        return this.risk_categories["dilution_factor"](item[value])
-      } else if (item.value == this.table_title.availability_quantity.recycled){
-        return this.risk_categories["recycled_water_factor"](item[value])
-      }else if (item.value == this.table_title.availability_quantity.treated){
-        return this.risk_categories["water_treated"](item[value])
-      }else if (item.value == this.table_title.availability_quantity.consumption_available){
-        return this.risk_categories["water_stress_ratio"](item[value])
-      }else if(item.value == this.table_title.availability_quantity.specific_water_consumption){
-        return this.risk_categories["specific_water_consumption"](item[value])
-      }
-      return null
-    },
-
-    getEutrophicationColor(item, value) {
-      return this.risk_categories["eutrophication"](item[value])
-    },
-
-    getDeltaEcotoxColor(item, value) {
-
-      return this.risk_categories["delta_ecotoxicity"](item[value])
-    },
-
-    getDelta(item, value) {
-      return this.risk_categories["delta"](item[value])
-    },
-
-    getEQSColor(item, value) {
-      return this.risk_categories["eqs"](item[value])
-    },
-    getGlobalWarming(item, value) {
-      return this.risk_categories["global_warming"](item[value])
-    },
-
-    getEcotoxicity(item, value){
-      return this.risk_categories["ecotoxicity"](item[value])
-    },
-
-    getDeltaEQSColor(item, value) {
-      return this.risk_categories["delta_eqs"](item[value])
-    },
-
-    getTreatmentEfficiencyColor(item, value) {
-      return this.risk_categories["treatment_efficiency"](item[value])
-    },
-    getTreatmentEfficiencyInfluentColor(item, value) {
-      return this.risk_categories["influent_treatment_efficiency"](item[value])
     },
 
     getGISLayerColor(item, value){
@@ -1241,10 +1080,6 @@ export default {
       return null
     },
 
-    itemRowBold: function (item) {
-      return item.value == "Total" ? 'style-1' : 'style-2'
-    },
-
     chunk(array, size){
       let R = [];
       for (let i = 0; i < array.length; i += size)
@@ -1261,68 +1096,6 @@ export default {
       return ADLER32.str(s)
     },
 
-
-    async generate_reporting_indicators_table() {
-
-      let _this = this
-
-
-      if(_this.tab !== undefined){
-
-        let table = {
-          header: [{text: "", value: "value", sortable: false}],
-          value: []
-        }
-
-        let g4_en8 = {value: "Water withdrawal", unit: "m3/year", link_text: "(GRI 303-1)", link_to: "https://www.globalreporting.org/standards/media/1909/gri-303-water-and-effluents-2018.pdf"}
-        let g4_en9 = {value: "Effect of water withdrawal on the water body", link_text: "(GRI 303-2)", link_to: "https://www.globalreporting.org/standards/media/1909/gri-303-water-and-effluents-2018.pdf", unit: "%", info: "If the value is greater than 5%, it means that the withdrawals significantly affect the water source"}
-        let g4_en10 = {value: "Water recycled and reused", link_text: "(GRI 303-3)", link_to: "https://www.globalreporting.org/standards/media/1909/gri-303-water-and-effluents-2018.pdf", unit: "%"}
-        let g4_en22 = {value: "Water discharge", link_text: "(GRI 306-1)", link_to: "https://www.globalreporting.org/standards/media/2573/gri-306-waste-2020.pdf", unit: "m3/year"}
-        let g4_en26 = {value: "Effect of water discharges on the water body", link_text: "(GRI 306-5)", unit: "%", link_to: "https://www.globalreporting.org/standards/media/2573/gri-306-waste-2020.pdf", info: "If the value is greater than 5%, it means that the discharges significantly affect the water source"}
-
-        let wd = {value: "Water withdrawn", link_text: "(CDP W1.2b)", unit: "ML/year", link_to: "https://guidance.cdp.net/en/guidance?cid=W1.2&ctype=ExternalRef&gettags=1+&idtype=RecordExternalRef&incchild=1&microsite=1&otype=questionnaire&page=1"}
-        let dis = {value: "Water discharged", link_text: "(CDP W1.2b)", unit: "ML/year", link_to: "https://guidance.cdp.net/en/guidance?cid=W1.2&ctype=ExternalRef&gettags=1+&idtype=RecordExternalRef&incchild=1&microsite=1&otype=questionnaire&page=1"}
-        let re = {value: "Water reused", link_text: "(CDP W1.2b)", unit: "ML/year", link_to: "https://guidance.cdp.net/en/guidance?cid=W1.2&ctype=ExternalRef&gettags=1+&idtype=RecordExternalRef&incchild=1&microsite=1&otype=questionnaire&page=1"}
-        let highest_level_discharge = {value: "Highest level(s) to which you treat your discharge", link_text: "(CDP W1.2j)", unit: "-", link_to: "https://guidance.cdp.net/en/guidance?cid=W1.2&ctype=ExternalRef&gettags=1+&idtype=RecordExternalRef&incchild=1&microsite=1&otype=questionnaire&page=1"}
-
-        for (const [key, industries] of Object.entries(_this.industries_aggregated)) {
-
-          let indicators = await metrics.reporting_metrics(industries, this.global_layers)
-
-          table.header.push({
-            text: key, value: key,
-          })
-
-          g4_en8[key] = indicators["g4-en8"]
-          g4_en9[key] = indicators["g4-en9"]
-          g4_en10[key] = indicators["g4-en10"]
-          g4_en22[key] = indicators["g4-en22"]
-          g4_en26[key] = indicators["g4-en26"]
-
-          wd[key] = indicators["wd"]
-          dis[key] = indicators["dis"]
-          re[key] = indicators["re"]
-          highest_level_discharge[key] = indicators["highest_level_discharge"]
-
-        }
-
-        table.header.push({text: "Unit", value: "unit", sortable: false,})
-
-        table.value.push(g4_en8)
-        table.value.push(g4_en9)
-        table.value.push(g4_en10)
-        table.value.push(g4_en22)
-        table.value.push(g4_en26)
-        table.value.push(wd)
-        table.value.push(dis)
-        table.value.push(re)
-        table.value.push(highest_level_discharge)
-
-        return table
-      }
-      else return {header: [], emissions: []}
-
-    },
 
     async generate_simple_report_table() {
 
@@ -3177,14 +2950,6 @@ export default {
           industries[industry.name] = [industry]
         })
         return industries
-      }
-    },
-
-    current_industry(){
-      if(this.industry_clicked != null || this.industry_clicked.length == 0) {
-        let obj = {}
-        obj[this.industry_clicked[0].name] = [this.industry_clicked[0]]
-        return obj
       }
     },
 

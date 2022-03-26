@@ -1,3 +1,5 @@
+const BundleAnalyzerPlugin = require('webpack-visualizer-plugin');
+
 module.exports = {
   devServer: {
     proxy: 'https://photon.komoot.io'
@@ -5,6 +7,10 @@ module.exports = {
 
   transpileDependencies: [
     'vuetify'
-  ]
+  ],
+
+  configureWebpack: {
+    plugins: [new BundleAnalyzerPlugin()]
+  }
 }
 

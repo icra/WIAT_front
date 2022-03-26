@@ -1,10 +1,14 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Map from '../components/Map'
-import New_industry from "../components/New_industry";
-import Import from "../components/Import";
-import Make_report from "../components/Make_report";
-import Industry_statistics from "../components/Industry_statistics";
+
+
+const Map = () => import('../components/Map')
+const Import = () => import('../components/Import')
+const Make_report = () => import('../components/Make_report')
+const New_industry = () => import('../components/New_industry')
+const Industry_statistics = () => import('../components/Industry_statistics')
+
+
 Vue.use(VueRouter)
 
 const routes = [
@@ -30,8 +34,9 @@ const routes = [
     component: Make_report
   },
   {
-    path: '/statistics',
+    path: '/statistics/:assessment_id/:industry_id',
     name: 'statistics',
+    props: true,
     component: Industry_statistics
   },
 

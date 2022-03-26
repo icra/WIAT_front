@@ -234,10 +234,10 @@
                   <v-hover v-slot:default="{ hover }">
                     <v-list-item :class="hover ? 'icon_hovered_pressed' : ''" @click="secondMenu = !secondMenu" style="height: 75px; margin-top: 25px">
                       <v-list-item-icon>
-                        <v-icon color = "#F2F4F3" v-if="secondMenu">
+                        <v-icon color = "#F2F4F3" v-if="secondMenu" style="display: inline-block; position: relative; left: 50%; top: 50%; transform: translate(-50%, 25%);">
                           mdi-arrow-left
                         </v-icon>
-                        <v-icon color = "#F2F4F3" v-else>
+                        <v-icon color = "#F2F4F3" v-else style="display: inline-block; position: relative; left: 50%; top: 50%; transform: translate(-50%, 25%);">
                           mdi-arrow-right
                         </v-icon>
                       </v-list-item-icon>
@@ -870,7 +870,6 @@
 
 <script>
 import {Assessment, Industry } from "./ecam_backend";
-import Vue from "vue";
 export default {
   data () {
     return {
@@ -882,7 +881,6 @@ export default {
         { title: "Maps and Datasets", icon: 'mdi-map', to:"map" },
         { title: "Import/Export", icon: 'mdi-import', to:"import"},
         { title: "Report", icon: 'mdi-file-chart', to:"report" },
-
       ],
       created_assessments: this.$assessments,  //Created assessments
       assessment_name: null,     //V-model name for creating/editing an assessment
@@ -933,8 +931,6 @@ export default {
       dialog_documents: false,
       dialog_contact: false,
       dialog_legal: false
-
-
     }
   },
   created() {
@@ -1368,7 +1364,7 @@ export default {
 
 
 
-/* @import url('https://use.typekit.net/eud5bih.css'); */
+@import url('https://use.typekit.net/eud5bih.css');
 
 
 html {
