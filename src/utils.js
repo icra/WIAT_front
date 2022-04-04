@@ -17,6 +17,29 @@ function sumObjectsByKey(...objs) {
 
 let utils = {
 
+    is_industry_valid(industry){
+        if(industry == null || industry == undefined) return false
+        if(industry.volume_withdrawn!=null && industry.product_produced!=null && industry.has_onsite_wwtp!=null && industry.has_offsite_wwtp!=null && industry.has_direct_discharge!=null && industry.industry_type!=null){
+            let arr = [true]
+            if(industry.has_onsite_wwtp == 1) {
+                let wwtp = industry.onsite_wwtp
+                arr.push(wwtp.wwt_vol_trea!=null && wwtp.wwt_vol_disc!=null)
+            }
+            if(industry.has_direct_discharge == 1) {
+                let dd = industry.direct_discharge
+                arr.push(dd.dd_vol_disc!=null)
+            }
+            if(industry.has_offsite_wwtp == 1) {
+                let wwtp = industry.offsite_wwtp
+                arr.push(wwtp.wwt_vol_trea!=null)
+            }
+            return !arr.includes(false)
+        }
+        return false
+
+    },
+
+
     equals(a, b){
         return JSON.stringify(a) === JSON.stringify(b);
     },

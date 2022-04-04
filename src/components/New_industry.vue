@@ -2166,13 +2166,12 @@
             <br>
             <br>
 
-            <router-link :to="{name: 'report'}">
+            <router-link :to="{name: 'report'}" style="text-decoration: none">
               <v-hover
                   v-slot="{ hover }"
-                  open-delay="200"
               >
                 <h3 :class="`${hover? 'link_to_report_hovered': 'link_to_report'}`"  @click="changeTab">
-                  Click here to see the generated report
+                  Click here to see the report
                 </h3>
 
               </v-hover>
@@ -3522,11 +3521,12 @@ export default {
 
 <style scoped>
 .link_to_report_hovered{
-  color: #1c1c1b;
+  color: #b62373;
   text-decoration: underline;
 }
 .link_to_report{
-  color: #1c1c1b;
+  color: #b62373;
+  text-decoration: none;
 }
 
 .v-btn--disabled{

@@ -1,5 +1,3 @@
-
-
 module.exports = {
   optimization: {
     splitChunks: {

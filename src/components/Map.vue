@@ -843,7 +843,8 @@ export default {
               return resp.json()
             }).then((response) => {
               // we get the data from the request response
-              if(response.rows[0] == undefined) return noData
+              if(response.rows == undefined) return noData
+              else if(response.rows[0] == undefined) return noData
               else if (response.rows[0] == noData) return noData
               else return response.rows[0][label]*unit_scale_factor
             })
@@ -1819,8 +1820,8 @@ export default {
         }
       `
 
-      //let water_rri_colors = ['#ffff99', '#ffe600', '#ff9900', '#ff1900', '#990000', '#4e4e4e' ]
-      //let water_rri_labels = ["Low (<25%)", "Low - Medium (25-50%)", "Medium - High (50-60%)","High (60-75%)","Extremely High (>75%)","No Data"]
+      let water_rri_colors = ['#ffff99', '#ffe600', '#ff9900', '#ff1900', '#990000', '#4e4e4e' ]
+      let water_rri_labels = ["Low (<25%)", "Low - Medium (25-50%)", "Medium - High (50-60%)","High (60-75%)","Extremely High (>75%)","No Data"]
 
 
       this.layers["Peak RepRisk Country ESG Risk Index"].layers.baseline.annual.layer = this.define_carto_layer(baselineRepRiskDataset, baselineRepRiskStyle, "rri_label", own_client, "jsalo")

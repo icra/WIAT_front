@@ -424,7 +424,7 @@
     <!-- Main content -->
     <div style="position: absolute; height: calc(100% - 70px); width: 100%; margin-top: 70px">
       <div class="content" :class="manageContentClass" style="overflow-y: auto;">
-        <router-view :selected_assessment="assessment_expansion_panel" :selected_layer="selected_layer" :selected_industry="selected_industry" @createIndustry="createNewIndustry" @createSupplyChain="create_supply_chain" @editIndustry="open_edit_industry_tab"  @editSupplyChain="open_edit_supply_chain_tab" @selectLayer="toggleLayerSelection" @closeRightMenu="closeRightMenu" @closeLayer="applyLayer(selected_layer)" @changeFirstMenuTab="changeFirstMenuTab" @wrongLocation="snackbars.wrong_location.v_model = true" ref="reference"></router-view>
+        <router-view :selected_assessment="assessment_expansion_panel" :selected_layer="selected_layer" :selected_industry="selected_industry" @createIndustry="createNewIndustry" @createSupplyChain="create_supply_chain" @editIndustry="open_edit_industry_tab"  @editSupplyChain="open_edit_supply_chain_tab" @selectLayer="toggleLayerSelection" @closeRightMenu="closeRightMenu" @closeLayer="applyLayer(selected_layer)" @wrongLocation="snackbars.wrong_location.v_model = true" ref="reference"></router-view>
       </div>
     </div>
 
@@ -618,8 +618,11 @@
 
                 <br>
               </v-form>
-              <v-btn :to="{ name: 'edit_industry', params: {assessment_id: selected_assessment, industry_id: selected_industry}}" small tile block @click="icon_selected = -1; selected_layer=null; secondMenu=false; rightMenu=false" color="#b62373">
+              <v-btn :to="{ name: 'edit_industry', params: {assessment_id: selected_assessment, industry_id: selected_industry}}" small tile block @click="selected_layer=null; secondMenu=false; rightMenu=false;" color="#b62373">
                 Advanced INPUTS
+              </v-btn>
+              <v-btn :to="{ name: 'statistics', params: {assessment_id: selected_assessment, industry_id: selected_industry}}" small tile block @click="selected_layer=null; secondMenu=false; rightMenu=false;" color="#b62373">
+                Statistics
               </v-btn>
               <v-btn @click="delete_industry" small tile block color="#b62373">
                 Delete
@@ -637,8 +640,6 @@
               </v-btn>
             </div>
             <div style="margin: 7px; padding: 7px;">
-
-
 
               <!--<v-btn block small outlined :to="{ name: 'statistics_industry', params: {assessment_id: selected_assessment, industry_id: selected_industry}}" @click="icon_selected = -1; selected_layer=null; secondMenu=false; rightMenu=false">
                 SHOW RESULTS
@@ -828,15 +829,7 @@
                 Delete
               </v-btn>
             </div>
-            <div style="margin: 7px; padding: 7px;">
 
-
-
-              <!--<v-btn block small outlined :to="{ name: 'statistics_industry', params: {assessment_id: selected_assessment, industry_id: selected_industry}}" @click="icon_selected = -1; selected_layer=null; secondMenu=false; rightMenu=false">
-                SHOW RESULTS
-              </v-btn>-->
-
-            </div>
           </div>
 
 
@@ -954,14 +947,22 @@ export default {
         this.$refs.reference.industry_created()
 
       } catch (error) {}
+    },
+
+    '$route' (to){
+      let page = to.name
+      let index = 0
+      if(page == "map") index = 0
+      else if(page == "import") index = 1
+      else if(page == "report") index = 2
+      else index = -1
+      this.icon_selected = index
     }
   },
 
   methods: {
 
-    changeFirstMenuTab(tab){
-      this.icon_selected = tab
-    },
+
     add_supply_chain_industry(){
       try {
         this.$refs.reference.enter_supply_chain_mode()
@@ -1037,7 +1038,6 @@ export default {
     },
 
     left_side_menu_icon_selected(index){
-      this.icon_selected = index;
       this.selected_layer=null;
       this.secondMenu=false;
       this.rightMenu=false;
@@ -1165,7 +1165,6 @@ export default {
       this.snackbars.edit_assessment.v_model = true
     },
     delete_assessment(){
-      if(this.icon_selected === -1) this.icon_selected = 0
       this.rightMenu = false
       this.snackbars.delete_assessment.v_model = true
       this.$assessments.splice(this.selected_assessment, 1)
@@ -1244,7 +1243,6 @@ export default {
       this.snackbars.edit_sc.v_model = true
     },
     delete_industry(){
-      if(this.icon_selected === -1) this.icon_selected = 0
       this.rightMenu = false
       this.snackbars.delete_industry.v_model = true
 
