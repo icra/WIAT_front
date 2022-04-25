@@ -758,7 +758,8 @@ let metrics = {
     },
 
     energy_used(industries){
-        return industries.map(i => i.energy_used()).sum()
+
+        return industries.map(i => i.energy_used()).sum() / calculate_water_treated(industries)
     },
 
     effluent_concentration(industries){

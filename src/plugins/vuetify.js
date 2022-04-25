@@ -6,6 +6,8 @@ import Vuetify from 'vuetify/lib/framework';
 import icraLogo from '@/components/Logos/icraLogo'
 import wbcsdLogo from '@/components/Logos/wbcsd'
 import WasteWaterZero from '@/components/Logos/WasteWaterZero'
+import cdpLogo from '@/components/Logos/cdpLogo'
+
 
 
 
@@ -22,6 +24,9 @@ export default new Vuetify({
             },
             waste_water_zero_logo: {
                 component: WasteWaterZero
+            },
+            cdp_logo: {
+                component: cdpLogo
             }
         },
     },

@@ -12,13 +12,52 @@
       <div v-if="selected_layer !== null">
         <div class="box legend">
           <div>
-            <b>{{ selected_layer }}</b> <v-icon style="float: right; color:#1C195B;" @click="$emit('closeLayer')">mdi-layers-remove</v-icon>
+            <v-row>
+              <v-col cols="8">
+                <b>{{ selected_layer }}</b>
+              </v-col>
+              <v-col align="right">
+                <div style="padding-left: 20px; margin-left:auto; margin-right: 0px">
+                  <v-tooltip bottom
+                  >
+                    <template v-slot:activator="{ on, attrs }">
+                      <a :href="source_applied_layer" target="_blank" style=" display: block">
+                        <v-icon
+                            v-bind="attrs"
+                            v-on="on"
+                            style="color:#1C195B; display: block"
+                        >
+                          mdi-open-in-new
+                        </v-icon>
+
+                      </a>
+                    </template>
+                    <span>Learn from source</span>
+                  </v-tooltip>
+                  <v-tooltip bottom>
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-icon
+                          style="cursor: pointer; color:#1C195B; "
+                          @click="$emit('closeLayer')"
+                          v-bind="attrs"
+                          v-on="on"
+
+                      >
+                        mdi-layers-remove
+                      </v-icon>
+                    </template>
+                    <span>Hide layer</span>
+                  </v-tooltip>
+
+                </div>
+              </v-col>
+            </v-row>
+
           </div>
           <div v-html="html_legend"></div>
 
         </div>
         <div class="box legend" v-if="layers[selected_layer].future || layers[selected_layer].monthly">
-
           <div>
             <b>Temporal resolution</b>
           </div>
@@ -32,7 +71,11 @@
                 color='#1C195B'
                 dense
             ></v-radio>
+
           </v-radio-group>
+
+
+
           <div v-if="baseline_future_model === 'baseline' && layers[selected_layer].monthly ">
             <v-radio-group v-model="annual_monthly_model" row >
               <v-radio
@@ -297,6 +340,8 @@ export default {
   props: ["selected_layer", "selected_assessment", "selected_industry"],
   data() {
     return {
+      source_applied_layer: null,
+      baseline_applied_layer: null,
       center: this.$map_info.latlng,
       zoom: this.$map_info.zoom_level,
       location_markers: this.$location_markers,  //Created industries [{assessment, industry, location}]
@@ -312,7 +357,7 @@ export default {
         },
         {
           key: "future",
-          label: "2030"
+          label: "BaU 2030"
         },
       ],
       baseline_future_model: "baseline",
@@ -526,8 +571,6 @@ export default {
     },
 },
   methods: {
-
-
     close_supply_chain_mode(){
       this.adding_supply_chain = false
     },
@@ -684,7 +727,7 @@ export default {
       this.popup_info.setPopupContent(text)
       this.popup_info.openPopup()
     },
-    define_carto_layer(dataset, style, label, carto_client, username, change_unit = false, old_units = "", new_units = "", unit_scale_factor = 1){
+    define_carto_layer(dataset, style, label, carto_client, username, url, change_unit = false, old_units = "", new_units = "", unit_scale_factor = 1){
       let _this = this
       let obj = {}
 
@@ -720,6 +763,7 @@ export default {
             featureOverColumns: [label]
           });
       obj["apply"] = function(){
+        _this.source_applied_layer = url
         _this.current_carto_client = carto_client
         carto_client.addLayer(layer);
         carto_client.getLeafletLayer().addTo(_this.mapDiv);
@@ -799,7 +843,7 @@ export default {
       return obj
     },
 
-    define_carto_layer_v2(dataset, style, label, carto_client, username, color_legend, label_legend, noData, unit_scale_factor = 1, units=""){
+    define_carto_layer_v2(dataset, style, label, carto_client, username, url, color_legend, label_legend, noData, unit_scale_factor = 1, units=""){
       let _this = this
       let obj = {}
 
@@ -811,6 +855,7 @@ export default {
             featureOverColumns: [label]
           });
       obj["apply"] = function(){
+        _this.source_applied_layer = url
         _this.current_carto_client = carto_client
         carto_client.addLayer(layer);
         carto_client.getLeafletLayer().addTo(_this.mapDiv);
@@ -846,6 +891,8 @@ export default {
               if(response.rows == undefined) return noData
               else if(response.rows[0] == undefined) return noData
               else if (response.rows[0] == noData) return noData
+              else if (response.rows[0][label] == noData) return noData
+
               else return response.rows[0][label]*unit_scale_factor
             })
             .catch(function (error) {
@@ -895,8 +942,7 @@ export default {
       return obj
     },
 
-
-    define_raster_layer(geotiff_file_data, geotiff_file_palette, color_function, color_legend, label_legend, units="", scale=1, resolution=16, noData=null){
+    define_raster_layer(geotiff_file_data, geotiff_file_palette, color_function, color_legend, label_legend, url, units="", scale=1, resolution=16, noData=null){
       let _this = this
       let obj = {}
       let url_to_geotiff_data = "https://wiat-server.icradev.cat/image?filename="+geotiff_file_data
@@ -905,9 +951,8 @@ export default {
 
 
       obj["apply"] = function(){
-
+        _this.source_applied_layer = url
         parseGeoraster(url_to_geotiff_palette).then(georaster => {
-
           let layer = new GeoRasterLayer({
             opacity: 0.7,
             georaster: georaster,
@@ -1138,6 +1183,7 @@ export default {
                 let color = properties.bws_cat;
                 return {
                   fillColor:
+                  fillColor:
                       color==0 ? '#ffff99' :
                           color==1 ? '#ffe600' :
                               color==2 ? '#ff9900' :
@@ -1213,12 +1259,14 @@ export default {
       let color_legend_population = ['#e1e1e1','#ffedde','#fccfa2','#fcae6a','#fc8d3d','#f26913','#d94800','#8c2d04']
       let label_legend_population = ["0 people","1-25 people","25-100 people","100-250 people","250-1000 people","1000-5000 people","5000-100000 people",">100000 people"]
 
-
+      let url = "https://sedac.ciesin.columbia.edu/data/set/popdynamics-1-km-downscaled-pop-base-year-projection-ssp-2000-2100-rev01"
       //Baseline population
-      this.layers["Population"].layers.baseline.annual.layer = this.define_raster_layer("baseline_population", null, color_function_population, color_legend_population, label_legend_population, " people")
+      this.layers["Population"].layers.baseline.annual.layer = this.define_raster_layer("baseline_population", null, color_function_population, color_legend_population, label_legend_population, url,  " people")
 
       //Future population
-      this.layers["Population"].layers.future.layer = this.define_raster_layer("future_population", null, color_function_population, color_legend_population, label_legend_population, " people")
+      this.layers["Population"].layers.future.layer = this.define_raster_layer("future_population", null, color_function_population, color_legend_population, label_legend_population, url,  " people")
+
+      url = "https://figshare.com/articles/dataset/Global_Aridity_Index_and_Potential_Evapotranspiration_ET0_Climate_Database_v2/7504448/3"
 
       //Baseline aridity
       let color_function_baseline_aridity = function(values) {
@@ -1226,26 +1274,22 @@ export default {
         if (value < 0) return
         else if(value <= 0.03) return '#cf7563'
         else if(value <= 0.2) return '#e09053'
-        else if(value <= 0.35) return '#f2ba41'
         else if(value <= 0.5) return '#fae039'
         else if(value <= 0.65) return '#d2fa32'
-        else if(value <= 0.8) return '#5de833'
-        else if(value <= 1) return '#3fd168'
-        else if(value <= 1.25) return '#4ab09c'
-        else if(value <= 1.5) return '#458aa1'
-        else return '#3d5894'
+        else return '#4ab09c'
       }
-      let color_legend_baseline_aridity = ['#cf7563', '#e09053', '#f2ba41', '#fae039', '#d2fa32', '#5de833', '#3fd168', '#4ab09c', '#458aa1','#3d5894' ]
-      let label_legend_baseline_aridity = ["0-0.03", "0.03-0.2", "0.2-0.35", "0.35-0.5","0.5-0.65","0.65-0.8","0.8-1.0","1.0-1.25","1.25-1.5",">1.50"]
+      let color_legend_baseline_aridity = ['#cf7563', '#e09053', '#fae039', '#d2fa32', '#4ab09c']
+      let label_legend_baseline_aridity = ["Hyper arid (0-0.03)", "Arid (0.03-0.2)", "Semi-Arid (0.2-0.5)", "Dry sub-humid (0.5-0.65)","Humid (>0.65)"]
 
-      this.layers["Aridity index"].layers.baseline.annual.layer = this.define_raster_layer("aridity_baseline", null, color_function_baseline_aridity, color_legend_baseline_aridity, label_legend_baseline_aridity,"", 1/10000)
+      this.layers["Aridity index"].layers.baseline.annual.layer = this.define_raster_layer("aridity_baseline", null, color_function_baseline_aridity, color_legend_baseline_aridity, label_legend_baseline_aridity, url, "", 1/10000)
 
       //Baseline runoff
       let color_legend_baseline_runoff = ['#bed1e3', '#4f9ce3', '#2171b5', '#19598d', '#08306b' ]
       let label_legend_baseline_runoff = ["<=1e+7 m3/year", "<=1e+8 m3/year", "<=1e+9 m3/year", "<=1e+10 m3/year", ">1e+10 m3/year"]
 
-      this.layers["Flow accumulation"].layers.baseline.annual.layer = this.define_raster_layer("flow_accumulated",  "flow_accumulated_palette", undefined, color_legend_baseline_runoff, label_legend_baseline_runoff, " m3/year")
-      this.layers["Flow accumulation"].layers.future.layer = this.define_raster_layer("flow_acc_bau",  "flow_acc_bau_palette", undefined, color_legend_baseline_runoff, label_legend_baseline_runoff, " m3/year")
+      url = "https://gmd.copernicus.org/articles/12/5213/2019/"
+      this.layers["Flow accumulation"].layers.baseline.annual.layer = this.define_raster_layer("flow_accumulated",  "flow_accumulated_palette", undefined, color_legend_baseline_runoff, label_legend_baseline_runoff, url, " m3/year")
+      this.layers["Flow accumulation"].layers.future.layer = this.define_raster_layer("flow_acc_bau",  "flow_acc_bau_palette", undefined, color_legend_baseline_runoff, label_legend_baseline_runoff, url, " m3/year")
 
       //Streamflow
       let color_function_streamflow = function(values) {
@@ -1261,8 +1305,11 @@ export default {
       let color_legend_streamflow = ['#d1e2f3', '#9ac8e0', '#529dcc', '#1d6cb1', '#08306b' ]
       let label_legend_streamflow = ["<=3 m3/seconds", "<=12 m3/seconds", "<=35 m3/seconds", "<=123 m3/seconds", ">=123 m3/seconds"]
 
-      this.layers["Streamflow"].layers.baseline.annual.layer = this.define_raster_layer("dismanual",  'streamflow_color', undefined, color_legend_streamflow, label_legend_streamflow, " m3/seconds", 1, 32)
-      this.layers["Streamflow"].layers.future.layer = this.define_raster_layer("streamflow_2030",  'streamflow_2030_color', undefined, color_legend_streamflow, label_legend_streamflow, " m3/seconds", 1, 32)
+      url = "https://gmd.copernicus.org/articles/14/1037/2021/"
+      this.layers["Streamflow"].layers.baseline.annual.layer = this.define_raster_layer("dismanual",  'streamflow_color', undefined, color_legend_streamflow, label_legend_streamflow, url, " m3/seconds", 1, 32)
+      this.layers["Streamflow"].layers.future.layer = this.define_raster_layer("streamflow_2030",  'streamflow_2030_color', undefined, color_legend_streamflow, label_legend_streamflow, url, " m3/seconds", 1, 32)
+
+      let aqueduct_url = "https://files.wri.org/d8/s3fs-public/aqueduct-30-updated-decision-relevant-global-water-risk-indicators_1.pdf"
 
       //Baseline water stress
       const baselineWaterStressDataset = 'wat_050_aqueduct_baseline_water_stress'
@@ -1285,20 +1332,20 @@ export default {
            polygon-fill: #990000;
          }
          [bws_label = "Arid and Low Water Use"]{
-           polygon-fill: #808080;
+           polygon-fill: #a3a3a3;
          }
          [bws_label = "No Data"]{
-           polygon-fill: #4e4e4e;
+           polygon-fill: #000000;
          }
         }
       `
 
-      let water_stress_colors = ['#ffff99', '#ffe600', '#ff9900', '#ff1900', '#990000', '#808080', '#4e4e4e' ]
+      let water_stress_colors = ['#ffff99', '#ffe600', '#ff9900', '#ff1900', '#990000', '#a3a3a3', '#000000' ]
       let water_stress_labels = ["Low (<10%)", "Low - Medium (10-20%)","Medium - High (20-40%)", "High (40-80%)","Extremely High (>80%)","Arid and Low Water Use","No Data"]
 
 
       //this.layers["Water stress"].layers.baseline.annual.layer = this.define_carto_layer(baselineWaterStressDataset, baselineWaterStressStyle, "bws_label", wri_client, "wri-rw")
-      this.layers["Water stress"].layers.baseline.annual.layer = this.define_carto_layer_v2(baselineWaterStressDataset, baselineWaterStressStyle, "bws_raw", wri_client, "wri-rw", water_stress_colors, water_stress_labels, -9999, 100, "%")
+      this.layers["Water stress"].layers.baseline.annual.layer = this.define_carto_layer_v2(baselineWaterStressDataset, baselineWaterStressStyle, "bws_raw", wri_client, "wri-rw", aqueduct_url, water_stress_colors, water_stress_labels, -9999, 100, "%")
 
 
       //Future water stress
@@ -1325,12 +1372,12 @@ export default {
            polygon-fill: #808080;
          }
          [ws3028tl = "No data"]{
-           polygon-fill: #4e4e4e;
+           polygon-fill: #000000;
          }
         }
       `
       //this.layers["Water stress"].layers.future.layer = this.define_carto_layer(futureWaterStressDataset, futureWaterStressStyle, "ws3028tl", wri_client, "wri-rw")
-      this.layers["Water stress"].layers.future.layer = this.define_carto_layer_v2(futureWaterStressDataset, futureWaterStressStyle, "ws3028tr", wri_client, "wri-rw", water_stress_colors, water_stress_labels, 0, 100, "%")
+      this.layers["Water stress"].layers.future.layer = this.define_carto_layer_v2(futureWaterStressDataset, futureWaterStressStyle, "ws3028tr", wri_client, "wri-rw", aqueduct_url, water_stress_colors, water_stress_labels, 0, 100, "%")
 
       //Monthly water stress
       for (let i=1; i<=12; i++){
@@ -1360,11 +1407,11 @@ export default {
            polygon-fill: #808080;
          }
          [`+label+` = "NoData"]{
-           polygon-fill: #4e4e4e;
+           polygon-fill: #000000;
          }
         }
       `
-        let layer_i = this.define_carto_layer(monthlyWaterStressDataset, monthlyWaterStressStyle, label, own_client, "jsalo")
+        let layer_i = this.define_carto_layer(monthlyWaterStressDataset, monthlyWaterStressStyle, label, own_client, "jsalo", aqueduct_url)
         this.layers["Water stress"].layers.baseline.monthly.push(layer_i)
       }
 
@@ -1389,19 +1436,18 @@ export default {
            polygon-fill: #990000;
          }
          [bwd_label = "Arid and Low Water Use"]{
-           polygon-fill: #808080;
+           polygon-fill: #a3a3a3;
          }
          [bwd_label = "No Data"]{
-           polygon-fill: #4e4e4e;
+           polygon-fill: #000000;
          }
         }
       `
-      let water_depletion_colors = ['#ffff99', '#ffe600', '#ff9900', '#ff1900', '#990000', '#808080', '#4e4e4e' ]
+      let water_depletion_colors = ['#ffff99', '#ffe600', '#ff9900', '#ff1900', '#990000', '#a3a3a3', '#000000' ]
       let water_depletion_labels = ["Low (<5%)", "Low - Medium (5-25%)","Medium - High (25-50%)", "High (50-75%)","Extremely High (>75%)","Arid and Low Water Use","No Data"]
 
       //this.layers["Water depletion"].layers.baseline.annual.layer = this.define_carto_layer(annualBaselineWaterDepletionDataset, annualBaselineWaterDepletionStyle, "bwd_label", wri_client, "wri-rw")
-      this.layers["Water depletion"].layers.baseline.annual.layer = this.define_carto_layer_v2(annualBaselineWaterDepletionDataset, annualBaselineWaterDepletionStyle, "bwd_raw", wri_client, "wri-rw", water_depletion_colors, water_depletion_labels, -9999, 100, "%")
-
+      this.layers["Water depletion"].layers.baseline.annual.layer = this.define_carto_layer_v2(annualBaselineWaterDepletionDataset, annualBaselineWaterDepletionStyle, "bwd_raw", wri_client, "wri-rw", aqueduct_url, water_depletion_colors, water_depletion_labels, -9999, 100, "%")
 
       //Monthly water depletion
       for (let i=1; i<=12; i++){
@@ -1431,11 +1477,11 @@ export default {
            polygon-fill: #808080;
          }
          [`+label+` = "NoData"]{
-           polygon-fill: #4e4e4e;
+           polygon-fill: #000000;
          }
         }
       `
-        let layer_i = this.define_carto_layer(monthlyWaterDepletionDataset, monthlyWaterDepletionStyle, label, own_client, "jsalo")
+        let layer_i = this.define_carto_layer(monthlyWaterDepletionDataset, monthlyWaterDepletionStyle, label, own_client, "jsalo", aqueduct_url)
         this.layers["Water depletion"].layers.baseline.monthly.push(layer_i)
       }
 
@@ -1460,16 +1506,16 @@ export default {
            polygon-fill: #990000;
          }
          [iav_label = "No Data"]{
-           polygon-fill: #4e4e4e;
+           polygon-fill: #000000;
          }
         }
       `
-      let water_iav_colors = ['#ffff99', '#ffe600', '#ff9900', '#ff1900', '#990000', '#4e4e4e' ]
+      let water_iav_colors = ['#ffff99', '#ffe600', '#ff9900', '#ff1900', '#990000', '#000000' ]
       let water_iav_labels = ["Low (<0.25)", "Low - Medium (0.25-0.50)","Medium - High (0.50-0.75)", "High (0.75-1.00)","Extremely High (>1.00)","No Data"]
 
 
       //this.layers["Interannual variability"].layers.baseline.annual.layer = this.define_carto_layer(baselineInterannualVariabilityDataset, baselineInterannualVariabilityStyle, "iav_label", wri_client, "wri-rw")
-      this.layers["Interannual variability"].layers.baseline.annual.layer = this.define_carto_layer_v2(baselineInterannualVariabilityDataset, baselineInterannualVariabilityStyle, "iav_raw", wri_client, "wri-rw", water_iav_colors, water_iav_labels, -9999)
+      this.layers["Interannual variability"].layers.baseline.annual.layer = this.define_carto_layer_v2(baselineInterannualVariabilityDataset, baselineInterannualVariabilityStyle, "iav_raw", wri_client, "wri-rw", aqueduct_url, water_iav_colors, water_iav_labels, -9999)
 
       //Monthly interannual variability
       for (let i=1; i<=12; i++){
@@ -1496,11 +1542,11 @@ export default {
            polygon-fill: #990000;
          }
          [`+label+` = "NoData"]{
-           polygon-fill: #4e4e4e;
+           polygon-fill: #000000;
          }
         }
       `
-        let layer_i = this.define_carto_layer(monthlyInterannualVariabilityDataset, monthlyInterannualVariabilityStyle, label, own_client, "jsalo")
+        let layer_i = this.define_carto_layer(monthlyInterannualVariabilityDataset, monthlyInterannualVariabilityStyle, label, own_client, "jsalo", aqueduct_url)
         this.layers["Interannual variability"].layers.baseline.monthly.push(layer_i)
       }
 
@@ -1525,16 +1571,16 @@ export default {
            polygon-fill: #990000;
          }
          [sev_label = "No Data"]{
-           polygon-fill: #4e4e4e;
+           polygon-fill: #000000;
          }
         }
       `
 
-      let water_sev_colors = ['#ffff99', '#ffe600', '#ff9900', '#ff1900', '#990000', '#4e4e4e' ]
+      let water_sev_colors = ['#ffff99', '#ffe600', '#ff9900', '#ff1900', '#990000', '#000000' ]
       let water_sev_labels = ["Low (<0.33)", "Low - Medium (0.33-0.66)","Medium - High (0.66-1.00)", "High (1.00-1.33)","Extremely High (>1.33)","No Data"]
 
       //this.layers["Seasonal variability"].layers.baseline.annual.layer = this.define_carto_layer(baselineSeasonalVariabilityDataset, baselineSeasonalVariabilityStyle, "sev_label", wri_client, "wri-rw")
-      this.layers["Seasonal variability"].layers.baseline.annual.layer = this.define_carto_layer_v2(baselineSeasonalVariabilityDataset, baselineSeasonalVariabilityStyle, "sev_raw", wri_client, "wri-rw", water_sev_colors, water_sev_labels, -9999)
+      this.layers["Seasonal variability"].layers.baseline.annual.layer = this.define_carto_layer_v2(baselineSeasonalVariabilityDataset, baselineSeasonalVariabilityStyle, "sev_raw", wri_client, "wri-rw", aqueduct_url, water_sev_colors, water_sev_labels, -9999)
 
 
       //Future Seasonal Variability
@@ -1558,12 +1604,12 @@ export default {
            polygon-fill: #990000;
          }
          [sv3028tl = "No data"]{
-           polygon-fill: #4e4e4e;
+           polygon-fill: #000000;
          }
         }
       `
       //this.layers["Seasonal variability"].layers.future.layer = this.define_carto_layer(futureSeasonalVariabilityDataset, futureSeasonalVariabilityStyle, "sv3028tl", wri_client, "wri-rw")
-      this.layers["Seasonal variability"].layers.future.layer = this.define_carto_layer_v2(futureSeasonalVariabilityDataset, futureSeasonalVariabilityStyle, "sv3028tr", wri_client, "wri-rw", water_sev_colors, water_sev_labels, -9999)
+      this.layers["Seasonal variability"].layers.future.layer = this.define_carto_layer_v2(futureSeasonalVariabilityDataset, futureSeasonalVariabilityStyle, "sv3028tr", wri_client, "wri-rw", aqueduct_url, water_sev_colors, water_sev_labels, -9999)
 
       //Baseline groundwater table decline
       const baselineGroundwaterTableDeclineDataset = 'wat_054_aqueduct_groundwater_table_decline'
@@ -1586,18 +1632,18 @@ export default {
            polygon-fill: #990000;
          }
          [gtd_label = "Insignificant Trend"]{
-           polygon-fill: #808080;
+           polygon-fill: #a3a3a3;
          }
          [gtd_label = "No Data"]{
-           polygon-fill: #4e4e4e;
+           polygon-fill: #383838;
          }
         }
       `
-      let water_gtd_colors = ['#ffff99', '#ffe600', '#ff9900', '#ff1900', '#990000', '#808080', '#4e4e4e' ]
+      let water_gtd_colors = ['#ffff99', '#ffe600', '#ff9900', '#ff1900', '#990000', '#a3a3a3', '#000000' ]
       let water_gtd_labels = ["Low (<0 mm/year)", "Low - Medium (0-20 mm/year)","Medium - High (20-40 mm/year)", "High (40-80 mm/year)","Extremely High (>80 mm/y)","Insignificant Trend","No Data"]
 
       //this.layers["Groundwater table decline"].layers.baseline.annual.layer = this.define_carto_layer(baselineGroundwaterTableDeclineDataset, baselineGroundwaterTableDeclineStyle, "gtd_label", wri_client, "wri-rw", true, "cm/y", "mm/yr", 10)
-      this.layers["Groundwater table decline"].layers.baseline.annual.layer = this.define_carto_layer_v2(baselineGroundwaterTableDeclineDataset, baselineGroundwaterTableDeclineStyle, "gtd_raw", wri_client, "wri-rw", water_gtd_colors, water_gtd_labels, -9999, 10," mm/year")
+      this.layers["Groundwater table decline"].layers.baseline.annual.layer = this.define_carto_layer_v2(baselineGroundwaterTableDeclineDataset, baselineGroundwaterTableDeclineStyle, "gtd_raw", wri_client, "wri-rw", aqueduct_url, water_gtd_colors, water_gtd_labels, -9999, 10," mm/year")
 
       //Baseline riverine flood risk
       const baselineRiverineFloodRiskDataset = 'wat_055_aqueduct_riverine_flood_risk'
@@ -1620,16 +1666,16 @@ export default {
            polygon-fill: #990000;
          }
          [rfr_label = "No Data"]{
-           polygon-fill: #4e4e4e;
+           polygon-fill: #000000;
          }
         }
       `
 
-      let water_rfr_colors = ['#ffff99', '#ffe600', '#ff9900', '#ff1900', '#990000', '#4e4e4e' ]
+      let water_rfr_colors = ['#ffff99', '#ffe600', '#ff9900', '#ff1900', '#990000', '#000000' ]
       let water_rfr_labels = ["Low (0 to 1 in 1,000)", "Low - Medium (1 in 1,000 to 2 in 1,000)", "Medium - High (2 in 1,000 to 6 in 1,000)","High (6 in 1,000 to 1 in 100)", "Extremely High (more than 1 in 100)","No Data"]
 
 //      this.layers["Riverine flood risk"].layers.baseline.annual.layer = this.define_carto_layer(baselineRiverineFloodRiskDataset, baselineRiverineFloodRiskStyle, "rfr_label", wri_client, "wri-rw")
-      this.layers["Riverine flood risk"].layers.baseline.annual.layer = this.define_carto_layer_v2(baselineRiverineFloodRiskDataset, baselineRiverineFloodRiskStyle, "rfr_raw", wri_client, "wri-rw", water_rfr_colors, water_rfr_labels, -9999)
+      this.layers["Riverine flood risk"].layers.baseline.annual.layer = this.define_carto_layer_v2(baselineRiverineFloodRiskDataset, baselineRiverineFloodRiskStyle, "rfr_raw", wri_client, "wri-rw", aqueduct_url, water_rfr_colors, water_rfr_labels, -9999)
 
 
       //Baseline coastal flood risk
@@ -1653,16 +1699,16 @@ export default {
            polygon-fill: #990000;
          }
          [cfr_label = "No Data"]{
-           polygon-fill: #4e4e4e;
+           polygon-fill: #000000;
          }
         }
       `
 
-      let water_cfr_colors = ['#ffff99', '#ffe600', '#ff9900', '#ff1900', '#990000', '#4e4e4e' ]
+      let water_cfr_colors = ['#ffff99', '#ffe600', '#ff9900', '#ff1900', '#990000', '#000000' ]
       let water_cfr_labels = ["Low (0 to 9 in 1,000,000)", "Low - Medium (9 in 1,000,000 to 7 in 100,000)", "Medium - High (7 in 100,000 to 3 in 10,000)","High (3 in 10,000 to 2 in 1,000)", "Extremely High (more than 2 in 1,000)","No Data"]
 
       //this.layers["Coastal flood risk"].layers.baseline.annual.layer = this.define_carto_layer(baselineCoastalFloodRiskDataset, baselineCoastalFloodRiskStyle, "cfr_label", wri_client, "wri-rw")
-      this.layers["Coastal flood risk"].layers.baseline.annual.layer = this.define_carto_layer_v2(baselineCoastalFloodRiskDataset, baselineCoastalFloodRiskStyle, "cfr_raw", wri_client, "wri-rw", water_cfr_colors, water_cfr_labels, -9999)
+      this.layers["Coastal flood risk"].layers.baseline.annual.layer = this.define_carto_layer_v2(baselineCoastalFloodRiskDataset, baselineCoastalFloodRiskStyle, "cfr_raw", wri_client, "wri-rw", aqueduct_url, water_cfr_colors, water_cfr_labels, -9999)
 
       //Baseline Drought risk
       const baselineDroughtRiskDataset = 'wat_057_aqueduct_drought_risk'
@@ -1685,15 +1731,16 @@ export default {
            polygon-fill: #990000;
          }
          [drr_label = "No Data"]{
-           polygon-fill: #4e4e4e;
+           polygon-fill: #000000;
          }
         }
       `
-      let water_ddr_colors = ['#ffff99', '#ffe600', '#ff9900', '#ff1900', '#990000', '#4e4e4e' ]
+      let water_ddr_colors = ['#ffff99', '#ffe600', '#ff9900', '#ff1900', '#990000', '#000000' ]
       let water_ddr_labels = ["Low (0.0-0.2)", "Low - Medium (0.2-0.4)", "Medium (0.4-0.6)","Medium - High (0.6-0.8)", "High (0.8-1.0)","No Data"]
 
       //this.layers["Drought risk"].layers.baseline.annual.layer = this.define_carto_layer(baselineDroughtRiskDataset, baselineDroughtRiskStyle, "drr_label", wri_client, "wri-rw")
-      this.layers["Drought risk"].layers.baseline.annual.layer = this.define_carto_layer_v2(baselineDroughtRiskDataset, baselineDroughtRiskStyle, "drr_raw", wri_client, "wri-rw", water_ddr_colors, water_ddr_labels, -9999, 1/5)
+
+      this.layers["Drought risk"].layers.baseline.annual.layer = this.define_carto_layer_v2(baselineDroughtRiskDataset, baselineDroughtRiskStyle, "drr_raw", wri_client, "wri-rw", aqueduct_url,  water_ddr_colors, water_ddr_labels, -9999, 1/5)
 
       //Baseline Coastal Eutrophication Potential
       const baselineCoastalEutrophicationPotentialDataset = 'wat_059_aqueduct_coastal_eutrophication_potential'
@@ -1716,15 +1763,15 @@ export default {
            polygon-fill: #990000;
          }
          [cep_label = "No Data"]{
-           polygon-fill: #4e4e4e;
+           polygon-fill: #000000;
          }
         }
       `
-      let water_cep_colors = ['#ffff99', '#ffe600', '#ff9900', '#ff1900', '#990000', '#4e4e4e' ]
+      let water_cep_colors = ['#ffff99', '#ffe600', '#ff9900', '#ff1900', '#990000', '#000000' ]
       let water_cep_labels = ["Low (<-5)", "Low - Medium (-5 to 0)", "Medium - High (0 to 1)","High (1 to 5)", "Extremely High (>5)","No Data"]
 
       //this.layers["Coastal Eutrophication Potential"].layers.baseline.annual.layer = this.define_carto_layer(baselineCoastalEutrophicationPotentialDataset, baselineCoastalEutrophicationPotentialStyle, "cep_label", wri_client, "wri-rw")
-      this.layers["Coastal Eutrophication Potential"].layers.baseline.annual.layer = this.define_carto_layer_v2(baselineCoastalEutrophicationPotentialDataset, baselineCoastalEutrophicationPotentialStyle, "cep_raw", wri_client, "wri-rw", water_cep_colors, water_cep_labels, -9999)
+      this.layers["Coastal Eutrophication Potential"].layers.baseline.annual.layer = this.define_carto_layer_v2(baselineCoastalEutrophicationPotentialDataset, baselineCoastalEutrophicationPotentialStyle, "cep_raw", wri_client, "wri-rw", aqueduct_url,  water_cep_colors, water_cep_labels, -9999)
 
       //Baseline No Drinking Water
       const baselineNoDrinkingWaterDataset = 'wat_060_aqueduct_unimproved_or_no_drinking_water_access'
@@ -1747,15 +1794,15 @@ export default {
            polygon-fill: #990000;
          }
          [udw_label = "No Data"]{
-           polygon-fill: #4e4e4e;
+           polygon-fill: #000000;
          }
         }
       `
-      let water_udw_colors = ['#ffff99', '#ffe600', '#ff9900', '#ff1900', '#990000', '#4e4e4e' ]
+      let water_udw_colors = ['#ffff99', '#ffe600', '#ff9900', '#ff1900', '#990000', '#000000' ]
       let water_udw_labels = ["Low (<2.5%)", "Low - Medium (2.5-5%)", "Medium - High (5-10%)","High (10-20%)", "Extremely High (>20%)","No Data"]
 
       //this.layers["Unimproved/No Drinking Water"].layers.baseline.annual.layer = this.define_carto_layer(baselineNoDrinkingWaterDataset, baselineNoDrinkingWaterStyle, "udw_label", wri_client, "wri-rw")
-      this.layers["Unimproved/No Drinking Water"].layers.baseline.annual.layer = this.define_carto_layer_v2(baselineNoDrinkingWaterDataset, baselineNoDrinkingWaterStyle, "udw_raw", wri_client, "wri-rw", water_udw_colors, water_udw_labels, -9999, 100, "%")
+      this.layers["Unimproved/No Drinking Water"].layers.baseline.annual.layer = this.define_carto_layer_v2(baselineNoDrinkingWaterDataset, baselineNoDrinkingWaterStyle, "udw_raw", wri_client, "wri-rw", aqueduct_url, water_udw_colors, water_udw_labels, -9999, 100, "%")
 
 
       //Baseline No sanitation
@@ -1779,17 +1826,17 @@ export default {
            polygon-fill: #990000;
          }
          [usa_label = "No Data"]{
-           polygon-fill: #4e4e4e;
+           polygon-fill: #000000;
          }
         }
       `
 
-      let water_usa_colors = ['#ffff99', '#ffe600', '#ff9900', '#ff1900', '#990000', '#4e4e4e' ]
+      let water_usa_colors = ['#ffff99', '#ffe600', '#ff9900', '#ff1900', '#990000', '#000000' ]
       let water_usa_labels = ["Low (<2.5%)", "Low - Medium (2.5-5%)", "Medium - High (5-10%)","High (10-20%)", "Extremely High (>20%)","No Data"]
 
 
       //this.layers["Unimproved/No Sanitation"].layers.baseline.annual.layer = this.define_carto_layer(baselineNoSanitationDataset, baselineNoSanitationStyle, "usa_label", wri_client, "wri-rw")
-      this.layers["Unimproved/No Sanitation"].layers.baseline.annual.layer = this.define_carto_layer_v2(baselineNoSanitationDataset, baselineNoSanitationStyle, "usa_raw", wri_client, "wri-rw", water_usa_colors, water_usa_labels, -9999, 100, "%")
+      this.layers["Unimproved/No Sanitation"].layers.baseline.annual.layer = this.define_carto_layer_v2(baselineNoSanitationDataset, baselineNoSanitationStyle, "usa_raw", wri_client, "wri-rw", aqueduct_url, water_usa_colors, water_usa_labels, -9999, 100, "%")
 
 
       //Demanar valor RAW
@@ -1815,17 +1862,17 @@ export default {
            polygon-fill: #990000;
          }
          [rri_label = "null"]{
-           polygon-fill: #4e4e4e;
+           polygon-fill: #000000;
          }
         }
       `
 
-      let water_rri_colors = ['#ffff99', '#ffe600', '#ff9900', '#ff1900', '#990000', '#4e4e4e' ]
+      let water_rri_colors = ['#ffff99', '#ffe600', '#ff9900', '#ff1900', '#990000', '#000000' ]
       let water_rri_labels = ["Low (<25%)", "Low - Medium (25-50%)", "Medium - High (50-60%)","High (60-75%)","Extremely High (>75%)","No Data"]
 
 
-      this.layers["Peak RepRisk Country ESG Risk Index"].layers.baseline.annual.layer = this.define_carto_layer(baselineRepRiskDataset, baselineRepRiskStyle, "rri_label", own_client, "jsalo")
-      this.layers["Peak RepRisk Country ESG Risk Index"].layers.baseline.annual.layer = this.define_carto_layer_v2(baselineRepRiskDataset, baselineRepRiskStyle, "rri_raw", wri_client, "wri-rw", water_rri_colors, water_rri_labels, -9999)
+      this.layers["Peak RepRisk Country ESG Risk Index"].layers.baseline.annual.layer = this.define_carto_layer(baselineRepRiskDataset, baselineRepRiskStyle, "rri_label", own_client, "jsalo", aqueduct_url)
+      this.layers["Peak RepRisk Country ESG Risk Index"].layers.baseline.annual.layer = this.define_carto_layer_v2(baselineRepRiskDataset, baselineRepRiskStyle, "rri_raw", wri_client, "wri-rw", aqueduct_url, water_rri_colors, water_rri_labels, -9999)
 
 
       //Baseline Water supply
@@ -1865,7 +1912,7 @@ export default {
 
 
       //this.layers["Water supply"].layers.baseline.annual.layer = this.define_carto_layer(baselineWaterSupplyDataset, baselineWaterSupplyStyle, "bt2028tl", wri_client, "wri-rw", true, "cm", "mm/yr", 10)
-      this.layers["Water supply"].layers.baseline.annual.layer = this.define_carto_layer_v2(baselineWaterSupplyDataset, baselineWaterSupplyStyle, "bt2028tr", wri_client, "wri-rw", water_supply_colors, water_supply_labels, -9999, 1000, " mm/yr")
+      this.layers["Water supply"].layers.baseline.annual.layer = this.define_carto_layer_v2(baselineWaterSupplyDataset, baselineWaterSupplyStyle, "bt2028tr", wri_client, "wri-rw", aqueduct_url, water_supply_colors, water_supply_labels, -9999, 1000, " mm/yr")
 
 
       //Future Water supply
@@ -1900,7 +1947,7 @@ export default {
         }
       `
       //this.layers["Water supply"].layers.future.layer = this.define_carto_layer(futureWaterSupplyDataset, futureWaterSupplyStyle, "bt3038tl", wri_client, "wri-rw")
-      this.layers["Water supply"].layers.future.layer = this.define_carto_layer_v2(futureWaterSupplyDataset, futureWaterSupplyStyle, "bt2028tr", wri_client, "wri-rw", water_supply_colors, water_supply_labels, -9999, 1000, " mm/yr")
+      this.layers["Water supply"].layers.future.layer = this.define_carto_layer_v2(futureWaterSupplyDataset, futureWaterSupplyStyle, "bt2028tr", wri_client, "wri-rw", aqueduct_url, water_supply_colors, water_supply_labels, -9999, 1000, " mm/yr")
 
 
       //Baseline Water demand
@@ -1930,7 +1977,7 @@ export default {
       let water_demand_labels = [">300 mm/year", "100-300 mm/year", "30-100 mm/year","10-30 mm/year", "< 10 mm/year"]
 
       //this.layers["Water demand"].layers.baseline.annual.layer = this.define_carto_layer(baselineWaterDemandDataset, baselineWaterDemandStyle, "ut2028tl", wri_client, "wri-rw", true, "cm", "mm/yr", 10)
-      this.layers["Water demand"].layers.baseline.annual.layer = this.define_carto_layer_v2(baselineWaterDemandDataset, baselineWaterDemandStyle, "ut2028tr", wri_client, "wri-rw", water_demand_colors, water_demand_labels, -9999, 1000, " mm/yr")
+      this.layers["Water demand"].layers.baseline.annual.layer = this.define_carto_layer_v2(baselineWaterDemandDataset, baselineWaterDemandStyle, "ut2028tr", wri_client, "wri-rw", aqueduct_url, water_demand_colors, water_demand_labels, -9999, 1000, " mm/yr")
 
 
 
@@ -1958,7 +2005,7 @@ export default {
       `
 
       //this.layers["Water demand"].layers.future.layer = this.define_carto_layer(futureWaterDemandDataset, futureWaterDemandStyle, "ut3028tl", wri_client, "wri-rw")
-      this.layers["Water demand"].layers.future.layer = this.define_carto_layer_v2(futureWaterDemandDataset, futureWaterDemandStyle, "ut3028tr", wri_client, "wri-rw", water_demand_colors, water_demand_labels, -9999, 1000, " mm/yr")
+      this.layers["Water demand"].layers.future.layer = this.define_carto_layer_v2(futureWaterDemandDataset, futureWaterDemandStyle, "ut3028tr", wri_client, "wri-rw", aqueduct_url, water_demand_colors, water_demand_labels, -9999, 1000, " mm/yr")
 
 
       //Baseline Surface Water Pharmaceutical Pollution
@@ -1973,15 +2020,15 @@ export default {
         else if(value <= 100) return '#fe0000'
         else return '#010103'
       }
+      url = "https://gmd.copernicus.org/articles/12/5213/2019/"
       let color_legend_Surface_Water_Pharmaceutical_Pollution = ['#09bbfb', '#3ad110', '#faed08', '#fe0000', '#010103' ]
       let label_legend_Surface_Water_Pharmaceutical_Pollution = ["0 ng/L", ">0-10 ng/L", "10-30 ng/L", "30-100 ng/L",">100 ng/L"]
-      //this.layers["Surface Water Pharmaceutical Pollution"].layers.baseline.annual.layer = this.define_raster_layer("surface_pharmaceutical_pollution_baseline", color_function_Surface_Water_Pharmaceutical_Pollution, color_legend_Surface_Water_Pharmaceutical_Pollution, label_legend_Surface_Water_Pharmaceutical_Pollution, " ng/L")
-      this.layers["Surface Water Pharmaceutical Pollution"].layers.baseline.annual.layer = this.define_raster_layer("contaminant_C", "contaminant_C_palette", undefined, color_legend_Surface_Water_Pharmaceutical_Pollution, label_legend_Surface_Water_Pharmaceutical_Pollution, " ng/L", 1, 32)
+      this.layers["Surface Water Pharmaceutical Pollution"].layers.baseline.annual.layer = this.define_raster_layer("contaminant_C", "contaminant_C_palette", undefined, color_legend_Surface_Water_Pharmaceutical_Pollution, label_legend_Surface_Water_Pharmaceutical_Pollution, url," ng/L", 1, 32)
 
 
 
       //Future Surface Water Pharmaceutical Pollution
-      this.layers["Surface Water Pharmaceutical Pollution"].layers.future.layer = this.define_raster_layer("contaminant_C_BAU", "contaminant_C_BAU_palette", undefined, color_legend_Surface_Water_Pharmaceutical_Pollution, label_legend_Surface_Water_Pharmaceutical_Pollution, " ng/L", 1, 32)
+      this.layers["Surface Water Pharmaceutical Pollution"].layers.future.layer = this.define_raster_layer("contaminant_C_BAU", "contaminant_C_BAU_palette", undefined, color_legend_Surface_Water_Pharmaceutical_Pollution, label_legend_Surface_Water_Pharmaceutical_Pollution, url, " ng/L", 1, 32)
 
 
       const coastal_pollution_dataset = 'raster_to_points'
@@ -2005,11 +2052,12 @@ export default {
          }
         }
       `
+
       //this.layers["Coastal Pharmaceutical Pollution"].layers.baseline.annual.layer = this.define_carto_layer(coastal_pollution_dataset, coastal_pollution_style, "dn", own_client, "jsalo")
       let color_legend_coastal_Pharmaceutical_Pollution = [' #02b5fd', '#34d10e', '#f8ee04', '#fe0000', ' #000000' ]
       let label_legend_coastal_Pharmaceutical_Pollution = ["<10 g/km*year", "10-50 g/km*year", "50-1000 g/km*year", "1000-100000 g/km*year",">100000 g/km*year"]
-
-      this.layers["Coastal Pharmaceutical Pollution"].layers.baseline.annual.layer = this.define_carto_layer_v2(coastal_pollution_dataset, coastal_pollution_style, "dn", own_client, "jsalo", color_legend_coastal_Pharmaceutical_Pollution, label_legend_coastal_Pharmaceutical_Pollution, -10000000, 1, " g/km*year")
+      url = "https://gmd.copernicus.org/articles/12/5213/2019/"
+      this.layers["Coastal Pharmaceutical Pollution"].layers.baseline.annual.layer = this.define_carto_layer_v2(coastal_pollution_dataset, coastal_pollution_style, "dn", own_client, "jsalo", url, color_legend_coastal_Pharmaceutical_Pollution, label_legend_coastal_Pharmaceutical_Pollution, -10000000, 1, " g/km*year")
 
 
     },

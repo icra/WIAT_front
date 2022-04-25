@@ -2,12 +2,9 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import vuetify from './plugins/vuetify'
-import AsyncComputed from 'vue-async-computed'
 
 
 Vue.config.productionTip = false
-
-Vue.use(AsyncComputed)
 
 import "@/assets/global.css"
 
@@ -29,8 +26,8 @@ Vue.prototype.$layers_description = [
       {
         name: "Population",
         locked: false,
-
         layer: {
+          info: "<b> Temporal resolution: 2000</b>",
           layers: {
             baseline: {
               annual: {
@@ -43,7 +40,10 @@ Vue.prototype.$layers_description = [
             },
           },
           monthly: false,
-          future: true
+          future: true,
+          url: "https://sedac.ciesin.columbia.edu/data/collection/gpw-v4/documentation",
+
+
         },
       },
     ]
@@ -81,7 +81,7 @@ Vue.prototype.$layers_description = [
                   },
                   monthly: false,
                   future: true,
-                  info: "Seasonal variability measures the average within-year variability of available water supply, including both renewable surface and groundwater supplies. "
+                  info: "Seasonal variability measures the average within-year variability of available water supply, including both renewable surface and groundwater supplies. <br><br><b> Temporal resolution: 2000</b>"
                 }
               },
               {
@@ -102,7 +102,7 @@ Vue.prototype.$layers_description = [
                   },
                   monthly: true,
                   future: false,
-                  info: "Interannual variability measures the average between year variability of available water supply, including both renewable surface and groundwater supplies. Higher values indicate wider variations in available supply from year to year."
+                  info: "Interannual variability measures the average between year variability of available water supply, including both renewable surface and groundwater supplies. Higher values indicate wider variations in available supply from year to year. <br><br><b> Temporal resolution: 1960-2014</b>"
                 }
               },
             ]
@@ -125,7 +125,7 @@ Vue.prototype.$layers_description = [
               },
               monthly: false,
               future: true,
-              info: "Water supply is the sum of total blue water, which is flow-accumulated runoff, and available blue water, which accounts for upstream consumptive use.  "
+              info: "Water supply is the sum of total blue water, which is flow-accumulated runoff, and available blue water, which accounts for upstream consumptive use.  <br><br><b> Temporal resolution: 1950-2010</b>"
             },
           },
           {
@@ -146,7 +146,7 @@ Vue.prototype.$layers_description = [
               },
               monthly: false,
               future: true,
-              info: "Flow accumulation indicates the accumulated flow as the accumulated weight of all cells flowing into each downslope cell. It counts the amount of water in each cell due to precipitation-evaporation water budget."
+              info: "Flow accumulation indicates the accumulated flow as the accumulated weight of all cells flowing into each downslope cell. It counts the amount of water in each cell due to precipitation-evaporation water budget. <br><br><b> Temporal resolution: N/A</b>"
             },
           },
           {
@@ -167,7 +167,7 @@ Vue.prototype.$layers_description = [
               },
               monthly: false,
               future: true,
-              info: "Streamflow is the volume of water flowing in one point, it considers the extraction of water for irrigation, livestock, domestic uses, manufacturing process and thermal power."
+              info: "Streamflow is the volume of water flowing in one point, it considers the extraction of water for irrigation, livestock, domestic uses, manufacturing process and thermal power. <br><br><b> Temporal resolution: N/A</b>"
             },
           },
 
@@ -196,7 +196,7 @@ Vue.prototype.$layers_description = [
               },
               monthly: false,
               future: true,
-              info: "Water demand is measured as water withdrawals. It counts the water used in agriculture, industry and in a domestic use.  "
+              info: "Water demand is measured as water withdrawals. It counts the water used in agriculture, industry and in a domestic use. <br><br><b> Temporal resolution: 1960-2014</b>"
             }
           },
         ]
@@ -224,7 +224,7 @@ Vue.prototype.$layers_description = [
               },
               monthly: true,
               future: true,
-              info: "Water stress stress measures the ratio of total water withdrawals to available renewable surface and groundwater supplies. Water withdrawals include domestic, industrial, irrigation, and livestock consumptive and nonconsumptive uses. "
+              info: "Water stress stress measures the ratio of total water withdrawals to available renewable surface and groundwater supplies. Water withdrawals include domestic, industrial, irrigation, and livestock consumptive and nonconsumptive uses. <br><br><b> Temporal resolution: 1960-2014</b>"
             },
           },
           {
@@ -245,7 +245,7 @@ Vue.prototype.$layers_description = [
               },
               monthly: true,
               future: false,
-              info: "Water depletion measures the ratio of total water consumption to available renewable water supplies. Total water consumption includes domestic, industrial, irrigation, and livestock consumptive uses."
+              info: "Water depletion measures the ratio of total water consumption to available renewable water supplies. Total water consumption includes domestic, industrial, irrigation, and livestock consumptive uses. <br><br><b> Temporal resolution: 1960-2014</b>"
             },
           },
           {
@@ -266,7 +266,7 @@ Vue.prototype.$layers_description = [
               },
               monthly: false,
               future: false,
-              info: "Aridity index is a global climate data related to evapotranspiration processes and rainfall deficit for potential vegetative growth.  It provides information about the potential availability of water in regions with low water demand, thus they are used to better account for deserts and other arid areas in the risk assessment. "
+              info: "Aridity index is a global climate data related to evapotranspiration processes and rainfall deficit for potential vegetative growth.  It provides information about the potential availability of water in regions with low water demand, thus they are used to better account for deserts and other arid areas in the risk assessment. <br><br><b> Temporal resolution: 1970-2000</b>"
             }
           },
         ]
@@ -294,7 +294,7 @@ Vue.prototype.$layers_description = [
               },
               monthly: false,
               future: false,
-              info: "Groundwater table decline measures the average decline of the groundwater table as the average change for the period of study (1990–2014)."
+              info: "Groundwater table decline measures the average decline of the groundwater table as the average change for the period of study. <br><br><b> Temporal resolution: 1960-2014</b>"
             }
           },
 
@@ -323,7 +323,7 @@ Vue.prototype.$layers_description = [
               },
               monthly: false,
               future: false,
-              info: "Riverine flood risk measures the percentage of population expected to be affected by Riverine flooding in an average year, accounting for existing flood-protection standards. "
+              info: "Riverine flood risk measures the percentage of population expected to be affected by Riverine flooding in an average year, accounting for existing flood-protection standards. <br><br><b> Temporal resolution: 2010</b>"
             }
           },
           {
@@ -344,7 +344,7 @@ Vue.prototype.$layers_description = [
               },
               monthly: false,
               future: false,
-              info: "Coastal flood risk measures the percentage of the population expected to be affected by coastal flooding in an average year, accounting for existing flood protection standards. "
+              info: "Coastal flood risk measures the percentage of the population expected to be affected by coastal flooding in an average year, accounting for existing flood protection standards. <br><br><b> Temporal resolution: 2010</b>"
             }
           },
         ]
@@ -372,7 +372,7 @@ Vue.prototype.$layers_description = [
               },
               monthly: false,
               future: false,
-              info: "Drought risk measures where droughts are likely to occur, the population and assets exposed, and the vulnerability of the population and assets to adverse effects. "
+              info: "Drought risk measures where droughts are likely to occur, the population and assets exposed, and the vulnerability of the population and assets to adverse effects. <br><br><b> Temporal resolution: 2000-2014</b>"
             }
           },
         ]
@@ -407,7 +407,7 @@ Vue.prototype.$layers_description = [
             },
             monthly: false,
             future: false,
-            info: "Coastal eutrophication potential (CEP) measures the potential for riverine loadings of nitrogen (N), phosphorus (P), and silica (Si) to stimulate harmful algal blooms in coastal waters. The CEP indicator is a useful metric to map where anthropogenic activities produce enough point-source and nonpoint-source pollution to potentially degrade the environment. "
+            info: "Coastal eutrophication potential (CEP) measures the potential for riverine loadings of nitrogen (N), phosphorus (P), and silica (Si) to stimulate harmful algal blooms in coastal waters. The CEP indicator is a useful metric to map where anthropogenic activities produce enough point-source and nonpoint-source pollution to potentially degrade the environment. <br><br><b> Temporal resolution: 2000</b>"
           }
         },
           {
@@ -428,7 +428,7 @@ Vue.prototype.$layers_description = [
               },
               monthly: false,
               future: true,
-              info: "Surface Water Pharmaceutical Pollution Indicates the concentration of the Diclofenac on the rivers from domestic uses, it takes in count the population consumption, the in-stream attenuation, excretion, and the removal at sanitation facilities."
+              info: "Surface Water Pharmaceutical Pollution Indicates the concentration of the Diclofenac on the rivers from domestic uses, it takes in count the population consumption, the in-stream attenuation, excretion, and the removal at sanitation facilities. <br><br><b> Temporal resolution: N/A</b>"
             }
           },
           {
@@ -449,7 +449,7 @@ Vue.prototype.$layers_description = [
               },
               monthly: false,
               future: false,
-              info: "Coastal Pharmaceutical Pollution Indicates the amount of Diclofenac exported by the rivers to the ocean."
+              info: "Coastal Pharmaceutical Pollution Indicates the amount of Diclofenac exported by the rivers to the ocean. <br><br><b> Temporal resolution: N/A</b>"
             }
           },
           {
@@ -470,7 +470,7 @@ Vue.prototype.$layers_description = [
               },
               monthly: false,
               future: false,
-              info: "Unimproved/no drinking water reflects the percentage of the population collecting drinking water from an unprotected dug well or spring, or directly from a river, dam, lake, pond, stream, canal, or irrigation canal."
+              info: "Unimproved/no drinking water reflects the percentage of the population collecting drinking water from an unprotected dug well or spring, or directly from a river, dam, lake, pond, stream, canal, or irrigation canal. <br><br><b> Temporal resolution: 2015</b>"
             }
           },
           {
@@ -491,7 +491,7 @@ Vue.prototype.$layers_description = [
               },
               monthly: false,
               future: false,
-              info: "Unimproved/no sanitation reflects the percentage of the population using pit latrines without a slab or platform, hanging/bucket latrines, or directly disposing human waste in fields, forests, bushes, open bodies of water, beaches, other open spaces, or with solid waste."
+              info: "Unimproved/no sanitation reflects the percentage of the population using pit latrines without a slab or platform, hanging/bucket latrines, or directly disposing human waste in fields, forests, bushes, open bodies of water, beaches, other open spaces, or with solid waste. <br><br><b> Temporal resolution: 2015</b>"
             }
           },
         ]
@@ -521,8 +521,7 @@ Vue.prototype.$layers_description = [
           },
           monthly: false,
           future: false,
-          info: "The Peak RepRisk country ESG risk index quantifies business conduct risk exposure related to environmental, social, and governance (ESG) issues in the corresponding country. The index provides insights into potential financial, reputational, and compliance risks, such as human rights violations and environmental destruction."
-
+          info: "The Peak RepRisk country ESG risk index quantifies business conduct risk exposure related to environmental, social, and governance (ESG) issues in the corresponding country. The index provides insights into potential financial, reputational, and compliance risks, such as human rights violations and environmental destruction. <br><br><b> Temporal resolution: 2016-2018</b>"
         }
       },
     ]

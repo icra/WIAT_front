@@ -1,7 +1,6 @@
 <template>
   <div style="height: 100%;" class="outer">
 
-
     <div v-if="utils.is_industry_valid(industry)">
       <v-tabs
           id="main_tab"
@@ -15,9 +14,7 @@
 
 
       </v-tabs>
-      <div class="dialog_detail" v-if="industry != null" style="background-color: white">
-        <h3>{{ industry.name }} </h3>
-        <br>
+      <div v-if="industry != null" style="background-color: white">
         <div
             v-if="main_tab == 0"
         >
@@ -40,6 +37,8 @@
             v-else-if="main_tab == 1"
         >
           <v-col cols="6">
+            <h3>{{ industry.name }} </h3>
+
             <v-treeview
                 :active.sync="active_indicator"
                 :items="indicators_industry"
@@ -67,6 +66,7 @@
 
           <v-col
               class="d-flex text-center"
+              cols="6"
           >
             <v-scroll-y-transition mode="out-in">
               <div
@@ -76,9 +76,39 @@
               >
                 Select an indicator
               </div>
-              <div v-else>
+              <div v-else style="width: 100%">
                 <div v-if="active_indicator[0] == 3">
 
+
+                  <v-chip-group
+                      mandatory
+                      v-model="delta_ecotox_chip"
+                  >
+                    <v-chip
+                        color="primary"
+                        outlined
+                        class="ma-2"
+                        pill
+                    >
+                      <v-icon left>
+                        mdi-chart-pie
+                      </v-icon>
+                      Chart
+                    </v-chip>
+
+                    <v-chip
+                        color="primary"
+                        outlined
+                        pill
+                        class="ma-2"
+                    >
+                      <v-icon left>
+                        mdi-table
+                      </v-icon>
+                      Table
+
+                    </v-chip>
+                  </v-chip-group>
                   <v-data-table
                       :headers="delta_ecotox_table.header"
                       :items="delta_ecotox_table.value"
@@ -87,6 +117,8 @@
                       disable-pagination
                       :hide-default-footer="true"
                       dense
+                      v-if="delta_ecotox_chip === 1"
+
                   >
                     <template v-slot:item.value="{ item }">
                     <span v-if="item.info">
@@ -143,6 +175,14 @@
 
                     </template>
                   </v-data-table>
+
+                  <PieChart
+                      style="padding-top: 10px"
+                      :chart-data="delta_ecotox_chart.chartData"
+                      :chart-options="delta_ecotox_chart.chartOptions"
+                      v-else-if="delta_ecotox_chip === 0"
+
+                  />
 
                 </div>
                 <div v-else-if="active_indicator[0] == 4">
@@ -216,6 +256,36 @@
 
                 </div>
                 <div v-else-if="active_indicator[0] == 5">
+
+                  <v-chip-group
+                      mandatory
+                      v-model="eutrophication_chip"
+                  >
+                    <v-chip
+                        color="primary"
+                        outlined
+                        class="ma-2"
+                        pill
+                    >
+                      <v-icon left>
+                        mdi-chart-pie
+                      </v-icon>
+                      Chart
+                    </v-chip>
+
+                    <v-chip
+                        color="primary"
+                        outlined
+                        pill
+                        class="ma-2"
+                    >
+                      <v-icon left>
+                        mdi-table
+                      </v-icon>
+                      Table
+
+                    </v-chip>
+                  </v-chip-group>
                   <v-data-table
                       :headers="eutrophication_table.header"
                       :items="eutrophication_table.value"
@@ -224,6 +294,7 @@
                       disable-pagination
                       :hide-default-footer="true"
                       dense
+                      v-if="eutrophication_chip === 1"
                   >
                     <template v-slot:item.value="{ item }">
                     <span v-if="item.info">
@@ -281,8 +352,47 @@
 
                   </v-data-table>
 
+                  <PieChart
+                      style="padding-top: 10px"
+                      :chart-data="eutrophication_chart.chartData"
+                      :chart-options="eutrophication_chart.chartOptions"
+                      v-else-if="eutrophication_chip === 0"
+
+                  />
+
+
                 </div>
                 <div v-else-if="active_indicator[0] == 6">
+
+                  <v-chip-group
+                      mandatory
+                      v-model="ecotoxicity_chip"
+                  >
+                    <v-chip
+                        color="primary"
+                        outlined
+                        class="ma-2"
+                        pill
+                    >
+                      <v-icon left>
+                        mdi-chart-pie
+                      </v-icon>
+                      Chart
+                    </v-chip>
+
+                    <v-chip
+                        color="primary"
+                        outlined
+                        pill
+                        class="ma-2"
+                    >
+                      <v-icon left>
+                        mdi-table
+                      </v-icon>
+                      Table
+
+                    </v-chip>
+                  </v-chip-group>
                   <v-data-table
                       :headers="ecotoxicity_table.header"
                       :items="ecotoxicity_table.value"
@@ -291,6 +401,7 @@
                       dense
                       class="expanded_table_hover"
                       :item-class="itemRowBold"
+                      v-if="ecotoxicity_chip === 1"
                   >
                     <template v-slot:item.value="{ item }">
                     <span v-if="item.info">
@@ -348,6 +459,14 @@
                     </template>
 
                   </v-data-table>
+
+                  <PieChart
+                      style="padding-top: 10px"
+                      :chart-data="ecotoxicity_chart.chartData"
+                      :chart-options="ecotoxicity_chart.chartOptions"
+                      v-else-if="ecotoxicity_chip === 0"
+
+                  />
 
                 </div>
                 <div v-else-if="active_indicator[0] == 7">
@@ -686,6 +805,37 @@
 
                 </div>
                 <div v-else-if="active_indicator[0] == 16">
+
+                  <v-chip-group
+                      mandatory
+                      v-model="emissions_chip"
+                  >
+                    <v-chip
+                        color="primary"
+                        outlined
+                        class="ma-2"
+                        pill
+                    >
+                      <v-icon left>
+                        mdi-chart-pie
+                      </v-icon>
+                      Chart
+                    </v-chip>
+
+                    <v-chip
+                        color="primary"
+                        outlined
+                        pill
+                        class="ma-2"
+                    >
+                      <v-icon left>
+                        mdi-table
+                      </v-icon>
+                      Table
+
+                    </v-chip>
+                  </v-chip-group>
+
                   <v-data-table
                       :headers="emissions_table.header"
                       :items="emissions_table.value"
@@ -694,6 +844,7 @@
                       disable-pagination
                       :hide-default-footer="true"
                       dense
+                      v-if="emissions_chip === 1"
                   >
                     <template v-slot:item.value="{ item }">
                     <span v-if="item.info">
@@ -748,8 +899,16 @@
                       </template>
                     </template>
 
-
                   </v-data-table>
+                  <PieChart
+                      style="padding-top: 10px"
+                      :chart-data="emissions_chart.chartData"
+                      :chart-options="emissions_chart.chartOptions"
+                      v-else-if="emissions_chip === 0"
+
+                  />
+
+
                 </div>
                 <div v-else-if="active_indicator[0] == 18">
                   <v-data-table
@@ -819,11 +978,47 @@
 
                   </v-data-table>
                 </div>
+                <div v-else-if="active_indicator[0] == 20">
+                  <v-data-table
+                      :headers="biogas_valorised_table.header"
+                      :items="biogas_valorised_table.value"
+
+                      :item-class="itemRowBold"
+                      disable-pagination
+                      :hide-default-footer="true"
+                      dense
+                  >
+                    <template v-slot:item.value="{ item }">
+                    <span v-if="item.info">
+                      {{ item.value }}
+                      <v-btn
+                          icon
+                          @click="$data[item.info] = true"
+                          class="icon_clickable"
+                          x-small
+                      >
+                        <v-icon
+                            color='#1C195B'
+                        >
+                          mdi-information-outline
+                        </v-icon>
+                      </v-btn>
+
+
+                    </span>
+                      <span v-else>{{ item.value }}</span>
+                    </template>
+
+
+                  </v-data-table>
+                </div>
+
 
               </div>
             </v-scroll-y-transition>
           </v-col>
         </v-row>
+
 
       </div>
       <div v-if="industry != null">
@@ -837,7 +1032,7 @@
             <h3>Energy used</h3>
             <br>
             Energy used by wastewater treatment plants to treat the water sent to the treatment plant.
-            <div v-katex:display="'\\sum_{i \\in WWTPS} W_{t_{i}} \\cdot energy_{{consumed}_i}'"></div>
+            <div v-katex:display="'\\frac{\\sum_{i \\in WWTPS} W_{t_{i}} \\cdot energy_{{consumed}_i}}{\\sum_{i \\in WWTPS} W_{t_{i}} }'"></div>
             <b>Where:</b>
             <br>
             <ul>
@@ -1668,6 +1863,34 @@
               </li>
               <li><span v-katex="'biog_{leaked}'"></span>: Biogas leaked to the atmosphere (% volume)</li>
 
+
+            </ul>
+
+
+          </div>
+
+        </v-dialog>
+        <v-dialog
+            v-model="info_biogas_valorised"
+            width="60%"
+        >
+          <div class="dialog_detail" style="background-color: white">
+            <h3>Biogas valorization </h3>
+            <div
+                v-katex:display="'biogas_{valorised} = \\sum_{i \\in WWTPS} \\frac{P \\cdot V_i}{R \\cdot T} \\cdot \\frac{biog_{val_i}}{100} \\cdot \\frac{biog_{CH4_i}}{100} \\cdot \\frac{44}{1000}'"></div>
+
+            <b>Where:</b>
+            <br>
+            <ul>
+              <li><span v-katex="'WWTPS'"></span>: onsite and external WWTP's where industry treats water</li>
+              <li><span v-katex="'P : 1.013 \\cdot 10^{5}'"></span> Pa</li>
+              <li><span v-katex="'V'"></span>: Volume of biogas produced in the WWTP</li>
+              <li><span v-katex="'R'"></span>: 8.31446261815324 J/K·mol</li>
+              <li><span v-katex="'T'"></span>: 273.15K</li>
+              <li><span v-katex="'biog_{CH4}'"></span>: Percent of the methane content in the produced biogas</li>
+              <li><span v-katex="'biog_{val}'"></span>: Biogas valorized in the treatment plant to heat the digesters or
+                the building and/or to run a Co-generator to generate heat and electricity
+              </li>
 
             </ul>
 
@@ -3322,13 +3545,30 @@
           </div>
 
         </v-dialog>
-
         <v-dialog
-            v-model="industry_info"
-            width="80%"
+            v-model="info_effluent_load_cod"
+            width="60%"
         >
+          <div class="dialog_detail" style="background-color: white">
+            <h3> COD effluent load </h3>
+            <br>
+            Reducing COD will contribute to reducing your GHG emissions associated to "water discharged"
+          </div>
 
         </v-dialog>
+        <v-dialog
+            v-model="info_effluent_load_tn"
+            width="60%"
+        >
+          <div class="dialog_detail" style="background-color: white">
+            <h3> TN effluent load </h3>
+            <br>
+            Reducing TN will contribute to reducing your GHG emissions associated to "water discharged"
+          </div>
+
+        </v-dialog>
+
+
 
 
       </div>
@@ -3358,28 +3598,24 @@
 
 <script>
 
-import BarChart from "@/components/BarChart";
 
 let _ = require('lodash');
-import Vue from "vue";
 import {utils, metrics} from "../utils"
 import external_indicators from "../external_indicators"
 
-import RadarChart from "@/components/RadarChart";
 import colors from "../colors"
 import risk_thereshold from "..//risk_categories"
 import VueKatex from 'vue-katex';
 import 'katex/dist/katex.min.css';
+import Vue from "vue";
 
 Vue.use(VueKatex, {});
 
-
+import BarChart from "./BarChart";
+import PieChart from "./PieChart";
 export default {
   name: "Industry_statistics",
-  components: {
-    RadarChart,
-    BarChart,
-  },
+  components: { BarChart, PieChart },
   props: ['assessment_id', 'industry_id'],
   data() {
     return {
@@ -3400,14 +3636,27 @@ export default {
       treatment_efficiency_influent_table: {header: [], value: []},
 
       ecotoxicity_table: {header: [], value: []},
+      ecotoxicity_chart: {chartData: {}, chartOptions: {}},
+      ecotoxicity_chip: 0,
+
       eqs_table: {header: [], value: []},
       delta_ecotox_table: {header: [], value: []},
+      delta_ecotox_chart: {chartData: {}, chartOptions: {}},
+      delta_ecotox_chip: 0,
+
+
       delta_eqs_table: {header: [], value: []},
 
       eutrophication_table: {header: [], value: []},
+      eutrophication_chart: {chartData: {}, chartOptions: {}},
+      eutrophication_chip: 0,
+
       emissions_table: {header: [], value: []},
+      emissions_chart: {chartData: {}, chartOptions: {}},
+      emissions_chip: 0,
       energy_use_table: {header: [], value: []},
       effluent_load_table: {header: [], value: []},
+      biogas_valorised_table: {header: [], value: []},
 
       simple_report_table: {header: [], value: []},
       external_indicators: external_indicators,
@@ -3485,6 +3734,8 @@ export default {
       info_discharge: false,
       info_sludge_management: false,
       info_biogas: false,
+      info_biogas_valorised: false,
+
       info_tn_eutrophication: false,
       info_cod_eutrophication: false,
       info_tp_eutrophication: false,
@@ -3550,8 +3801,9 @@ export default {
       info_efficiency_influent_cod: false,
       info_efficiency_influent_tn: false,
       info_efficiency_influent_tp: false,
+      info_effluent_load_tn: false,
+      info_effluent_load_cod: false,
       dialog_biogas_stage: 0,
-      industry_info: false,
       active_indicator: [],
       open_indicator: [],
       selected_assessment: null,
@@ -3686,9 +3938,6 @@ export default {
       return null
     },
 
-    simpleTableRowClick(item, row) {
-      this.industry_info = true
-    },
 
 
     getAvailabilityColor(item) {
@@ -3762,7 +4011,6 @@ export default {
 
       let _this = this
 
-
       if (_this.industry !== null) {
 
         let emission_table = {
@@ -3800,19 +4048,11 @@ export default {
         }
 
 
-        const data_chart = {
-          labels: [],
-          datasets: [{
-            data: [],
-            backgroundColor: []
-          }]
-        };
-
         let key = this.industry.name
         let industries = [this.industry]
 
         emission_table.header.push({
-          text: key, value: key,
+          text: "", value: key,
         })
         let emissions = metrics.emissions_and_descriptions(industries, 1)
 
@@ -3826,10 +4066,6 @@ export default {
         disc[key] = emissions["disc"]
 
 
-        data_chart.datasets[0].data.push(emissions["total"])
-        data_chart.labels.push(key)
-        data_chart.datasets[0].backgroundColor.push(this.chooseColor(key))
-
         emission_table.header.push({text: "Unit", value: "unit", sortable: false,})
         emission_table.value.push(total)
         emission_table.value.push(elec)
@@ -3840,36 +4076,75 @@ export default {
         emission_table.value.push(reus)
         emission_table.value.push(disc)
 
-        //CHART
-        const options = {
-          animation: false,
-          legend: {
-            display: false
+
+        _this.emissions_chart = {
+          chartData: {
+            labels: [
+              _this.table_title.global_warming_potential.elec,
+              _this.table_title.global_warming_potential.fuel,
+              _this.table_title.global_warming_potential.treatment,
+              _this.table_title.global_warming_potential.biogas,
+              _this.table_title.global_warming_potential.sludge,
+              _this.table_title.global_warming_potential.reuse,
+              _this.table_title.global_warming_potential.discharged,
+
+
+            ],
+            datasets: [
+              {
+                backgroundColor: ['#1c195b', '#0095c6', '#5bc9bf', '#00b140', '#ff386b', '#f89c27', '#964fe5'],
+                data: [elec[key], fuel[key], tre[key], biog[key], slu[key], reus[key], disc[key]]
+              }
+            ]
           },
-          scales: {
-            yAxes: [{
-              ticks: {
-                beginAtZero: true
-              },
-              scaleLabel: {
-                display: true,
-                labelString: 'kgCO2eq emission'
+          chartOptions: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    return context.label + ": "+context.raw + " kgCO2eq/day"
+                  }
+                }
+
               }
-            }],
-            xAxes: [{
-              scaleLabel: {
-                display: true,
-                labelString: 'Industry'
-              }
-            }]
+            }
+
           }
         }
 
+        return emission_table
+      }
+      return {header: [], value: []}
 
-        _this.ghg_emission_chart = {
-          chartData: data_chart,
-          options: options
+    },
+
+    generate_biogas_valorised_table() {
+
+      let _this = this
+
+      if (_this.industry !== null) {
+
+        let emission_table = {
+          header: [{text: "Emissions", value: "value", sortable: false}],
+          value: []
         }
+
+        let biog = {value: _this.table_title.global_warming_potential.biogas, unit: "kgCO2eq/day", info: "info_biogas_valorised"}
+        let key = this.industry.name
+        let industries = [this.industry]
+
+        emission_table.header.push({
+          text: "", value: key,
+        })
+        let emissions = metrics.emissions_and_descriptions(industries, 1)
+
+        biog[key] = emissions["biog"]
+
+
+        emission_table.header.push({text: "Unit", value: "unit", sortable: false,})
+        emission_table.value.push(biog)
 
 
         return emission_table
@@ -3877,6 +4152,7 @@ export default {
       return {header: [], value: []}
 
     },
+
 
     generate_energy_use_table() {
 
@@ -3889,7 +4165,7 @@ export default {
           value: []
         }
 
-        let energy = {value: "Energy used per day", unit: "kWh/day", info: "info_energy_used"}
+        let energy = {value: "Energy used per day", unit: "kWh/m3", info: "info_energy_used"}
 
         let key = this.industry.name
         let industries = [this.industry]
@@ -3919,9 +4195,9 @@ export default {
           value: []
         }
 
-        let tn = {value: _this.table_title.pollutants.tn, unit: "gTN/m3",}
+        let tn = {value: _this.table_title.pollutants.tn, unit: "gTN/m3", info: "info_effluent_load_tn"}
         let tp = {value: _this.table_title.pollutants.tp, unit: "gTP/m3",}
-        let cod = {value: _this.table_title.pollutants.cod, unit: "gCOD/m3",}
+        let cod = {value: _this.table_title.pollutants.cod, unit: "gCOD/m3", info: "info_effluent_load_cod"}
 
         let key = this.industry.name
         let industries = [this.industry]
@@ -3939,7 +4215,6 @@ export default {
 
         pollutants_table.value.push(cod)
         pollutants_table.value.push(tn)
-        pollutants_table.value.push(tp)
         return pollutants_table
       } else return {header: [], value: []}
 
@@ -3962,14 +4237,6 @@ export default {
         let cod = {value: _this.table_title.pollutants.cod, unit: "gPO4eq/m3", info: "info_cod_eutrophication"}
 
 
-        const data_chart = {
-          labels: [],
-          datasets: [{
-            data: [],
-            backgroundColor: []
-          }]
-        };
-
         let key = this.industry.name
         let industries = [this.industry]
 
@@ -3985,47 +4252,43 @@ export default {
         total[key] = eutrophication.total
 
 
-        data_chart.datasets[0].data.push(eutrophication.total)
-        data_chart.labels.push(key)
-        data_chart.datasets[0].backgroundColor.push('rgba(210,109,9,0.93)')
-
-        //CHART
-        const options = {
-          animation: false,
-          legend: {
-            display: false
-          },
-          scales: {
-            yAxes: [{
-              ticks: {
-                beginAtZero: true
-              },
-              scaleLabel: {
-                display: true,
-                labelString: 'gPO4eq/m3'
-              }
-            }],
-            xAxes: [{
-              scaleLabel: {
-                display: true,
-                labelString: 'Industry'
-              }
-            }]
-          }
-        }
-
-
-        _this.eutrophication_chart = {
-          chartData: data_chart,
-          options: options
-        }
-
         pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
 
         pollutants_table.value.push(total)
         pollutants_table.value.push(cod)
         pollutants_table.value.push(tn)
         pollutants_table.value.push(tp)
+
+        _this.eutrophication_chart = {
+          chartData: {
+            labels: [
+              cod.value,
+              tn.value,
+              tp.value,
+            ],
+            datasets: [
+              {
+                backgroundColor: ['#1c195b', '#0095c6', '#5bc9bf'],
+                data: [cod[key], tn[key], tp[key]]
+              }
+            ]
+          },
+          chartOptions: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    return context.label + ": "+context.raw + " gPO4eq/m3"
+                  }
+                }
+
+              }
+            }
+          }
+        }
+
 
         return pollutants_table
       } else return {header: [], emissions: []}
@@ -4081,14 +4344,6 @@ export default {
         }
         let total = {value: _this.table_title.pollutants.total, unit: "TU/day"}
 
-        const data_chart = {
-          labels: [],
-          datasets: [{
-            data: [],
-            backgroundColor: []
-          }]
-        };
-
         let key = this.industry.name
         let industries = [this.industry]
 
@@ -4110,40 +4365,6 @@ export default {
         trichloroethylene[key] = tu.tricloroetile
         total[key] = tu.total
 
-        data_chart.datasets[0].data.push(total[key])
-        data_chart.labels.push(key)
-        data_chart.datasets[0].backgroundColor.push('rgba(210,109,9,0.93)')
-
-        const options = {
-          animation: false,
-          legend: {
-            display: false
-          },
-          scales: {
-            yAxes: [{
-              ticks: {
-                beginAtZero: true
-              },
-              scaleLabel: {
-                display: true,
-                labelString: 'TU'
-              }
-            }],
-            xAxes: [{
-              scaleLabel: {
-                display: true,
-                labelString: 'Industry'
-              }
-            }]
-          }
-        }
-
-
-        _this.ecotoxicity_chart = {
-          chartData: data_chart,
-          options: options
-        }
-
 
         pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
 
@@ -4159,6 +4380,46 @@ export default {
         pollutants_table.value.push(nonylphenols)
         pollutants_table.value.push(tetrachloroethene)
         pollutants_table.value.push(trichloroethylene)
+
+        _this.ecotoxicity_chart = {
+          chartData: {
+            labels: [
+              dichloroethane.value,
+              cadmium.value,
+              hexachlorobenzene.value,
+              mercury.value,
+              lead.value,
+              nickel.value,
+              chloroalkanes.value,
+              hexaclorobutadie.value,
+              nonylphenols.value,
+              tetrachloroethene.value,
+              trichloroethylene.value,
+
+            ],
+            datasets: [
+              {
+                backgroundColor: ['#1c195b', '#0095c6', '#5bc9bf', '#00b140', '#ff386b', '#f89c27', '#964fe5', '#009b77', '#b62373', '#9ebe3f', '#999999'],
+                data: [dichloroethane[key], cadmium[key], hexachlorobenzene[key], mercury[key], lead[key], nickel[key], chloroalkanes[key], hexaclorobutadie[key], nonylphenols[key], tetrachloroethene[key], trichloroethylene[key]]
+              }
+            ]
+          },
+          chartOptions: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    return context.label + ": "+context.raw + " TU/day"
+                  }
+                }
+
+              }
+            }
+          }
+        }
+
 
         return pollutants_table
       } else return {header: [], emissions: []}
@@ -4304,14 +4565,6 @@ export default {
         let total = {value: _this.table_title.pollutants.total, unit: "TU/day"}
 
 
-        const data_chart = {
-          labels: [],
-          datasets: [{
-            data: [],
-            backgroundColor: []
-          }]
-        };
-
         let key = this.industry.name
         let industries = [this.industry]
 
@@ -4334,39 +4587,6 @@ export default {
         trichloroethylene[key] = tu.tricloroetile
         total[key] = tu.total
 
-        data_chart.datasets[0].data.push(total[key])
-        data_chart.labels.push(key)
-        data_chart.datasets[0].backgroundColor.push('rgba(210,109,9,0.93)')
-
-
-        const options = {
-          animation: false,
-          legend: {
-            display: false
-          },
-          scales: {
-            yAxes: [{
-              ticks: {
-                beginAtZero: true
-              },
-              scaleLabel: {
-                display: true,
-                labelString: 'TU'
-              }
-            }],
-            xAxes: [{
-              scaleLabel: {
-                display: true,
-                labelString: 'Industry'
-              }
-            }]
-          }
-        }
-
-        _this.ecotoxicity_chart = {
-          chartData: data_chart,
-          options: options
-        }
 
         pollutants_table.value.push(total)
         pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
@@ -4381,6 +4601,47 @@ export default {
         pollutants_table.value.push(nonylphenols)
         pollutants_table.value.push(tetrachloroethene)
         pollutants_table.value.push(trichloroethylene)
+
+
+        _this.delta_ecotox_chart = {
+          chartData: {
+            labels: [
+              dichloroethane.value,
+              cadmium.value,
+              hexachlorobenzene.value,
+              mercury.value,
+              lead.value,
+              nickel.value,
+              chloroalkanes.value,
+              hexaclorobutadie.value,
+              nonylphenols.value,
+              tetrachloroethene.value,
+              trichloroethylene.value,
+
+            ],
+            datasets: [
+              {
+                backgroundColor: ['#1c195b', '#0095c6', '#5bc9bf', '#00b140', '#ff386b', '#f89c27', '#964fe5', '#009b77', '#b62373', '#9ebe3f', '#999999'],
+                data: [dichloroethane[key], cadmium[key], hexachlorobenzene[key], mercury[key], lead[key], nickel[key], chloroalkanes[key], hexaclorobutadie[key], nonylphenols[key], tetrachloroethene[key], trichloroethylene[key]]
+              }
+            ]
+          },
+          chartOptions: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    return context.label + ": "+context.raw + " TU/day"
+                  }
+                }
+
+              }
+            }
+          }
+        }
+
 
         return pollutants_table
       } else return {header: [], emissions: []}
@@ -4997,6 +5258,8 @@ export default {
 
     _this.simple_report_table = await _this.generate_simple_report_table()
     _this.industry_table = _this.generate_industry_table()
+    _this.biogas_valorised_table = _this.generate_biogas_valorised_table()
+
 
   },
 
@@ -5049,6 +5312,8 @@ export default {
               children: [
                 {id: 18, name: "Energy use"},
                 {id: 19, name: "Wastewater effluent concentration"},
+                {id: 20, name: "Biogas valorised"},
+
               ]
 
             },

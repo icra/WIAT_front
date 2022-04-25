@@ -751,7 +751,7 @@
                               mdi-information-outline
                             </v-icon>
                           </template>
-                          <span>{{item.layer.info}}</span>
+                          <span v-html="item.layer.info"></span>
                         </v-tooltip>
 
                         <v-icon v-if="selected_layer === item.name && item.layer" color='#1C195B'>
