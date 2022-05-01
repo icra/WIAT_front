@@ -737,6 +737,8 @@
                         clear-icon="mdi-close-circle-outline"
                         :search="search_layer_model"
                         :active.sync = "actived_layers"
+                        :open.sync = "opened_layers"
+
                         @update:active="layerTreeSelected"
                     >
                       <template v-slot:append="{ item }">
@@ -916,6 +918,7 @@ export default {
       end_date_model_assessment: new Date(new Date().setFullYear((new Date(Date.now() - (new Date()).getTimezoneOffset() * 60000)).getFullYear() + 1)).toISOString().substr(0, 10),
       end_date_modal: false,
       actived_layers: [],
+      opened_layers: [],
       new_supply_chain_valid: false,
       supply_chain_name: null,
       supply_chain_marker: null,
@@ -949,7 +952,7 @@ export default {
       } catch (error) {}
     },
 
-    '$route' (to){
+    '$route' (to, from){
       let page = to.name
       let index = 0
       if(page == "map") index = 0
@@ -957,6 +960,12 @@ export default {
       else if(page == "report") index = 2
       else index = -1
       this.icon_selected = index
+
+      if(from.name == "map"){
+        this.actived_layers.splice(0, this.actived_layers.length)
+        this.opened_layers.splice(0, this.opened_layers.length)
+      }
+
     }
   },
 
@@ -1019,7 +1028,6 @@ export default {
     layerTreeSelected(nodeLayer){
       if(nodeLayer.length > 0) this.applyLayer(nodeLayer[0].name)
       else this.applyLayer(this.selected_layer)
-
     },
 
     add_identifier: function (category, id){
@@ -1304,10 +1312,7 @@ export default {
       else return 'An assessment with same name already exists.' //If there is an assessment with the same name, must be the edited assessment
     },
     hide_show_industries(assessment_index){
-      console.log(assessment_index)
-      console.log("before:", this.assessment_active)
       this.assessment_active[assessment_index] = !this.assessment_active[assessment_index] //hide/show industries of the assessment
-      console.log("after:", this.assessment_active)
 
       if(this.assessment_active[assessment_index]){
         //show assessment

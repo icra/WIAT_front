@@ -80,10 +80,18 @@ let utils = {
     async areCoordsLand(lat, lng){
         let file_name = "baseline_population"
         let population_data = (await this.get_raster_data(file_name, lat, lng))
+
         if(population_data !== null) return true
         else return false
-
     },
+
+    async overall_water_risk(lat, lng){
+        let file_name = "owr"
+        let data = (await this.get_raster_data(file_name, lat, lng))
+        if(data !== null) return data
+        else return null
+    },
+
 
     getRandomColor(){
         let letters = '0123456789ABCDEF';
@@ -301,6 +309,19 @@ let metrics = {
         })
         return aggregated
     },
+
+    emissions_deglossed(industries){
+
+        let industries_emissions = industries.map(industry => industry.ghg_deglossed())
+        let aggregated = sumObjectsByKey(...industries_emissions)
+        Object.keys(aggregated).forEach(key => {
+            let value = aggregated[key]
+            if(Number.isFinite(value)) aggregated[key] = value.toExponential(2)
+            else aggregated[key] = "-"
+        })
+        return aggregated
+    },
+
 
     async dilution_factor(global_layers, industries){
 

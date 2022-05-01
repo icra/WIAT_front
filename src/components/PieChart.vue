@@ -14,6 +14,7 @@
 
 <script>
 import { Pie } from 'vue-chartjs/legacy'
+import ChartJSPluginDatalabels from "chartjs-plugin-datalabels"
 
 import {
   Chart as ChartJS,
@@ -24,7 +25,8 @@ import {
   CategoryScale
 } from 'chart.js'
 
-ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale)
+ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale, ChartJSPluginDatalabels)
+
 
 export default {
   name: 'PieChart',
@@ -69,5 +71,6 @@ export default {
       default: () => {}
     }
   },
+
 }
 </script>

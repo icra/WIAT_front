@@ -16,7 +16,7 @@ Vue.prototype.$assessment_active = []    //active assessments shown on map
 Vue.prototype.$selected_layer = "None"
 Vue.prototype.$map_info = {
   latlng: [41.9672203, 2.8385181],
-  zoom_level: 6
+  zoom_level: 6,
 },
 Vue.prototype.$layers_description = [
   {

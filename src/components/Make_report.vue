@@ -61,6 +61,24 @@
                             style="border-color: #0AA44A"
                             @click:row="simpleTableRowClick"
                         >
+                          <template v-slot:header.owr="{ header }">
+                            {{ header.text }}
+
+                            <v-tooltip bottom max-width="700px">
+                              <template v-slot:activator="{ on, attrs }">
+                                <v-icon
+                                    small
+                                    v-bind="attrs"
+                                    v-on="on"
+                                >mdi-information-outline</v-icon>
+                              </template>
+                              <span>
+                                Overall water risk measures all water-related risks of an industry and all its suppliers, by aggregating all indicators from the Physical Quantity, Quality and Regulatory & Reputational Risk categories. Higher values indicate higher water risk.
+                              </span>
+                            </v-tooltip>
+
+
+                          </template>
 
                           <template v-slot:no-data>
                             <v-progress-linear
@@ -91,7 +109,7 @@
                           </template>
 
                           <template
-                              v-for="value in ['pollution_impact', 'freshwater_impact', 'carbon_impact']"
+                              v-for="value in ['pollution_impact', 'freshwater_impact', 'carbon_impact', 'owr']"
                               v-slot:[`item.${value}`]="{ item }"
                           >
                             <template v-if="getSimpleReportColor(item, value) != null">
@@ -749,9 +767,6 @@ export default {
 
       })
     },
-    main_tab: function(value){
-      console.log(value)
-    }
   },
   methods: {
 
@@ -1022,6 +1037,9 @@ export default {
         return this.risk_categories["pollution"](item["freshwater_impact"])
       }else if(value == "carbon_impact")
         return this.risk_categories["global_warming"](item["carbon_impact"])
+      else if(value == "owr"){
+        return this.risk_categories["owr"](item["owr"])
+      }
       /*
       if (item.value == this.table_title.simple_table.quality_quantity){
         return this.risk_categories["quality_quantity"](item[value])
@@ -1074,7 +1092,7 @@ export default {
       if(_this.tab !== undefined){
 
         let pollutants_table = {
-          header: [{text: "Name", value: "value"}, {text: "Country", value: "country"}, {text: "Number of suppliers", value: "supply_chain_number"}, {text: "Pollution impact", value: "pollution_impact", sortable: false}, {text: "Freshwater impact", value: "freshwater_impact", sortable: false}, {text: "GHG emissions from Wastewater", value: "carbon_impact", sortable: false}],
+          header: [{text: "Name", value: "value"}, {text: "Country", value: "country"}, {text: "Number of suppliers", value: "supply_chain_number", sortable: true}, {text: "Pollution impact", value: "pollution_impact", sortable: false}, {text: "Freshwater impact", value: "freshwater_impact", sortable: false}, {text: "GHG emissions from Wastewater", value: "carbon_impact", sortable: false}, {text: "Overall water risk", value: "owr", sortable: true}],
           value: []
         }
 
@@ -1091,6 +1109,16 @@ export default {
 
           industry_row["country"] = utils.get_country_code_from_coordinates(industry.location.lat, industry.location.lng)
           industry_row["supply_chain_number"] = industry.supply_chain.length
+
+          //calcular overall water index a partir d'una mitjana entre la industria i els seus suppliers
+          let avg_owr = 0
+          const locations = [industry.location, ...industry.supply_chain.map(x => x.location)]
+          for (const location of locations){
+            let owr = await utils.overall_water_risk(location.lat, location.lng)
+            avg_owr += owr
+          }
+          avg_owr = avg_owr / locations.length
+          industry_row["owr"] = avg_owr.toFixed(3)
 
 
           if(utils.is_industry_valid(industry)){

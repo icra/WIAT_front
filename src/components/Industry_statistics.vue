@@ -18,18 +18,61 @@
         <div
             v-if="main_tab == 0"
         >
-          <v-data-table
-              :headers="industry_table.header"
-              :items="industry_table.value"
-              :hide-default-footer="true"
-              class="expanded_table_hover"
-          >
-            <template v-slot:no-data>
-              <p>Industry has no suppliers</p>
-            </template>
+          <v-row>
+            <v-col cols="4">
+              <v-treeview
+                  :items="layer_tree"
+                  dense
+                  hoverable
+                  activatable
+                  selection-type="leaf"
+                  return-object
+                  open-on-click
+                  color="#1C195B"
+                  selected-color="#1C195B"
+                  style="padding-left: 15px"
+                  item-disabled="locked"
+                  @update:active="layerTreeSelected"
+
+              >
+                <template v-slot:append="{ item }">
+                  <v-tooltip bottom v-if="item.layer && item.layer.info" max-width="700px">
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-icon
+                          color='#1C195B'
+                          style="padding-right: 10px"
+                          v-bind="attrs"
+                          v-on="on"
+                      >
+                        mdi-information-outline
+                      </v-icon>
+                    </template>
+                    <span v-html="item.layer.info"></span>
+                  </v-tooltip>
 
 
-          </v-data-table>
+                </template>
+
+              </v-treeview>
+
+            </v-col>
+            <v-divider vertical></v-divider>
+            <v-col cols="8">
+              <v-data-table
+                  :headers="industry_table.header"
+                  :items="industry_table.value"
+                  :hide-default-footer="true"
+                  class="expanded_table_hover"
+              >
+                <template v-slot:no-data>
+                  <p>Industry has no suppliers</p>
+                </template>
+
+
+              </v-data-table>
+            </v-col>
+          </v-row>
+
         </div>
         <v-row
             class="pa-4"
@@ -47,6 +90,7 @@
                 transition
                 dense
                 :open.sync="open_indicator"
+
             >
               <template v-slot:prepend="{ item, open }" style="height: 120%; margin-top: -10px; padding-bottom: -30px;">
                 <div
@@ -176,13 +220,18 @@
                     </template>
                   </v-data-table>
 
-                  <PieChart
-                      style="padding-top: 10px"
-                      :chart-data="delta_ecotox_chart.chartData"
-                      :chart-options="delta_ecotox_chart.chartOptions"
-                      v-else-if="delta_ecotox_chip === 0"
+                  <div v-else-if="delta_ecotox_chip === 0">
+                    <PieChart
+                        style="padding-top: 10px"
+                        :chart-data="delta_ecotox_chart.chartData"
+                        :chart-options="delta_ecotox_chart.chartOptions"
 
-                  />
+                    />
+                    <p class="instructions_2">
+                      *Only labels >5% are shown.
+                    </p>
+                  </div>
+
 
                 </div>
                 <div v-else-if="active_indicator[0] == 4">
@@ -352,14 +401,17 @@
 
                   </v-data-table>
 
-                  <PieChart
-                      style="padding-top: 10px"
-                      :chart-data="eutrophication_chart.chartData"
-                      :chart-options="eutrophication_chart.chartOptions"
-                      v-else-if="eutrophication_chip === 0"
+                  <div v-else-if="eutrophication_chip === 0">
+                    <PieChart
+                        style="padding-top: 10px"
+                        :chart-data="eutrophication_chart.chartData"
+                        :chart-options="eutrophication_chart.chartOptions"
 
-                  />
-
+                    />
+                    <p class="instructions_2">
+                      *Only labels >5% are shown.
+                    </p>
+                  </div>
 
                 </div>
                 <div v-else-if="active_indicator[0] == 6">
@@ -460,13 +512,19 @@
 
                   </v-data-table>
 
-                  <PieChart
-                      style="padding-top: 10px"
-                      :chart-data="ecotoxicity_chart.chartData"
-                      :chart-options="ecotoxicity_chart.chartOptions"
-                      v-else-if="ecotoxicity_chip === 0"
+                  <div v-else-if="ecotoxicity_chip === 0">
+                    <PieChart
+                        style="padding-top: 10px"
+                        :chart-data="ecotoxicity_chart.chartData"
+                        :chart-options="ecotoxicity_chart.chartOptions"
 
-                  />
+
+                    />
+                    <p class="instructions_2">
+                      *Only labels >5% are shown.
+                    </p>
+                  </div>
+
 
                 </div>
                 <div v-else-if="active_indicator[0] == 7">
@@ -900,13 +958,20 @@
                     </template>
 
                   </v-data-table>
-                  <PieChart
-                      style="padding-top: 10px"
-                      :chart-data="emissions_chart.chartData"
-                      :chart-options="emissions_chart.chartOptions"
-                      v-else-if="emissions_chip === 0"
+                  <div v-else-if="emissions_chip === 0">
+                    <PieChart
+                        style="padding-top: 10px"
+                        :chart-data="emissions_chart.chartData"
+                        :chart-options="emissions_chart.chartOptions"
 
-                  />
+
+                    />
+                    <p class="instructions_2">
+                      *Only labels >5% are shown.
+                    </p>
+                  </div>
+
+
 
 
                 </div>
@@ -1011,6 +1076,81 @@
 
 
                   </v-data-table>
+                </div>
+                <div v-else-if="active_indicator[0] == 21">
+                  <v-chip-group
+                      mandatory
+                      v-model="ghg_ratio_chip"
+                  >
+                    <v-chip
+                        color="primary"
+                        outlined
+                        class="ma-2"
+                        pill
+                    >
+                      <v-icon left>
+                        mdi-chart-pie
+                      </v-icon>
+                      Chart
+                    </v-chip>
+
+                    <v-chip
+                        color="primary"
+                        outlined
+                        pill
+                        class="ma-2"
+                    >
+                      <v-icon left>
+                        mdi-table
+                      </v-icon>
+                      Table
+
+                    </v-chip>
+                  </v-chip-group>
+                  <v-data-table
+                      :headers="ghg_ratio_table.header"
+                      :items="ghg_ratio_table.value"
+                      class="expanded_table_hover"
+                      :item-class="itemRowBold"
+                      disable-pagination
+                      :hide-default-footer="true"
+                      dense
+                      v-if="ghg_ratio_chip === 1"
+                  >
+                    <template v-slot:item.value="{ item }">
+                      <span v-if="item.info">
+                      {{ item.value }}
+                      <v-btn
+                          icon
+                          @click="$data[item.info] = true"
+                          class="icon_clickable"
+                          x-small
+                      >
+                        <v-icon
+                            color='#1C195B'
+                        >
+                          mdi-information-outline
+                        </v-icon>
+                      </v-btn>
+
+                    </span>
+                      <span v-else>{{ item.value }}</span>
+                    </template>
+
+                  </v-data-table>
+
+                  <div v-else-if="ghg_ratio_chip === 0">
+                    <PieChart
+                        style="padding-top: 10px"
+                        :chart-data="ghg_ratio_chart.chartData"
+                        :chart-options="ghg_ratio_chart.chartOptions"
+
+                    />
+                    <p class="instructions_2">
+                      *Only labels >5% are shown.
+                    </p>
+                  </div>
+
                 </div>
 
 
@@ -3552,6 +3692,8 @@
           <div class="dialog_detail" style="background-color: white">
             <h3> COD effluent load </h3>
             <br>
+            Concentration of COD discharged by the industry.
+            <br>
             Reducing COD will contribute to reducing your GHG emissions associated to "water discharged"
           </div>
 
@@ -3562,6 +3704,8 @@
         >
           <div class="dialog_detail" style="background-color: white">
             <h3> TN effluent load </h3>
+            <br>
+            Concentration of TN discharged by the industry.
             <br>
             Reducing TN will contribute to reducing your GHG emissions associated to "water discharged"
           </div>
@@ -3650,6 +3794,11 @@ export default {
       eutrophication_table: {header: [], value: []},
       eutrophication_chart: {chartData: {}, chartOptions: {}},
       eutrophication_chip: 0,
+
+      ghg_ratio_table: {header: [], value: []},
+      ghg_ratio_chart: {chartData: {}, chartOptions: {}},
+      ghg_ratio_chip: 0,
+
 
       emissions_table: {header: [], value: []},
       emissions_chart: {chartData: {}, chartOptions: {}},
@@ -3823,6 +3972,8 @@ export default {
         }
       }
     },
+
+
     info_sludge_management: function (value) {
       if (value) {
         this.dialog_biogas_stage = 0
@@ -3839,6 +3990,74 @@ export default {
   methods: {
 
 
+    async layerTreeSelected(nodeLayer){
+      if(nodeLayer.length > 0){
+        this.industry_table.header =
+          [{text: "Supplier name", value: "supplier_name"},
+            {text: "Country", value: "country"},
+            {text: "Latitude", value: "lat"},
+            {text: "Longitude", value: "lng"},
+            {text: nodeLayer[0].name+ " (Baseline)", value: "baseline"},
+          ]
+
+        if(nodeLayer[0].layer.future == true){
+          this.industry_table.header.push(
+              {text: nodeLayer[0].name+ " (Value In Year To 2030 Business as usual)", value: "future"}
+          )
+        }
+
+        let arr =  [this.industry, ...this.industry.supply_chain]
+        this.industry_table.value = []
+
+        for(let [i, val] of arr.entries()){
+          let location = arr[i].location
+
+          let obj = {
+            supplier_name: val.name,
+            lat: val.location.lat.toFixed(3),
+            lng: val.location.lng.toFixed(3),
+            country: utils.get_country_code_from_coordinates(val.location.lat, val.location.lng)
+          }
+
+          let baseline = await nodeLayer[0].layer.layers.baseline.annual.layer["data_for_report"](location.lat, location.lng)
+          obj["baseline"] = baseline
+
+          if(nodeLayer[0].layer.future == true){
+            let future = await nodeLayer[0].layer.layers.future.layer["data_for_report"](location.lat, location.lng)
+            obj["future"] = future
+
+          }
+
+          this.industry_table.value.push(obj)
+        }
+
+      }
+      else {
+        this.industry_table.header =
+            [{text: "Supplier name", value: "supplier_name"},
+              {text: "Country", value: "country"},
+              {text: "Latitude", value: "lat"},
+              {text: "Longitude", value: "lng"},
+            ]
+      }
+    },
+
+
+    add_identifier: function (category, id){
+      let _this = this
+      category.id = id
+      category.locked = (_this.radio_layers === 2 || _this.radio_layers === null)
+      id++
+
+      if(category.hasOwnProperty("children")){
+        category.children.forEach(subcategory => {
+          id = _this.add_identifier(subcategory, id)
+        })
+
+      }
+
+      return id
+    },
 
     industries_deleted(){ //An industry or assessment has been deleted, if it's the current one return to map
       let _this = this
@@ -3853,8 +4072,13 @@ export default {
 
     indicator_risk_class: function (id) {
 
+
+
       if (this.industry == null) return
       //risks
+
+
+
       let current_industry_name = this.industry.name
       let industry = this.simple_report_table.value.filter(industry => industry.value == current_industry_name)[0]
       if (industry == null || industry == undefined) return
@@ -3886,6 +4110,7 @@ export default {
       toxicity_load_risk[1] = this.return_avg_risk([delta_eqs_impact, delta_ecotox_impact])
       let effluent_toxicity_risk = [null, null]
       effluent_toxicity_risk[1] = this.return_avg_risk([eqs_impact, ecotox_impact])*/
+
 
 
       let return_color_class = function (value) {
@@ -4108,9 +4333,24 @@ export default {
                   }
                 }
 
-              }
-            }
+              },
+              datalabels: {
+                formatter: function (value, ctx) {
+                  let datasets = ctx.chart.data.datasets;
+                  if (datasets.length > 0) {
+                    let sum = datasets[0].data.map(x => parseFloat(x)).reduce((a, b) => a + b, 0);
+                    let percentage = ((value / sum) * 100).toFixed(2);
+                    if(percentage > 5) {
+                      return percentage + "%"
+                    }else return ''
+                  }
 
+                },
+                color: 'white'
+              },
+
+
+            },
           }
         }
 
@@ -4119,6 +4359,101 @@ export default {
       return {header: [], value: []}
 
     },
+
+    generate_ghg_ratio_table() {
+
+      let _this = this
+
+      if (_this.industry !== null) {
+
+        let emission_table = {
+          header: [{text: "Emissions", value: "value", sortable: false}],
+          value: []
+        }
+
+        let co2 = {value: "CO2 emissions", unit: "kgCO2eq/day"}
+        let ch4 = {
+          value: "CH4 emissions",
+          unit: "kgCO2eq/day",
+          info: "info_electricity"
+        }
+        let n2o = {
+          value: "N2O emissions",
+          unit: "kgCO2eq/day",
+          info: "info_fuel_engines"
+        }
+
+
+        let key = this.industry.name
+        let industries = [this.industry]
+
+        emission_table.header.push({
+          text: "", value: key,
+        })
+        let emissions = metrics.emissions_deglossed(industries)
+
+
+        co2[key] = emissions["co2"]
+        ch4[key] = emissions["ch4"]
+        n2o[key] = emissions["n2o"]
+
+        emission_table.header.push({text: "Unit", value: "unit", sortable: false,})
+        emission_table.value.push(co2)
+        emission_table.value.push(ch4)
+        emission_table.value.push(n2o)
+
+        _this.ghg_ratio_chart = {
+          chartData: {
+            labels: [
+              "CO2 emissions",
+              "CH4 emissions",
+              "N2O emissions",
+            ],
+            datasets: [
+              {
+                backgroundColor: ['#1c195b', '#0095c6', '#5bc9bf', ],
+                data: [co2[key], ch4[key], n2o[key]]
+              }
+            ]
+          },
+          chartOptions: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    return context.label + ": "+context.raw + " kgCO2eq/day"
+                  }
+                }
+
+              },
+              datalabels: {
+                formatter: function (value, ctx) {
+                  let datasets = ctx.chart.data.datasets;
+                  if (datasets.length > 0) {
+                    let sum = datasets[0].data.map(x => parseFloat(x)).reduce((a, b) => a + b, 0);
+                    let percentage = ((value / sum) * 100).toFixed(2);
+                    if(percentage > 5) {
+                      return percentage + "%"
+                    }else return ''
+                  }
+
+                },
+                color: 'white'
+              },
+
+
+            },
+          }
+        }
+
+        return emission_table
+      }
+      return {header: [], value: []}
+
+    },
+
 
     generate_biogas_valorised_table() {
 
@@ -4284,7 +4619,21 @@ export default {
                   }
                 }
 
-              }
+              },
+              datalabels: {
+                formatter: function (value, ctx) {
+                  let datasets = ctx.chart.data.datasets;
+                  if (datasets.length > 0) {
+                    let sum = datasets[0].data.map(x => parseFloat(x)).reduce((a, b) => a + b, 0);
+                    let percentage = ((value / sum) * 100).toFixed(2);
+                    if(percentage > 5) {
+                      return percentage + "%"
+                    }else return ''
+                  }
+
+                },
+                color: 'white'
+              },
             }
           }
         }
@@ -4416,7 +4765,21 @@ export default {
                 }
 
               }
-            }
+            },
+            datalabels: {
+              formatter: function (value, ctx) {
+                let datasets = ctx.chart.data.datasets;
+                if (datasets.length > 0) {
+                  let sum = datasets[0].data.map(x => parseFloat(x)).reduce((a, b) => a + b, 0);
+                  let percentage = ((value / sum) * 100).toFixed(2);
+                  if(percentage > 5) {
+                    return percentage + "%"
+                  }else return ''
+                }
+
+              },
+              color: 'white'
+            },
           }
         }
 
@@ -4637,8 +5000,22 @@ export default {
                   }
                 }
 
-              }
-            }
+              },
+              datalabels: {
+                formatter: function (value, ctx) {
+                  let datasets = ctx.chart.data.datasets;
+                  if (datasets.length > 0) {
+                    let sum = datasets[0].data.map(x => parseFloat(x)).reduce((a, b) => a + b, 0);
+                    let percentage = ((value / sum) * 100).toFixed(2);
+                    if(percentage > 5) {
+                      return percentage + "%"
+                    }else return ''
+                  }
+
+                },
+                color: 'white'
+              },
+            },
           }
         }
 
@@ -5207,7 +5584,9 @@ export default {
           value: []
         }
 
-        this.industry.supply_chain.forEach(supply_chain => {
+        let arr =  [this.industry, ...this.industry.supply_chain]
+
+       arr.forEach(supply_chain => {
           table.value.push({
             supplier_name: supply_chain.name,
             lat: supply_chain.location.lat.toFixed(3),
@@ -5215,7 +5594,6 @@ export default {
             country: utils.get_country_code_from_coordinates(supply_chain.location.lat, supply_chain.location.lng)
 
           })
-
         })
 
 
@@ -5260,10 +5638,22 @@ export default {
     _this.industry_table = _this.generate_industry_table()
     _this.biogas_valorised_table = _this.generate_biogas_valorised_table()
 
+    _this.ghg_ratio_table = _this.generate_ghg_ratio_table()
 
   },
 
   computed: {
+
+    layer_tree: function () {
+      let _this = this
+      let id = 1
+      this.layers.forEach(category => {
+        id = _this.add_identifier(category, id)  //id has the new id to add
+      })
+
+      return this.layers
+    },
+
 
     indicators_industry() {
       return [
@@ -5313,6 +5703,7 @@ export default {
                 {id: 18, name: "Energy use"},
                 {id: 19, name: "Wastewater effluent concentration"},
                 {id: 20, name: "Biogas valorised"},
+                {id: 21, name: "GHG emissions ratio"},
 
               ]
 
@@ -5386,7 +5777,25 @@ table {
 .hover:hover {
   text-decoration: underline;
 }
+.instructions_2{
+  color: grey;
+  font-size: 10px;
+  font-weight: bold;
+  text-align: left !important;
+}
 
+.low {
+  background-color: #529fee;
+}
+.medium {
+  background-color: yellow;
+}
+.high {
+  background-color: orange;
+}
+.very_high {
+  background-color: red;
+}
 
 </style>
 
@@ -5395,4 +5804,3 @@ table {
 
 
 
-</style>

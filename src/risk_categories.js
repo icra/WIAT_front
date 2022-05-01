@@ -132,6 +132,14 @@ let risk_category = {
         else if (value > 100) return red
         return null
     },
+    owr: function(value){
+        if(value < 1) return layers.l
+        else if (value < 2) return layers.lm
+        else if (value < 3) return layers.mh
+        else if (value < 4) return layers.h
+        else if (value >= 4) return layers.eh
+        return null
+    },
     seasonal_variability: function(value){
         if(value < 0.33) return layers.l
         else if (value < 0.66) return layers.lm

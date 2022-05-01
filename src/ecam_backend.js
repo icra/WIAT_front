@@ -128,6 +128,13 @@ export class Industry{
         return sumObjectsByKey(onsite_wwtp, offsite_wwtp, direct_discharge)
     }
 
+    ghg_deglossed(){
+        let onsite_wwtp = this.onsite_wwtp.wwt_KPI_GHG_deglossed()
+        let offsite_wwtp = this.offsite_wwtp.wwt_KPI_GHG_deglossed()
+        let direct_discharge = this.direct_discharge.wwt_KPI_GHG_deglossed()
+        return sumObjectsByKey(onsite_wwtp, offsite_wwtp, direct_discharge)
+    }
+
     emissions_from_supply_chain(){  //kgCO2-eq for supplying materials (supply chain)
 
         //https://storage.googleapis.com/scsc/Green%20Freight/EDF-Green-Freight-Handbook.pdf
@@ -381,6 +388,17 @@ export class Direct_discharge{
         return {elec, fuel, treatment, biog, slu, reuse, disc, total}
     }
 
+    wwt_KPI_GHG_deglossed(){
+        let disc = this.wwt_KPI_GHG_disc()
+
+        let co2 = disc.co2
+        let n2o = disc.n2o
+        let ch4 = disc.ch4
+
+        return {co2, n2o, ch4}
+    }
+
+
     //emissions from water discharged
     wwt_KPI_GHG_disc(){
         let co2   = 0;
@@ -549,6 +567,25 @@ export class WWTP{
 
         return obj
     }
+
+    //GHG separated by CO2, N2O, CH4
+    wwt_KPI_GHG_deglossed(){
+        let elec = this.wwt_KPI_GHG_elec()
+        let fuel = this.wwt_KPI_GHG_fuel()
+        let treatment = this.wwt_KPI_GHG_tre()
+        let biog = this.wwt_KPI_GHG_biog()
+        let slu = this.wwt_KPI_GHG_slu()
+        let reuse = this.wwt_KPI_GHG_reus_trck()
+        let disc = this.wwt_KPI_GHG_disc()
+
+        let arr = [elec, fuel, treatment, biog, slu, reuse, disc]
+        let co2 = arr.map(x => x.co2).sum()
+        let n2o = arr.map(x => x.n2o).sum()
+        let ch4 = arr.map(x => x.ch4).sum()
+
+        return {co2, n2o, ch4}
+    }
+
 
     //emissions from water discharged
     wwt_KPI_GHG_disc(){

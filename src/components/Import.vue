@@ -28,7 +28,7 @@
                             v-on="on"
                             size="20px"
                         >
-                          mdi-information-variant
+                          mdi-information-outline
                         </v-icon>
                       </template>
                       <span>Replace current assessments with imported ones</span>
@@ -49,7 +49,7 @@
                             v-on="on"
                             size="20px"
                         >
-                          mdi-information-variant
+                          mdi-information-outline
                         </v-icon>
                       </template>
                       <span>Add new industries and assessments to the current assessments</span>
@@ -166,7 +166,7 @@
               size="25px"
               style="padding-bottom: 10px"
           >
-            mdi-information-variant
+            mdi-information-outline
           </v-icon>
         </template>
         <span>WIAT has, for some impact indicators, a default ranking, but you can upload custom values (e.g. if the GHG emission is less than X, the impact is low, if it is greater than X, the impact is high).</span>
