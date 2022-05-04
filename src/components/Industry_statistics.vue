@@ -68,6 +68,26 @@
                   <p>Industry has no suppliers</p>
                 </template>
 
+                <template v-slot:item.type="{ item }">
+                  <v-tooltip>
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-icon
+                          v-bind="attrs"
+                          v-on="on"
+
+                      >
+                        mdi-factory
+                      </v-icon>
+                    </template>
+                    <span>Main industry</span>
+                  </v-tooltip>
+                  <v-icon v-else>
+                    mdi-truck
+                  </v-icon>
+
+
+                </template>
+
 
               </v-data-table>
             </v-col>
@@ -3989,11 +4009,15 @@ export default {
   },
   methods: {
 
-
+    prova(a){
+      console.log(a)
+    },
     async layerTreeSelected(nodeLayer){
       if(nodeLayer.length > 0){
         this.industry_table.header =
-          [{text: "Supplier name", value: "supplier_name"},
+          [
+              {text: "Type", value: "type"},
+            {text: "Name", value: "supplier_name"},
             {text: "Country", value: "country"},
             {text: "Latitude", value: "lat"},
             {text: "Longitude", value: "lng"},
@@ -4034,7 +4058,8 @@ export default {
       }
       else {
         this.industry_table.header =
-            [{text: "Supplier name", value: "supplier_name"},
+            [{text: "Type", value: "type"},
+                {text: "Name", value: "supplier_name"},
               {text: "Country", value: "country"},
               {text: "Latitude", value: "lat"},
               {text: "Longitude", value: "lng"},
@@ -5577,7 +5602,9 @@ export default {
       if (_this.industry !== null) {
 
         let table = {
-          header: [{text: "Supplier name", value: "supplier_name"}, {
+          header: [
+            {text: "Type", value: "type"},
+              {text: "Name", value: "supplier_name"}, {
             text: "Country",
             value: "country"
           }, {text: "Latitude", value: "lat"}, {text: "Longitude", value: "lng"}],
