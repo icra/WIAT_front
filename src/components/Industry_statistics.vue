@@ -9,7 +9,7 @@
       >
         <v-tabs-slider color="#b62373"></v-tabs-slider>
 
-        <v-tab style="border-color: #b62373">SUPPLIERS</v-tab>
+        <v-tab style="border-color: #b62373">CONTEXT</v-tab>
         <v-tab style="border-color: #b62373">IMPACT AND LEVERS FOR ACTION</v-tab>
 
 
@@ -67,29 +67,42 @@
                 <template v-slot:no-data>
                   <p>Industry has no suppliers</p>
                 </template>
-
                 <template v-slot:item.type="{ item }">
-                  <v-tooltip>
+                  <v-tooltip left v-if="item.supplier_name == industry.name">
                     <template v-slot:activator="{ on, attrs }">
                       <v-icon
                           v-bind="attrs"
                           v-on="on"
-
                       >
                         mdi-factory
                       </v-icon>
                     </template>
                     <span>Main industry</span>
                   </v-tooltip>
-                  <v-icon v-else>
-                    mdi-truck
-                  </v-icon>
-
+                  <v-tooltip left v-else>
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-icon
+                          v-bind="attrs"
+                          v-on="on"
+                      >
+                        mdi-truck
+                      </v-icon>
+                    </template>
+                    <span>Supplier</span>
+                  </v-tooltip>
 
                 </template>
-
+                <v-icon>
+                  mdi-truck
+                </v-icon>
 
               </v-data-table>
+              <BarChart
+                  v-if="show_context_chart"
+                  style="padding-top: 40px;"
+                  :chart-data="context_chart.chartData"
+                  :chart-options="context_chart.chartOptions"
+              />
             </v-col>
           </v-row>
 
@@ -3808,6 +3821,7 @@ export default {
       delta_ecotox_chart: {chartData: {}, chartOptions: {}},
       delta_ecotox_chip: 0,
 
+      context_chart: {chartData: {}, chartOptions: {}},
 
       delta_eqs_table: {header: [], value: []},
 
@@ -3830,6 +3844,7 @@ export default {
       simple_report_table: {header: [], value: []},
       external_indicators: external_indicators,
       main_tab: 0,
+      show_context_chart: false,
 
       table_title: {
         global_warming_potential: {
@@ -4009,11 +4024,10 @@ export default {
   },
   methods: {
 
-    prova(a){
-      console.log(a)
-    },
     async layerTreeSelected(nodeLayer){
+      this.show_context_chart = false
       if(nodeLayer.length > 0){
+
         this.industry_table.header =
           [
               {text: "Type", value: "type"},
@@ -4033,6 +4047,11 @@ export default {
         let arr =  [this.industry, ...this.industry.supply_chain]
         this.industry_table.value = []
 
+        let chart_label = []
+        let chart_data_baseline = []
+        let chart_data_future = []
+
+
         for(let [i, val] of arr.entries()){
           let location = arr[i].location
 
@@ -4046,14 +4065,59 @@ export default {
           let baseline = await nodeLayer[0].layer.layers.baseline.annual.layer["data_for_report"](location.lat, location.lng)
           obj["baseline"] = baseline
 
+          chart_label.push(val.name)
+          chart_data_baseline.push(baseline)
+
+
+
+
           if(nodeLayer[0].layer.future == true){
             let future = await nodeLayer[0].layer.layers.future.layer["data_for_report"](location.lat, location.lng)
             obj["future"] = future
+            chart_data_future.push(future)
 
           }
 
           this.industry_table.value.push(obj)
         }
+        let unit = await nodeLayer[0].layer.layers.baseline.annual.layer["unit"]()
+        this.context_chart = {
+          chartData: {
+            labels: chart_label,
+            datasets: [
+              {
+                label: "Baseline",
+                data: chart_data_baseline,
+                backgroundColor: '#1c195b',
+              },
+            ]
+          },
+          chartOptions: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    return context.label + ": "+context.raw + " "+unit
+                  }
+                }
+              },
+              datalabels: {
+                color: 'white'
+              },
+            }
+          }
+        }
+        if(chart_data_future.length > 0){
+          this.context_chart.chartData.datasets.push({
+            data: chart_data_future,
+            label: "Future",
+            backgroundColor: '#0095c6'
+          })
+        }
+        this.show_context_chart = true
+
 
       }
       else {

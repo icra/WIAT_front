@@ -636,7 +636,7 @@
                   color="#b62373"
 
               >
-                PLACE SUPPLY CHAIN ON THE MAP
+                PLACE supplier ON THE MAP
               </v-btn>
             </div>
             <div style="margin: 7px; padding: 7px;">
@@ -778,13 +778,13 @@
           <!-- Create supply chain industry -->
           <div v-else-if="right_sidebar_content === 7">
             <div style="margin: 7px; padding: 7px; background-color: white">
-              <h3 style="color: #b62373">Supply chain industry</h3>
+              <h3 style="color: #b62373">Supplier</h3>
               <v-form
                   v-model="new_supply_chain_valid"
               >
                 <v-text-field
                     v-model="supply_chain_name"
-                    label="Supply chain industry name"
+                    label="Supplier name"
                     :rules="[new_supply_chain_rules_name, rules_required]"
 
                 ></v-text-field>
@@ -796,7 +796,7 @@
                     block
                     color="#b62373"
                 >
-                  Add supply chain industry
+                  Add supplier
                 </v-btn>
               </v-form>
 
@@ -806,7 +806,7 @@
           <!-- Edit supply chain industry -->
           <div v-else-if="right_sidebar_content === 8">
             <div style="margin: 7px; padding: 7px; background-color: white">
-              <h3 style="color: #b62373">Edit supply chain (from industry {{ factory_name }})</h3>
+              <h3 style="color: #b62373">Edit supplier (from industry {{ factory_name }})</h3>
               <v-form
                   v-model="new_supply_chain_valid"
               >
@@ -895,13 +895,13 @@ export default {
         new_industry: {v_model: false, text: "New industry added correctly", },
         edit_industry: {v_model: false, text: "Industry edited correctly", },
         delete_industry: {v_model: false, text: "Industry deleted correctly", },
-        delete_sc: {v_model: false, text: "Supply chain industry deleted correctly", },
+        delete_sc: {v_model: false, text: "Supplier deleted correctly", },
         assessment_not_selected: {v_model: false, text: "Can't create industry, please select and assessment first", },
         create_industry_not_in_map: {v_model: false, text: "Can't create industry, please return to the map tab and try again", },
-        place_supply_chain: {v_model: false, text: "Please, indicate the location of the supply chain industry on the map"},
-        new_supply_chain: {v_model: false, text: "Supply chain industry added", },
+        place_supply_chain: {v_model: false, text: "Please, indicate the location of the supplier on the map"},
+        new_supply_chain: {v_model: false, text: "supplier added", },
         wrong_location: {v_model: false, text: "Please select a valid location", },
-        edit_sc: {v_model: false, text: "Supply chain industry edited correctly", },
+        edit_sc: {v_model: false, text: "supplier edited correctly", },
 
 
       },
@@ -1279,9 +1279,10 @@ export default {
       else return 'An industry with same name already exists. '
     },
     new_supply_chain_rules_name(value){
-      return this.created_assessments[this.assessment_expansion_panel].industries[this.selected_industry].supply_chain.filter(industry => {
+      if (this.created_assessments[this.assessment_expansion_panel].industries[this.selected_industry].supply_chain.filter(industry => {
         return industry.name == value
-      }).length == 0
+      }).length == 0 && this.created_assessments[this.assessment_expansion_panel].industries[this.selected_industry].name != value) return true
+      else return "Industry/supplier with same name already exists"
 
     },
     rules_required(value) {  //Rules for creating new factory
@@ -1289,11 +1290,7 @@ export default {
       else return 'Required.'
     },
     edit_industry_rules_name(value){ //Rules for editing industry
-      let industries_with_same_name = this.created_assessments[this.selected_assessment].industries.filter(industry => {
-        return industry.name === value
-      })
-      if (industries_with_same_name.length === 0 || (industries_with_same_name.length === 1 && this.created_assessments[this.selected_assessment].industries[this.selected_industry].name === value)) return true  //If there is an assessment with the same name, must be the edited assessment
-      else return 'An assessment with same name already exists.'
+      return this.new_supply_chain_rules_name(value)
     },
 
 
