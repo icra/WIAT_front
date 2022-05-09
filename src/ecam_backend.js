@@ -69,7 +69,8 @@ export class Industry{
         this.has_offsite_wwtp = null
         this.offsite_wwtp = new WWTP()
         this.offsite_wwtp_type = "Domestic" //Domestic or Industrial
-        this.volume_withdrawn = null   //Amount of water withdrawn from the wb per day(m3/day)
+        this.volume_withdrawn = null   //Amount of superficial water withdrawn from the wb per day(m3/day)
+        this.volume_withdrawn_groundwater = null   //Amount of groundwater water withdrawn from the wb per day(m3/day)
         this.has_direct_discharge = null
         this.direct_discharge = new Direct_discharge()
         this.industry_type = null
@@ -273,7 +274,7 @@ export class Industry{
     }
 
     infl_pollutant_load(pollutant){
-        return this[pollutant]*this.volume_of_water_withdrawn()
+        return this[pollutant]*this.volume_of_surface_water_withdrawn()
     }
 
     generated_pollutant_load(pollutant){
@@ -318,7 +319,15 @@ export class Industry{
         return this.product_produced == null ? 0 : this.product_produced
     }
 
+    //groundwater + superficial
     volume_of_water_withdrawn(){
+        let superficial = this.volume_withdrawn == null ? 0 : this.volume_withdrawn
+        let groundwater = this.volume_withdrawn_groundwater == null ? 0 : this.volume_withdrawn_groundwater
+        return superficial+groundwater
+    }
+
+    //superficial
+    volume_of_surface_water_withdrawn(){
         return this.volume_withdrawn == null ? 0 : this.volume_withdrawn
     }
 

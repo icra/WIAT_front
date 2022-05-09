@@ -60,6 +60,7 @@
                             :hide-default-footer="true"
                             style="border-color: #0AA44A"
                             @click:row="simpleTableRowClick"
+                            :custom-sort="customSort"
                         >
                           <template v-slot:header.owr="{ header }">
                             {{ header.text }}
@@ -769,6 +770,22 @@ export default {
     },
   },
   methods: {
+    customSort(items, index, isDescending) {
+      // The following is informations as far as I researched.
+      // items: 'food' items
+      // index: Enabled sort headers value. (black arrow status).
+      // isDescending: Whether enabled sort headers is desc
+      items.sort((a, b) => {
+        let x1 = parseFloat(a[index[0]])
+        let x2 = parseFloat(b[index[0]])
+        if (isDescending[0]) {
+          return x2 - x1;
+        } else {
+          return x1 - x2;
+        }
+      });
+      return items
+    },
 
     async apply_analysis_global_layers(){
       this.loading_table = true
@@ -953,7 +970,6 @@ export default {
       let equals = function(name1, name2){
         return name1 == name2 || name1 == name2 + " (BAU 2030)"
       }
-
       if (equals(item.layer, "Seasonal variability")){
         return this.risk_categories.seasonal_variability(item[value])
       }else if (equals(item.layer, "Interannual variability")){
@@ -1092,7 +1108,7 @@ export default {
       if(_this.tab !== undefined){
 
         let pollutants_table = {
-          header: [{text: "Name", value: "value"}, {text: "Country", value: "country"}, {text: "Number of suppliers", value: "supply_chain_number", sortable: true}, {text: "Pollution impact", value: "pollution_impact", sortable: false}, {text: "Freshwater impact", value: "freshwater_impact", sortable: false}, {text: "GHG emissions from Wastewater", value: "carbon_impact", sortable: false}, {text: "Overall water risk", value: "owr", sortable: true}],
+          header: [{text: "Name", value: "value", sortable: false}, {text: "Country", value: "country", sortable: false}, {text: "Number of suppliers", value: "supply_chain_number", sortable: true}, {text: "Pollution impact", value: "pollution_impact", sortable: false}, {text: "Freshwater impact", value: "freshwater_impact", sortable: false}, {text: "GHG emissions from Wastewater", value: "carbon_impact", sortable: true}, {text: "Overall water risk", value: "owr", sortable: true}],
           value: []
         }
 

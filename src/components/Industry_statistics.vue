@@ -63,10 +63,11 @@
                   :items="industry_table.value"
                   :hide-default-footer="true"
                   class="expanded_table_hover"
+                  :loading = "loading_context_table"
+                  loading-text="Loading... Please wait"
+                  :custom-sort="customSort"
               >
-                <template v-slot:no-data>
-                  <p>Industry has no suppliers</p>
-                </template>
+
                 <template v-slot:item.type="{ item }">
                   <v-tooltip left v-if="item.supplier_name == industry.name">
                     <template v-slot:activator="{ on, attrs }">
@@ -92,10 +93,124 @@
                   </v-tooltip>
 
                 </template>
-                <v-icon>
-                  mdi-truck
-                </v-icon>
+                <template v-slot:header.overall_water_risk="{ header }">
+                  {{ header.text }}
 
+                  <v-tooltip bottom max-width="700px">
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-icon
+                          small
+                          v-bind="attrs"
+                          v-on="on"
+                      >mdi-information-outline</v-icon>
+                    </template>
+                    <span>
+                      Overall water risk measures all water-related risks of an industry, by aggregating all indicators from the Physical Quantity, Quality and Regulatory & Reputational Risk categories. Higher values indicate higher water risk.
+                    </span>
+                  </v-tooltip>
+
+
+                </template>
+                <template v-slot:header.baseline="{ header }">
+                  {{ header.text }}
+
+                  <v-tooltip bottom max-width="700px">
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-icon
+                          small
+                          v-bind="attrs"
+                          v-on="on"
+                      >mdi-information-outline</v-icon>
+                    </template>
+                    <span>
+                      {{selected_layer.layer.layers.baseline.annual.layer["unit"]()}}
+                    </span>
+                  </v-tooltip>
+
+
+                </template>
+                <template v-slot:header.future="{ header }">
+                  {{ header.text }}
+
+                  <v-tooltip bottom max-width="700px">
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-icon
+                          small
+                          v-bind="attrs"
+                          v-on="on"
+                      >mdi-information-outline</v-icon>
+                    </template>
+                    <span>
+                      {{selected_layer.layer.layers.baseline.annual.layer["unit"]()}}
+                    </span>
+                  </v-tooltip>
+
+
+                </template>
+
+                <template
+                    v-slot:item.overall_water_risk="{ item }"
+                >
+                  <template v-if="get_owr_color(item) != null">
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-chip
+                            :color="get_owr_color(item)[0]"
+                            dark
+                            v-bind="attrs"
+                            v-on="on"
+                            text-color="#1c1c1b"
+                        >
+                          {{ item['overall_water_risk'] }}
+                        </v-chip>
+                      </template>
+                      <span>{{ get_owr_color(item)[1] }}</span>
+                    </v-tooltip>
+                  </template>
+                  <template v-else>
+                    <v-chip
+                        color="transparent"
+                        dark
+                        text-color="#1c1c1b"
+                        class= "chip_no_hover"
+                    >
+                      {{ item['overall_water_risk'] }}
+                    </v-chip>
+                  </template>
+                </template>
+                <template
+                    v-for="value in ['baseline', 'future']"
+                    v-slot:[`item.${value}`]="{ item }"
+                >
+                  <template v-if="getGISLayerColor(item, value) != null">
+                    <v-tooltip bottom>
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-chip
+                            :color="getGISLayerColor(item, value)[0]"
+                            dark
+                            :key="value"
+                            v-bind="attrs"
+                            v-on="on"
+                            text-color="#1c1c1b"
+                        >
+                          {{ item[value] }}
+                        </v-chip>
+                      </template>
+                      <span>{{ getGISLayerColor(item, value)[1] }}</span>
+                    </v-tooltip>
+                  </template>
+                  <template v-else>
+                    <v-chip
+                        color="transparent"
+                        dark
+                        :key="value"
+                        text-color="#1c1c1b"
+                        class= "chip_no_hover"
+                    >
+                      {{ item[value] }}
+                    </v-chip>
+                  </template>
+                </template>
               </v-data-table>
               <BarChart
                   v-if="show_context_chart"
@@ -1233,7 +1348,7 @@
             <b>Where:</b>
             <br>
             <ul>
-              <li><span v-katex="'W_a'"></span>: Amount of water available in the river <b>(streamflow global
+              <li><span v-katex="'W_a'"></span>: Amount of superficial water available <b>(streamflow global
                 indicator)</b></li>
               <li><span v-katex="'W_w'"></span>: Amount of water withdrawn from the river</li>
               <li><span v-katex="'W_{effl}'"></span>: Amount of water discharged into the river by industry</li>
@@ -1329,7 +1444,7 @@
             <ul>
               <li><span v-katex="'T_{ppi}'"></span>: tons of product produced by the industry</li>
 
-              <li><span v-katex="'W_w'"></span>: amount of water that the industry withdraws from the river</li>
+              <li><span v-katex="'W_w'"></span>: amount of water that the industry withdraws (both superficial and groundwater)</li>
             </ul>
           </div>
 
@@ -1769,6 +1884,8 @@
                     kgCO2eq/kgN2O)
                   </li>
                   <li><span v-katex="'CO_2SI'"></span>: Amount of CO2eq emissions due to sludge incineration</li>
+                  <li><span v-katex="'SNCR'"></span>: Is 'SNCR air emissions with urea' used?</li>
+
                 </ul>
                 <br>
                 <b>Reference:</b> <a href="docs/beam_final_report_1432.pdf#page=183" target="_blank">Section 12.10
@@ -1815,6 +1932,8 @@
                     kgCO2eq/kgN2O
                   </li>
                   <li><span v-katex="'CO_2LA'"></span>: Amount of CO2eq emissions due to land application of sludge</li>
+                  <li><span v-katex="'biosolids'"></span>: Amount of solids content of sludge sent to land application</li>
+
                 </ul>
                 <br>
                 <b>Reference:</b> <a href="docs/beam_final_report_1432.pdf#page=188" target="_blank">Section 12.11 "Land
@@ -3663,7 +3782,7 @@
             <ul>
               <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water</li>
               <li><span v-katex="'COD_{effl}'"></span>: load of COD in the effluent</li>
-              <li><span v-katex="'COD_{infl}'"></span>: load of COD in the influent of the industry</li>
+              <li><span v-katex="'COD_{infl}'"></span>:  Industry withdrawal water COD concentration (surface water only) </li>
 
             </ul>
             <br>
@@ -3686,7 +3805,7 @@
             <ul>
               <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water</li>
               <li><span v-katex="'TN_{effl}'"></span>: load of TN in the effluent</li>
-              <li><span v-katex="'TN_{infl}'"></span>: load of TN in the influent of the industry</li>
+              <li><span v-katex="'TN_{infl}'"></span>:  Industry withdrawal water TN concentration (surface water only) </li>
 
             </ul>
             <br>
@@ -3709,7 +3828,7 @@
             <ul>
               <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water</li>
               <li><span v-katex="'TP_{effl}'"></span>: load of TP in the effluent</li>
-              <li><span v-katex="'TP_{infl}'"></span>: load of TP in the influent of the industry</li>
+              <li><span v-katex="'TP_{infl}'"></span>:  Industry withdrawal water TP concentration (surface water only) </li>
 
             </ul>
             <br>
@@ -3744,8 +3863,43 @@
           </div>
 
         </v-dialog>
+        <v-dialog
+            v-model="co2_ghg_ratio_info"
+            width="60%"
+        >
+          <div class="dialog_detail" style="background-color: white">
+            <h3> CO2 emissions </h3>
+            <br>
+            CO2 emissions in the wastewater treatment process.
+            <br>
+            For more information, see Carbon impact.          </div>
 
+        </v-dialog>
+        <v-dialog
+            v-model="n2o_ghg_ratio_info"
+            width="60%"
+        >
+          <div class="dialog_detail" style="background-color: white">
+            <h3> N2O emissions </h3>
+            <br>
+            N2O emissions in the wastewater treatment process.
+            <br>
+            For more information, see Carbon impact.
+          </div>
 
+        </v-dialog>
+        <v-dialog
+            v-model="ch4_ghg_ratio_info"
+            width="60%"
+        >
+          <div class="dialog_detail" style="background-color: white">
+            <h3> CH4 emissions </h3>
+            <br>
+            CH4 emissions in the wastewater treatment process.
+            <br>
+            For more information, see Carbon impact.          </div>
+
+        </v-dialog>
 
 
       </div>
@@ -3796,6 +3950,7 @@ export default {
   props: ['assessment_id', 'industry_id'],
   data() {
     return {
+      selected_layer: null,
       utils,
       assessment: null,
       industry: null,
@@ -3845,6 +4000,7 @@ export default {
       external_indicators: external_indicators,
       main_tab: 0,
       show_context_chart: false,
+      loading_context_table: false,
 
       table_title: {
         global_warming_potential: {
@@ -3896,7 +4052,7 @@ export default {
           avg_treatment_efficiency: "Percentage of treatment efficiency (compared to WWTP influent)",
           impact_biodiversity: "Impact on biodiversity and ecosystems",
           eqs: "Concentration of the pollutants in the effluent (with respect to EQS)",
-          avg_influent_efficiency: "Percentage of treatment efficiency (compared to industry influent)",
+          avg_influent_efficiency: "Percentage of treatment efficiency (compared to intake water)",
           pollution: "Pollution impact",
           energy_used_text: "Energy used",
           ecotoxicology: "Ecotoxicology indicators"
@@ -3987,6 +4143,9 @@ export default {
       info_efficiency_influent_tp: false,
       info_effluent_load_tn: false,
       info_effluent_load_cod: false,
+      co2_ghg_ratio_info: false,
+      n2o_ghg_ratio_info: false,
+      ch4_ghg_ratio_info: false,
       dialog_biogas_stage: 0,
       active_indicator: [],
       open_indicator: [],
@@ -4023,18 +4182,91 @@ export default {
 
   },
   methods: {
+    customSort(items, index, isDescending) {
+      // The following is informations as far as I researched.
+      // items: 'food' items
+      // index: Enabled sort headers value. (black arrow status).
+      // isDescending: Whether enabled sort headers is desc
+      /*items.sort((a, b) => {
+        if (index[0] === 'overall_water_risk') {
+          if (isDescending[0]) {
+            return b.overall_water_risk - a.overall_water_risk;
+          } else {
+            return a.overall_water_risk - b.overall_water_risk;
+          }
+        }
+      });*/
+      items.sort((a, b) => {
+        let x1 = parseFloat(a[index[0]])
+        let x2 = parseFloat(b[index[0]])
+        if (isDescending[0]) {
+          return x2 - x1;
+        } else {
+          return x1 - x2;
+        }
+
+      });
+      return items
+    },
+    getGISLayerColor(item, value){
+      let layer = this.selected_layer.name
+      let equals = function(name1, name2){
+        return name1 == name2 || name1 == name2 + " (Value In Year to 2030 Business as usual)"
+      }
+      if (equals(layer, "Seasonal variability")){
+        return this.risk_categories.seasonal_variability(item[value])
+      }else if (equals(layer, "Interannual variability")){
+        return this.risk_categories.interannual_variability(item[value])
+      }else if (equals(layer, "Water stress")){
+        return this.risk_categories.water_stress(item[value])
+      }else if (equals(layer, "Water depletion")){
+        return this.risk_categories.water_depletion(item[value])
+      }else if (equals(layer, "Aridity index")){
+        return this.risk_categories.aridity_index(item[value])
+      }else if (equals(layer, "Groundwater table decline")){
+        return this.risk_categories.groundwater_table_decline(item[value])
+      }else if (equals(layer, "Riverine flood risk")){
+        return this.risk_categories.riverine_flood_risk(item[value])
+      }else if (equals(layer, "Coastal flood risk")){
+        return this.risk_categories.coastal_flood_risk(item[value])
+      }else if (equals(layer, "Drought risk")){
+        return this.risk_categories.drought_risk(item[value])
+      }else if (equals(layer, "Coastal eutrophication potential")){
+        return this.risk_categories.coastal_eutrophication_potential(item[value])
+      }else if (equals(layer, "Peak RepRisk Country ESG Risk Index")){
+        return this.risk_categories.reprisk(item[value])
+      }else if (equals(layer, "Unimproved/No Sanitation")){
+        return this.risk_categories.no_sanitation(item[value])
+      } else if (equals(layer, "Unimproved/No Drinking Water")){
+        return this.risk_categories.no_drinking(item[value])
+      }
+    },
+
+    get_owr_color(item){
+      return this.risk_categories["owr"](item["overall_water_risk"])
+    },
 
     async layerTreeSelected(nodeLayer){
+      this.selected_layer = null
       this.show_context_chart = false
       if(nodeLayer.length > 0){
+        this.selected_layer = nodeLayer[0]
+        this.loading_context_table = true
 
-        this.industry_table.header =
-          [
-              {text: "Type", value: "type"},
+        let arr =  [this.industry, ...this.industry.supply_chain]
+        for(let [i, val] of arr.entries()) {
+          this.industry_table.value[i]["baseline"] = null
+          this.industry_table.value[i]["future"] = null
+
+        }
+
+        this.industry_table.header = [
+            {text: "Type", value: "type"},
             {text: "Name", value: "supplier_name"},
             {text: "Country", value: "country"},
             {text: "Latitude", value: "lat"},
             {text: "Longitude", value: "lng"},
+            {text: "Overall water risk", value: "overall_water_risk"},
             {text: nodeLayer[0].name+ " (Baseline)", value: "baseline"},
           ]
 
@@ -4044,41 +4276,28 @@ export default {
           )
         }
 
-        let arr =  [this.industry, ...this.industry.supply_chain]
-        this.industry_table.value = []
 
         let chart_label = []
         let chart_data_baseline = []
         let chart_data_future = []
 
-
         for(let [i, val] of arr.entries()){
           let location = arr[i].location
 
-          let obj = {
-            supplier_name: val.name,
-            lat: val.location.lat.toFixed(3),
-            lng: val.location.lng.toFixed(3),
-            country: utils.get_country_code_from_coordinates(val.location.lat, val.location.lng)
-          }
 
           let baseline = await nodeLayer[0].layer.layers.baseline.annual.layer["data_for_report"](location.lat, location.lng)
-          obj["baseline"] = baseline
+          this.industry_table.value[i]["baseline"] = baseline
 
           chart_label.push(val.name)
           chart_data_baseline.push(baseline)
 
 
-
-
           if(nodeLayer[0].layer.future == true){
             let future = await nodeLayer[0].layer.layers.future.layer["data_for_report"](location.lat, location.lng)
-            obj["future"] = future
+            this.industry_table.value[i]["future"] = future
             chart_data_future.push(future)
 
           }
-
-          this.industry_table.value.push(obj)
         }
         let unit = await nodeLayer[0].layer.layers.baseline.annual.layer["unit"]()
         this.context_chart = {
@@ -4099,8 +4318,10 @@ export default {
               tooltip: {
                 callbacks: {
                   label: function(context) {
-                    return context.label + ": "+context.raw + " "+unit
+
+                    return context.label + ": "+context.raw + unit
                   }
+
                 }
               },
               datalabels: {
@@ -4116,7 +4337,9 @@ export default {
             backgroundColor: '#0095c6'
           })
         }
+        this.loading_context_table = false
         this.show_context_chart = true
+
 
 
       }
@@ -4127,6 +4350,7 @@ export default {
               {text: "Country", value: "country"},
               {text: "Latitude", value: "lat"},
               {text: "Longitude", value: "lng"},
+              {text: "Overall water risk", value: "overall_water_risk"}
             ]
       }
     },
@@ -4366,7 +4590,7 @@ export default {
         let industries = [this.industry]
 
         emission_table.header.push({
-          text: "", value: key,
+          text: key, value: key,
         })
         let emissions = metrics.emissions_and_descriptions(industries, 1)
 
@@ -4418,8 +4642,13 @@ export default {
               tooltip: {
                 callbacks: {
                   label: function(context) {
-                    return context.label + ": "+context.raw + " kgCO2eq/day"
+                    let datasets = context.dataset;
+                    let sum = datasets.data.map(x => parseFloat(x)).reduce((a, b) => a + b, 0);
+                    let percentage = ((context.raw / sum) * 100).toFixed(2);
+
+                    return context.label + ": "+context.raw + " kgCO2eq/day" + " ("+percentage+"%)"
                   }
+
                 }
 
               },
@@ -4460,24 +4689,23 @@ export default {
           value: []
         }
 
-        let co2 = {value: "CO2 emissions", unit: "kgCO2eq/day"}
+        let co2 = {value: "CO2 emissions", unit: "kgCO2eq/day", info: "co2_ghg_ratio_info"}
         let ch4 = {
           value: "CH4 emissions",
           unit: "kgCO2eq/day",
-          info: "info_electricity"
+          info: "ch4_ghg_ratio_info"
         }
         let n2o = {
           value: "N2O emissions",
           unit: "kgCO2eq/day",
-          info: "info_fuel_engines"
+          info: "n2o_ghg_ratio_info"
         }
-
 
         let key = this.industry.name
         let industries = [this.industry]
 
         emission_table.header.push({
-          text: "", value: key,
+          text: key, value: key,
         })
         let emissions = metrics.emissions_deglossed(industries)
 
@@ -4512,8 +4740,13 @@ export default {
               tooltip: {
                 callbacks: {
                   label: function(context) {
-                    return context.label + ": "+context.raw + " kgCO2eq/day"
+                    let datasets = context.dataset;
+                    let sum = datasets.data.map(x => parseFloat(x)).reduce((a, b) => a + b, 0);
+                    let percentage = ((context.raw / sum) * 100).toFixed(2);
+
+                    return context.label + ": "+context.raw + " kgCO2eq/day" + " ("+percentage+"%)"
                   }
+
                 }
 
               },
@@ -4560,7 +4793,7 @@ export default {
         let industries = [this.industry]
 
         emission_table.header.push({
-          text: "", value: key,
+          text: key, value: key,
         })
         let emissions = metrics.emissions_and_descriptions(industries, 1)
 
@@ -4704,8 +4937,13 @@ export default {
               tooltip: {
                 callbacks: {
                   label: function(context) {
-                    return context.label + ": "+context.raw + " gPO4eq/m3"
+                    let datasets = context.dataset;
+                    let sum = datasets.data.map(x => parseFloat(x)).reduce((a, b) => a + b, 0);
+                    let percentage = ((context.raw / sum) * 100).toFixed(2);
+
+                    return context.label + ": "+context.raw + " gPO4/m3" + " ("+percentage+"%)"
                   }
+
                 }
 
               },
@@ -4736,7 +4974,6 @@ export default {
     generate_ecotoxicity_table() {
 
       let _this = this
-
 
       if (_this.industry !== null) {
 
@@ -4849,25 +5086,32 @@ export default {
               tooltip: {
                 callbacks: {
                   label: function(context) {
-                    return context.label + ": "+context.raw + " TU/day"
-                  }
-                }
+                    let datasets = context.dataset;
+                    let sum = datasets.data.map(x => parseFloat(x)).reduce((a, b) => a + b, 0);
+                    let percentage = ((context.raw / sum) * 100).toFixed(2);
 
-              }
-            },
-            datalabels: {
-              formatter: function (value, ctx) {
-                let datasets = ctx.chart.data.datasets;
-                if (datasets.length > 0) {
-                  let sum = datasets[0].data.map(x => parseFloat(x)).reduce((a, b) => a + b, 0);
-                  let percentage = ((value / sum) * 100).toFixed(2);
-                  if(percentage > 5) {
-                    return percentage + "%"
-                  }else return ''
+                    return context.label + ": "+context.raw + " TU/day" + " ("+percentage+"%)"
+                  }
+
                 }
 
               },
-              color: 'white'
+              datalabels: {
+                formatter: function (value, ctx) {
+                  let datasets = ctx.chart.data.datasets;
+                  if (datasets.length > 0) {
+                    let sum = datasets[0].data.map(x => parseFloat(x)).reduce((a, b) => a + b, 0);
+                    let percentage = ((value / sum) * 100).toFixed(2);
+                    if(percentage > 5) {
+
+                      return percentage + "%"
+                    }else return ''
+                  }
+
+                },
+                color: 'white'
+              },
+
             },
           }
         }
@@ -5085,7 +5329,11 @@ export default {
               tooltip: {
                 callbacks: {
                   label: function(context) {
-                    return context.label + ": "+context.raw + " TU/day"
+                    let datasets = context.dataset;
+                    let sum = datasets.data.map(x => parseFloat(x)).reduce((a, b) => a + b, 0);
+                    let percentage = ((context.raw / sum) * 100).toFixed(2);
+
+                    return context.label + ": "+context.raw + " TU/day" + " ("+percentage+"%)"
                   }
                 }
 
@@ -5659,37 +5907,38 @@ export default {
 
     },
 
-    generate_industry_table() {
+    async generate_industry_table() {
 
       let _this = this
 
       if (_this.industry !== null) {
-
         let table = {
           header: [
             {text: "Type", value: "type"},
               {text: "Name", value: "supplier_name"}, {
             text: "Country",
             value: "country"
-          }, {text: "Latitude", value: "lat"}, {text: "Longitude", value: "lng"}],
+          }, {text: "Latitude", value: "lat"}, {text: "Longitude", value: "lng"}, {text: "Overall water risk", value: "overall_water_risk"}],
           value: []
         }
 
         let arr =  [this.industry, ...this.industry.supply_chain]
 
-       arr.forEach(supply_chain => {
-          table.value.push({
+       for (let supply_chain of arr){
+
+         //calcular overall water index
+         let owr = await utils.overall_water_risk(supply_chain.location.lat, supply_chain.location.lng)
+         owr = owr.toFixed(3)
+         table.value.push({
             supplier_name: supply_chain.name,
             lat: supply_chain.location.lat.toFixed(3),
             lng: supply_chain.location.lng.toFixed(3),
-            country: utils.get_country_code_from_coordinates(supply_chain.location.lat, supply_chain.location.lng)
-
+            country: utils.get_country_code_from_coordinates(supply_chain.location.lat, supply_chain.location.lng),
+            overall_water_risk: owr
           })
-        })
-
-
-        return table
-      } else return {header: [], emissions: []}
+        }
+       return table
+      } else return {header: [], value: []}
 
     },
 
@@ -5726,7 +5975,7 @@ export default {
     _this.delta_ecotox_table = await _this.generate_delta_ecotox_table()
 
     _this.simple_report_table = await _this.generate_simple_report_table()
-    _this.industry_table = _this.generate_industry_table()
+    _this.industry_table = await _this.generate_industry_table()
     _this.biogas_valorised_table = _this.generate_biogas_valorised_table()
 
     _this.ghg_ratio_table = _this.generate_ghg_ratio_table()

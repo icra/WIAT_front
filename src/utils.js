@@ -19,7 +19,7 @@ let utils = {
 
     is_industry_valid(industry){
         if(industry == null || industry == undefined) return false
-        if(industry.volume_withdrawn!=null && industry.product_produced!=null && industry.has_onsite_wwtp!=null && industry.has_offsite_wwtp!=null && industry.has_direct_discharge!=null && industry.industry_type!=null){
+        if(industry.volume_withdrawn!=null && industry.volume_withdrawn_groundwater!=null && industry.product_produced!=null && industry.has_onsite_wwtp!=null && industry.has_offsite_wwtp!=null && industry.has_direct_discharge!=null && industry.industry_type!=null){
             let arr = [true]
             if(industry.has_onsite_wwtp == 1) {
                 let wwtp = industry.onsite_wwtp
@@ -142,7 +142,7 @@ let utils = {
 }
 
 
-async function withdrawn_factor(industries, global_layers){
+async function withdrawn_factor(industries, global_layers){     //S'ha de mirar
 
     let streamflow_value = await streamflow(industries, global_layers) //streamflow (m3/day)
     let water_withdrawn = calculate_water_withdrawn(industries)
@@ -184,6 +184,12 @@ function calculate_water_discharged(industries){
     return industries.map(industry => industry.water_discharged()).sum()
 }
 
+//superficial
+function calculate_surface_water_withdrawn(industries){
+    return industries.map(industry => industry.volume_of_surface_water_withdrawn()).sum()
+}
+
+//Groundwater + superficial
 function calculate_water_withdrawn(industries){
     return industries.map(industry => industry.volume_of_water_withdrawn()).sum()
 }
@@ -206,7 +212,7 @@ async function effl_delta(industries, effl, global_layers){
 
     let water_discharged = calculate_water_discharged(industries)
     let streamflow_value = await streamflow(industries, global_layers) //streamflow (m3/day)
-    let water_withdrawn = calculate_water_withdrawn(industries)
+    let water_withdrawn = calculate_surface_water_withdrawn(industries)
 
     let delta = load / (streamflow_value + water_discharged - water_withdrawn)
 
@@ -341,7 +347,7 @@ let metrics = {
     async available_ratio(global_layers, industries){
 
         let streamflow_value = await streamflow(industries, global_layers) //streamflow (m3/day)
-        let water_withdrawn = calculate_water_withdrawn(industries)
+        let water_withdrawn = calculate_surface_water_withdrawn(industries)
 
 
         let available_ratio = water_withdrawn / streamflow_value

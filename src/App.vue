@@ -320,7 +320,14 @@
                   @click.native.stop
               >
                 <v-expansion-panel-header disable-icon-rotate style="background-color: #c4c4d4">
-                  <b>{{ assessment.name }}</b>
+                  <span>
+                    <b>{{ assessment.name }}</b>
+                    <span style="padding-left: 15px; font-size: 12px; font-weight: bold; color: #1C195B" v-if="assessment_index == assessment_expansion_panel">
+                      CURRENT
+                    </span>
+
+                  </span>
+
                   <template v-slot:actions>
                     <v-tooltip bottom>
                       <template v-slot:activator="{ on, attrs }">
@@ -351,8 +358,6 @@
 
                     </v-tooltip>
 
-
-
                     <v-tooltip bottom>
                       <template v-slot:activator="{ on, attrs }">
                         <v-hover v-slot:default="{ hover }">
@@ -371,7 +376,6 @@
                   </template>
                 </v-expansion-panel-header>
                 <v-expansion-panel-content v-if="created_assessments[assessment_index].industries.length > 0" >
-
                   <div
                       v-for="(industry,industry_index ) in created_assessments[assessment_index].industries"
                       :key="industry.name"
@@ -382,7 +386,12 @@
                     <v-hover v-slot:default="{ hover }">
                       <div style="padding: 7px 26px 7px 35px; display: flex; align-items: flex-end; width: 100%;" :class="{ 'hover_industry': hover }">
                         <div >
-                          {{industry.name}}
+                          <span>
+                            {{industry.name}}
+                          </span>
+                          <span style="padding-left: 15px; font-size: 12px; font-weight: bold; color: #1C195B" v-if="selected_assessment == assessment_index && industry_index == selected_industry && rightMenu && right_sidebar_content">
+                            CURRENT
+                          </span>
                         </div>
                         <div style="flex-grow: 1; display: block;">
                           <v-icon
@@ -406,6 +415,20 @@
 
           </div>
           <div style="padding-bottom: 20px; min-width: 100px; margin-top: 10px">
+            <div v-if="show_tip" style="margin-bottom: 20px; padding: 20px; border-color: #1C195B; border-size: 4px; border-style: solid; font-size: 13px">
+              <div>
+                Click the button below to start a new assessment. Once created, select it from the list above, and click on the map to create an industry. With the industry created, you can start adding advanced inputs and view statistics. To see a more detailed manual, click on the "DOCUMENTS" tab (at the top of the page).
+              </div>
+              <v-btn
+                  x-small
+                  style="margin-top: 10px"
+                  color="#1C195B"
+                  @click="show_tip = false"
+              >
+                Hide tip
+              </v-btn>
+            </div>
+
             <v-btn
                 style="width: 100%; "
                 @click="open_create_assessment_tab"
@@ -868,6 +891,7 @@ import {Assessment, Industry } from "./ecam_backend";
 export default {
   data () {
     return {
+      show_tip: true,
       tab: null,
       dialog: false,
       secondMenu: true, //Assessment/factory sidebar
@@ -936,6 +960,7 @@ export default {
 
   watch: {
 
+
     dialog_tour: function(opened){
       if(!opened){
         let video = document.querySelector("#video");
@@ -970,7 +995,6 @@ export default {
   },
 
   methods: {
-
 
     add_supply_chain_industry(){
       try {
