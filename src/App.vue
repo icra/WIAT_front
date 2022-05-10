@@ -313,25 +313,32 @@
           <!-- <div style = "overflow-y: auto; height: 75%; max-height: 75%; width: 100%"> -->
           <div style="flex: 2; overflow-y: auto; width: 100%; position: relative; height: 100%" >
 
-            <v-expansion-panels focusable v-model="assessment_expansion_panel">
+            <v-expansion-panels focusable v-model="assessment_expansion_panel" v-if="created_assessments.length > 0">
               <v-expansion-panel
                   v-for="(assessment, assessment_index ) in created_assessments"
                   :key="assessment.name"
                   @click.native.stop
+
               >
-                <v-expansion-panel-header disable-icon-rotate style="background-color: #c4c4d4">
-                  <span>
-                    <b>{{ assessment.name }}</b>
-                    <span style="padding-left: 15px; font-size: 12px; font-weight: bold; color: #1C195B" v-if="assessment_index == assessment_expansion_panel">
-                      CURRENT
-                    </span>
+                <v-tooltip right>
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-expansion-panel-header
+                        disable-icon-rotate
+                        style="background-color: #c4c4d4"
+                        v-bind="attrs"
+                        v-on="on"
+                    >
+                      <span>
+                        <b>{{ assessment.name }}</b>
+                        <span style="padding-left: 15px; font-size: 12px; font-weight: bold; color: #1C195B" v-if="assessment_index == assessment_expansion_panel">
+                          CURRENT
+                        </span>
 
-                  </span>
-
-                  <template v-slot:actions>
-                    <v-tooltip bottom>
-                      <template v-slot:activator="{ on, attrs }">
-                        <v-hover  v-slot:default="{ hover }" style="margin-right: 10px">
+                      </span>
+                      <template v-slot:actions>
+                        <v-tooltip bottom>
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-hover  v-slot:default="{ hover }" style="margin-right: 10px">
                           <span>
                             <v-icon
                                 v-bind="attrs"
@@ -351,30 +358,33 @@
                           </v-icon>
 
                           </span>
-                        </v-hover>
+                            </v-hover>
+                          </template>
+                          <span v-if="assessment_active[assessment_index]">Hide</span>
+                          <span v-else>Show</span>
+
+                        </v-tooltip>
+
+                        <v-tooltip bottom>
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-hover v-slot:default="{ hover }">
+                              <v-icon
+                                  v-bind="attrs"
+                                  v-on="on"
+                                  class="icon_clickable" :color="hover ? '#555283' : '#1C195B'" @click="open_edit_assessment_tab(assessment_index)" @click.native.stop>
+                                mdi-cog
+                              </v-icon>
+                            </v-hover>
+                          </template>
+                          <span>Edit assessment</span>
+                        </v-tooltip>
+
+
                       </template>
-                      <span v-if="assessment_active[assessment_index]">Hide</span>
-                      <span v-else>Show</span>
-
-                    </v-tooltip>
-
-                    <v-tooltip bottom>
-                      <template v-slot:activator="{ on, attrs }">
-                        <v-hover v-slot:default="{ hover }">
-                          <v-icon
-                              v-bind="attrs"
-                              v-on="on"
-                              class="icon_clickable" :color="hover ? '#555283' : '#1C195B'" @click="open_edit_assessment_tab(assessment_index)" @click.native.stop>
-                            mdi-cog
-                          </v-icon>
-                        </v-hover>
-                      </template>
-                      <span>Edit assessment</span>
-                    </v-tooltip>
-
-
+                    </v-expansion-panel-header>
                   </template>
-                </v-expansion-panel-header>
+                  <span>Select assessment</span>
+                </v-tooltip>
                 <v-expansion-panel-content v-if="created_assessments[assessment_index].industries.length > 0" >
                   <div
                       v-for="(industry,industry_index ) in created_assessments[assessment_index].industries"
@@ -383,35 +393,50 @@
                       @click = "open_edit_industry_tab(assessment_index, industry_index)"
 
                   >
-                    <v-hover v-slot:default="{ hover }">
-                      <div style="padding: 7px 26px 7px 35px; display: flex; align-items: flex-end; width: 100%;" :class="{ 'hover_industry': hover }">
-                        <div >
+                    <v-tooltip right>
+                      <template v-slot:activator="{ on, attrs }">
+                        <v-hover
+                            v-slot:default="{ hover }">
+                          <div style="padding: 7px 26px 7px 35px; display: flex; align-items: flex-end; width: 100%;" :class="{ 'hover_industry': hover }"
+                               v-bind="attrs"
+                               v-on="on"
+                          >
+                            <div >
                           <span>
                             {{industry.name}}
                           </span>
-                          <span style="padding-left: 15px; font-size: 12px; font-weight: bold; color: #1C195B" v-if="selected_assessment == assessment_index && industry_index == selected_industry && rightMenu && right_sidebar_content">
+                              <span style="padding-left: 15px; font-size: 12px; font-weight: bold; color: #1C195B" v-if="selected_assessment == assessment_index && industry_index == selected_industry && rightMenu && right_sidebar_content">
                             CURRENT
                           </span>
-                        </div>
-                        <div style="flex-grow: 1; display: block;">
-                          <v-icon
-                              style="float: right; margin-right: 3px; padding-bottom: 3px"
-                              color="#1C195B"
-                              size="18px"
-                              class="icon_clickable"
-                          >
-                            mdi-circle-edit-outline
-                          </v-icon>
-                        </div>
-                      </div>
-                    </v-hover>
+                            </div>
+                            <div style="flex-grow: 1; display: block;">
+                              <v-icon
+                                  style="float: right; margin-right: 3px; padding-bottom: 3px"
+                                  color="#1C195B"
+                                  size="18px"
+                              >
+                                mdi-factory
+                              </v-icon>
+                            </div>
+                          </div>
+                        </v-hover>
+
+                      </template>
+                      <span>Select industry</span>
+                    </v-tooltip>
+
 
 
                   </div>
                 </v-expansion-panel-content>
+                <div v-if="created_assessments[assessment_index].industries.length == 0 && assessment_expansion_panel == assessment_index" style="margin: 10px 15px 10px 15px; min-width: 100px; color: #3b3b3b; font-size: 13px">
+                  Click a location on the map where you want to locate the industry
+                </div>
               </v-expansion-panel>
             </v-expansion-panels>
-
+            <div v-else style="margin: 0px 5px 0px 0px; min-width: 100px; color: #3b3b3b; font-size: 13px">
+              Create an assessment by clicking on the button below.
+            </div>
 
           </div>
           <div style="padding-bottom: 20px; min-width: 100px; margin-top: 10px">

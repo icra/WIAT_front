@@ -241,13 +241,20 @@
 
             >
               <template v-slot:prepend="{ item, open }" style="height: 120%; margin-top: -10px; padding-bottom: -30px;">
-                <div
-                    style="width: 5px; margin-left: 40px;"
-                    :class="indicator_risk_class(item)"
-                >
-                  &nbsp
-                </div>
+                <v-tooltip left v-if="indicator_risk_class(item) != null">
+                  <template v-slot:activator="{ on, attrs }">
+                    <div
+                        style="width: 5px; margin-left: 40px;"
+                        :class="indicator_risk_class(item)[0]"
+                        v-bind="attrs"
+                        v-on="on"
+                    >
+                      &nbsp
+                    </div>
 
+                  </template>
+                  <span>{{indicator_risk_class(item)[1]}}</span>
+                </v-tooltip>
               </template>
 
 
@@ -4386,11 +4393,8 @@ export default {
     indicator_risk_class: function (id) {
 
 
-
       if (this.industry == null) return
       //risks
-
-
 
       let current_industry_name = this.industry.name
       let industry = this.simple_report_table.value.filter(industry => industry.value == current_industry_name)[0]
@@ -4427,16 +4431,16 @@ export default {
 
 
       let return_color_class = function (value) {
-        if (value == null) return null
+        if (value == null) return ['no-risk', "Cannot assess impact"]
 
         if (value[1] == "Low impact") {
-          return 'low'
+          return ['low', value[1]]
         } else if (value[1] == "Medium impact") {
-          return "medium"
+          return ["medium", value[1]]
         } else if (value[1] == "High impact") {
-          return "high"
+          return ["high", value[1]]
         } else if (value[1] == "Very high impact") {
-          return "very_high"
+          return ["very_high", value[1]]
         }
         return null
 
@@ -6124,6 +6128,12 @@ table {
   text-align: left !important;
 }
 
+.no-risk {
+  background-color: white;
+  border-color: #1C195B;
+  border-style: solid;
+  border-width: 1px;
+}
 .low {
   background-color: #529fee;
 }
