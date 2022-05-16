@@ -7,11 +7,11 @@ let external_indicators = {
     cdp: {
         "1_2_b": {
             key: "1.2B",
-            text: "What are the total volumes of water withdrawn, discharged, and consumed across all your operations"
+            text: "What are the total volumes of water withdrawn, discharged, and consumed across all your operations",
         },
         "5_1": {
             key: "5.1",
-            text: "For each facility, provide coordinates and water accounting data"
+            text: "For each facility, provide coordinates and water accounting data",
         }
     }
 }

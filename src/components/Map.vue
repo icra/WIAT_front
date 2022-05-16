@@ -1942,7 +1942,7 @@ export default {
 
       temporal_resolution = "Temporal resolution: 2016-2018"
       //this.layers["Peak RepRisk Country ESG Risk Index"].layers.baseline.annual.layer = this.define_carto_layer(baselineRepRiskDataset, baselineRepRiskStyle, "rri_label", own_client, "jsalo", aqueduct_url)
-      this.layers["Peak RepRisk Country ESG Risk Index"].layers.baseline.annual.layer = this.define_carto_layer_v2(baselineRepRiskDataset, baselineRepRiskStyle, "rri_raw", wri_client, "wri-rw", aqueduct_url,temporal_resolution, water_rri_colors, water_rri_labels, -9999)
+      //this.layers["Peak RepRisk Country ESG Risk Index"].layers.baseline.annual.layer = this.define_carto_layer_v2(baselineRepRiskDataset, baselineRepRiskStyle, "rri_raw", wri_client, "wri-rw", aqueduct_url,temporal_resolution, water_rri_colors, water_rri_labels, -9999)
 
 
       //Baseline Water supply

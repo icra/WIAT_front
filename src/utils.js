@@ -411,23 +411,23 @@ let metrics = {
     environmental_quality_standards(industries){
 
         let obj = {
-            diclo: effl_concentration(industries, "wwt_diclo_effl")/0.01,
-            cadmium: effl_concentration(industries, "wwt_cadmium_effl")/0.001,
-            hexaclorobenzene: effl_concentration(industries, "wwt_hexaclorobenzene_effl")/0.0005,
-            mercury: effl_concentration(industries, "wwt_mercury_effl")/0.00007,
-            lead: effl_concentration(industries, "wwt_plomo_effl")/0.0072,
-            nickel: effl_concentration(industries, "wwt_niquel_effl")/0.02,
-            chloroalkanes: effl_concentration(industries, "wwt_chloro_effl")/0.0014,
-            hexaclorobutadie: effl_concentration(industries, "wwt_hexaclorobutadie_effl")/0.0006,
-            nonylphenols: effl_concentration(industries, "wwt_nonilfenols_effl")/0.002,
-            tetracloroetile: effl_concentration(industries, "wwt_tetracloroetile_effl")/0.01,
-            tricloroetile: effl_concentration(industries, "wwt_tricloroetile_effl")/0.01,
+            diclo: 100*effl_concentration(industries, "wwt_diclo_effl")/0.01,
+            cadmium: 100*effl_concentration(industries, "wwt_cadmium_effl")/0.001,
+            hexaclorobenzene: 100*effl_concentration(industries, "wwt_hexaclorobenzene_effl")/0.0005,
+            mercury: 100*effl_concentration(industries, "wwt_mercury_effl")/0.00007,
+            lead: 100*effl_concentration(industries, "wwt_plomo_effl")/0.0072,
+            nickel: 100*effl_concentration(industries, "wwt_niquel_effl")/0.02,
+            chloroalkanes: 100*effl_concentration(industries, "wwt_chloro_effl")/0.0014,
+            hexaclorobutadie: 100*effl_concentration(industries, "wwt_hexaclorobutadie_effl")/0.0006,
+            nonylphenols: 100*effl_concentration(industries, "wwt_nonilfenols_effl")/0.002,
+            tetracloroetile: 100*effl_concentration(industries, "wwt_tetracloroetile_effl")/0.01,
+            tricloroetile: 100*effl_concentration(industries, "wwt_tricloroetile_effl")/0.01,
         }
 
         Object.keys(obj).forEach(pollutant => {
             let value = obj[pollutant]
             if(!isNaN(value)) {
-                obj[pollutant] = value.toExponential(2)
+                obj[pollutant] = value.toFixed(2)
             }
             else obj[pollutant] = "-"
         })
@@ -734,22 +734,22 @@ let metrics = {
     },
     async delta_eqs(industries, global_layers){ //concentration of tu (tu/day)
         let toxic_units = {
-            diclo: await effl_delta(industries, "wwt_diclo_effl", global_layers)/0.01,
-            cadmium: await effl_delta(industries, "wwt_cadmium_effl", global_layers)/0.001,
-            hexaclorobenzene: await effl_delta(industries, "wwt_hexaclorobenzene_effl", global_layers)/0.0005,
-            mercury: await effl_delta(industries, "wwt_mercury_effl", global_layers)/0.00007,
-            lead: await effl_delta(industries, "wwt_plomo_effl", global_layers)/0.0072,
-            nickel: await effl_delta(industries, "wwt_niquel_effl", global_layers)/0.02,
-            chloroalkanes: await effl_delta(industries, "wwt_chloro_effl", global_layers)/0.0014,
-            hexaclorobutadie: await effl_delta(industries, "wwt_hexaclorobutadie_effl", global_layers)/0.0006,
-            nonylphenols: await effl_delta(industries, "wwt_nonilfenols_effl", global_layers)/0.002,
-            tetracloroetile: await effl_delta(industries, "wwt_tetracloroetile_effl", global_layers)/0.01,
-            tricloroetile: await effl_delta(industries, "wwt_tricloroetile_effl", global_layers)/0.01,
+            diclo: await effl_delta(industries, "wwt_diclo_effl", global_layers)*100/0.01,
+            cadmium: await effl_delta(industries, "wwt_cadmium_effl", global_layers)*100/0.001,
+            hexaclorobenzene: await effl_delta(industries, "wwt_hexaclorobenzene_effl", global_layers)*100/0.0005,
+            mercury: await effl_delta(industries, "wwt_mercury_effl", global_layers)*100/0.00007,
+            lead: await effl_delta(industries, "wwt_plomo_effl", global_layers)*100/0.0072,
+            nickel: await effl_delta(industries, "wwt_niquel_effl", global_layers)*100/0.02,
+            chloroalkanes: await effl_delta(industries, "wwt_chloro_effl", global_layers)*100/0.0014,
+            hexaclorobutadie: await effl_delta(industries, "wwt_hexaclorobutadie_effl", global_layers)*100/0.0006,
+            nonylphenols: await effl_delta(industries, "wwt_nonilfenols_effl", global_layers)*100/0.002,
+            tetracloroetile: await effl_delta(industries, "wwt_tetracloroetile_effl", global_layers)*100/0.01,
+            tricloroetile: await effl_delta(industries, "wwt_tricloroetile_effl", global_layers)*100/0.01,
         }
 
         Object.keys(toxic_units).forEach(key => {
             let value = toxic_units[key]
-            if(Number.isFinite(value)) toxic_units[key] = value.toExponential(2)
+            if(Number.isFinite(value)) toxic_units[key] = value.toFixed(2)
             else toxic_units[key] = "-"
         })
 

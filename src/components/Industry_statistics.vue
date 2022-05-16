@@ -244,7 +244,7 @@
                 <v-tooltip left v-if="indicator_risk_class(item) != null">
                   <template v-slot:activator="{ on, attrs }">
                     <div
-                        style="width: 5px; margin-left: 40px;"
+                        style="width: 5px;"
                         :class="indicator_risk_class(item)[0]"
                         v-bind="attrs"
                         v-on="on"
@@ -256,7 +256,21 @@
                   <span>{{indicator_risk_class(item)[1]}}</span>
                 </v-tooltip>
               </template>
-
+              <template v-slot:append="{ item }">
+                <v-tooltip bottom max-width="700px" v-if="item.info">
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-icon
+                        color='#1C195B'
+                        style="padding-right: 10px"
+                        v-bind="attrs"
+                        v-on="on"
+                    >
+                      mdi-information-outline
+                    </v-icon>
+                  </template>
+                  <span>{{ item.info }}</span>
+                </v-tooltip>
+              </template>
 
             </v-treeview>
           </v-col>
@@ -390,10 +404,46 @@
 
                 </div>
                 <div v-else-if="active_indicator[0] == 4">
+                  <v-chip-group
+                      mandatory
+                      v-model="delta_eqs_chip"
+                  >
+                    <v-chip
+                        color="primary"
+                        outlined
+                        class="ma-2"
+                        pill
+                    >
+                      <v-icon left>
+                        mdi-chart-pie
+                      </v-icon>
+                      Chart
+                    </v-chip>
+
+                    <v-chip
+                        color="primary"
+                        outlined
+                        pill
+                        class="ma-2"
+                    >
+                      <v-icon left>
+                        mdi-table
+                      </v-icon>
+                      Table
+
+                    </v-chip>
+                  </v-chip-group>
+                  <BarChart
+                      style="padding-top: 40px;"
+                      :chart-data="delta_eqs_chart.chartData"
+                      :chart-options="delta_eqs_chart.chartOptions"
+                      v-if="delta_eqs_chip == 0"
+                  />
                   <v-data-table
                       :headers="delta_eqs_table.header"
                       :items="delta_eqs_table.value"
                       class="expanded_table_hover"
+                      v-else
 
                       disable-pagination
                       :hide-default-footer="true"
@@ -683,6 +733,42 @@
 
                 </div>
                 <div v-else-if="active_indicator[0] == 7">
+                  <v-chip-group
+                      mandatory
+                      v-model="eqs_chip"
+                  >
+                    <v-chip
+                        color="primary"
+                        outlined
+                        class="ma-2"
+                        pill
+                    >
+                      <v-icon left>
+                        mdi-chart-pie
+                      </v-icon>
+                      Chart
+                    </v-chip>
+
+                    <v-chip
+                        color="primary"
+                        outlined
+                        pill
+                        class="ma-2"
+                    >
+                      <v-icon left>
+                        mdi-table
+                      </v-icon>
+                      Table
+
+                    </v-chip>
+                  </v-chip-group>
+                  <BarChart
+                      style="padding-top: 40px;"
+                      :chart-data="eqs_chart.chartData"
+                      :chart-options="eqs_chart.chartOptions"
+                      v-if="eqs_chip == 0"
+                  />
+
                   <v-data-table
                       :headers="eqs_table.header"
                       :items="eqs_table.value"
@@ -690,6 +776,7 @@
                       :hide-default-footer="true"
                       dense
                       class="expanded_table_hover"
+                      v-else
                   >
 
                     <template v-slot:item.value="{ item }">
@@ -2868,7 +2955,7 @@
             <h3> Ecotoxicity profile for 1,2-Dichloroethane </h3>
             <br>
             <div
-                v-katex:display="'\\frac{\\sum_{i \\in DP} 1,2-Dichloroethane_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EQS_{1,2-Dichloroethane}}'"></div>
+                v-katex:display="'\\frac{\\sum_{i \\in DP} 1,2-Dichloroethane_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EQS_{1,2-Dichloroethane}} \\cdot 100'"></div>
 
             <b>Where:</b>
             <br>
@@ -2892,7 +2979,7 @@
             <h3> Ecotoxicity profile for cadmium </h3>
             <br>
             <div
-                v-katex:display="'\\frac{\\sum_{i \\in DP} cadmium_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EQS_{cadmium}}'"></div>
+                v-katex:display="'\\frac{\\sum_{i \\in DP} cadmium_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EQS_{cadmium}} \\cdot 100'"></div>
 
             <b>Where:</b>
             <br>
@@ -2916,7 +3003,7 @@
             <h3> Ecotoxicity profile for hexachlorobenzene </h3>
             <br>
             <div
-                v-katex:display="'\\frac{\\sum_{i \\in DP} hexachlorobenzene_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EQS_{hexachlorobenzene}}'"></div>
+                v-katex:display="'\\frac{\\sum_{i \\in DP} hexachlorobenzene_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EQS_{hexachlorobenzene}} \\cdot 100'"></div>
 
             <b>Where:</b>
             <br>
@@ -2940,7 +3027,7 @@
             <h3> Ecotoxicity profile for mercury </h3>
             <br>
             <div
-                v-katex:display="'\\frac{\\sum_{i \\in DP} mercury_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EQS_{mercury} \\cdot }'"></div>
+                v-katex:display="'\\frac{\\sum_{i \\in DP} mercury_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EQS_{mercury} \\cdot } \\cdot 100'"></div>
 
             <b>Where:</b>
             <br>
@@ -2964,7 +3051,7 @@
             <h3> Ecotoxicity profile for lead </h3>
             <br>
             <div
-                v-katex:display="'\\frac{\\sum_{i \\in DP} lead_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EQS_{lead}}'"></div>
+                v-katex:display="'\\frac{\\sum_{i \\in DP} lead_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EQS_{lead}} \\cdot 100'"></div>
 
             <b>Where:</b>
             <br>
@@ -2988,7 +3075,7 @@
             <h3> Ecotoxicity profile for nickel </h3>
             <br>
             <div
-                v-katex:display="'\\frac{\\sum_{i \\in DP} nickel_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EQS_{nickel}}'"></div>
+                v-katex:display="'\\frac{\\sum_{i \\in DP} nickel_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EQS_{nickel}} \\cdot 100'"></div>
 
             <b>Where:</b>
             <br>
@@ -3012,7 +3099,7 @@
             <h3> Ecotoxicity profile for chloroalkanes </h3>
             <br>
             <div
-                v-katex:display="'\\frac{\\sum_{i \\in DP} chloroalkanes_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EQS_{chloroalkanes}}'"></div>
+                v-katex:display="'\\frac{\\sum_{i \\in DP} chloroalkanes_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EQS_{chloroalkanes}} \\cdot 100'"></div>
 
             <b>Where:</b>
             <br>
@@ -3036,7 +3123,7 @@
             <h3> Ecotoxicity profile for hexachlorobutadiene </h3>
             <br>
             <div
-                v-katex:display="'\\frac{\\sum_{i \\in DP} hexachlorobutadiene_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EQS_{hexachlorobutadiene}}'"></div>
+                v-katex:display="'\\frac{\\sum_{i \\in DP} hexachlorobutadiene_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EQS_{hexachlorobutadiene}} \\cdot 100'"></div>
 
             <b>Where:</b>
             <br>
@@ -3060,7 +3147,7 @@
             <h3> Ecotoxicity profile for nonylphenols </h3>
             <br>
             <div
-                v-katex:display="'\\frac{\\sum_{i \\in DP} nonylphenol_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EQS_{nonylphenol} }'"></div>
+                v-katex:display="'\\frac{\\sum_{i \\in DP} nonylphenol_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EQS_{nonylphenol} } \\cdot 100'"></div>
 
             <b>Where:</b>
             <br>
@@ -3084,7 +3171,7 @@
             <h3> Ecotoxicity profile for tetrachloroethylene </h3>
             <br>
             <div
-                v-katex:display="'\\frac{\\sum_{i \\in DP} tetrachloroethylene_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EQS_{tetrachloroethylene}}'"></div>
+                v-katex:display="'\\frac{\\sum_{i \\in DP} tetrachloroethylene_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EQS_{tetrachloroethylene}} \\cdot 100'"></div>
 
             <b>Where:</b>
             <br>
@@ -3108,7 +3195,7 @@
             <h3> Ecotoxicity profile for trichloroethylene </h3>
             <br>
             <div
-                v-katex:display="'\\frac{\\sum_{i \\in DP} trichloroethylene_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EQS_{trichloroethylene}}'"></div>
+                v-katex:display="'\\frac{\\sum_{i \\in DP} trichloroethylene_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EQS_{trichloroethylene}} \\cdot 100'"></div>
 
             <b>Where:</b>
             <br>
@@ -3135,7 +3222,7 @@
             <h3> Ecotoxicity profile for 1,2-Dichloroethane </h3>
             <br>
             <div
-                v-katex:display="' \\frac{ \\sum_{i \\in DP} 1,2-Dichloroethane_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EQS_{1,2-Dichloroethane}} '"></div>
+                v-katex:display="' \\frac{ \\sum_{i \\in DP} 1,2-Dichloroethane_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EQS_{1,2-Dichloroethane}} \\cdot 100'"></div>
 
             <b>Where:</b>
             <br>
@@ -3163,7 +3250,7 @@
             <h3> Ecotoxicity profile for cadmium </h3>
             <br>
             <div
-                v-katex:display="' \\frac{ \\sum_{i \\in DP} cadmium_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EQS_{cadmium}} '"></div>
+                v-katex:display="' \\frac{ \\sum_{i \\in DP} cadmium_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EQS_{cadmium}} \\cdot 100'"></div>
 
             <b>Where:</b>
             <br>
@@ -3191,7 +3278,7 @@
             <h3> Ecotoxicity profile for hexachlorobenzene </h3>
             <br>
             <div
-                v-katex:display="' \\frac{ \\sum_{i \\in DP} hexachlorobenzene_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EQS_{hexachlorobenzene}} '"></div>
+                v-katex:display="' \\frac{ \\sum_{i \\in DP} hexachlorobenzene_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EQS_{hexachlorobenzene}} \\cdot 100'"></div>
 
             <b>Where:</b>
             <br>
@@ -3219,7 +3306,7 @@
             <h3> Ecotoxicity profile for mercury </h3>
             <br>
             <div
-                v-katex:display="' \\frac{ \\sum_{i \\in DP} mercury_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EQS_{mercury}} '"></div>
+                v-katex:display="' \\frac{ \\sum_{i \\in DP} mercury_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EQS_{mercury}} \\cdot 100'"></div>
 
             <b>Where:</b>
             <br>
@@ -3247,7 +3334,7 @@
             <h3> Ecotoxicity profile for lead </h3>
             <br>
             <div
-                v-katex:display="' \\frac{ \\sum_{i \\in DP} lead_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EQS_{lead}} '"></div>
+                v-katex:display="' \\frac{ \\sum_{i \\in DP} lead_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EQS_{lead}} \\cdot 100'"></div>
 
             <b>Where:</b>
             <br>
@@ -3275,7 +3362,7 @@
             <h3> Ecotoxicity profile for nickel </h3>
             <br>
             <div
-                v-katex:display="' \\frac{ \\sum_{i \\in DP} nickel_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EQS_{nickel}} '"></div>
+                v-katex:display="' \\frac{ \\sum_{i \\in DP} nickel_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EQS_{nickel}} \\cdot 100'"></div>
 
             <b>Where:</b>
             <br>
@@ -3303,7 +3390,7 @@
             <h3> Ecotoxicity profile for chloroalkanes </h3>
             <br>
             <div
-                v-katex:display="' \\frac{ \\sum_{i \\in DP} chloroalkanes_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EQS_{chloroalkanes}} '"></div>
+                v-katex:display="' \\frac{ \\sum_{i \\in DP} chloroalkanes_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EQS_{chloroalkanes}} \\cdot 100'"></div>
 
             <b>Where:</b>
             <br>
@@ -3331,7 +3418,7 @@
             <h3> Ecotoxicity profile for hexachlorobutadiene </h3>
             <br>
             <div
-                v-katex:display="' \\frac{ \\sum_{i \\in DP} hexachlorobutadiene_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EQS_{hexachlorobutadiene}} '"></div>
+                v-katex:display="' \\frac{ \\sum_{i \\in DP} hexachlorobutadiene_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EQS_{hexachlorobutadiene}} \\cdot 100'"></div>
 
             <b>Where:</b>
             <br>
@@ -3359,7 +3446,7 @@
             <h3> Ecotoxicity profile for nonylphenols </h3>
             <br>
             <div
-                v-katex:display="' \\frac{ \\sum_{i \\in DP} nonylphenol_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EQS_{nonylphenol}} '"></div>
+                v-katex:display="' \\frac{ \\sum_{i \\in DP} nonylphenol_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EQS_{nonylphenol}} \\cdot 100'"></div>
 
             <b>Where:</b>
             <br>
@@ -3387,7 +3474,7 @@
             <h3> Ecotoxicity profile for tetrachloroethylene </h3>
             <br>
             <div
-                v-katex:display="' \\frac{ \\sum_{i \\in DP} tetrachloroethylene_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EQS_{tetrachloroethylene}} '"></div>
+                v-katex:display="' \\frac{ \\sum_{i \\in DP} tetrachloroethylene_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EQS_{tetrachloroethylene}} \\cdot 100'"></div>
 
             <b>Where:</b>
             <br>
@@ -3415,7 +3502,7 @@
             <h3> Ecotoxicity profile for trichloroethylene </h3>
             <br>
             <div
-                v-katex:display="' \\frac{ \\sum_{i \\in DP} trichloroethylene_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EQS_{trichloroethylene}} '"></div>
+                v-katex:display="' \\frac{ \\sum_{i \\in DP} trichloroethylene_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}} \\cdot \\frac{1}{EQS_{trichloroethylene}} \\cdot 100'"></div>
 
             <b>Where:</b>
             <br>
@@ -3979,6 +4066,10 @@ export default {
       ecotoxicity_chip: 0,
 
       eqs_table: {header: [], value: []},
+      eqs_chart: {chartData: {}, chartOptions: {}},
+      eqs_chip: 0,
+
+
       delta_ecotox_table: {header: [], value: []},
       delta_ecotox_chart: {chartData: {}, chartOptions: {}},
       delta_ecotox_chip: 0,
@@ -3986,6 +4077,8 @@ export default {
       context_chart: {chartData: {}, chartOptions: {}},
 
       delta_eqs_table: {header: [], value: []},
+      delta_eqs_chart: {chartData: {}, chartOptions: {}},
+      delta_eqs_chip: 0,
 
       eutrophication_table: {header: [], value: []},
       eutrophication_chart: {chartData: {}, chartOptions: {}},
@@ -4240,9 +4333,9 @@ export default {
         return this.risk_categories.drought_risk(item[value])
       }else if (equals(layer, "Coastal eutrophication potential")){
         return this.risk_categories.coastal_eutrophication_potential(item[value])
-      }else if (equals(layer, "Peak RepRisk Country ESG Risk Index")){
+      }/*else if (equals(layer, "Peak RepRisk Country ESG Risk Index")){
         return this.risk_categories.reprisk(item[value])
-      }else if (equals(layer, "Unimproved/No Sanitation")){
+      }*/else if (equals(layer, "Unimproved/No Sanitation")){
         return this.risk_categories.no_sanitation(item[value])
       } else if (equals(layer, "Unimproved/No Drinking Water")){
         return this.risk_categories.no_drinking(item[value])
@@ -5139,39 +5232,39 @@ export default {
           value: []
         }
 
-        let dichloroethane = {value: _this.table_title.pollutants.diclo, unit: "-", info: "info_delta_eqs_diclo"}
-        let cadmium = {value: _this.table_title.pollutants.cadmium, unit: "-", info: "info_delta_eqs_cadmium"}
+        let dichloroethane = {value: _this.table_title.pollutants.diclo, unit: "%", info: "info_delta_eqs_diclo"}
+        let cadmium = {value: _this.table_title.pollutants.cadmium, unit: "%", info: "info_delta_eqs_cadmium"}
         let hexachlorobenzene = {
           value: _this.table_title.pollutants.hexaclorobenzene,
-          unit: "-",
+          unit: "%",
           info: "info_delta_eqs_hexaclorobenzene"
         }
-        let mercury = {value: _this.table_title.pollutants.mercury, unit: "-", info: "info_delta_eqs_mercury"}
-        let lead = {value: _this.table_title.pollutants.lead, unit: "-", info: "info_delta_eqs_lead"}
-        let nickel = {value: _this.table_title.pollutants.nickel, unit: "-", info: "info_delta_eqs_nickel"}
+        let mercury = {value: _this.table_title.pollutants.mercury, unit: "%", info: "info_delta_eqs_mercury"}
+        let lead = {value: _this.table_title.pollutants.lead, unit: "%", info: "info_delta_eqs_lead"}
+        let nickel = {value: _this.table_title.pollutants.nickel, unit: "%", info: "info_delta_eqs_nickel"}
         let chloroalkanes = {
           value: _this.table_title.pollutants.chloroalkanes,
-          unit: "-",
+          unit: "%",
           info: "info_delta_eqs_chloroalkanes"
         }
         let hexaclorobutadie = {
           value: _this.table_title.pollutants.hexaclorobutadie,
-          unit: "-",
+          unit: "%",
           info: "info_delta_eqs_hexaclorobutadiene"
         }
         let nonylphenols = {
           value: _this.table_title.pollutants.nonylphenols,
-          unit: "-",
+          unit: "%",
           info: "info_delta_eqs_nonylphenols"
         }
         let tetrachloroethene = {
           value: _this.table_title.pollutants.tetrachloroethene,
-          unit: "-",
+          unit: "%",
           info: "info_delta_eqs_tetrachloroethene"
         }
         let trichloroethylene = {
           value: _this.table_title.pollutants.tricloroetile,
-          unit: "-",
+          unit: "%",
           info: "info_delta_eqs_trychloroethylene"
         }
 
@@ -5210,6 +5303,39 @@ export default {
         pollutants_table.value.push(nonylphenols)
         pollutants_table.value.push(tetrachloroethene)
         pollutants_table.value.push(trichloroethylene)
+
+        this.delta_eqs_chart = {
+          chartData: {
+            labels: [dichloroethane.value, cadmium.value, hexachlorobenzene.value, mercury.value, lead.value, nickel.value, chloroalkanes.value, hexaclorobutadie.value, nonylphenols.value, tetrachloroethene.value, trichloroethylene.value],
+            datasets: [
+              {
+                data: [dichloroethane[key],cadmium[key], hexachlorobenzene[key], mercury[key], lead[key], nickel[key], chloroalkanes[key], hexaclorobutadie[key], nonylphenols[key], tetrachloroethene[key], trichloroethylene[key]],
+                backgroundColor: ['#1c195b', '#0095c6', '#5bc9bf', '#5f89c27', '#ff386b', '#9ebe3f', '#009b77', '#00b140', '#964fe5', '#b62373', '#999999' ]
+              },
+
+            ]
+          },
+          chartOptions: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: false
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    return context.label + ": "+context.raw + "%"
+                  }
+
+                }
+
+              },
+            },
+          }
+
+        }
+
 
         return pollutants_table
       } else return {header: [], emissions: []}
@@ -5378,38 +5504,37 @@ export default {
           value: []
         }
 
-        let dichloroethane = {value: _this.table_title.pollutants.diclo, unit: "-", info: "info_eqs_diclo"}
-        let cadmium = {value: _this.table_title.pollutants.cadmium, unit: "-", info: "info_eqs_cadmium"}
+        let dichloroethane = {value: _this.table_title.pollutants.diclo, unit: "%", info: "info_eqs_diclo"}
+        let cadmium = {value: _this.table_title.pollutants.cadmium, unit: "%", info: "info_eqs_cadmium"}
         let hexachlorobenzene = {
           value: _this.table_title.pollutants.hexaclorobenzene,
-          unit: "-",
+          unit: "%",
           info: "info_eqs_hexaclorobenzene"
         }
-        let mercury = {value: _this.table_title.pollutants.mercury, unit: "-", info: "info_eqs_mercury"}
-        let lead = {value: _this.table_title.pollutants.lead, unit: "-", info: "info_eqs_lead"}
-        let nickel = {value: _this.table_title.pollutants.nickel, unit: "-", info: "info_eqs_nickel"}
+        let mercury = {value: _this.table_title.pollutants.mercury, unit: "%", info: "info_eqs_mercury"}
+        let lead = {value: _this.table_title.pollutants.lead, unit: "%", info: "info_eqs_lead"}
+        let nickel = {value: _this.table_title.pollutants.nickel, unit: "%", info: "info_eqs_nickel"}
         let chloroalkanes = {
           value: _this.table_title.pollutants.chloroalkanes,
-          unit: "-",
+          unit: "%",
           info: "info_eqs_chloroalkanes"
         }
         let hexaclorobutadie = {
           value: _this.table_title.pollutants.hexaclorobutadie,
-          unit: "-",
+          unit: "%",
           info: "info_eqs_hexaclorobutadiene"
         }
-        let nonylphenols = {value: _this.table_title.pollutants.nonylphenols, unit: "-", info: "info_eqs_nonylphenols"}
+        let nonylphenols = {value: _this.table_title.pollutants.nonylphenols, unit: "%", info: "info_eqs_nonylphenols"}
         let tetrachloroethene = {
           value: _this.table_title.pollutants.tetrachloroethene,
-          unit: "-",
+          unit: "%",
           info: "info_eqs_tetrachloroethene"
         }
         let trichloroethylene = {
           value: _this.table_title.pollutants.tricloroetile,
-          unit: "-",
+          unit: "%",
           info: "info_eqs_trychloroethylene"
         }
-
 
         let key = this.industry.name
         let industries = [this.industry]
@@ -5431,9 +5556,7 @@ export default {
         tetrachloroethene[key] = tu.tetracloroetile
         trichloroethylene[key] = tu.tricloroetile
 
-
         pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
-
 
         pollutants_table.value.push(dichloroethane)
         pollutants_table.value.push(cadmium)
@@ -5446,6 +5569,40 @@ export default {
         pollutants_table.value.push(nonylphenols)
         pollutants_table.value.push(tetrachloroethene)
         pollutants_table.value.push(trichloroethylene)
+
+        this.eqs_chart = {
+          chartData: {
+            labels: [dichloroethane.value, cadmium.value, hexachlorobenzene.value, mercury.value, lead.value, nickel.value, chloroalkanes.value, hexaclorobutadie.value, nonylphenols.value, tetrachloroethene.value, trichloroethylene.value],
+            datasets: [
+              {
+                data: [dichloroethane[key],cadmium[key], hexachlorobenzene[key], mercury[key], lead[key], nickel[key], chloroalkanes[key], hexaclorobutadie[key], nonylphenols[key], tetrachloroethene[key], trichloroethylene[key]],
+                backgroundColor: ['#1c195b', '#0095c6', '#5bc9bf', '#5f89c27', '#ff386b', '#9ebe3f', '#009b77', '#00b140', '#964fe5', '#b62373', '#999999' ]
+              },
+
+            ]
+          },
+          chartOptions: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: false
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    return context.label + ": "+context.raw + "%"
+                  }
+
+                }
+
+              },
+
+            },
+          }
+
+        }
+
 
         return pollutants_table
       } else return {header: [], emissions: []}
@@ -6009,20 +6166,22 @@ export default {
               id: 2,
               name: 'Impact',
               children: [
-                {id: 3, name: this.table_title.simple_table.delta_tu,},
-                {id: 4, name: this.table_title.simple_table.delta_eqs,},
-                {id: 5, name: this.table_title.simple_table.eutrophication,},
-                {id: 6, name: this.table_title.simple_table.tu,},
-                {id: 7, name: this.table_title.simple_table.eqs,},
+                {id: 3, name: this.table_title.simple_table.delta_tu, info: "Toxic units in the receiving water body indicates if the concentration after the effluent discharge on the water body exceed the EC50, supposing the receiving water has a concentration of 0. This metric does not calculate values for COD, TN, TP, just for PP. "},
+                {id: 4, name: this.table_title.simple_table.delta_eqs, info: "Increase of the concentration of the pollutants in the receiving water body after discharge (with respect to EQS)"},
+                {id: 5, name: this.table_title.simple_table.eutrophication, info: "Eutrophication potential (EP) is defined as the potential to cause over-fertilization of water and soil, which can result in increased growth of biomass. It will always have positive values; higher values indicate higher impact. It converts the pollutants to PO4 equivalent to calculate the total Eutrophication potential. "},
+                {id: 6, name: this.table_title.simple_table.tu, info: "Toxic units in the effluent aims to calculate haw toxic is industry effluent for the ecosystem. To calculate the ecotoxicity potential, we have used the PP concentrations values from which in 24h cause the deaths or lack of movement of 50% of Daphnia magna individuals. These values (EC50) have been extracted from different studies compiled into two different databases, the ECOTOX Knowledgebase from the United States Environmental Protection Agency (ECOTOX | Home, n.d.) and from the NORMAN Ecotoxicology Database. (NORMAN Ecotoxicology Database, n.d.)\n" +
+                      "This metric has no impact categories because it calculates with respect to the industry effluent and not with respect to the water body.\n"},
+                {id: 7, name: this.table_title.simple_table.eqs, info: "The Environmental Quality Standards (EQS) are the limits approved by the EU’s Water Framework Directive. The directive sets environmental quality standards for priority pollutants (PP) and eight other pollutants. These substances include the metals cadmium, lead, mercury and nickel, and their compounds; benzene; polyaromatic hydrocarbons (PAH); and several pesticides. Several of these priority substances are classed as hazardous. Each PP has a maximum allowable concentration (MAC) for inland surface waters. The metric of impact indicates if the concentration of the pollutant in the industry effluent is higher than the MAC (> 100%) or lower (< 100%). (Priority Substances - Water - Environment - European Commission, n.d.)\n" +
+                      "This metric has no impact categories because it calculates with respect to the industry effluent and not with respect to the water body.  \n"},
               ]
             },
             {
               id: 8,
               name: 'Levers for action',
               children: [
-                {id: 9, name: this.table_title.simple_table.avg_treatment_efficiency},
-                {id: 10, name: this.table_title.simple_table.avg_influent_efficiency},
-                {id: 11, name: this.table_title.simple_table.treated},
+                {id: 9, name: this.table_title.simple_table.avg_treatment_efficiency, info: "This metric indicates what is the percentage of pollutant load that the WWTP eliminates from the industry water."},
+                {id: 10, name: this.table_title.simple_table.avg_influent_efficiency, info: "This metric indicates whether there is an improvement in water quality due to its use by the industry. If the quality of the water after treatment is better than the industry withdrawal water quality (surface water only), then the value of this metric is greater than 100. This is only calculated for COD, TN and TP when the “advanced inputs” provide a value under “Industry withdrawal water quality (surface water only)”"},
+                {id: 11, name: this.table_title.simple_table.treated, info: "This metric indicates the ratio between the water remaining after the industry consumption and the water that is treated in the WWTP. "},
               ]
             },
           ],
@@ -6044,10 +6203,10 @@ export default {
               id: 17,
               name: "Levers for action",
               children: [
-                {id: 18, name: "Energy use"},
-                {id: 19, name: "Wastewater effluent concentration"},
-                {id: 20, name: "Biogas valorised"},
-                {id: 21, name: "GHG emissions ratio"},
+                {id: 18, name: "Energy use", info: "Energy used by the industry to treat a m3 of water"},
+                {id: 19, name: "Wastewater effluent concentration", info: "Concentration of pollutant discharged by the industry"},
+                {id: 20, name: "Biogas valorised", info: "GHG emissions from biogas valorisation"},
+                {id: 21, name: "GHG emissions ratio", info: "Amount of CO2, CH4 and N2O during wastewater treatment process"},
 
               ]
 

@@ -498,7 +498,7 @@ Vue.prototype.$layers_description = [
       },
     ],
   },
-  {
+  /*{
     name: "Reputational risk",
     locked: false,
 
@@ -525,7 +525,7 @@ Vue.prototype.$layers_description = [
         }
       },
     ]
-  },
+  },*/
 ]
 
 

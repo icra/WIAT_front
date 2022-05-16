@@ -154,18 +154,39 @@
             </template>
             <template v-else-if="main_tab == 1" class="report">
               <div style="padding-top: 20px">
-                <div style="width: 90%; margin: auto">
-                  <details>
-                    <summary>
-                      <span class="cdp_key">1.2B</span>
-                      <span class="cdp_description">What are the total volumes of water withdrawn, discharged, and consumed
-                                across all your operations, and how do these volumes compare to the previous
-                                reporting year?
-                      </span>
+                <div style="width: 100%; margin-left: 10px">
+                  <div>
+                    <div class="side_menu_title">
+                      Linking to ESG reporting frameworks
+                    </div>
+                  </div>
+                  <div style="padding: 20px 50px 20px 0px">
+
+                    <span class="instructions_2" style="color: #b62373">
+                      Select ESG reporting frameworks. More frameworks and responses will be added soon!
+                    </span>
+                    <v-sheet>
+                      <v-chip-group
+                          v-model = "selected_esg_frameworks"
+                          multiple
+                          column
+                      >
+                        <v-chip filter style =  "margin-right: 20px">CDP</v-chip>
+                        <v-chip filter style =  "margin-right: 20px">GRI</v-chip>
+                      </v-chip-group>
+                    </v-sheet>
+
+                  </div>
+
+                  <details v-if="selected_esg_frameworks.includes(0)" v-for="key in ['1_2_b', '5_1']">
+                    <summary >
+                      <span class="cdp_key">{{external_indicators["cdp"][key]["key"]}}</span>
+                      <span class="cdp_description">{{external_indicators["cdp"][key]["text"]}}</span>
+
                     </summary>
                     <v-data-table
-                        :headers="cdp_1_2_b.header"
-                        :items="cdp_1_2_b.value"
+                        :headers="external_indicators_table.cdp['_'+key].header"
+                        :items="external_indicators_table.cdp['_'+key].value"
                         disable-pagination
                         :hide-default-footer="true"
                         dense
@@ -254,30 +275,9 @@
 
                     </v-data-table>
                   </details>
+
                 </div>
-                <div style="width: 90%; margin: auto">
-                  <details>
-                    <summary>
-                      <span class="cdp_key">{{external_indicators["cdp"]["5_1"]["key"]}}</span>
-                      <span class="cdp_description">{{external_indicators["cdp"]["5_1"]["text"]}}</span>
-                    </summary>
-                    <v-data-table
-                        :headers="cdp_5_1.header"
-                        :items="cdp_5_1.value"
-                        disable-pagination
-                        :hide-default-footer="true"
-                        dense
-                        style="padding: 20px 20px 20px 20px"
-                    >
-                      <template v-slot:no-data>
-                        <v-progress-linear
-                            indeterminate
-                            color="#1C195B"
-                        ></v-progress-linear>
-                      </template>
-                    </v-data-table>
-                  </details>
-                </div>
+
 
               </div>
             </template>
@@ -605,9 +605,12 @@
 
 <script>
 
+import Vuetify from "vuetify";
+
 let _ = require('lodash');
 import pdfMake from 'pdfmake/build/pdfmake.min'
 import Vue from "vue";
+Vue.use(Vuetify)
 import {utils, metrics} from "../utils"
 import standard_industrial_classification from "../standard_industrial_classification"
 import external_indicators from "../external_indicators"
@@ -639,8 +642,12 @@ export default {
       layers_table: {header: [], value: []},
 
       simple_report_table: {header: [], value: []},
-      cdp_5_1: {header: [], value: []},
-      cdp_1_2_b: {header: [], value: []},
+      external_indicators_table: {
+        cdp: {
+          _1_2_b: {header: [], value: []},
+          _5_1: {header: [], value: []},
+        },
+      },
       external_indicators: external_indicators,
 
       include_future: true,
@@ -706,6 +713,7 @@ export default {
       radio_industry_edit: null,
       industry_clicked: null,
       selected_assessment: null,
+      selected_esg_frameworks: [0],
 
     }
 
@@ -753,8 +761,9 @@ export default {
       let _this = this
       this.layers_table = {header: [], value: []}
       this.simple_report_table = {header: [], value: []}
-      this.cdp_5_1 = {header: [], value: []}
-      this.cdp_1_2_b = {header: [], value: []}
+      this.external_indicators_table.cdp._5_1 = {header: [], value: []}
+      this.external_indicators_table.cdp._1_2_b = {header: [], value: []}
+
 
 
       Vue.nextTick(async function () {
@@ -763,8 +772,8 @@ export default {
         _this.selected_layers.splice(0, _this.selected_layers.length)
         _this.radio_layers = null
         _this.main_tab = 0
-        _this.cdp_5_1 = await _this.generate_cdp_5_1_table()
-        _this.cdp_1_2_b = await _this.generate_cdp_1_2_b_table()
+        _this.external_indicators_table.cdp._5_1 = await _this.generate_cdp_5_1_table()
+        _this.external_indicators_table.cdp._1_2_b = await _this.generate_cdp_1_2_b_table()
 
       })
     },
@@ -834,7 +843,6 @@ export default {
       }
 
     },
-
     async generate_cdp_1_2_b_table() {
       let assessment = this.assessments_with_industries[this.tab]
 
@@ -990,9 +998,9 @@ export default {
         return this.risk_categories.drought_risk(item[value])
       }else if (equals(item.layer, "Coastal eutrophication potential")){
         return this.risk_categories.coastal_eutrophication_potential(item[value])
-      }else if (equals(item.layer, "Peak RepRisk Country ESG Risk Index")){
+      }/*else if (equals(item.layer, "Peak RepRisk Country ESG Risk Index")){
         return this.risk_categories.reprisk(item[value])
-      }else if (equals(item.layer, "Unimproved/No Sanitation")){
+      }*/else if (equals(item.layer, "Unimproved/No Sanitation")){
         return this.risk_categories.no_sanitation(item[value])
       } else if (equals(item.layer, "Unimproved/No Drinking Water")){
         return this.risk_categories.no_drinking(item[value])
@@ -1027,9 +1035,9 @@ export default {
         ret = this.risk_categories.drought_risk(value)
       }else if (equals(layer, "Coastal eutrophication potential")){
         ret = this.risk_categories.coastal_eutrophication_potential(value)
-      }else if (equals(layer, "Peak RepRisk Country ESG Risk Index")){
+      }/*else if (equals(layer, "Peak RepRisk Country ESG Risk Index")){
         ret = this.risk_categories.reprisk(value)
-      }else if (equals(layer, "Unimproved/No Sanitation")){
+      }*/else if (equals(layer, "Unimproved/No Sanitation")){
         ret = this.risk_categories.no_sanitation(value)
       } else if (equals(layer, "Unimproved/No Drinking Water")){
         ret = this.risk_categories.no_drinking(value)
@@ -3284,6 +3292,12 @@ summary::marker {
 
   color: #b62373;
   font-size:22px;
+}
+
+chip_active_class {
+  background-color: #b62373;
+  color: #0A6BB4;
+
 }
 
 

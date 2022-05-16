@@ -422,7 +422,7 @@
                         </v-hover>
 
                       </template>
-                      <span>Select industry</span>
+                      <span>Click to enter or modify data related to the industrial site</span>
                     </v-tooltip>
 
 
@@ -430,7 +430,7 @@
                   </div>
                 </v-expansion-panel-content>
                 <div v-if="created_assessments[assessment_index].industries.length == 0 && assessment_expansion_panel == assessment_index" style="margin: 10px 15px 10px 15px; min-width: 100px; color: #3b3b3b; font-size: 13px">
-                  Click a location on the map where you want to locate the industry
+                  Click on the map to locate the industrial site
                 </div>
               </v-expansion-panel>
             </v-expansion-panels>

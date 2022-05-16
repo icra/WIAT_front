@@ -104,10 +104,10 @@ let risk_category = {
 
     delta_eqs: function(value){
         if(value < 0) return null
-        else if (value < 0.2) return blue
-        else if (value < 1) return yellow
-        else if (value < 2) return orange
-        else if (value >= 2) return red
+        else if (value < 2) return blue
+        else if (value < 100) return yellow
+        else if (value < 200) return orange
+        else if (value >= 20) return red
         return null
     },
     delta_ecotoxicity: function(value){
@@ -220,14 +220,14 @@ let risk_category = {
         else if (value >= 5) return layers.eh
         return null
     },
-    reprisk: function(value){
+    /*reprisk: function(value){
         if(value < 25) return layers.l
         else if (value < 50) return layers.lm
         else if (value < 60) return layers.mh
         else if (value < 75) return layers.h
         else if (value >= 75) return layers.eh
         return null
-    },
+    },*/
     no_drinking: function(value){
         if(value < 2.5) return layers.l
         else if (value < 5) return layers.lm
