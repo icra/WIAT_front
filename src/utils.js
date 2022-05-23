@@ -17,6 +17,23 @@ function sumObjectsByKey(...objs) {
 
 let utils = {
 
+    async water_stress(industries, global_layers){
+        let ws = global_layers["Water stress"].layers.baseline.annual.layer
+        let ws_value = await Promise.all(
+            industries.map(async industry => {
+                if(industry.water_stress == null || industry.water_stress == undefined) {
+                    industry.water_stress = await ws.data_on_point(industry.location.lat, industry.location.lng)
+                }
+                return industry.water_stress
+
+            })) //water stress (%)
+
+        let filtered = ws_value.filter(x => x!= null)
+        return filtered.sum() / filtered.length
+    },
+
+
+
     is_industry_valid(industry){
         if(industry == null || industry == undefined) return false
         if(industry.volume_withdrawn!=null && industry.volume_withdrawn_groundwater!=null && industry.product_produced!=null && industry.has_onsite_wwtp!=null && industry.has_offsite_wwtp!=null && industry.has_direct_discharge!=null && industry.industry_type!=null){
@@ -62,6 +79,11 @@ let utils = {
         return code
     },
 
+    async get_river_basin(lat, lng){
+        let basin = await utils.get_carto_data("hydrobasins_fao_fiona_merged_v01", 'maj_name', lat, lng)
+        return basin
+    },
+
     async get_raster_data(file_name, lat, lng){
         let call = "https://wiat-server.icradev.cat/data_point?filename="+file_name+"&longitude="+lng+"&latitude="+lat
         return axios
@@ -75,6 +97,26 @@ let utils = {
                     else return null
                 }else return null
             })
+    },
+
+    async get_carto_data(dataset, label, lat, lng){
+        return fetch("https://wri-rw.carto.com:443/api/v2/sql?q=select "+label+" from "+dataset+" where ST_Intersects( the_geom, cdb_latlng("+lat+","+lng+"))")
+            // we transform the response from the Fetch API into a JSON format
+            .then(resp => {
+                return resp.json()
+            }).then((response) => {
+                // we get the data from the request response
+                if(response.rows == undefined) return null
+                else if(response.rows[0] == undefined) return null
+                else if(response.rows[0][label] == undefined) return null
+                else return response.rows[0][label]
+
+
+            })
+            .catch(function (error) {
+                // check if the request is returning an error
+                console.log(error)
+            });
     },
 
     async areCoordsLand(lat, lng){
@@ -91,7 +133,6 @@ let utils = {
         if(data !== null) return data
         else return null
     },
-
 
     getRandomColor(){
         let letters = '0123456789ABCDEF';
@@ -189,10 +230,49 @@ function calculate_surface_water_withdrawn(industries){
     return industries.map(industry => industry.volume_of_surface_water_withdrawn()).sum()
 }
 
+//groundwater
+function calculate_groundwater_water_withdrawn(industries){
+    return industries.map(industry => industry.volume_of_groundwater_water_withdrawn()).sum()
+}
+
 //Groundwater + superficial
 function calculate_water_withdrawn(industries){
     return industries.map(industry => industry.volume_of_water_withdrawn()).sum()
 }
+
+async function calculate_water_withdrawn_in_water_stress(industries, global_layers){
+    let volume = 0
+    for(let industry of industries){
+        let water_stress = await has_water_stress([industry], global_layers)
+        if(water_stress == "Yes"){
+            volume += industry.volume_of_water_withdrawn()
+        }
+    }
+    return volume
+}
+
+async function calculate_surface_water_withdrawn_in_water_stress(industries, global_layers){
+    let volume = 0
+    for(let industry of industries){
+        let water_stress = await has_water_stress([industry], global_layers)
+        if(water_stress == "Yes"){
+            volume += industry.volume_of_surface_water_withdrawn()
+        }
+    }
+    return volume
+}
+
+async function calculate_groundwater_water_withdrawn_in_water_stress(industries, global_layers){
+    let volume = 0
+    for(let industry of industries){
+        let water_stress = await has_water_stress([industry], global_layers)
+        if(water_stress == "Yes"){
+            volume += industry.volume_of_groundwater_water_withdrawn()
+        }
+    }
+    return volume
+}
+
 
 function calculate_water_treated(industries){
     return industries.map(industry => industry.volume_of_water_treated()).sum()
@@ -233,29 +313,117 @@ async function streamflow(industries, global_layers){
         })) //streamflow (m3/day)
 
 
-
     return streamflow_value.filter(x => x!= null).sum()
 
 }
+async function groundwater_table_decline(industries, global_layers){
 
-async function water_stress(industries, global_layers){
-
-    let ws = global_layers["Water stress"].layers.baseline.annual.layer
+    let ws = global_layers["Groundwater table decline"].layers.baseline.annual.layer
     let ws_value = await Promise.all(
         industries.map(async industry => {
-            if(industry.water_stress == null) {
-                industry.water_stress = await ws.data_on_point(industry.location.lat, industry.location.lng)
+            if(industry.groundwater_table_decline == null || industry.groundwater_table_decline == undefined) {
+                industry.groundwater_table_decline = await ws.data_on_point(industry.location.lat, industry.location.lng)
             }
-            return industry.water_stress
+            return industry.groundwater_table_decline
 
-        })) //water stress (%)
+        }))
+
+    let filtered = ws_value.filter(x => x!= null)
+    return filtered.sum() / filtered.length
+}
+async function no_sanitation(industries, global_layers){
+
+    let ws = global_layers["Unimproved/No Sanitation"].layers.baseline.annual.layer
+    let ws_value = await Promise.all(
+        industries.map(async industry => {
+            if(industry.no_sanitation == null || industry.no_sanitation == undefined) {
+                industry.no_sanitation = await ws.data_on_point(industry.location.lat, industry.location.lng)
+            }
+            return industry.no_sanitation
+
+        }))
+
+    let filtered = ws_value.filter(x => x!= null)
+    return filtered.sum() / filtered.length
+}
+async function seasonal_variability(industries, global_layers){
+
+    let ws = global_layers["Seasonal variability"].layers.baseline.annual.layer
+    let ws_value = await Promise.all(
+        industries.map(async industry => {
+            if(industry.seasonal_variability == null || industry.seasonal_variability == undefined) {
+                industry.seasonal_variability = await ws.data_on_point(industry.location.lat, industry.location.lng)
+            }
+            return industry.seasonal_variability
+
+        }))
+
+    let filtered = ws_value.filter(x => x!= null)
+    return filtered.sum() / filtered.length
+}
+async function interannual_variability(industries, global_layers){
+
+    let ws = global_layers["Interannual variability"].layers.baseline.annual.layer
+    let ws_value = await Promise.all(
+        industries.map(async industry => {
+            if(industry.interannual_variability == null || industry.interannual_variability == undefined) {
+                industry.interannual_variability = await ws.data_on_point(industry.location.lat, industry.location.lng)
+            }
+            return industry.interannual_variability
+
+        }))
+
+    let filtered = ws_value.filter(x => x!= null)
+    return filtered.sum() / filtered.length
+}
+async function drought_risk(industries, global_layers){
+
+    let ws = global_layers["Drought risk"].layers.baseline.annual.layer
+    let ws_value = await Promise.all(
+        industries.map(async industry => {
+            if(industry.drought_risk == null || industry.drought_risk == undefined) {
+                industry.drought_risk = await ws.data_on_point(industry.location.lat, industry.location.lng)
+            }
+            return industry.drought_risk
+
+        }))
+
+    let filtered = ws_value.filter(x => x!= null)
+    return filtered.sum() / filtered.length
+}
+async function riverine_flood_risk(industries, global_layers){
+
+    let ws = global_layers["Riverine flood risk"].layers.baseline.annual.layer
+    let ws_value = await Promise.all(
+        industries.map(async industry => {
+            if(industry.riverine_flood_risk == null || industry.riverine_flood_risk == undefined) {
+                industry.riverine_flood_risk = await ws.data_on_point(industry.location.lat, industry.location.lng)
+            }
+            return industry.riverine_flood_risk
+
+        }))
+
+    let filtered = ws_value.filter(x => x!= null)
+    return filtered.sum() / filtered.length
+}
+async function coastal_flood_risk(industries, global_layers){
+
+    let ws = global_layers["Coastal flood risk"].layers.baseline.annual.layer
+    let ws_value = await Promise.all(
+        industries.map(async industry => {
+            if(industry.coastal_flood_risk == null || industry.coastal_flood_risk == undefined) {
+                industry.coastal_flood_risk = await ws.data_on_point(industry.location.lat, industry.location.lng)
+            }
+            return industry.coastal_flood_risk
+
+        }))
 
     let filtered = ws_value.filter(x => x!= null)
     return filtered.sum() / filtered.length
 }
 
 async function has_water_stress(industries, global_layers){
-    let ws = await water_stress(industries, global_layers)
+    let ws = await utils.water_stress(industries, global_layers)
     return (ws > 50) ? "Yes" : "No"
 }
 
@@ -283,6 +451,7 @@ function calculate_pollutant_generated(industries, pollutant){
 }
 
 function better_treatment(industries){
+
     let scores = industries.map(industry => {
         let _scores = [0,0]
         if(industry.has_onsite_wwtp == 1){
@@ -298,9 +467,57 @@ function better_treatment(industries){
     else if (Math.max(...scores) == 1) return "Primary"
     else if (Math.max(...scores) == 2) return "Secondary"
     else if (Math.max(...scores) == 3) return "Tertiary"
-
 }
 
+function highest_level_of_treatment(industries){
+
+    let treatments = {
+        "tertiary": {
+            volume: 0,
+            sites: 0
+        },
+        "secondary": {
+            volume: 0,
+            sites: 0
+        },
+        "primary": {
+            volume: 0,
+            sites: 0
+        },
+        "direct_discharge": {
+            volume: 0,
+            sites: 0
+        },
+        "third_party": {
+            volume: 0,
+            sites: 0
+        },
+    }
+
+    for(let industry of industries){
+        if(industry.has_onsite_wwtp == 1 && industry.onsite_wwtp.wwt_treatment_type == 3){
+            treatments.tertiary.volume += industry.onsite_wwtp.wwt_vol_trea
+            treatments.tertiary.sites += 1
+        }else if(industry.has_onsite_wwtp == 1 && industry.onsite_wwtp.wwt_treatment_type == 2){
+            treatments.secondary.volume += industry.onsite_wwtp.wwt_vol_trea
+            treatments.secondary.sites += 1
+        }else if(industry.has_onsite_wwtp == 1 && industry.onsite_wwtp.wwt_treatment_type == 1){
+            treatments.primary.volume += industry.onsite_wwtp.wwt_vol_trea
+            treatments.primary.sites += 1
+        }
+        if(industry.has_direct_discharge == 1){
+            treatments.direct_discharge.volume += industry.direct_discharge.dd_vol_disc
+            treatments.direct_discharge.sites += 1
+        }
+        if(industry.has_onsite_wwtp == 0 && industry.has_offsite_wwtp == 1){
+            treatments.third_party.volume += industry.offsite_wwtp.wwt_vol_trea
+            treatments.third_party.sites += 1
+        }
+    }
+
+    return treatments
+
+}
 
 let metrics = {
 
@@ -663,6 +880,204 @@ let metrics = {
         return reporting_metrics
     },
 
+    async cdp_1_2_d_indicators(industries, global_layers){
+
+        let water_withdrawn_in_water_stress = await calculate_water_withdrawn_in_water_stress(industries, global_layers)
+
+        let percentage = 100*water_withdrawn_in_water_stress/calculate_water_withdrawn(industries)
+        if(Number.isFinite(percentage)){
+            percentage = percentage.toFixed(2)
+        }else{
+            percentage = "-"
+        }
+        let withdrawals_in_water_stress = ""
+        if(percentage == '-'){
+            withdrawals_in_water_stress = "Unknown"
+        }else if(percentage == 0){
+            withdrawals_in_water_stress = "No"
+        }else{
+            withdrawals_in_water_stress = "Yes"
+        }
+
+
+        let reporting_metrics = {
+            "withdrawals_in_water_stress": withdrawals_in_water_stress,
+            "water_stress": percentage,
+            "identification_tool": "WRI Aqueduct",
+        }
+
+        return reporting_metrics
+    },
+
+    cdp_1_2_h_indicators(industries){
+
+        let reporting_metrics = {
+            "surface": 365*0.001*calculate_surface_water_withdrawn(industries),
+            "groundwater": 365*0.001*calculate_groundwater_water_withdrawn(industries),
+        }
+
+        Object.keys(reporting_metrics).forEach(key => {
+            let value = reporting_metrics[key]
+            if(Number.isFinite(value)) reporting_metrics[key] = value.toExponential(2)
+            else reporting_metrics[key] = "-"
+        })
+
+        return reporting_metrics
+    },
+
+    cdp_1_2_i_indicators(industries){
+
+        let reporting_metrics = {
+            "surface": 365*0.001*calculate_water_discharged(industries),
+        }
+
+        Object.keys(reporting_metrics).forEach(key => {
+            let value = reporting_metrics[key]
+            if(Number.isFinite(value)) reporting_metrics[key] = value.toExponential(2)
+            else reporting_metrics[key] = "-"
+        })
+
+        return reporting_metrics
+    },
+
+    cdp_1_2_j_indicators(industries){
+
+        let highest_level = highest_level_of_treatment(industries)
+
+
+        Object.keys(highest_level).forEach(key => {
+            let sites = highest_level[key].sites
+            if(Number.isFinite(sites)) highest_level[key].sites = (100 * sites / industries.length).toFixed(2)
+            else highest_level[key].sites = "-"
+
+            let volume = highest_level[key].volume
+            if(Number.isFinite(volume)) highest_level[key].volume = (365*0.001*volume).toExponential(2)
+            else highest_level[key].volume = "-"
+        })
+
+        return highest_level
+    },
+
+    async cdp_2_1_a_indicators(industries, global_layers){
+        let industries_and_supply_chains = []
+        for(let industry of industries){
+            industries_and_supply_chains.push(industry)
+            for(let sp of industry.supply_chain){
+                industries_and_supply_chains.push(sp)
+            }
+        }
+
+        let high_water_stress = async function(){
+            let values = []
+            for(let site of industries_and_supply_chains){
+                let lat = site.location.lat
+                let lng = site.location.lng
+                let ws = await utils.water_stress([site], global_layers)
+                if(ws > 50){
+                    values.push({
+                        country: utils.get_country_code_from_coordinates(lat, lng),
+                        basin: await utils.get_river_basin(lat, lng),
+                        type: "Chronic physical",
+                        primary: "Water stress"
+                    })
+                }
+            }
+            return values
+        }
+        let high_groundwater_table_decline = async function(){
+            let values = []
+            for(let site of industries_and_supply_chains){
+                let lat = site.location.lat
+                let lng = site.location.lng
+                let ws = await groundwater_table_decline([site], global_layers)
+                if(ws > 40){
+                    values.push({
+                        country: utils.get_country_code_from_coordinates(lat, lng),
+                        basin: await utils.get_river_basin(lat, lng),
+                        type: "Chronic physical",
+                        primary: "Declining water quality"
+                    })
+                }
+            }
+            return values
+        }
+        let poorly_sanitation = async function(){
+            let values = []
+            for(let site of industries_and_supply_chains){
+                let lat = site.location.lat
+                let lng = site.location.lng
+                let ws = await no_sanitation([site], global_layers)
+                if(ws > 10){
+                    values.push({
+                        country: utils.get_country_code_from_coordinates(lat, lng),
+                        basin: await utils.get_river_basin(lat, lng),
+                        type: "Chronic physical",
+                        primary: "Poorly managed sanitation"
+                    })
+                }
+            }
+            return values
+        }
+        let supply_variability = async function(){
+            let values = []
+            for(let site of industries_and_supply_chains){
+                let lat = site.location.lat
+                let lng = site.location.lng
+                let seasonal = await seasonal_variability([site], global_layers)
+                let interannual = await interannual_variability([site], global_layers)
+
+                if(seasonal > 1 || interannual > 0.75){
+                    values.push({
+                        country: utils.get_country_code_from_coordinates(lat, lng),
+                        basin: await utils.get_river_basin(lat, lng),
+                        type: "Chronic physical",
+                        primary: "Seasonal supply variability/inter annual variability"
+                    })
+                }
+            }
+            return values
+        }
+        let drought = async function(){
+            let values = []
+            for(let site of industries_and_supply_chains){
+                let lat = site.location.lat
+                let lng = site.location.lng
+                let risk = await drought_risk([site], global_layers)
+
+                if(risk > 0.6){
+                    values.push({
+                        country: utils.get_country_code_from_coordinates(lat, lng),
+                        basin: await utils.get_river_basin(lat, lng),
+                        type: "Acute physical",
+                        primary: "Drought"
+                    })
+                }
+            }
+            return values
+        }
+        let flood_risk = async function(){
+            let values = []
+            for(let site of industries_and_supply_chains){
+                let lat = site.location.lat
+                let lng = site.location.lng
+                let riverine = await riverine_flood_risk([site], global_layers)
+                let coastal = await coastal_flood_risk([site], global_layers)
+
+                if(riverine > 6/1000 || coastal > 3/10000){
+                    values.push({
+                        country: utils.get_country_code_from_coordinates(lat, lng),
+                        basin: await utils.get_river_basin(lat, lng),
+                        type: "Acute physical",
+                        primary: "Flood (coastal, fluvial, pluvial, groundwater)"
+                    })
+                }
+            }
+            return values
+        }
+
+        let impacts = [...(await high_water_stress()), ...(await high_groundwater_table_decline()), ...(await poorly_sanitation()), ...(await supply_variability()), ...(await drought()),  ...(await flood_risk())]
+        return impacts
+    },
 
     async cdp_5_1_indicators(industries, global_layers){
 
@@ -681,6 +1096,63 @@ let metrics = {
 
         return reporting_metrics
     },
+
+    async gri_303_3(industries, global_layers){
+        let reporting_metrics = [
+            {
+                "all": 365*0.001*calculate_surface_water_withdrawn(industries),
+                "water_stress": 365*0.001*(await calculate_surface_water_withdrawn_in_water_stress(industries, global_layers)),
+                "text": "Surface water (total)"
+            },
+            {
+                "all": 365*0.001*calculate_groundwater_water_withdrawn(industries),
+                "water_stress": 365*0.001*(await calculate_groundwater_water_withdrawn_in_water_stress(industries, global_layers)),
+                "text": "Groundwater (total)"
+            },
+            {
+                "all": 365*0.001*calculate_water_withdrawn(industries),
+                "water_stress": 365*0.001*(await calculate_water_withdrawn_in_water_stress(industries, global_layers)),
+                "text": "Surface water (total) + groundwater (total)"
+            }
+        ]
+
+        reporting_metrics.forEach(obj => {
+            for(let key of ["all", "water_stress"]){
+                let value = obj[key]
+                if(Number.isFinite(value)) obj[key] = value.toExponential(2)
+                else obj[key] = "-"
+            }
+        })
+
+        return reporting_metrics
+
+    },
+
+    async gri_clause_2_2_1(industries, global_layers){
+        let table = [
+            {water_type: "Surface water", },
+            {water_type: "Groundwater", },
+        ]
+        for(let industry of industries) {
+            let ws = (await has_water_stress([industry], global_layers)) == "Yes"
+            if(ws){
+                let surface = 365 * 0.001 * calculate_surface_water_withdrawn(industries)
+                if(Number.isFinite(surface)) surface = surface.toExponential(2)
+                else surface = "-"
+
+                let groundwater = 365 * 0.001 * calculate_groundwater_water_withdrawn(industries)
+                if(Number.isFinite(groundwater)) groundwater = groundwater.toExponential(2)
+                else groundwater = "-"
+
+                table[0][industry.name] = surface
+                table[1][industry.name] = groundwater
+            }
+
+        }
+        return table
+
+    },
+
 
     ecotoxicity_potential_tu(industries) { //concentration of tu (tu/day)
         let toxic_units = {

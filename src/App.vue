@@ -430,7 +430,7 @@
                   </div>
                 </v-expansion-panel-content>
                 <div v-if="created_assessments[assessment_index].industries.length == 0 && assessment_expansion_panel == assessment_index" style="margin: 10px 15px 10px 15px; min-width: 100px; color: #3b3b3b; font-size: 13px">
-                  Click on the map to locate the industrial site
+                  Click on the map to locate the industrial site for which you want to have an assessment
                 </div>
               </v-expansion-panel>
             </v-expansion-panels>

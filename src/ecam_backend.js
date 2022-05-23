@@ -331,6 +331,11 @@ export class Industry{
         return this.volume_withdrawn == null ? 0 : this.volume_withdrawn
     }
 
+    //groundwater
+    volume_of_groundwater_water_withdrawn(){
+        return this.volume_withdrawn_groundwater == null ? 0 : this.volume_withdrawn_groundwater
+    }
+
     volume_of_water_treated(){
         let water_treated = 0
         if(this.has_onsite_wwtp == 1) {
