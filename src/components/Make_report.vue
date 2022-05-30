@@ -182,102 +182,32 @@
                       <span class="cdp_key">W1.2</span>
                       <span class="cdp_description">Across all your operations, what proportion of the following water aspects are regularly measured and monitored?</span>
                     </summary>
-                    <details style="padding-left: 40px" v-if="selected_esg_frameworks.includes(0)" v-for="key in ['1_2_b', '1_2_d', '1_2_h', '1_2_i', '1_2_j']">
-                      <summary >
-                        <span class="cdp_key">{{external_indicators["cdp"][key]["key"]}}</span>
-                        <span class="cdp_description">{{external_indicators["cdp"][key]["text"]}}</span>
-                      </summary>
-                      <v-data-table
-                          :headers="external_indicators_table.cdp['_'+key].header"
-                          :items="external_indicators_table.cdp['_'+key].value"
-                          disable-pagination
-                          :hide-default-footer="true"
-                          dense
-                          style="padding: 20px 20px 20px 20px"
+                    <div v-if="selected_esg_frameworks.includes(0)" style="padding: 10px 0px 20px 40px">
+                      <details v-for="key in ['1_2_b', '1_2_d', '1_2_h', '1_2_i', '1_2_j']">
+                        <summary >
+                          <span class="cdp_key_2">{{external_indicators["cdp"][key]["key"]}}</span>
+                          <span class="cdp_description_2">{{external_indicators["cdp"][key]["text"]}}</span>
+                        </summary>
+                        <v-data-table
+                            :headers="external_indicators_table.cdp['_'+key].header"
+                            :items="external_indicators_table.cdp['_'+key].value"
+                            disable-pagination
+                            :hide-default-footer="true"
+                            dense
+                            style="padding: 20px 20px 20px 20px"
 
-                      >
-
-                        <template v-slot:no-data>
-                          <v-progress-linear
-                              indeterminate
-                              color="#1C195B"
-                          ></v-progress-linear>
-                        </template>
-
-                        <template v-slot:item.value="{ item }">
-                          <v-tooltip bottom max-width="700px" v-if="item.info">
-                            <template v-slot:activator="{ on, attrs }">
-                                      <span>
-                                        {{ item.value + " "}}
-                                        <a target="_blank" :href="item.link_to">
-                                        <span>
-                                          {{ item.link_text}}
-                                        </span>
-                                        </a>
-                                      </span>
-                              {{" "}}
-
-                              <v-icon
-                                  color='#1C195B'
-                                  style="padding-right: 10px"
-                                  v-bind="attrs"
-                                  v-on="on"
-                                  size="18px"
-                              >
-                                mdi-information-outline
-                              </v-icon>
-                            </template>
-                            <span>{{ item.info }}</span>
-                          </v-tooltip>
-                          <span v-else>
-                                    <span>
-                                        {{ item.value + " "}}
-                                        <a target="_blank" :href="item.link_to">
-                                        <span>
-                                          {{ item.link_text}}
-                                        </span>
-                                        </a>
-                                      </span>
-                                  </span>
-                        </template>
-
-                        <template
-                            v-for="value in Object.keys(industries_aggregated)"
-                            v-slot:[`item.${value}`]="{ item }"
                         >
 
-                          <template v-if="getReportingColor(item, value) != null">
-                            <v-tooltip bottom>
-                              <template v-slot:activator="{ on, attrs }">
-                                <v-chip
-                                    :color="getReportingColor(item, value)[0]"
-                                    dark
-                                    :key="value"
-                                    v-bind="attrs"
-                                    v-on="on"
-                                    text-color="#1c1c1b"
-                                >
-                                  {{ item[value] }}
-                                </v-chip>
-                              </template>
-                              <span>{{ getReportingColor(item, value)[1] }}</span>
-                            </v-tooltip>
+                          <template v-slot:no-data>
+                            <v-progress-linear
+                                indeterminate
+                                color="#1C195B"
+                            ></v-progress-linear>
                           </template>
-                          <template v-else>
-                            <v-chip
-                                color="transparent"
-                                dark
-                                :key="value"
-                                text-color="#1c1c1b"
-                                class= "chip_no_hover"
-                            >
-                              {{ item[value] }}
-                            </v-chip>
-                          </template>
-                        </template>
 
-                      </v-data-table>
-                    </details>
+                        </v-data-table>
+                      </details>
+                    </div>
 
                   </details>
                   <details v-if="selected_esg_frameworks.includes(0)" v-for="key in ['2_1_a', '5_1']">
@@ -302,78 +232,6 @@
                         ></v-progress-linear>
                       </template>
 
-                      <template v-slot:item.value="{ item }">
-                        <v-tooltip bottom max-width="700px" v-if="item.info">
-                          <template v-slot:activator="{ on, attrs }">
-                                      <span>
-                                        {{ item.value + " "}}
-                                        <a target="_blank" :href="item.link_to">
-                                        <span>
-                                          {{ item.link_text}}
-                                        </span>
-                                        </a>
-                                      </span>
-                            {{" "}}
-
-                            <v-icon
-                                color='#1C195B'
-                                style="padding-right: 10px"
-                                v-bind="attrs"
-                                v-on="on"
-                                size="18px"
-                            >
-                              mdi-information-outline
-                            </v-icon>
-                          </template>
-                          <span>{{ item.info }}</span>
-                        </v-tooltip>
-                        <span v-else>
-                                    <span>
-                                        {{ item.value + " "}}
-                                        <a target="_blank" :href="item.link_to">
-                                        <span>
-                                          {{ item.link_text}}
-                                        </span>
-                                        </a>
-                                      </span>
-                                  </span>
-                      </template>
-
-                      <template
-                          v-for="value in Object.keys(industries_aggregated)"
-                          v-slot:[`item.${value}`]="{ item }"
-                      >
-
-                        <template v-if="getReportingColor(item, value) != null">
-                          <v-tooltip bottom>
-                            <template v-slot:activator="{ on, attrs }">
-                              <v-chip
-                                  :color="getReportingColor(item, value)[0]"
-                                  dark
-                                  :key="value"
-                                  v-bind="attrs"
-                                  v-on="on"
-                                  text-color="#1c1c1b"
-                              >
-                                {{ item[value] }}
-                              </v-chip>
-                            </template>
-                            <span>{{ getReportingColor(item, value)[1] }}</span>
-                          </v-tooltip>
-                        </template>
-                        <template v-else>
-                          <v-chip
-                              color="transparent"
-                              dark
-                              :key="value"
-                              text-color="#1c1c1b"
-                              class= "chip_no_hover"
-                          >
-                            {{ item[value] }}
-                          </v-chip>
-                        </template>
-                      </template>
-
                     </v-data-table>
                   </details>
                   <details v-if="selected_esg_frameworks.includes(1)">
@@ -381,10 +239,11 @@
                       <span class="cdp_key">[Disclosure 303-3]</span>
                       <span class="cdp_description">Water withdrawal</span>
                     </summary>
-                    <details style="padding-left: 40px" v-if="selected_esg_frameworks.includes(1)" v-for="key in ['303_3', 'clause_2_2_1']">
+                    <div v-if="selected_esg_frameworks.includes(1)" style="padding: 10px 0px 20px 40px">
+                      <details v-if="selected_esg_frameworks.includes(1)" v-for="key in ['303_3', 'clause_2_2_1']">
                       <summary >
-                        <span class="cdp_key">{{external_indicators["gri"][key]["key"]}}</span>
-                        <span class="cdp_description">{{external_indicators["gri"][key]["text"]}}</span>
+                        <span class="cdp_key_2">{{external_indicators["gri"][key]["key"]}}</span>
+                        <span class="cdp_description_2">{{external_indicators["gri"][key]["text"]}}</span>
 
                       </summary>
                       <v-data-table
@@ -404,80 +263,52 @@
                           ></v-progress-linear>
                         </template>
 
-                        <template v-slot:item.value="{ item }">
-                          <v-tooltip bottom max-width="700px" v-if="item.info">
-                            <template v-slot:activator="{ on, attrs }">
-                                      <span>
-                                        {{ item.value + " "}}
-                                        <a target="_blank" :href="item.link_to">
-                                        <span>
-                                          {{ item.link_text}}
-                                        </span>
-                                        </a>
-                                      </span>
-                              {{" "}}
-
-                              <v-icon
-                                  color='#1C195B'
-                                  style="padding-right: 10px"
-                                  v-bind="attrs"
-                                  v-on="on"
-                                  size="18px"
-                              >
-                                mdi-information-outline
-                              </v-icon>
-                            </template>
-                            <span>{{ item.info }}</span>
-                          </v-tooltip>
-                          <span v-else>
-                                    <span>
-                                        {{ item.value + " "}}
-                                        <a target="_blank" :href="item.link_to">
-                                        <span>
-                                          {{ item.link_text}}
-                                        </span>
-                                        </a>
-                                      </span>
-                                  </span>
-                        </template>
-
-                        <template
-                            v-for="value in Object.keys(industries_aggregated)"
-                            v-slot:[`item.${value}`]="{ item }"
-                        >
-
-                          <template v-if="getReportingColor(item, value) != null">
-                            <v-tooltip bottom>
-                              <template v-slot:activator="{ on, attrs }">
-                                <v-chip
-                                    :color="getReportingColor(item, value)[0]"
-                                    dark
-                                    :key="value"
-                                    v-bind="attrs"
-                                    v-on="on"
-                                    text-color="#1c1c1b"
-                                >
-                                  {{ item[value] }}
-                                </v-chip>
-                              </template>
-                              <span>{{ getReportingColor(item, value)[1] }}</span>
-                            </v-tooltip>
-                          </template>
-                          <template v-else>
-                            <v-chip
-                                color="transparent"
-                                dark
-                                :key="value"
-                                text-color="#1c1c1b"
-                                class= "chip_no_hover"
-                            >
-                              {{ item[value] }}
-                            </v-chip>
-                          </template>
-                        </template>
-
                       </v-data-table>
                     </details>
+                    </div>
+                  </details>
+                  <details v-if="selected_esg_frameworks.includes(1)" v-for="key in ['303_4']">
+                    <summary >
+                      <span class="cdp_key">{{external_indicators["gri"][key]["key"]}}</span>
+                      <span class="cdp_description">{{external_indicators["gri"][key]["text"]}}</span>
+
+                    </summary>
+                    <v-data-table
+                        :headers="external_indicators_table.gri['_'+key].header"
+                        :items="external_indicators_table.gri['_'+key].value"
+                        disable-pagination
+                        :hide-default-footer="true"
+                        dense
+                        style="padding: 20px 20px 20px 20px"
+
+                    >
+
+                      <template v-slot:no-data>
+                        <v-progress-linear
+                            indeterminate
+                            color="#1C195B"
+                        ></v-progress-linear>
+                      </template>
+
+                    </v-data-table>
+                    <v-data-table
+                        :headers="external_indicators_table.gri['_303_4_2'].header"
+                        :items="external_indicators_table.gri['_303_4_2'].value"
+                        disable-pagination
+                        :hide-default-footer="true"
+                        dense
+                        style="padding: 20px 20px 20px 20px"
+
+                    >
+                      <template v-slot:no-data>
+                        <v-progress-linear
+                            indeterminate
+                            color="#1C195B"
+                        ></v-progress-linear>
+                      </template>
+
+                    </v-data-table>
+
                   </details>
 
 
@@ -860,8 +691,8 @@ export default {
         gri: {
           _303_3: {header: [], value: []},
           _clause_2_2_1: {header: [], value: []},
-
           _303_4: {header: [], value: []},
+          _303_4_2: {header: [], value: []},
 
         }
       },
@@ -986,7 +817,6 @@ export default {
       this.external_indicators_table.cdp._2_1_a = {header: [], value: []}
       this.external_indicators_table.gri._303_3 = {header: [], value: []}
       this.external_indicators_table.gri._clause_2_2_1 = {header: [], value: []}
-
       this.external_indicators_table.gri._303_4 = {header: [], value: []}
 
 
@@ -1178,6 +1008,10 @@ export default {
         destination: "Fresh surface water",
         volume: indicators.surface,
       })
+      value.push({
+        destination: "Third party sources",
+        volume: indicators.third_party,
+      })
 
       return {
         header, value
@@ -1253,8 +1087,8 @@ export default {
 
       let header = [
         { text: 'Water withdrawal by source', value: 'text' },
-        { text: 'All areas', value: 'all'},
-        { text: 'Areas with water stress', value: 'water_stress'},
+        { text: 'All areas (ML/yr)', value: 'all'},
+        { text: 'Areas with water stress (ML/yr)', value: 'water_stress'},
       ]
 
       let value = await metrics.gri_303_3(assessment.assessment.industries, this.global_layers)
@@ -1276,7 +1110,7 @@ export default {
       for(let industry of assessment.assessment.industries) {
         let ws = await utils.water_stress([industry], this.global_layers)
         if(ws > 50){
-          header.push({text: industry.name, value: industry.name})
+          header.push({text: industry.name + " (ML/yr)", value: industry.name})
         }
       }
       let value = await metrics.gri_clause_2_2_1(assessment.assessment.industries, this.global_layers)
@@ -1291,12 +1125,48 @@ export default {
       let assessment = this.assessments_with_industries[this.tab]
 
       let header = [
-        { text: 'Water withdrawal by source', value: 'text' },
-        { text: 'All areas', value: 'all'},
-        { text: 'Areas with water stress', value: 'water_stress'},
+        { text: 'Water discharge by destination', value: 'text' },
+        { text: 'All areas (ML/yr)', value: 'all'},
+        { text: 'Areas with water stress (ML/yr)', value: 'water_stress'},
       ]
+      let value = await metrics.gri_303_4(assessment.assessment.industries, this.global_layers)
 
-      let value = await metrics.gri_303_3(assessment.assessment.industries, this.global_layers)
+
+      let header_2 = [
+        { text: 'Water discharge by level of treatment', value: 'highest' },
+        { text: 'All areas (ML/yr)', value: 'volume'},
+      ]
+      let value_2 = []
+      let reporting_metrics = metrics.gri_303_4_2(assessment.assessment.industries)
+
+      value_2.push({
+        highest: "Tertiary treatment",
+        volume: reporting_metrics.tertiary.volume,
+        percentage: reporting_metrics.tertiary.sites,
+      })
+      value_2.push({
+        highest: "Secondary treatment",
+        volume: reporting_metrics.secondary.volume,
+        percentage: reporting_metrics.secondary.sites,
+      })
+      value_2.push({
+        highest: "Primary treatment only",
+        volume: reporting_metrics.primary.volume,
+        percentage: reporting_metrics.primary.sites,
+      })
+      value_2.push({
+        highest: "Discharge to the natural environment without treatment",
+        volume: reporting_metrics.direct_discharge.volume,
+        percentage: reporting_metrics.direct_discharge.sites,
+      })
+      value_2.push({
+        highest: "Discharge to a third party without treatment",
+        volume: reporting_metrics.third_party.volume,
+        percentage: reporting_metrics.third_party.sites,
+      })
+
+      this.external_indicators_table.gri._303_4_2.header = header_2
+      this.external_indicators_table.gri._303_4_2.value = value_2
 
 
       return {
@@ -3729,6 +3599,16 @@ table {
   padding-right: 10px;
 }
 .cdp_description {
+  font-weight: bold;
+}
+
+.cdp_key_2 {
+  color: #b62373;
+  font-size: 0.9rem;
+  font-weight: bold;
+  padding-right: 10px;
+}
+.cdp_description_2 {
   font-weight: bold;
 }
 

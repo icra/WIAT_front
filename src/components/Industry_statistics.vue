@@ -1004,9 +1004,41 @@
                     </template>
 
                   </v-data-table>
+                </div>
+                <div v-else-if="active_indicator[0] == 12">
+                  <v-data-table
+                      :headers="concentration_table.header"
+                      :items="concentration_table.value"
+                      disable-pagination
+                      :hide-default-footer="true"
+                      dense
+                      class="expanded_table_hover"
+
+                  >
+
+                    <template v-slot:item.value="{ item }">
+                    <span v-if="item.info">
+                      {{ item.value }}
+                      <v-btn
+                          icon
+                          @click="$data[item.info] = true"
+                          class="icon_clickable"
+                          x-small
+                      >
+                        <v-icon
+                            color='#1C195B'
+                        >
+                          mdi-information-outline
+                        </v-icon>
+                      </v-btn>
+                    </span>
+                      <span v-else>{{ item.value }}</span>
+                    </template>
+
+                  </v-data-table>
 
                 </div>
-                <div v-else-if="active_indicator[0] == 13">
+                <div v-else-if="active_indicator[0] == 14">
                   <v-data-table
                       :headers="water_quantity.header"
                       :items="water_quantity.value"
@@ -1071,7 +1103,7 @@
                   </v-data-table>
 
                 </div>
-                <div v-else-if="active_indicator[0] == 14">
+                <div v-else-if="active_indicator[0] == 15">
                   <v-data-table
                       :headers="freshwater_lever_for_action.header"
                       :items="freshwater_lever_for_action.value"
@@ -1104,7 +1136,7 @@
                   </v-data-table>
 
                 </div>
-                <div v-else-if="active_indicator[0] == 16">
+                <div v-else-if="active_indicator[0] == 17">
 
                   <v-chip-group
                       mandatory
@@ -1217,7 +1249,7 @@
 
 
                 </div>
-                <div v-else-if="active_indicator[0] == 18">
+                <div v-else-if="active_indicator[0] == 19">
                   <v-data-table
                       :headers="energy_use_table.header"
                       :items="energy_use_table.value"
@@ -1251,7 +1283,7 @@
 
                   </v-data-table>
                 </div>
-                <div v-else-if="active_indicator[0] == 19">
+                <div v-else-if="active_indicator[0] == 20">
                   <v-data-table
                       :headers="effluent_load_table.header"
                       :items="effluent_load_table.value"
@@ -1285,7 +1317,7 @@
 
                   </v-data-table>
                 </div>
-                <div v-else-if="active_indicator[0] == 20">
+                <div v-else-if="active_indicator[0] == 21">
                   <v-data-table
                       :headers="biogas_valorised_table.header"
                       :items="biogas_valorised_table.value"
@@ -1319,7 +1351,7 @@
 
                   </v-data-table>
                 </div>
-                <div v-else-if="active_indicator[0] == 21">
+                <div v-else-if="active_indicator[0] == 22">
                   <v-chip-group
                       mandatory
                       v-model="ghg_ratio_chip"
@@ -1391,6 +1423,77 @@
                     <p class="instructions_2">
                       *Only labels >5% are shown.
                     </p>
+                  </div>
+
+                </div>
+                <div v-else-if="active_indicator[0] == 23">
+                  <v-chip-group
+                      mandatory
+                      v-model="ghg_sludge_management_chip"
+                  >
+                    <v-chip
+                        color="primary"
+                        outlined
+                        class="ma-2"
+                        pill
+                    >
+                      <v-icon left>
+                        mdi-chart-pie
+                      </v-icon>
+                      Chart
+                    </v-chip>
+
+                    <v-chip
+                        color="primary"
+                        outlined
+                        pill
+                        class="ma-2"
+                    >
+                      <v-icon left>
+                        mdi-table
+                      </v-icon>
+                      Table
+
+                    </v-chip>
+                  </v-chip-group>
+                  <v-data-table
+                      :headers="ghg_sludge_management_table.header"
+                      :items="ghg_sludge_management_table.value"
+                      class="expanded_table_hover"
+                      :item-class="itemRowBold"
+                      disable-pagination
+                      :hide-default-footer="true"
+                      dense
+                      v-if="ghg_sludge_management_chip === 1"
+                  >
+                    <template v-slot:item.value="{ item }">
+                      <span v-if="item.info">
+                      {{ item.value }}
+                      <v-btn
+                          icon
+                          @click="$data[item.info] = true"
+                          class="icon_clickable"
+                          x-small
+                      >
+                        <v-icon
+                            color='#1C195B'
+                        >
+                          mdi-information-outline
+                        </v-icon>
+                      </v-btn>
+
+                    </span>
+                      <span v-else>{{ item.value }}</span>
+                    </template>
+
+                  </v-data-table>
+
+                  <div v-else-if="ghg_sludge_management_chip === 0">
+                    <BarChart
+                        style="padding-top: 10px"
+                        :chart-data="ghg_sludge_management_chart.chartData"
+                        :chart-options="ghg_sludge_management_chart.chartOptions"
+                    />
                   </div>
 
                 </div>
@@ -1721,7 +1824,7 @@
               <tr style="border: 1px solid; border-collapse: collapse">
                 <td style="border: 1px solid; border-collapse: collapse">Diesel</td>
                 <td style="border: 1px solid; border-collapse: collapse">3.9</td>
-                <td style="border: 1px solid; border-collapse: collapse">3.0</td>
+                <td style="border: 1px solid; border-collapse: collapse">3.9</td>
                 <td style="border: 1px solid; border-collapse: collapse">74100</td>
                 <td style="border: 1px solid; border-collapse: collapse">0.84</td>
                 <td style="border: 1px solid; border-collapse: collapse">43</td>
@@ -1978,7 +2081,7 @@
                     kgCO2eq/kgN2O)
                   </li>
                   <li><span v-katex="'CO_2SI'"></span>: Amount of CO2eq emissions due to sludge incineration</li>
-                  <li><span v-katex="'SNCR'"></span>: Is 'SNCR air emissions with urea' used?</li>
+                  <li><span v-katex="'SNCR'"></span>: Is 'SNCR air emissions with urea' used? (SNCR (Selective Non-Catalytic Reduction) uses the injection of ammonia or urea into the backend of the combustion chamber to reduce NO to N2)</li>
 
                 </ul>
                 <br>
@@ -2225,14 +2328,10 @@
           <div class="dialog_detail" style="background-color: white">
             <h3>Biogas (anaerobic digestion of sludge) </h3>
             <br>
-            Sum of emissions from biogas production (biogas flared, valorized and leaked)
-            <div
-                v-katex:display="'biogas_{flared} = \\sum_{i \\in WWTPS} \\frac{P \\cdot V_i}{R \\cdot T} \\cdot \\frac{biog_{flared_i}}{100} \\cdot \\frac{biog_{CH4_i}}{100} \\cdot \\frac{44}{1000}'"></div>
-            <div
-                v-katex:display="'biogas_{valorised} = \\sum_{i \\in WWTPS} \\frac{P \\cdot V_i}{R \\cdot T} \\cdot \\frac{biog_{val_i}}{100} \\cdot \\frac{biog_{CH4_i}}{100} \\cdot \\frac{44}{1000}'"></div>
+            Sum of emissions from biogas production.
             <div
                 v-katex:display="'biogas_{leaked} = \\sum_{i \\in WWTPS} \\frac{P \\cdot V_i}{R \\cdot T} \\cdot \\frac{biog_{leaked_i}}{100} \\cdot \\frac{biog_{CH4_i}}{100} \\cdot \\frac{16}{1000}'"></div>
-            <div v-katex:display="'Total = biogas_{flared} + biogas_{valorised} + biogas_{leaked}'"></div>
+            <div v-katex:display="'Total = biogas_{leaked}'"></div>
 
             <b>Where:</b>
             <br>
@@ -2242,11 +2341,7 @@
               <li><span v-katex="'V'"></span>: Volume of biogas produced in the WWTP</li>
               <li><span v-katex="'R'"></span>: 8.31446261815324 J/K·mol</li>
               <li><span v-katex="'T'"></span>: 273.15K</li>
-              <li><span v-katex="'biog_{flared}'"></span>: Biogas flared (% volume)</li>
               <li><span v-katex="'biog_{CH4}'"></span>: Percent of the methane content in the produced biogas</li>
-              <li><span v-katex="'biog_{val}'"></span>: Biogas valorized in the treatment plant to heat the digesters or
-                the building and/or to run a Co-generator to generate heat and electricity
-              </li>
               <li><span v-katex="'biog_{leaked}'"></span>: Biogas leaked to the atmosphere (% volume)</li>
 
 
@@ -2280,6 +2375,107 @@
 
             </ul>
 
+
+          </div>
+
+        </v-dialog>
+        <v-dialog
+            v-model="info_biogas_flared"
+            width="60%"
+        >
+          <div class="dialog_detail" style="background-color: white">
+            <h3>Biogas flared </h3>
+            <div
+                v-katex:display="'biogas_{flared} = \\sum_{i \\in WWTPS} \\frac{P \\cdot V_i}{R \\cdot T} \\cdot \\frac{biog_{fla_i}}{100} \\cdot \\frac{biog_{CH4_i}}{100} \\cdot \\frac{44}{1000}'"></div>
+
+            <b>Where:</b>
+            <br>
+            <ul>
+              <li><span v-katex="'WWTPS'"></span>: onsite and external WWTP's where industry treats water</li>
+              <li><span v-katex="'P : 1.013 \\cdot 10^{5}'"></span> Pa</li>
+              <li><span v-katex="'V'"></span>: Volume of biogas produced in the WWTP</li>
+              <li><span v-katex="'R'"></span>: 8.31446261815324 J/K·mol</li>
+              <li><span v-katex="'T'"></span>: 273.15K</li>
+              <li><span v-katex="'biog_{CH4}'"></span>: Percent of the methane content in the produced biogas</li>
+              <li><span v-katex="'biog_{fla}'"></span>: Biogas flared (% volume)
+              </li>
+
+            </ul>
+
+
+          </div>
+
+        </v-dialog>
+        <v-dialog
+            v-model="info_digester_fuel"
+            width="60%"
+        >
+          <div class="dialog_detail" style="background-color: white">
+            <h3>Fuel (digester) </h3>
+            <br>
+            Amount of CO2 eq emissions due to fuel employed for digester
+            <br>
+            <div
+                v-katex:display="'CO_2 = \\sum_{i \\in WWTPS}\\frac{V_i \\cdot FD \\cdot NCV \\cdot EF_{CO_2}}{1000}'"></div>
+            <div
+                v-katex:display="'N_2O = \\sum_{i \\in WWTPS}\\frac{V_i \\cdot FD \\cdot NCV \\cdot EF_{N_2O} \\cdot EQ_{N_2O}}{1000}'"></div>
+            <div
+                v-katex:display="'CH_4 = \\sum_{i \\in WWTPS}\\frac{V_i \\cdot FD \\cdot NCV \\cdot EF_{CH_4} \\cdot EQ_{CH_4}}{1000}'"></div>
+            <div v-katex:display="'Total = CO_2 + N_2O + CH_4'"></div>
+
+            <b>Where:</b>
+            <br>
+            <ul>
+              <li><span v-katex="'WWTPS'"></span>: onsite and external WWTP's where industry treats water</li>
+
+              <li><span v-katex="'V'"></span>: volume of fuel consumed</li>
+
+              <li><span v-katex="'EQ_{N_2O}'"></span>: conversion of N2O emissions to CO2 equivalent emissions (<b>298
+                kgCO2eq/kgN2O</b>)
+              </li>
+              <li><span v-katex="'EQ_{CH_4}'"></span>: Conversion of CH4 emissions to CO2 equivalent emissions (<b>34
+                kgCO2eq/kgCH4</b>)
+              </li>
+            </ul>
+            <br>
+            <table style="width: 90%; border: 1px solid; border-collapse: collapse">
+              <tr style="border: 1px solid; border-collapse: collapse">
+                <td style="border: 1px solid; border-collapse: collapse"><b>Fuel type</b></td>
+                <td style="border: 1px solid; border-collapse: collapse"><b>EFCH4 <br> (kg/TJ) </b></td>
+                <td style="border: 1px solid; border-collapse: collapse"><b>EFN2O <br> (kg/TJ) </b></td>
+                <td style="border: 1px solid; border-collapse: collapse"><b>EFCO2 <br> (kg/TJ) </b></td>
+                <td style="border: 1px solid; border-collapse: collapse"><b>FD <br> (kg/L) </b></td>
+                <td style="border: 1px solid; border-collapse: collapse"><b>NCV <br> (TJ/Gg) </b></td>
+              </tr>
+              <tr style="border: 1px solid; border-collapse: collapse">
+                <td style="border: 1px solid; border-collapse: collapse">Diesel</td>
+                <td style="border: 1px solid; border-collapse: collapse">3</td>
+                <td style="border: 1px solid; border-collapse: collapse">0.6</td>
+                <td style="border: 1px solid; border-collapse: collapse">74100</td>
+                <td style="border: 1px solid; border-collapse: collapse">0.84</td>
+                <td style="border: 1px solid; border-collapse: collapse">43</td>
+              </tr>
+              <tr style="border: 1px solid; border-collapse: collapse">
+                <td style="border: 1px solid; border-collapse: collapse">Gasoline/Petrol</td>
+                <td style="border: 1px solid; border-collapse: collapse">3</td>
+                <td style="border: 1px solid; border-collapse: collapse">0.6</td>
+                <td style="border: 1px solid; border-collapse: collapse">69300</td>
+                <td style="border: 1px solid; border-collapse: collapse">0.74</td>
+                <td style="border: 1px solid; border-collapse: collapse">44.3</td>
+              </tr>
+              <tr style="border: 1px solid; border-collapse: collapse">
+                <td style="border: 1px solid; border-collapse: collapse">Natural gas</td>
+                <td style="border: 1px solid; border-collapse: collapse">10</td>
+                <td style="border: 1px solid; border-collapse: collapse">0.1</td>
+                <td style="border: 1px solid; border-collapse: collapse">56100</td>
+                <td style="border: 1px solid; border-collapse: collapse">0.75</td>
+                <td style="border: 1px solid; border-collapse: collapse">48</td>
+              </tr>
+            </table>
+            <br>
+            <br>
+            <b>Reference:</b> <a href="docs/V2_3_Ch3_Mobile_Combustion.pdf#page=21" target="_blank">IPCC 2006, Volume 2,
+            Chapter 3: Mobile Combustion, Table 3.2.2 </a>
 
           </div>
 
@@ -4088,6 +4284,12 @@ export default {
       ghg_ratio_chart: {chartData: {}, chartOptions: {}},
       ghg_ratio_chip: 0,
 
+      ghg_sludge_management_table: {header: [], value: []},
+      ghg_sludge_management_chart: {chartData: {}, chartOptions: {}},
+      ghg_sludge_management_chip: 0,
+
+      concentration_table: {header: [], value: []},
+
 
       emissions_table: {header: [], value: []},
       emissions_chart: {chartData: {}, chartOptions: {}},
@@ -4111,7 +4313,11 @@ export default {
           sludge: "Sludge management",
           reuse: "Water reuse transport",
           discharged: "Water discharged",
-          total: "Total"
+          total: "Total",
+          fuel_digester: "Fuel (digester)",
+          biogas_flared: "Biogas flared",
+          biogas_valorized: "Biogas valorized",
+
         },
         availability_quantity: {
           dilution_factor: "Dilution factor",
@@ -4175,7 +4381,8 @@ export default {
       info_sludge_management: false,
       info_biogas: false,
       info_biogas_valorised: false,
-
+      info_biogas_flared: false,
+      info_digester_fuel: false,
       info_tn_eutrophication: false,
       info_cod_eutrophication: false,
       info_tp_eutrophication: false,
@@ -4256,7 +4463,7 @@ export default {
   },
   watch: {
     open_indicator(value) {
-      let impact_index = [1, 12, 15] //Index in tree-view where main categories start
+      let impact_index = [1, 13, 16] //Index in tree-view where main categories start
       let new_item = value[value.length - 1]
       if (impact_index.includes(new_item)) {
         if (value.length > 1) {
@@ -4282,6 +4489,7 @@ export default {
 
   },
   methods: {
+
     customSort(items, index, isDescending) {
       // The following is informations as far as I researched.
       // items: 'food' items
@@ -4539,7 +4747,7 @@ export default {
 
       }
 
-      let id_risk = [1, 2, 3, 4, 5, 6, 7, 12, 13, 15, 16]
+      let id_risk = [1, 2, 3, 4, 5, 6, 7, 13, 14, 16, 17]
       if (id_risk.includes(id.id)) {
         if (id.id < 3) {
           return return_color_class(pollution_impact)
@@ -4553,7 +4761,7 @@ export default {
           return return_color_class(ecotox_impact)
         } else if (id.id == 7) {
           return return_color_class(eqs_impact)
-        } else if (id.id <= 13) {
+        } else if (id.id <= 14) {
           return return_color_class(freshwater_impact)
         } else {
           return return_color_class(ghg_impact)
@@ -4670,6 +4878,9 @@ export default {
           info: "info_treatment"
         }
         let biog = {value: _this.table_title.global_warming_potential.biogas, unit: "kgCO2eq/day", info: "info_biogas"}
+
+        let dig_fuel = {value: _this.table_title.global_warming_potential.fuel_digester, unit: "kgCO2eq/day", info: "info_digester_fuel"}
+
         let slu = {
           value: _this.table_title.global_warming_potential.sludge,
           unit: "kgCO2eq/day",
@@ -4696,6 +4907,7 @@ export default {
         fuel[key] = emissions["fuel"]
         tre[key] = emissions["treatment"]
         biog[key] = emissions["biog"]
+        dig_fuel[key] = emissions["digester_fuel"]
         slu[key] = emissions["slu"]
         reus[key] = emissions["reuse"]
         disc[key] = emissions["disc"]
@@ -4707,6 +4919,7 @@ export default {
         emission_table.value.push(fuel)
         emission_table.value.push(tre)
         emission_table.value.push(biog)
+        emission_table.value.push(dig_fuel)
         emission_table.value.push(slu)
         emission_table.value.push(reus)
         emission_table.value.push(disc)
@@ -4719,6 +4932,7 @@ export default {
               _this.table_title.global_warming_potential.fuel,
               _this.table_title.global_warming_potential.treatment,
               _this.table_title.global_warming_potential.biogas,
+              _this.table_title.global_warming_potential.fuel_digester,
               _this.table_title.global_warming_potential.sludge,
               _this.table_title.global_warming_potential.reuse,
               _this.table_title.global_warming_potential.discharged,
@@ -4728,7 +4942,7 @@ export default {
             datasets: [
               {
                 backgroundColor: ['#1c195b', '#0095c6', '#5bc9bf', '#00b140', '#ff386b', '#f89c27', '#964fe5'],
-                data: [elec[key], fuel[key], tre[key], biog[key], slu[key], reus[key], disc[key]]
+                data: [elec[key], fuel[key], tre[key], biog[key], dig_fuel[key], slu[key], reus[key], disc[key]]
               }
             ]
           },
@@ -4874,6 +5088,200 @@ export default {
     },
 
 
+    generate_sludge_management_table() {
+
+      let _this = this
+
+      if (_this.industry !== null) {
+        let emission_table = {
+          header: [{text: "Emissions", value: "value", sortable: false}],
+          value: []
+        }
+
+        let storage = {value: "Sludge storage", unit: "kgCO2eq/day", info: "info_sludge_management"}
+        let composting = {value: "Sludge composted", unit: "kgCO2eq/day", info: "info_sludge_management"}
+        let incineration = {value: "Sludge incineration", unit: "kgCO2eq/day", info: "info_sludge_management"}
+        let land_application = {value: "Land application of sludge", unit: "kgCO2eq/day", info: "info_sludge_management"}
+        let landfilling = {value: "Emissions from landfilled biosolids", unit: "kgCO2eq/day", info: "info_sludge_management"}
+        let stockpilling = {value: "Sludge stockpiling", unit: "kgCO2eq/day", info: "info_sludge_management"}
+        let transport = {value: "Sludge transport off-site", unit: "kgCO2eq/day", info: "info_sludge_management"}
+
+
+        let key = this.industry.name
+        let industries = [this.industry]
+
+        emission_table.header.push({
+          text: key, value: key,
+        })
+        let emissions = metrics.sludge_management(industries)
+
+
+        storage[key] = emissions["storage"]
+        composting[key] = emissions["composting"]
+        incineration[key] = emissions["incineration"]
+        land_application[key] = emissions["land_application"]
+        landfilling[key] = emissions["landfilling"]
+        stockpilling[key] = emissions["stockpilling"]
+        transport[key] = emissions["sludge_transport"]
+
+
+        emission_table.header.push({text: "Unit", value: "unit", sortable: false,})
+        emission_table.value.push(storage)
+        emission_table.value.push(composting)
+        emission_table.value.push(incineration)
+        emission_table.value.push(land_application)
+        emission_table.value.push(landfilling)
+        emission_table.value.push(stockpilling)
+        emission_table.value.push(transport)
+
+
+
+        _this.ghg_sludge_management_chart = {
+          chartData: {
+            labels: [
+              storage['value'], composting['value'], incineration['value'], land_application['value'], landfilling['value'], stockpilling['value'], transport['value']
+            ],
+            datasets: [
+              {
+                backgroundColor: ['#1c195b', '#0095c6', '#5bc9bf', '#00b140', '#ff386b', '#f89c27', '#964fe5'],
+                data: [storage[key], composting[key], incineration[key], land_application[key], landfilling[key], stockpilling[key], transport[key]]
+              }
+            ]
+          },
+          chartOptions: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: false
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    return context.label + ": "+context.raw + " kgCO2eq/day"
+                  }
+
+                }
+
+              },
+              datalabels: {
+                formatter: function (value, ctx) {
+                  let datasets = ctx.chart.data.datasets;
+                  if (datasets.length > 0) {
+                    return value
+                  }
+
+                },
+                color: 'white'
+              },
+
+
+            },
+          }
+        }
+
+        return emission_table
+      }
+      return {header: [], value: []}
+
+    },
+
+    async generate_concentration_table() {
+      let _this = this
+
+
+      if (_this.industry !== null) {
+
+        let pollutants_table = {
+          header: [{text: "", value: "value", sortable: false}],
+          value: []
+        }
+
+        let dichloroethane = {value: _this.table_title.pollutants.diclo,  info: "info_eqs_diclo"}
+        let cadmium = {value: _this.table_title.pollutants.cadmium, info: "info_eqs_cadmium"}
+        let hexachlorobenzene = {
+          value: _this.table_title.pollutants.hexaclorobenzene,
+          info: "info_eqs_hexaclorobenzene"
+        }
+        let mercury = {value: _this.table_title.pollutants.mercury, info: "info_eqs_mercury"}
+        let lead = {value: _this.table_title.pollutants.lead, info: "info_eqs_lead"}
+        let nickel = {value: _this.table_title.pollutants.nickel, info: "info_eqs_nickel"}
+        let chloroalkanes = {
+          value: _this.table_title.pollutants.chloroalkanes,
+          info: "info_eqs_chloroalkanes"
+        }
+        let hexaclorobutadie = {
+          value: _this.table_title.pollutants.hexaclorobutadie,
+          info: "info_eqs_hexaclorobutadiene"
+        }
+        let nonylphenols = {value: _this.table_title.pollutants.nonylphenols, unit: "%", info: "info_eqs_nonylphenols"}
+        let tetrachloroethene = {
+          value: _this.table_title.pollutants.tetrachloroethene,
+          info: "info_eqs_tetrachloroethene"
+        }
+        let trichloroethylene = {
+          value: _this.table_title.pollutants.tricloroetile,
+          info: "info_eqs_trychloroethylene"
+        }
+
+        let key = this.industry.name
+        let industries = [this.industry]
+
+        pollutants_table.header.push({
+          text: "Concentration of the water discharged", value: key,
+        })
+        pollutants_table.header.push({
+          text: "Increase of the concentration in the receiving water body", value: 'delta',
+        })
+
+        let tu = metrics.pollutant_concentration(industries)
+        let delta = await metrics.pollutant_delta(industries, _this.global_layers)
+        dichloroethane[key] = tu.diclo
+        cadmium[key] = tu.cadmium
+        hexachlorobenzene[key] = tu.hexaclorobenzene
+        mercury[key] = tu.mercury
+        lead[key] = tu.lead
+        nickel[key] = tu.nickel
+        chloroalkanes[key] = tu.chloroalkanes
+        hexaclorobutadie[key] = tu.hexaclorobutadie
+        nonylphenols[key] = tu.nonylphenols
+        tetrachloroethene[key] = tu.tetracloroetile
+        trichloroethylene[key] = tu.tricloroetile
+
+
+        dichloroethane['delta'] = delta.diclo
+        cadmium['delta'] = delta.cadmium
+        hexachlorobenzene['delta'] = delta.hexaclorobenzene
+        mercury['delta'] = delta.mercury
+        lead['delta'] = delta.lead
+        nickel['delta'] = delta.nickel
+        chloroalkanes['delta'] = delta.chloroalkanes
+        hexaclorobutadie['delta'] = delta.hexaclorobutadie
+        nonylphenols['delta'] = delta.nonylphenols
+        tetrachloroethene['delta'] = delta.tetracloroetile
+        trichloroethylene['delta'] = delta.tricloroetile
+
+
+        pollutants_table.value.push(dichloroethane)
+        pollutants_table.value.push(cadmium)
+        pollutants_table.value.push(hexachlorobenzene)
+        pollutants_table.value.push(mercury)
+        pollutants_table.value.push(lead)
+        pollutants_table.value.push(nickel)
+        pollutants_table.value.push(chloroalkanes)
+        pollutants_table.value.push(hexaclorobutadie)
+        pollutants_table.value.push(nonylphenols)
+        pollutants_table.value.push(tetrachloroethene)
+        pollutants_table.value.push(trichloroethylene)
+
+
+        return pollutants_table
+      } else return {header: [], emissions: []}
+
+
+    },
+
+
     generate_biogas_valorised_table() {
 
       let _this = this
@@ -4885,20 +5293,28 @@ export default {
           value: []
         }
 
-        let biog = {value: _this.table_title.global_warming_potential.biogas, unit: "kgCO2eq/day", info: "info_biogas_valorised"}
+        let total = {value: "Total", unit: "kgCO2eq/day"}
+        let flared = {value: _this.table_title.global_warming_potential.biogas_flared, unit: "kgCO2eq/day", info: "info_biogas_flared"}
+        let valorized = {value: _this.table_title.global_warming_potential.biogas_valorized, unit: "kgCO2eq/day", info: "info_biogas_valorised"}
+
         let key = this.industry.name
         let industries = [this.industry]
 
         emission_table.header.push({
           text: key, value: key,
         })
-        let emissions = metrics.emissions_and_descriptions(industries, 1)
+        let emissions = metrics.biogenic_emissions(industries)
 
-        biog[key] = emissions["biog"]
+        total[key] = emissions["total"]
+        flared[key] = emissions["flared"]
+        valorized[key] = emissions["valorized"]
 
 
         emission_table.header.push({text: "Unit", value: "unit", sortable: false,})
-        emission_table.value.push(biog)
+
+        emission_table.value.push(total)
+        emission_table.value.push(flared)
+        emission_table.value.push(valorized)
 
 
         return emission_table
@@ -6140,6 +6556,9 @@ export default {
     _this.biogas_valorised_table = _this.generate_biogas_valorised_table()
 
     _this.ghg_ratio_table = _this.generate_ghg_ratio_table()
+    _this.ghg_sludge_management_table = _this.generate_sludge_management_table()
+    _this.concentration_table = await _this.generate_concentration_table()
+
 
   },
 
@@ -6182,36 +6601,36 @@ export default {
                 {id: 9, name: this.table_title.simple_table.avg_treatment_efficiency, info: "This metric indicates what is the percentage of pollutant load that the WWTP eliminates from the industry water."},
                 {id: 10, name: this.table_title.simple_table.avg_influent_efficiency, info: "This metric indicates whether there is an improvement in water quality due to its use by the industry. If the quality of the water after treatment is better than the industry withdrawal water quality (surface water only), then the value of this metric is greater than 100. This is only calculated for COD, TN and TP when the “advanced inputs” provide a value under “Industry withdrawal water quality (surface water only)”"},
                 {id: 11, name: this.table_title.simple_table.treated, info: "This metric indicates the ratio between the water remaining after the industry consumption and the water that is treated in the WWTP. "},
+                {id: 12, name: 'Concentration of pollutants'},
+
               ]
             },
           ],
         },
         {
-          id: 12,
+          id: 13,
           name: "Freshwater",
           children: [
-            {id: 13, name: "Impact",},
-            {id: 14, name: "Levers for action",}
+            {id: 14, name: "Impact",},
+            {id: 15, name: "Levers for action",}
           ]
         },
         {
-          id: 15,
+          id: 16,
           name: "Carbon",
           children: [
-            {id: 16, name: "Impact",},
+            {id: 17, name: "Impact",},
             {
-              id: 17,
+              id: 18,
               name: "Levers for action",
               children: [
-                {id: 18, name: "Energy use", info: "Energy used by the industry to treat a m3 of water"},
-                {id: 19, name: "Wastewater effluent concentration", info: "Concentration of pollutant discharged by the industry"},
-                {id: 20, name: "Biogas valorised", info: "GHG emissions from biogas valorisation"},
-                {id: 21, name: "GHG emissions ratio", info: "Amount of CO2, CH4 and N2O during wastewater treatment process"},
-
+                {id: 19, name: "Energy use", info: "Energy used by the industry to treat a m3 of water"},
+                {id: 20, name: "Wastewater effluent concentration", info: "Concentration of pollutant discharged by the industry"},
+                {id: 21, name: "Biogenic emissions", info: "Biogenic emissions sources are emissions that come from natural sources"},
+                {id: 22, name: "GHG emissions ratio", info: "Amount of CO2, CH4 and N2O during wastewater treatment process"},
+                {id: 23, name: "Sludge management", info: "GHG emissions from sludge management operations (storing, composting, incineration, land application, landfilling, stockpiling and truck transport)"},
               ]
-
             },
-
           ]
         }
       ]

@@ -98,6 +98,16 @@ export class Industry{
         this.supply_chain = []
 
     }
+    //emissions from biogenic emissions
+    biogenic_emissions(){
+
+        let flared = this.onsite_wwtp.wwt_KPI_GHG_biog_flared().total + this.offsite_wwtp.wwt_KPI_GHG_biog_flared().total
+        let valorized = this.onsite_wwtp.wwt_KPI_GHG_biog_valorized().total + this.offsite_wwtp.wwt_KPI_GHG_biog_valorized().total
+        let total = flared + valorized
+        return {flared, valorized, total}
+
+    }
+
 
     energy_used(){
         let energy = 0
@@ -108,10 +118,6 @@ export class Industry{
             energy += this.offsite_wwtp.wwt_vol_trea*this.offsite_wwtp.wwt_nrg_cons
         }
         return energy
-    }
-
-    load_removal_efficiency(){
-        
     }
 
     delete_supply_chain(i){
@@ -128,6 +134,21 @@ export class Industry{
         let direct_discharge = this.direct_discharge.wwt_KPI_GHG()
         return sumObjectsByKey(onsite_wwtp, offsite_wwtp, direct_discharge)
     }
+
+    sludge_management_emissions(){
+        let storage = sumObjectsByKey(this.onsite_wwtp.wwt_KPI_GHG_sludge_storage(), this.offsite_wwtp.wwt_KPI_GHG_sludge_storage()).total
+        let composting = sumObjectsByKey(this.onsite_wwtp.wwt_KPI_GHG_sludge_composting(), this.offsite_wwtp.wwt_KPI_GHG_sludge_composting()).total
+        let land_application = sumObjectsByKey(this.onsite_wwtp.wwt_KPI_GHG_sludge_land_application(), this.offsite_wwtp.wwt_KPI_GHG_sludge_land_application()).total
+        let landfilling = sumObjectsByKey(this.onsite_wwtp.wwt_KPI_GHG_sludge_landfilling(), this.offsite_wwtp.wwt_KPI_GHG_sludge_landfilling()).total
+        let stockpilling = sumObjectsByKey(this.onsite_wwtp.wwt_KPI_GHG_sludge_stockpilling(), this.offsite_wwtp.wwt_KPI_GHG_sludge_stockpilling()).total
+        let sludge_transport = sumObjectsByKey(this.onsite_wwtp.wwt_KPI_GHG_sludge_transport(), this.offsite_wwtp.wwt_KPI_GHG_sludge_transport()).total
+        let incineration = sumObjectsByKey(this.onsite_wwtp.wwt_KPI_GHG_sludge_incineration(), this.offsite_wwtp.wwt_KPI_GHG_sludge_incineration()).total
+
+
+        return {storage, composting, land_application, landfilling, stockpilling, sludge_transport, incineration}
+
+    }
+
 
     ghg_deglossed(){
         let onsite_wwtp = this.onsite_wwtp.wwt_KPI_GHG_deglossed()
@@ -309,6 +330,26 @@ export class Industry{
         if(this.has_offsite_wwtp == 1) water_discharged += this.offsite_wwtp.wwt_vol_disc //m3/day
         return water_discharged
     }
+
+    water_discharged_onsite(){
+        let water_discharged = 0
+        if(this.has_onsite_wwtp == 1) water_discharged += this.onsite_wwtp.wwt_vol_disc  //m3/day
+        return water_discharged
+    }
+
+    water_directly_discharged(){
+        let water_discharged = 0
+        if(this.has_direct_discharge == 1) water_discharged += this.direct_discharge.dd_vol_disc //m3/day
+        return water_discharged
+    }
+
+    water_discharged_offsite(){
+        let water_discharged = 0
+        if(this.has_offsite_wwtp == 1) water_discharged += this.offsite_wwtp.wwt_vol_disc //m3/day
+        return water_discharged
+    }
+
+
 
     water_recycled(){
         if(this.has_onsite_wwtp == 1) return this.onsite_wwtp.wwt_vol_reused
@@ -572,11 +613,13 @@ export class WWTP{
         let fuel = this.wwt_KPI_GHG_fuel().total
         let treatment = this.wwt_KPI_GHG_tre().total
         let biog = this.wwt_KPI_GHG_biog().total
+        let digester_fuel = this.wwt_KPI_GHG_dig_fuel().total
         let slu = this.wwt_KPI_GHG_slu().total
         let reuse = this.wwt_KPI_GHG_reus_trck().total
         let disc = this.wwt_KPI_GHG_disc().total
 
-        let obj = {elec, fuel, treatment, biog, slu, reuse, disc}
+
+        let obj = {elec, fuel, treatment, biog, digester_fuel, slu, reuse, disc}
         obj["total"] = Object.values(obj).sum()
 
         return obj
@@ -588,11 +631,12 @@ export class WWTP{
         let fuel = this.wwt_KPI_GHG_fuel()
         let treatment = this.wwt_KPI_GHG_tre()
         let biog = this.wwt_KPI_GHG_biog()
+        let digester_fuel = this.wwt_KPI_GHG_dig_fuel()
         let slu = this.wwt_KPI_GHG_slu()
         let reuse = this.wwt_KPI_GHG_reus_trck()
         let disc = this.wwt_KPI_GHG_disc()
 
-        let arr = [elec, fuel, treatment, biog, slu, reuse, disc]
+        let arr = [elec, fuel, treatment, biog, digester_fuel, slu, reuse, disc]
         let co2 = arr.map(x => x.co2).sum()
         let n2o = arr.map(x => x.n2o).sum()
         let ch4 = arr.map(x => x.ch4).sum()
@@ -642,8 +686,9 @@ export class WWTP{
         return {total,co2,ch4,n2o};
     }
 
+
     //emissions from biogas (fuel used in digester)
-    wwt_KPI_GHG_biog_dig(){
+    wwt_KPI_GHG_dig_fuel(){
         let vol   = this.wwt_fuel_dig;
         let fuel  = Tables.get_row('Fuel type',this.wwt_dige_typ);
         let co2   = vol*fuel.FD*fuel.NCV/1000*fuel.EFCO2
@@ -656,10 +701,9 @@ export class WWTP{
     //emissions from biogas
     wwt_KPI_GHG_biog(){
         let sources=[
-            this.wwt_KPI_GHG_biog_flared(),
-            this.wwt_KPI_GHG_biog_valorized(),
+            //this.wwt_KPI_GHG_biog_flared(),
+            //this.wwt_KPI_GHG_biog_valorized(),
             this.wwt_KPI_GHG_biog_leaked(),
-            this.wwt_KPI_GHG_biog_dig(),
         ];
 
         //gases (numbers)

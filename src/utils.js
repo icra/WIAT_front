@@ -273,6 +273,35 @@ async function calculate_groundwater_water_withdrawn_in_water_stress(industries,
     return volume
 }
 
+function calculate_water_discharged_surface(industries){
+    return industries.map(industry => industry.water_discharged_onsite()+industry.water_directly_discharged()).sum()
+}
+
+function calculate_water_discharged_third_party(industries){
+    return industries.map(industry => industry.water_discharged_offsite()).sum()
+}
+
+async function calculate_water_discharged_surface_in_water_stress(industries, global_layers){
+    let volume = 0
+    for(let industry of industries){
+        let water_stress = await has_water_stress([industry], global_layers)
+        if(water_stress == "Yes"){
+            volume += calculate_water_discharged_surface([industry])
+        }
+    }
+    return volume
+}
+
+async function calculate_water_discharged_third_party_in_water_stress(industries, global_layers){
+    let volume = 0
+    for(let industry of industries){
+        let water_stress = await has_water_stress([industry], global_layers)
+        if(water_stress == "Yes"){
+            volume += calculate_water_discharged_third_party([industry])
+        }
+    }
+    return volume
+}
 
 function calculate_water_treated(industries){
     return industries.map(industry => industry.volume_of_water_treated()).sum()
@@ -444,6 +473,10 @@ function effl_efficiency(industries, industry_effluent, wwtp_effluent){   //Amou
 
 function calculate_water_generated(industries){
     return industries.map(industry => industry.water_generated()).sum()
+}
+
+function calculate_water_consumed(industries){
+    return industries.map(industry => industry.volume_of_water_withdrawn() - industry.water_discharged()).sum()
 }
 
 function calculate_pollutant_generated(industries, pollutant){
@@ -652,6 +685,57 @@ let metrics = {
         return obj
 
     },
+
+
+    pollutant_concentration(industries){
+
+        let obj = {
+            diclo: effl_concentration(industries, "wwt_diclo_effl"),
+            cadmium: effl_concentration(industries, "wwt_cadmium_effl"),
+            hexaclorobenzene: effl_concentration(industries, "wwt_hexaclorobenzene_effl"),
+            mercury: effl_concentration(industries, "wwt_mercury_effl"),
+            lead: effl_concentration(industries, "wwt_plomo_effl"),
+            nickel: effl_concentration(industries, "wwt_niquel_effl"),
+            chloroalkanes: effl_concentration(industries, "wwt_chloro_effl"),
+            hexaclorobutadie: effl_concentration(industries, "wwt_hexaclorobutadie_effl"),
+            nonylphenols: effl_concentration(industries, "wwt_nonilfenols_effl"),
+            tetracloroetile: effl_concentration(industries, "wwt_tetracloroetile_effl"),
+            tricloroetile: effl_concentration(industries, "wwt_tricloroetile_effl"),
+        }
+
+        Object.keys(obj).forEach(pollutant => {
+            let value = obj[pollutant]
+            if(!isNaN(value)) {
+                obj[pollutant] = value.toExponential(2)
+            }
+            else obj[pollutant] = "-"
+        })
+
+        return obj
+
+    },
+
+    async pollutant_delta(industries, global_layers){
+
+        let obj = {
+            diclo: await effl_delta(industries, "wwt_diclo_effl", global_layers),
+            cadmium: await effl_delta(industries, "wwt_cadmium_effl", global_layers),
+            hexaclorobenzene: await effl_delta(industries, "wwt_hexaclorobenzene_effl", global_layers),
+            mercury: await effl_delta(industries, "wwt_mercury_effl", global_layers),
+            lead: await effl_delta(industries, "wwt_plomo_effl", global_layers),
+            nickel: await effl_delta(industries, "wwt_niquel_effl", global_layers),
+            chloroalkanes: await effl_delta(industries, "wwt_chloro_effl", global_layers),
+            hexaclorobutadie: await effl_delta(industries, "wwt_hexaclorobutadie_effl", global_layers),
+            nonylphenols: await effl_delta(industries, "wwt_nonilfenols_effl", global_layers),
+            tetracloroetile: await effl_delta(industries, "wwt_tetracloroetile_effl", global_layers),
+            tricloroetile: await effl_delta(industries, "wwt_tricloroetile_effl", global_layers),
+        }
+
+        return obj
+
+    },
+
+
     eqs_avg(industries){
         let eqs = this.environmental_quality_standards(industries)
 
@@ -868,7 +952,7 @@ let metrics = {
         let reporting_metrics = {
             "wd": 365*0.001*calculate_water_withdrawn(industries), //Water withdrawn
             "dis": 365*0.001*calculate_water_discharged(industries),  //water discharged
-            "consumed": 365*0.001*calculate_water_generated(industries)   //water consumed or generated
+            "consumed": 365*0.001*calculate_water_consumed(industries)   //water consumed or generated
         }
 
         Object.keys(reporting_metrics).forEach(key => {
@@ -928,7 +1012,8 @@ let metrics = {
     cdp_1_2_i_indicators(industries){
 
         let reporting_metrics = {
-            "surface": 365*0.001*calculate_water_discharged(industries),
+            "surface": 365*0.001*calculate_water_discharged_surface(industries),
+            "third_party": 365*0.001*calculate_water_discharged_third_party(industries)
         }
 
         Object.keys(reporting_metrics).forEach(key => {
@@ -1084,7 +1169,7 @@ let metrics = {
         let reporting_metrics = {
             "wd": 365*0.001*calculate_water_withdrawn(industries), //Water withdrawn
             "dis": 365*0.001*calculate_water_discharged(industries),  //water discharged
-            "consumed": 365*0.001*calculate_water_generated(industries)   //water consumed or generated
+            "consumed": 365*0.001*calculate_water_consumed(industries)   //water consumed or generated
         }
         Object.keys(reporting_metrics).forEach(key => {
             let value = reporting_metrics[key]
@@ -1128,6 +1213,48 @@ let metrics = {
 
     },
 
+    async gri_303_4(industries, global_layers){
+
+        let discharged_surface = 365*0.001*calculate_water_discharged_surface(industries)
+        let discharged_third_party = 365*0.001*calculate_water_discharged_third_party(industries)
+        let discharged_surface_water_stress = 365*0.001*(await calculate_water_discharged_surface_in_water_stress(industries, global_layers))
+        let discharged_third_party_water_stress = 365*0.001*(await calculate_water_discharged_third_party_in_water_stress(industries, global_layers))
+
+        let reporting_metrics = [
+            {
+                "all": discharged_surface,
+                "water_stress": discharged_surface_water_stress,
+                "text": "Surface water"
+            },
+            {
+                "all": discharged_third_party,
+                "water_stress": discharged_third_party_water_stress,
+                "text": "Third-party water (total)"
+            },
+            {
+                "all": discharged_surface+discharged_third_party,
+                "water_stress": discharged_surface_water_stress+discharged_third_party_water_stress,
+                "text": "Surface water + Third-party water (total)"
+            }
+        ]
+
+        reporting_metrics.forEach(obj => {
+            for(let key of ["all", "water_stress"]){
+                let value = obj[key]
+                if(Number.isFinite(value)) obj[key] = value.toExponential(2)
+                else obj[key] = "-"
+            }
+        })
+
+        return reporting_metrics
+
+    },
+
+    gri_303_4_2(industries){
+        return this.cdp_1_2_j_indicators(industries)
+
+    },
+
     async gri_clause_2_2_1(industries, global_layers){
         let table = [
             {water_type: "Surface water", },
@@ -1136,11 +1263,11 @@ let metrics = {
         for(let industry of industries) {
             let ws = (await has_water_stress([industry], global_layers)) == "Yes"
             if(ws){
-                let surface = 365 * 0.001 * calculate_surface_water_withdrawn(industries)
+                let surface = 365 * 0.001 * calculate_surface_water_withdrawn([industry])
                 if(Number.isFinite(surface)) surface = surface.toExponential(2)
                 else surface = "-"
 
-                let groundwater = 365 * 0.001 * calculate_groundwater_water_withdrawn(industries)
+                let groundwater = 365 * 0.001 * calculate_groundwater_water_withdrawn([industry])
                 if(Number.isFinite(groundwater)) groundwater = groundwater.toExponential(2)
                 else groundwater = "-"
 
@@ -1258,7 +1385,9 @@ let metrics = {
 
     energy_used(industries){
 
-        return industries.map(i => i.energy_used()).sum() / calculate_water_treated(industries)
+        let energy = industries.map(i => i.energy_used()).sum() / calculate_water_treated(industries)
+        if(Number.isFinite(energy)) return energy.toExponential(2)
+        else return "-"
     },
 
     effluent_concentration(industries){
@@ -1277,6 +1406,32 @@ let metrics = {
         return load
 
     },
+
+    sludge_management(industries){
+        let sludge = sumObjectsByKey(...industries.map(x => x.sludge_management_emissions()))
+
+        Object.keys(sludge).forEach(key => {
+            let value = sludge[key]
+            if(Number.isFinite(value)) sludge[key] = value.toExponential(2)
+            else sludge[key] = "-"
+        })
+
+        return sludge
+    },
+
+    biogenic_emissions(industries){
+
+        let industries_emissions = industries.map(industry => industry.biogenic_emissions())
+        let aggregated = sumObjectsByKey(...industries_emissions)
+        Object.keys(aggregated).forEach(key => {
+            let value = aggregated[key]
+            if(Number.isFinite(value)) aggregated[key] = value.toExponential(2)
+            else aggregated[key] = "-"
+        })
+        return aggregated
+    },
+
+
 
 
 }
