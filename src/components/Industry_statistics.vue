@@ -5197,31 +5197,26 @@ export default {
           value: []
         }
 
-        let dichloroethane = {value: _this.table_title.pollutants.diclo,  info: "info_eqs_diclo"}
-        let cadmium = {value: _this.table_title.pollutants.cadmium, info: "info_eqs_cadmium"}
+        let dichloroethane = {value: _this.table_title.pollutants.diclo,  }
+        let cadmium = {value: _this.table_title.pollutants.cadmium, }
         let hexachlorobenzene = {
           value: _this.table_title.pollutants.hexaclorobenzene,
-          info: "info_eqs_hexaclorobenzene"
         }
-        let mercury = {value: _this.table_title.pollutants.mercury, info: "info_eqs_mercury"}
-        let lead = {value: _this.table_title.pollutants.lead, info: "info_eqs_lead"}
-        let nickel = {value: _this.table_title.pollutants.nickel, info: "info_eqs_nickel"}
+        let mercury = {value: _this.table_title.pollutants.mercury, }
+        let lead = {value: _this.table_title.pollutants.lead, }
+        let nickel = {value: _this.table_title.pollutants.nickel, }
         let chloroalkanes = {
           value: _this.table_title.pollutants.chloroalkanes,
-          info: "info_eqs_chloroalkanes"
         }
         let hexaclorobutadie = {
           value: _this.table_title.pollutants.hexaclorobutadie,
-          info: "info_eqs_hexaclorobutadiene"
         }
-        let nonylphenols = {value: _this.table_title.pollutants.nonylphenols, unit: "%", info: "info_eqs_nonylphenols"}
+        let nonylphenols = {value: _this.table_title.pollutants.nonylphenols, unit: "%", }
         let tetrachloroethene = {
           value: _this.table_title.pollutants.tetrachloroethene,
-          info: "info_eqs_tetrachloroethene"
         }
         let trichloroethylene = {
           value: _this.table_title.pollutants.tricloroetile,
-          info: "info_eqs_trychloroethylene"
         }
 
         let key = this.industry.name
@@ -6601,7 +6596,8 @@ export default {
                 {id: 9, name: this.table_title.simple_table.avg_treatment_efficiency, info: "This metric indicates what is the percentage of pollutant load that the WWTP eliminates from the industry water."},
                 {id: 10, name: this.table_title.simple_table.avg_influent_efficiency, info: "This metric indicates whether there is an improvement in water quality due to its use by the industry. If the quality of the water after treatment is better than the industry withdrawal water quality (surface water only), then the value of this metric is greater than 100. This is only calculated for COD, TN and TP when the “advanced inputs” provide a value under “Industry withdrawal water quality (surface water only)”"},
                 {id: 11, name: this.table_title.simple_table.treated, info: "This metric indicates the ratio between the water remaining after the industry consumption and the water that is treated in the WWTP. "},
-                {id: 12, name: 'Concentration of pollutants'},
+                {id: 12, name: 'Concentration of pollutants', info: "Calculation of the increment of the industry pollutants on the receiving water, it calculates what are the final concentration on the river will be supposing the receiving water has a concentration of 0. The delta load is calculated for COD, Total Nitrogen, Total phosphorus, and the PP.\n" +
+                      "This lever for action is shown alongside with the concentration of the industry water discharged.\n"},
 
               ]
             },
