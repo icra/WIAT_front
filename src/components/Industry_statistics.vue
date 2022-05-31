@@ -1017,7 +1017,7 @@
                   >
 
                     <template v-slot:item.value="{ item }">
-                    <span v-if="item.info">
+                      <span v-if="item.info">
                       {{ item.value }}
                       <v-btn
                           icon
@@ -4190,6 +4190,36 @@
             For more information, see Carbon impact.          </div>
 
         </v-dialog>
+        <v-dialog
+            v-model="info_pollutant_concentration"
+            width="60%"
+        >
+          <div class="dialog_detail" style="background-color: white">
+            <h3> Pollutant concentration </h3>
+            <br>
+
+            <div v-katex:display="'C = \\frac{\\sum_{i \\in DP} pollutant_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} '"></div>
+            <div v-katex:display="' \\Delta = \\frac{C}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}}'"></div>
+
+            <b>Where:</b>
+            <br>
+            <ul>
+              <li><span v-katex="'C'"></span>: Concentration of pollutants in the water after treatment in the WWTP (g/m3)</li>
+              <li><span v-katex="'\\Delta'"></span>: Increase of the concentration in the receiving water body after discharge (g/m3)</li>
+
+              <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water</li>
+              <li><span v-katex="'pollutant_{effl}'"></span>: load of pollutant in the effluent</li>
+              <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body</li>
+              <li><span v-katex="'W_{a}'"></span>: amount of water available in the river <b>(streamflow global
+                indicator)</b></li>
+              <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river</li>
+
+            </ul>
+            <br>
+
+          </div>
+        </v-dialog>
+
 
 
       </div>
@@ -4450,6 +4480,7 @@ export default {
       info_efficiency_influent_tp: false,
       info_effluent_load_tn: false,
       info_effluent_load_cod: false,
+      info_pollutant_concentration: false,
       co2_ghg_ratio_info: false,
       n2o_ghg_ratio_info: false,
       ch4_ghg_ratio_info: false,
@@ -5197,36 +5228,29 @@ export default {
           value: []
         }
 
-        let dichloroethane = {value: _this.table_title.pollutants.diclo,  }
-        let cadmium = {value: _this.table_title.pollutants.cadmium, }
-        let hexachlorobenzene = {
-          value: _this.table_title.pollutants.hexaclorobenzene,
-        }
-        let mercury = {value: _this.table_title.pollutants.mercury, }
-        let lead = {value: _this.table_title.pollutants.lead, }
-        let nickel = {value: _this.table_title.pollutants.nickel, }
-        let chloroalkanes = {
-          value: _this.table_title.pollutants.chloroalkanes,
-        }
-        let hexaclorobutadie = {
-          value: _this.table_title.pollutants.hexaclorobutadie,
-        }
-        let nonylphenols = {value: _this.table_title.pollutants.nonylphenols, unit: "%", }
-        let tetrachloroethene = {
-          value: _this.table_title.pollutants.tetrachloroethene,
-        }
+        let dichloroethane = {value: _this.table_title.pollutants.diclo,  info: "info_pollutant_concentration"}
+        let cadmium = {value: _this.table_title.pollutants.cadmium, info: "info_pollutant_concentration"}
+        let hexachlorobenzene = {value: _this.table_title.pollutants.hexaclorobenzene, info: "info_pollutant_concentration"}
+        let mercury = {value: _this.table_title.pollutants.mercury, info: "info_pollutant_concentration"}
+        let lead = {value: _this.table_title.pollutants.lead, info: "info_pollutant_concentration"}
+        let nickel = {value: _this.table_title.pollutants.nickel, info: "info_pollutant_concentration"}
+        let chloroalkanes = {value: _this.table_title.pollutants.chloroalkanes, info: "info_pollutant_concentration"}
+        let hexaclorobutadie = {value: _this.table_title.pollutants.hexaclorobutadie, info: "info_pollutant_concentration"}
+        let nonylphenols = {value: _this.table_title.pollutants.nonylphenols, unit: "%", info: "info_pollutant_concentration"}
+        let tetrachloroethene = {value: _this.table_title.pollutants.tetrachloroethene, info: "info_pollutant_concentration"}
         let trichloroethylene = {
           value: _this.table_title.pollutants.tricloroetile,
+          info: "info_pollutant_concentration"
         }
 
         let key = this.industry.name
         let industries = [this.industry]
 
         pollutants_table.header.push({
-          text: "Concentration of the water discharged", value: key,
+          text: "Concentration of the water discharged (g/m3)", value: key,
         })
         pollutants_table.header.push({
-          text: "Increase of the concentration in the receiving water body", value: 'delta',
+          text: "Increase of the concentration in the receiving water body (g/m3)", value: 'delta',
         })
 
         let tu = metrics.pollutant_concentration(industries)
@@ -5268,7 +5292,6 @@ export default {
         pollutants_table.value.push(nonylphenols)
         pollutants_table.value.push(tetrachloroethene)
         pollutants_table.value.push(trichloroethylene)
-
 
         return pollutants_table
       } else return {header: [], emissions: []}
@@ -6596,9 +6619,7 @@ export default {
                 {id: 9, name: this.table_title.simple_table.avg_treatment_efficiency, info: "This metric indicates what is the percentage of pollutant load that the WWTP eliminates from the industry water."},
                 {id: 10, name: this.table_title.simple_table.avg_influent_efficiency, info: "This metric indicates whether there is an improvement in water quality due to its use by the industry. If the quality of the water after treatment is better than the industry withdrawal water quality (surface water only), then the value of this metric is greater than 100. This is only calculated for COD, TN and TP when the “advanced inputs” provide a value under “Industry withdrawal water quality (surface water only)”"},
                 {id: 11, name: this.table_title.simple_table.treated, info: "This metric indicates the ratio between the water remaining after the industry consumption and the water that is treated in the WWTP. "},
-                {id: 12, name: 'Concentration of pollutants', info: "Calculation of the increment of the industry pollutants on the receiving water, it calculates what are the final concentration on the river will be supposing the receiving water has a concentration of 0. The delta load is calculated for COD, Total Nitrogen, Total phosphorus, and the PP.\n" +
-                      "This lever for action is shown alongside with the concentration of the industry water discharged.\n"},
-
+                {id: 12, name: 'Concentration of pollutants', info: "Concentration of pollutants in the water after treatment in the WWTP, and increase of the concentration in the receiving water body after discharge."},
               ]
             },
           ],
