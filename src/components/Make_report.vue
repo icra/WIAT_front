@@ -197,12 +197,59 @@
                             style="padding: 20px 20px 20px 20px"
 
                         >
-
                           <template v-slot:no-data>
                             <v-progress-linear
                                 indeterminate
                                 color="#1C195B"
                             ></v-progress-linear>
+                          </template>
+
+                          <template v-for="header in external_indicators_table.cdp['_'+key].header" v-slot:[`header.${header.value}`]="{ header }">
+                            <span v-if="exists_in_dict(external_indicators, ['cdp', key, 'description', 'header', header.value])" >
+
+                              {{header.text}}
+                              <v-tooltip bottom max-width="700px">
+                                <template v-slot:activator="{ on, attrs }">
+                                  <v-icon
+                                      small
+                                      v-bind="attrs"
+                                      v-on="on"
+                                  >mdi-information-outline</v-icon>
+                                </template>
+                                <span>
+                                  {{ external_indicators.cdp[key]['description']['header'][header.value] }}
+                                </span>
+                              </v-tooltip>
+
+                            </span>
+                            <span v-else>
+                              {{header.text}}
+                            </span>
+                          </template>
+
+                          <template v-if="get_slot_cdp(key) != undefined" v-slot:[`item.${get_slot_cdp(key)}`]="{ item }">
+
+                            <span v-if="exists_in_dict(external_indicators, ['cdp', key, 'description', 'body', item[get_slot_cdp(key)]])" >
+
+                              {{item[get_slot_cdp(key)]}}
+                              <v-tooltip bottom max-width="700px">
+                                <template v-slot:activator="{ on, attrs }">
+                                  <v-icon
+                                      small
+                                      v-bind="attrs"
+                                      v-on="on"
+                                  >mdi-information-outline</v-icon>
+                                </template>
+                                <span>
+                                  {{ external_indicators.cdp[key]['description']['body'][item[get_slot_cdp(key)]] }}
+                                </span>
+                              </v-tooltip>
+
+                            </span>
+                            <span v-else>
+                              {{item[get_slot_cdp(key)]}}
+                            </span>
+
                           </template>
 
                         </v-data-table>
@@ -222,15 +269,62 @@
                         :hide-default-footer="true"
                         dense
                         style="padding: 20px 20px 20px 20px"
-
                     >
-
                       <template v-slot:no-data>
                         <v-progress-linear
                             indeterminate
                             color="#1C195B"
                         ></v-progress-linear>
                       </template>
+
+                      <template v-for="header in external_indicators_table.cdp['_'+key].header" v-slot:[`header.${header.value}`]="{ header }">
+                            <span v-if="exists_in_dict(external_indicators, ['cdp', key, 'description', 'header', header.value])" >
+
+                              {{header.text}}
+                              <v-tooltip bottom max-width="700px">
+                                <template v-slot:activator="{ on, attrs }">
+                                  <v-icon
+                                      small
+                                      v-bind="attrs"
+                                      v-on="on"
+                                  >mdi-information-outline</v-icon>
+                                </template>
+                                <span>
+                                  {{ external_indicators.cdp[key]['description']['header'][header.value] }}
+                                </span>
+                              </v-tooltip>
+
+                            </span>
+                        <span v-else>
+                              {{header.text}}
+                            </span>
+                      </template>
+
+                      <template v-if="get_slot_cdp(key) != undefined" v-slot:[`item.${get_slot_cdp(key)}`]="{ item }">
+
+                            <span v-if="exists_in_dict(external_indicators, ['cdp', key, 'description', 'body', item[get_slot_cdp(key)]])" >
+
+                              {{item[get_slot_cdp(key)]}}
+                              <v-tooltip bottom max-width="700px">
+                                <template v-slot:activator="{ on, attrs }">
+                                  <v-icon
+                                      small
+                                      v-bind="attrs"
+                                      v-on="on"
+                                  >mdi-information-outline</v-icon>
+                                </template>
+                                <span>
+                                  {{ external_indicators.cdp[key]['description']['body'][item[get_slot_cdp(key)]] }}
+                                </span>
+                              </v-tooltip>
+
+                            </span>
+                            <span v-else>
+                              {{item[get_slot_cdp(key)]}}
+                            </span>
+
+                      </template>
+
 
                     </v-data-table>
                   </details>
@@ -274,12 +368,13 @@
 
                     </summary>
                     <v-data-table
-                        :headers="external_indicators_table.gri['_'+key].header"
-                        :items="external_indicators_table.gri['_'+key].value"
+                        :headers="external_indicators_table.gri['_'+key_2].header"
+                        :items="external_indicators_table.gri['_'+key_2].value"
                         disable-pagination
                         :hide-default-footer="true"
                         dense
                         style="padding: 20px 20px 20px 20px"
+                        v-for="key_2 in ['303_4', '303_4_2']"
 
                     >
 
@@ -290,22 +385,53 @@
                         ></v-progress-linear>
                       </template>
 
-                    </v-data-table>
-                    <v-data-table
-                        :headers="external_indicators_table.gri['_303_4_2'].header"
-                        :items="external_indicators_table.gri['_303_4_2'].value"
-                        disable-pagination
-                        :hide-default-footer="true"
-                        dense
-                        style="padding: 20px 20px 20px 20px"
+                      <template v-for="header in external_indicators_table.gri['_'+key_2].header" v-slot:[`header.${header.value}`]="{ header }">
+                            <span v-if="exists_in_dict(external_indicators, ['gri', key_2, 'description', 'header', header.value])" >
 
-                    >
-                      <template v-slot:no-data>
-                        <v-progress-linear
-                            indeterminate
-                            color="#1C195B"
-                        ></v-progress-linear>
+                              {{header.text}}
+                              <v-tooltip bottom max-width="700px">
+                                <template v-slot:activator="{ on, attrs }">
+                                  <v-icon
+                                      small
+                                      v-bind="attrs"
+                                      v-on="on"
+                                  >mdi-information-outline</v-icon>
+                                </template>
+                                <span>
+                                  {{ external_indicators.gri[key_2]['description']['header'][header.value] }}
+                                </span>
+                              </v-tooltip>
+
+                            </span>
+                        <span v-else>
+                              {{header.text}}
+                            </span>
                       </template>
+                      <template v-if="get_slot_gri(key_2) != undefined" v-slot:[`item.${get_slot_gri(key_2)}`]="{ item }">
+
+                            <span v-if="exists_in_dict(external_indicators, ['gri', key_2, 'description', 'body', item[get_slot_gri(key_2)]])" >
+
+                              {{item[get_slot_gri(key_2)]}}
+                              <v-tooltip bottom max-width="700px">
+                                <template v-slot:activator="{ on, attrs }">
+                                  <v-icon
+                                      small
+                                      v-bind="attrs"
+                                      v-on="on"
+                                  >mdi-information-outline</v-icon>
+                                </template>
+                                <span>
+                                  {{ external_indicators.gri[key_2]['description']['body'][item[get_slot_gri(key_2)]] }}
+                                </span>
+                              </v-tooltip>
+
+                            </span>
+                        <span v-else>
+                              {{item[get_slot_gri(key_2)]}}
+                            </span>
+
+                      </template>
+
 
                     </v-data-table>
 
@@ -671,12 +797,9 @@ export default {
       global_layers: utils.format_layer_description(Vue.prototype.$layers_description),
       //selected_layers: [Vue.prototype.$layers_description[1].children[0].children[3]], //layers included in the report (initially only streamflow)
       selected_layers: [], //layers included in the report (initially only streamflow)
-
       selected_layers_pdf: [], //layers included in the pdf report
-
       main_tab: 0,
       layers_table: {header: [], value: []},
-
       simple_report_table: {header: [], value: []},
       external_indicators_table: {
         cdp: {
@@ -845,6 +968,32 @@ export default {
     },
   },
   methods: {
+
+    prova(key){
+      console.log(key)
+    },
+
+    get_slot_cdp(key){
+      try {
+        return this.external_indicators_table["cdp"]['_'+key].header[0].value
+      } catch (error) {
+        return undefined
+      }
+    },
+
+    get_slot_gri(key){
+      console.log(key)
+      try {
+        return this.external_indicators_table["gri"]['_'+key].header[0].value
+      } catch (error) {
+        return undefined
+      }
+    },
+
+    exists_in_dict(keys, value){
+      return utils.exists_in_dict(keys, value)
+    },
+
     customSort(items, index, isDescending) {
       // The following is informations as far as I researched.
       // items: 'food' items
@@ -896,8 +1045,8 @@ export default {
           country: utils.get_country_code_from_coordinates(industry.location.lat, industry.location.lng),
           lat: industry.location.lat.toFixed(2),
           lng: industry.location.lng.toFixed(2),
-          withdrawals: indicators["dis"],
-          discharges: indicators["wd"],
+          withdrawals: indicators["wd"],
+          discharges: indicators["dis"],
           consumption: indicators["consumed"],
           water_stress: indicators["water_stress"],
 
@@ -1009,7 +1158,7 @@ export default {
         volume: indicators.surface,
       })
       value.push({
-        destination: "Third party sources",
+        destination: "Third party destinations",
         volume: indicators.third_party,
       })
 
@@ -1109,7 +1258,7 @@ export default {
       ]
       for(let industry of assessment.assessment.industries) {
         let ws = await utils.water_stress([industry], this.global_layers)
-        if(ws > 50){
+        if(ws >= 40){
           header.push({text: industry.name + " (ML/yr)", value: industry.name})
         }
       }

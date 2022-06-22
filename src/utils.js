@@ -17,6 +17,19 @@ function sumObjectsByKey(...objs) {
 
 let utils = {
 
+    exists_in_dict(dict, keys) {
+        try {
+            let dict_aux = dict
+            for(let key of keys){
+                dict_aux = dict_aux[key]
+            }
+
+            return dict_aux != undefined
+        } catch (error) {
+            return false
+        }
+    },
+
     async water_stress(industries, global_layers){
         let ws = global_layers["Water stress"].layers.baseline.annual.layer
         let ws_value = await Promise.all(
@@ -31,8 +44,6 @@ let utils = {
         let filtered = ws_value.filter(x => x!= null)
         return filtered.sum() / filtered.length
     },
-
-
 
     is_industry_valid(industry){
         if(industry == null || industry == undefined) return false
@@ -55,7 +66,6 @@ let utils = {
         return false
 
     },
-
 
     equals(a, b){
         return JSON.stringify(a) === JSON.stringify(b);
@@ -453,7 +463,7 @@ async function coastal_flood_risk(industries, global_layers){
 
 async function has_water_stress(industries, global_layers){
     let ws = await utils.water_stress(industries, global_layers)
-    return (ws > 50) ? "Yes" : "No"
+    return (ws >= 40) ? "Yes" : "No"
 }
 
 function water_filtered(industries, industry_effluent, wwtp_effluent){
@@ -529,22 +539,22 @@ function highest_level_of_treatment(industries){
 
     for(let industry of industries){
         if(industry.has_onsite_wwtp == 1 && industry.onsite_wwtp.wwt_treatment_type == 3){
-            treatments.tertiary.volume += industry.onsite_wwtp.wwt_vol_trea
+            treatments.tertiary.volume += industry.onsite_wwtp.wwt_vol_disc + industry.onsite_wwtp.wwt_vol_treated_external
             treatments.tertiary.sites += 1
         }else if(industry.has_onsite_wwtp == 1 && industry.onsite_wwtp.wwt_treatment_type == 2){
-            treatments.secondary.volume += industry.onsite_wwtp.wwt_vol_trea
+            treatments.secondary.volume += industry.onsite_wwtp.wwt_vol_disc + industry.onsite_wwtp.wwt_vol_treated_external
             treatments.secondary.sites += 1
         }else if(industry.has_onsite_wwtp == 1 && industry.onsite_wwtp.wwt_treatment_type == 1){
-            treatments.primary.volume += industry.onsite_wwtp.wwt_vol_trea
+            treatments.primary.volume += industry.onsite_wwtp.wwt_vol_disc + industry.onsite_wwtp.wwt_vol_treated_external
             treatments.primary.sites += 1
+        }
+        if(industry.has_onsite_wwtp == 0 && industry.has_offsite_wwtp == 1) {
+            treatments.third_party.volume += industry.offsite_wwtp.wwt_vol_trea
+            treatments.third_party.sites += 1
         }
         if(industry.has_direct_discharge == 1){
             treatments.direct_discharge.volume += industry.direct_discharge.dd_vol_disc
             treatments.direct_discharge.sites += 1
-        }
-        if(industry.has_onsite_wwtp == 0 && industry.has_offsite_wwtp == 1){
-            treatments.third_party.volume += industry.offsite_wwtp.wwt_vol_trea
-            treatments.third_party.sites += 1
         }
     }
 
@@ -553,6 +563,7 @@ function highest_level_of_treatment(industries){
 }
 
 let metrics = {
+
 
     emissions_and_descriptions(industries, days_factor){
 
@@ -1029,7 +1040,6 @@ let metrics = {
 
         let highest_level = highest_level_of_treatment(industries)
 
-
         Object.keys(highest_level).forEach(key => {
             let sites = highest_level[key].sites
             if(Number.isFinite(sites)) highest_level[key].sites = (100 * sites / industries.length).toFixed(2)
@@ -1057,8 +1067,9 @@ let metrics = {
             for(let site of industries_and_supply_chains){
                 let lat = site.location.lat
                 let lng = site.location.lng
-                let ws = await utils.water_stress([site], global_layers)
-                if(ws > 50){
+                let ws = (await has_water_stress([site], global_layers)) == "Yes"
+
+                if(ws){
                     values.push({
                         country: utils.get_country_code_from_coordinates(lat, lng),
                         basin: await utils.get_river_basin(lat, lng),
@@ -1161,6 +1172,7 @@ let metrics = {
         }
 
         let impacts = [...(await high_water_stress()), ...(await high_groundwater_table_decline()), ...(await poorly_sanitation()), ...(await supply_variability()), ...(await drought()),  ...(await flood_risk())]
+
         return impacts
     },
 
@@ -1171,6 +1183,7 @@ let metrics = {
             "dis": 365*0.001*calculate_water_discharged(industries),  //water discharged
             "consumed": 365*0.001*calculate_water_consumed(industries)   //water consumed or generated
         }
+
         Object.keys(reporting_metrics).forEach(key => {
             let value = reporting_metrics[key]
             if(Number.isFinite(value)) reporting_metrics[key] = value.toExponential(2)

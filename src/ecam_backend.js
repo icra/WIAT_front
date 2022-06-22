@@ -115,7 +115,7 @@ export class Industry{
             energy += this.onsite_wwtp.wwt_vol_trea*this.onsite_wwtp.wwt_nrg_cons
         }
         if(this.has_offsite_wwtp == 1){
-            energy += this.offsite_wwtp.wwt_vol_trea*this.offsite_wwtp.wwt_nrg_cons
+            energy += (this.offsite_wwtp.wwt_vol_trea + this.offsite_wwtp.wwt_vol_from_external)*this.offsite_wwtp.wwt_nrg_cons
         }
         return energy
     }
@@ -146,9 +146,7 @@ export class Industry{
 
 
         return {storage, composting, land_application, landfilling, stockpilling, sludge_transport, incineration}
-
     }
-
 
     ghg_deglossed(){
         let onsite_wwtp = this.onsite_wwtp.wwt_KPI_GHG_deglossed()
@@ -269,11 +267,14 @@ export class Industry{
         let onsite_wwtp = this.onsite_wwtp
         let _this = this
 
+
         offsite_and_onsite_inputs.forEach(input => {
             let offsite_input = input[0]
             let onsite_input = input[1]
             wwtp[offsite_input] = _this.has_onsite_wwtp == 1 ? onsite_wwtp[onsite_input] : 0
         })
+
+        console.log(wwtp['wwt_vol_from_external'], onsite_wwtp['wwt_vol_treated_external'])
     }    //Update offsite wwtp if industry or connected onsite WWTP has changed
 
     reset_offsite_wwtp(){
@@ -473,8 +474,8 @@ export class WWTP{
         this.wwt_vol_trea = null
         this.wwt_vol_disc = null
         this.wwt_vol_reused = 0
-        this.wwt_vol_treated_external = 0   //Amount of water treated in another WWTP
-        this.wwt_vol_from_external = 0   //Amount of water FROM other WWTP
+        this.wwt_vol_treated_external = 0   //Amount of water treated in another WWTP (input in onsite WWTP)
+        this.wwt_vol_from_external = 0   //Amount of water FROM other WWTP (input in offsite WWTP)
 
         this.wwt_cod_infl_ind = 0
         this.wwt_cod_infl_wwtp = 0

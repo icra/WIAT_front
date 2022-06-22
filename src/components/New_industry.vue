@@ -1303,7 +1303,7 @@
                 <v-col cols="8" >
                   <div style="width: 100%;">
                     <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                    <span>
+                      <span>
                       <span v-if="input === 'wwt_vol_trea'">
                         Volume of industrial wastewater sent to the offsite WWTP every day
                       </span>
@@ -2263,7 +2263,7 @@ export default {
         "wwt_slu_inc_SNCR": {items: Tables["Yes/No"]},
         "wwt_trck_typ": {items: Tables["Fuel type options"]},
       },
-      button_estimation: ["ind_cod_effl", "ind_tn_effl", "ind_tp_effl", "ind_diclo_effl", "ind_cadmium_effl", "ind_hexaclorobenzene_effl", "ind_mercury_effl", "ind_plomo_effl", "ind_niquel_effl", "ind_chloro_effl", "ind_hexaclorobutadie_effl", "ind_nonilfenols_effl", "ind_tetracloroetile_effl", "ind_tricloroetile_effl", "wwt_cod_effl", "wwt_tn_effl", "wwt_tp_effl", "wwt_diclo_effl", "wwt_cadmium_effl", "wwt_hexaclorobenzene_effl", "wwt_mercury_effl", "wwt_plomo_effl", "wwt_niquel_effl", "wwt_chloro_effl", "wwt_hexaclorobutadie_effl", "wwt_nonilfenols_effl", "wwt_tetracloroetile_effl", "wwt_tricloroetile_effl", "wwt_conv_kwh",
+      button_estimation: ["wwt_vol_disc", "wwt_vol_treated_external", "wwt_vol_reused", "ind_cod_effl", "ind_tn_effl", "ind_tp_effl", "ind_diclo_effl", "ind_cadmium_effl", "ind_hexaclorobenzene_effl", "ind_mercury_effl", "ind_plomo_effl", "ind_niquel_effl", "ind_chloro_effl", "ind_hexaclorobutadie_effl", "ind_nonilfenols_effl", "ind_tetracloroetile_effl", "ind_tricloroetile_effl", "wwt_cod_effl", "wwt_tn_effl", "wwt_tp_effl", "wwt_diclo_effl", "wwt_cadmium_effl", "wwt_hexaclorobenzene_effl", "wwt_mercury_effl", "wwt_plomo_effl", "wwt_niquel_effl", "wwt_chloro_effl", "wwt_hexaclorobutadie_effl", "wwt_nonilfenols_effl", "wwt_tetracloroetile_effl", "wwt_tricloroetile_effl", "wwt_conv_kwh",
         "wwt_biog_pro", "wwt_biog_fla", "wwt_biog_val", "wwt_biog_lkd", "wwt_biog_sold", "wwt_ch4_biog", "wwt_slu_comp_low_CN_EF", "wwt_slu_comp_seqst_rate", "wwt_slu_comp_uncovered_pile_EF", "wwt_temp_inc", "wwt_slu_lf_uncertainty", "wwt_slu_lf_CH4_in_gas", "wwt_slu_lf_DOCf", "wwt_slu_lf_decomp_3yr", "wwt_slu_lf_low_CN_EF" ],
       select_estimation: ["wwt_cod_slud", "wwt_ch4_efac_dis", "wwt_ch4_efac_tre", "wwt_n2o_efac_tre", "wwt_n2o_efac_dis", "wwt_slu_sto_TVS", "wwt_slu_sto_f_CH4", "wwt_slu_sto_f_CH4", "wwt_slu_comp_N_cont", "wwt_slu_comp_TVS", "wwt_slu_inc_N_cont", "wwt_slu_la_TVS", "wwt_slu_la_N_cont", "wwt_slu_la_EF", "wwt_slu_lf_TVS", "wwt_slu_lf_MCF", "wwt_slu_lf_N_cont"],
       basic_inputs: ["wwt_treatment_type", "wwt_vol_trea", "wwt_vol_disc", "dd_vol_disc", "wwt_vol_reused", "wwt_vol_treated_external", "wwt_cod_effl", "wwt_tn_effl", "wwt_tp_effl", "wwt_ch4_efac_tre", "wwt_n2o_efac_tre", "wwt_ch4_efac_dis", "wwt_n2o_efac_dis", "volume_withdrawn", "volume_withdrawn_groundwater", "has_onsite_wwtp", "has_direct_discharge", "has_offsite_wwtp", "industry_type", "product_produced", "ind_cod_effl", "ind_tn_effl", "ind_tp_effl", "wwt_nrg_cons", "wwt_conv_kwh", "wwt_mass_slu", "wwt_cod_slud"],
@@ -2390,7 +2390,6 @@ export default {
       let influent_load = wwtp_model.wwt_vol_trea*wwtp[pollutant_ind] + wwtp.wwt_vol_from_external*wwtp[pollutant_wwtp]
       let flowstream = Number(wwtp_model.wwt_vol_trea) + wwtp.wwt_vol_from_external
 
-
       let loadEffl = Tables["WW treatment organics removal fractions (centralised) (Table 6.6B and 6.10C)"][wwtp_model.wwt_treatment_type][pollutant_table]*influent_load/flowstream
       return Number(loadEffl)
     },
@@ -2409,6 +2408,31 @@ export default {
       let _this = this
 
       let estimations = {
+        wwt_vol_disc: function(){
+          if(stepper_model == 2){
+            return wwtp_model.wwt_vol_trea - wwtp_model.wwt_vol_reused - wwtp_model.wwt_vol_treated_external
+          }else if(stepper_model == 3){
+            return null
+          }else if(stepper_model == 4){
+            return wwtp_model.wwt_vol_trea + wwtp.wwt_vol_from_external
+          }
+
+        },
+        wwt_vol_reused: function(){
+          if(stepper_model == 2){
+            return wwtp_model.wwt_vol_trea - wwtp_model.wwt_vol_disc - wwtp_model.wwt_vol_treated_external
+          }
+          return null
+
+        },
+        wwt_vol_treated_external: function(){
+          if(stepper_model == 2){
+            return wwtp_model.wwt_vol_trea - wwtp_model.wwt_vol_disc - wwtp_model.wwt_vol_reused
+          }
+          return null
+
+        },
+
         ind_cod_effl: function(){
           if(industry_model.industry_type === 1){  //noves categories
             return 336.2591324200910/2.4
@@ -3096,8 +3120,6 @@ export default {
           }else return null
         },
         wwt_cod_effl: function(){
-
-
           return _this.concentration_effluent_load("wwt_cod_infl_ind", "wwt_cod_infl_wwtp", "cod_effl")
         },
         wwt_tn_effl: function(){
@@ -3197,13 +3219,15 @@ export default {
           return 0.015
         }
 
-
-
       }
       return estimations[code]()
     },
     select_estimations(code){
       let wwt_model = this.onsite_wwtp_model
+      if(this.stepper_model == 4){
+        wwt_model = this.offsite_wwtp_model
+      }
+
       let estimations = {
         wwt_cod_slud: function(){
           return Tables["type_of_treatment_KREM"].map(option => {
@@ -3375,8 +3399,9 @@ export default {
         if((!isNaN(this.offsite_wwtp_model[input]) || this.offsite_wwtp_model[input]!="") && this.offsite_wwtp_model[input]>=0) this.industry.offsite_wwtp[input] = Number(this.offsite_wwtp_model[input])
       }
 
-      this.industry.offsite_wwtp['wwt_vol_disc'] = this.industry.offsite_wwtp["wwt_vol_trea"]
+      console.log(this.industry.offsite_wwtp['wwt_vol_disc'])
 
+      this.industry.offsite_wwtp['wwt_vol_disc'] = this.industry.offsite_wwtp["wwt_vol_trea"]
 
 
       this.stepper_model = 5
