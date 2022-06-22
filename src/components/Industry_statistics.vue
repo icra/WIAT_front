@@ -106,6 +106,9 @@
                     </template>
                     <span>
                       Overall water risk measures all water-related risks of an industry, by aggregating all indicators from the Physical Quantity, Quality and Regulatory & Reputational Risk categories. Higher values indicate higher water risk.
+                      <br>
+                      <b>Source: Aqueduct</b>
+
                     </span>
                   </v-tooltip>
 
@@ -4605,7 +4608,7 @@ export default {
             {text: "Country", value: "country"},
             {text: "Latitude", value: "lat"},
             {text: "Longitude", value: "lng"},
-            {text: "Overall water risk", value: "overall_water_risk"},
+            {text: "Overall water risk.", value: "overall_water_risk"},
             {text: nodeLayer[0].name+ " (Baseline)", value: "baseline"},
           ]
 

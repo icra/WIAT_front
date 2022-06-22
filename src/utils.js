@@ -539,17 +539,17 @@ function highest_level_of_treatment(industries){
 
     for(let industry of industries){
         if(industry.has_onsite_wwtp == 1 && industry.onsite_wwtp.wwt_treatment_type == 3){
-            treatments.tertiary.volume += industry.onsite_wwtp.wwt_vol_disc + industry.onsite_wwtp.wwt_vol_treated_external
+            treatments.tertiary.volume += industry.onsite_wwtp.wwt_vol_disc
             treatments.tertiary.sites += 1
         }else if(industry.has_onsite_wwtp == 1 && industry.onsite_wwtp.wwt_treatment_type == 2){
-            treatments.secondary.volume += industry.onsite_wwtp.wwt_vol_disc + industry.onsite_wwtp.wwt_vol_treated_external
+            treatments.secondary.volume += industry.onsite_wwtp.wwt_vol_disc
             treatments.secondary.sites += 1
         }else if(industry.has_onsite_wwtp == 1 && industry.onsite_wwtp.wwt_treatment_type == 1){
-            treatments.primary.volume += industry.onsite_wwtp.wwt_vol_disc + industry.onsite_wwtp.wwt_vol_treated_external
+            treatments.primary.volume += industry.onsite_wwtp.wwt_vol_disc
             treatments.primary.sites += 1
         }
-        if(industry.has_onsite_wwtp == 0 && industry.has_offsite_wwtp == 1) {
-            treatments.third_party.volume += industry.offsite_wwtp.wwt_vol_trea
+        if(industry.has_offsite_wwtp == 1 && industry.offsite_wwtp.wwt_vol_trea > 0) {
+            treatments.third_party.volume += industry.offsite_wwtp.wwt_vol_disc
             treatments.third_party.sites += 1
         }
         if(industry.has_direct_discharge == 1){
@@ -1062,6 +1062,7 @@ let metrics = {
             }
         }
 
+
         let high_water_stress = async function(){
             let values = []
             for(let site of industries_and_supply_chains){
@@ -1080,6 +1081,7 @@ let metrics = {
             }
             return values
         }
+
         let high_groundwater_table_decline = async function(){
             let values = []
             for(let site of industries_and_supply_chains){
@@ -1172,6 +1174,14 @@ let metrics = {
         }
 
         let impacts = [...(await high_water_stress()), ...(await high_groundwater_table_decline()), ...(await poorly_sanitation()), ...(await supply_variability()), ...(await drought()),  ...(await flood_risk())]
+        if(impacts.length == 0){
+            return [{
+                country: '-',
+                basin: '-',
+                type: "-",
+                primary: "-"
+            }]
+        }
 
         return impacts
     },

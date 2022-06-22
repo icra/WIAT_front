@@ -637,6 +637,10 @@
               </v-form>
             </div>
             <div style="margin: 7px; padding: 7px;">
+              <v-btn :to="{ name: 'report_prop', params: {assessment_id: selected_assessment}}" small tile block @click="selected_layer=null; secondMenu=false; rightMenu=false;" color="#b62373">
+                Statistics
+              </v-btn>
+
               <v-btn @click = "delete_assessment" small tile block color="#b62373">
                 Delete
               </v-btn>

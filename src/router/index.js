@@ -29,9 +29,16 @@ const routes = [
     component: Import
   },
   {
-    path: '/make_report',
+    path: '/make_report/',
     name: 'report',
     component: Make_report
+  },
+  {
+    path: '/make_report/:assessment_id/',
+    name: 'report_prop',
+    component: Make_report,
+    props: true,
+
   },
   {
     path: '/statistics/:assessment_id/:industry_id',
