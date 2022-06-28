@@ -5763,13 +5763,22 @@ export default {
                 callbacks: {
                   label: function(context) {
                     return context.label + ": "+context.raw + "%"
-                  }
-
+                  },
                 }
 
               },
             },
-          }
+            scales: {
+              y: {
+                ticks: {
+                  beginAtZero:true,
+                  callback: function(value, index, values) {
+                    return value + '%';
+                  }
+                },
+              }
+            }
+          },
 
         }
 
@@ -6036,6 +6045,17 @@ export default {
               },
 
             },
+            scales: {
+              y: {
+                ticks: {
+                  beginAtZero:true,
+                  callback: function(value, index, values) {
+                    return value + '%';
+                  }
+                },
+              }
+            }
+
           }
 
         }
@@ -6606,10 +6626,10 @@ export default {
               id: 2,
               name: 'Impact',
               children: [
-                {id: 3, name: this.table_title.simple_table.delta_tu, info: "Toxic units in the receiving water body indicates if the concentration after the effluent discharge on the water body exceed the EC50, supposing the receiving water has a concentration of 0. This metric does not calculate values for COD, TN, TP, just for PP. "},
-                {id: 4, name: this.table_title.simple_table.delta_eqs, info: "Increase of the concentration of the pollutants in the receiving water body after discharge (with respect to EQS)"},
+                {id: 3, name: this.table_title.simple_table.delta_tu, info: "Toxic units in the receiving water body indicates if the concentration after the effluent discharge on the water body exceed the EC50, supposing the receiving water has a concentration of 0 before discharge."},
+                {id: 4, name: this.table_title.simple_table.delta_eqs, info: "Increase of the concentration of the pollutants in the receiving water body after discharge (with respect to EQS), supposing the receiving water has a concentration of 0 before discharge."},
                 {id: 5, name: this.table_title.simple_table.eutrophication, info: "Eutrophication potential (EP) is defined as the potential to cause over-fertilization of water and soil, which can result in increased growth of biomass. It will always have positive values; higher values indicate higher impact. It converts the pollutants to PO4 equivalent to calculate the total Eutrophication potential. "},
-                {id: 6, name: this.table_title.simple_table.tu, info: "Toxic units in the effluent aims to calculate haw toxic is industry effluent for the ecosystem. To calculate the ecotoxicity potential, we have used the PP concentrations values from which in 24h cause the deaths or lack of movement of 50% of Daphnia magna individuals. These values (EC50) have been extracted from different studies compiled into two different databases, the ECOTOX Knowledgebase from the United States Environmental Protection Agency (ECOTOX | Home, n.d.) and from the NORMAN Ecotoxicology Database. (NORMAN Ecotoxicology Database, n.d.)\n" +
+                {id: 6, name: this.table_title.simple_table.tu, info: "Toxic units in the effluent aims to calculate haw toxic is industry effluent for the ecosystem. To calculate Toxic units, we have used the PP concentrations values from which in 24h cause the deaths or lack of movement of 50% of Daphnia magna individuals. These values (EC50) have been extracted from different studies compiled into two different databases, the ECOTOX Knowledgebase from the United States Environmental Protection Agency (ECOTOX | Home, n.d.) and from the NORMAN Ecotoxicology Database. (NORMAN Ecotoxicology Database, n.d.)\n" +
                       "This metric has no impact categories because it calculates with respect to the industry effluent and not with respect to the water body.\n"},
                 {id: 7, name: this.table_title.simple_table.eqs, info: "The Environmental Quality Standards (EQS) are the limits approved by the EU’s Water Framework Directive. The directive sets environmental quality standards for priority pollutants (PP) and eight other pollutants. These substances include the metals cadmium, lead, mercury and nickel, and their compounds; benzene; polyaromatic hydrocarbons (PAH); and several pesticides. Several of these priority substances are classed as hazardous. Each PP has a maximum allowable concentration (MAC) for inland surface waters. The metric of impact indicates if the concentration of the pollutant in the industry effluent is higher than the MAC (> 100%) or lower (< 100%). (Priority Substances - Water - Environment - European Commission, n.d.)\n" +
                       "This metric has no impact categories because it calculates with respect to the industry effluent and not with respect to the water body.  \n"},

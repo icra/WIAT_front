@@ -87,6 +87,11 @@ let risk_category = {
         return null
     },
     eutrophication: function(value){
+        if(value < 0) return null
+        else if (value < 0.5) return blue
+        else if (value < 1) return yellow
+        else if (value < 2) return orange
+        else if (value >= 2) return red
         return null
     },
 
