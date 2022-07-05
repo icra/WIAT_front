@@ -3381,61 +3381,6 @@ export default {
       else return index
     },
 
-    indicators_industry(){
-      return [
-        {
-          id: 1,
-          name: 'Pollution',
-          children: [
-            {
-              id: 2,
-              name: 'Impact' ,
-              children: [
-                {id: 3, name: this.table_title.simple_table.delta_tu,},
-                {id: 4, name: this.table_title.simple_table.delta_eqs,},
-                {id: 5, name: this.table_title.simple_table.eutrophication,},
-                {id: 6, name: this.table_title.simple_table.tu,},
-                {id: 7, name: this.table_title.simple_table.eqs,},
-              ]
-            },
-            { id:8,
-              name: 'Levers for action',
-              children: [
-                { id: 9, name: this.table_title.simple_table.avg_treatment_efficiency },
-                { id: 10, name: this.table_title.simple_table.avg_influent_efficiency },
-                { id: 11, name: this.table_title.simple_table.treated },
-              ]
-            },
-          ],
-        },
-        {
-          id: 12,
-          name: "Freshwater",
-          children: [
-            {id: 13, name: "Impact",},
-            {id: 14, name: "Levers for action",}
-          ]
-        },
-        {
-          id: 15,
-          name: "Carbon",
-          children: [
-            {id: 16, name: "Impact",},
-            {
-              id: 17,
-              name: "Levers for action",
-              children: [
-                {id: 18, name: "Energy use"},
-                {id: 19, name: "Wastewater effluent concentration"},
-              ]
-
-            },
-
-          ]
-        }
-      ]
-    },
-
     assessments_with_industries(){
       let _this = this
 

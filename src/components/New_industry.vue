@@ -1,62 +1,67 @@
 <template>
-  <div class="outer">
-    <div>
-      <div>
-        <h1 style="color: #b62373"> {{ this.industry.name}} </h1>
+  <div class="outer_2">
+    <v-stepper v-model="stepper_model" style="width: 100%">
+      <div style="height: 100%; width: 100%;  background-color: white; box-shadow: none">
+
+        <div style="padding: 20px 0px 20px 0px;  width: 100%; ">
+          <h1 style="color: #b62373"> {{ this.industry.name}} </h1>
+          <v-stepper-header>
+              <v-stepper-step
+                  step="1"
+                  editable
+              >
+                Water withdrawal and industry
+              </v-stepper-step>
+
+              <v-divider></v-divider>
+
+              <v-stepper-step
+                  step="2"
+                  :editable="industry.has_onsite_wwtp == 1"
+
+              >
+                On-site WWTP
+              </v-stepper-step>
+
+              <v-divider></v-divider>
+
+              <v-stepper-step
+                  step="3"
+                  :editable="industry.has_direct_discharge == 1"
+              >
+                Direct discharge
+              </v-stepper-step>
+
+              <v-divider></v-divider>
+
+              <v-stepper-step
+                  step="4"
+                  :editable="industry.has_offsite_wwtp == 1"
+              >
+                Offsite WWTP
+              </v-stepper-step>
+              <v-stepper-step
+                  v-show="false"
+                  step="5"
+              >
+                Finish page
+              </v-stepper-step>
+
+
+
+            </v-stepper-header>
+
+        </div>
+
+
+
       </div>
-      <br>
-
-      <v-stepper v-model="stepper_model" alt-labels style="height: 100%">
-        <v-stepper-header >
-          <v-stepper-step
-              step="1"
-              editable
-          >
-            Water withdrawal and industry
-          </v-stepper-step>
-
-          <v-divider></v-divider>
-
-          <v-stepper-step
-              step="2"
-              :editable="industry.has_onsite_wwtp == 1"
-
-          >
-            On-site WWTP
-          </v-stepper-step>
-
-          <v-divider></v-divider>
-
-          <v-stepper-step
-              step="3"
-              :editable="industry.has_direct_discharge == 1"
-          >
-            Direct discharge
-          </v-stepper-step>
-
-          <v-divider></v-divider>
-
-          <v-stepper-step
-              step="4"
-              :editable="industry.has_offsite_wwtp == 1"
-          >
-            Offsite WWTP
-          </v-stepper-step>
-          <v-stepper-step
-              v-show="false"
-              step="5"
-          >
-            Finish page
-          </v-stepper-step>
-
-
-
-        </v-stepper-header>
+      <div style="height: 100%; margin-top: 160px;  overflow-y: auto !important;">
 
         <v-stepper-items>
           <v-stepper-content step="1">
 
-            <v-row>
+            <!--<v-row>
               <v-col cols="12">
                 <v-img
                     :src="water_withdrawal_image"
@@ -67,7 +72,7 @@
               </v-col>
 
 
-            </v-row>
+            </v-row>-->
             <v-row
                 align="center"
                 v-for = "industry_input in array_intersection(industry_inputs, basic_inputs)"
@@ -78,16 +83,16 @@
                   <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
 
                     <div>
-                    <span>
-                    {{user_inputs[industry_input].question}}
-                    </span>
+                <span>
+                {{user_inputs[industry_input].question}}
+                </span>
                       <v-tooltip bottom v-if="required.includes(industry_input)">
                         <template v-slot:activator="{ on, attrs }">
-                        <span
-                            v-bind="attrs"
-                            v-on="on"
-                            style="color: red"
-                        >*</span>
+                    <span
+                        v-bind="attrs"
+                        v-on="on"
+                        style="color: red"
+                    >*</span>
                         </template>
                         <span>Required input</span>
                       </v-tooltip>
@@ -120,30 +125,30 @@
                 <div>
                   <div>
 
-                  <span v-if="type_option[industry_input]">
+              <span v-if="type_option[industry_input]">
 
-                    <v-select
-                        v-if="required.includes(industry_input)"
-                        v-model="industry_model[industry_input]"
-                        item-text="text"
-                        item-value="value"
-                        :items="type_option[industry_input].items"
-                        label="Select"
-                        :rules = "rules(industry_input)"
-                    >
-                    </v-select>
+                <v-select
+                    v-if="required.includes(industry_input)"
+                    v-model="industry_model[industry_input]"
+                    item-text="text"
+                    item-value="value"
+                    :items="type_option[industry_input].items"
+                    label="Select"
+                    :rules = "rules(industry_input)"
+                >
+                </v-select>
 
-                    <v-select
-                        v-else
-                        v-model="industry_model[industry_input]"
-                        item-text="text"
-                        item-value="value"
-                        :items="type_option[industry_input].items"
-                        label="Select"
-                    >
-                    </v-select>
+                <v-select
+                    v-else
+                    v-model="industry_model[industry_input]"
+                    item-text="text"
+                    item-value="value"
+                    :items="type_option[industry_input].items"
+                    label="Select"
+                >
+                </v-select>
 
-                  </span>
+              </span>
                     <v-text-field
                         v-else-if="required.includes(industry_input)"
                         v-model="industry_model[industry_input]"
@@ -184,16 +189,16 @@
                         <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
 
                           <div>
-                    <span>
-                    {{user_inputs[industry_input].question}}
-                    </span>
+                <span>
+                {{user_inputs[industry_input].question}}
+                </span>
                             <v-tooltip bottom v-if="required.includes(industry_input)">
                               <template v-slot:activator="{ on, attrs }">
-                        <span
-                            v-bind="attrs"
-                            v-on="on"
-                            style="color: red"
-                        >*</span>
+                    <span
+                        v-bind="attrs"
+                        v-on="on"
+                        style="color: red"
+                    >*</span>
                               </template>
                               <span>Required input</span>
                             </v-tooltip>
@@ -309,20 +314,20 @@
                 <v-col cols="8" >
                   <div style="width: 100%;">
                     <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                    <span>
-                      {{user_inputs[input].question}}
-                      <v-tooltip bottom v-if="required.includes(input)">
-                      <template v-slot:activator="{ on, attrs }">
-                        <span
-                            v-bind="attrs"
-                            v-on="on"
-                            style="color: red"
-                        >*</span>
-                      </template>
-                      <span>Required input</span>
-                    </v-tooltip>
+                <span>
+                  {{user_inputs[input].question}}
+                  <v-tooltip bottom v-if="required.includes(input)">
+                  <template v-slot:activator="{ on, attrs }">
+                    <span
+                        v-bind="attrs"
+                        v-on="on"
+                        style="color: red"
+                    >*</span>
+                  </template>
+                  <span>Required input</span>
+                </v-tooltip>
 
-                    </span>
+                </span>
                       <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
                              tile
                              color="#b62373"
@@ -399,9 +404,9 @@
                             <v-col cols="8" >
                               <div style="width: 100%;">
                                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                    <span>
-                      {{user_inputs[input].question}}
-                    </span>
+                <span>
+                  {{user_inputs[input].question}}
+                </span>
                                   <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
                                          tile
                                          color="#b62373"
@@ -467,9 +472,9 @@
                             <v-col cols="8" >
                               <div style="width: 100%;">
                                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                    <span>
-                      {{user_inputs[input].question}}
-                    </span>
+                <span>
+                  {{user_inputs[input].question}}
+                </span>
                                   <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
                                          tile
                                          color="#b62373"
@@ -535,9 +540,9 @@
                             <v-col cols="8" >
                               <div style="width: 100%;">
                                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                    <span>
-                      {{user_inputs[input].question}}
-                    </span>
+                <span>
+                  {{user_inputs[input].question}}
+                </span>
                                   <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
                                          tile
                                          color="#b62373"
@@ -603,9 +608,9 @@
                             <v-col cols="8" >
                               <div style="width: 100%;">
                                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                    <span>
-                      {{user_inputs[input].question}}
-                    </span>
+                <span>
+                  {{user_inputs[input].question}}
+                </span>
                                   <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
                                          tile
                                          color="#b62373"
@@ -671,9 +676,9 @@
                             <v-col cols="8" >
                               <div style="width: 100%;">
                                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                    <span>
-                      {{user_inputs[input].question}}
-                    </span>
+                <span>
+                  {{user_inputs[input].question}}
+                </span>
                                   <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
                                          tile
                                          color="#b62373"
@@ -739,9 +744,9 @@
                             <v-col cols="8" >
                               <div style="width: 100%;">
                                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                    <span>
-                      {{user_inputs[input].question}}
-                    </span>
+                <span>
+                  {{user_inputs[input].question}}
+                </span>
                                   <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
                                          tile
                                          color="#b62373"
@@ -807,9 +812,9 @@
                             <v-col cols="8" >
                               <div style="width: 100%;">
                                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                    <span>
-                      {{user_inputs[input].question}}
-                    </span>
+                <span>
+                  {{user_inputs[input].question}}
+                </span>
                                   <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
                                          tile
                                          color="#b62373"
@@ -875,9 +880,9 @@
                             <v-col cols="8" >
                               <div style="width: 100%;">
                                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                    <span>
-                      {{user_inputs[input].question}}
-                    </span>
+                <span>
+                  {{user_inputs[input].question}}
+                </span>
                                   <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
                                          tile
                                          color="#b62373"
@@ -943,9 +948,9 @@
                             <v-col cols="8" >
                               <div style="width: 100%;">
                                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                    <span>
-                      {{user_inputs[input].question}}
-                    </span>
+                <span>
+                  {{user_inputs[input].question}}
+                </span>
                                   <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
                                          tile
                                          color="#b62373"
@@ -1011,9 +1016,9 @@
                             <v-col cols="8" >
                               <div style="width: 100%;">
                                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                    <span>
-                      {{user_inputs[input].question}}
-                    </span>
+                <span>
+                  {{user_inputs[input].question}}
+                </span>
                                   <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
                                          tile
                                          color="#b62373"
@@ -1079,9 +1084,9 @@
                             <v-col cols="8" >
                               <div style="width: 100%;">
                                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                    <span>
-                      {{user_inputs[input].question}}
-                    </span>
+                <span>
+                  {{user_inputs[input].question}}
+                </span>
                                   <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
                                          tile
                                          color="#b62373"
@@ -1186,19 +1191,19 @@
                 <v-col cols="8" >
                   <div style="width: 100%;">
                     <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                    <span>
-                      {{user_inputs[input].question}}
-                      <v-tooltip bottom v-if="required.includes(input)">
-                        <template v-slot:activator="{ on, attrs }">
-                            <span
-                                v-bind="attrs"
-                                v-on="on"
-                                style="color: red"
-                            >*</span>
-                        </template>
-                        <span>Required input</span>
-                      </v-tooltip>
-                    </span>
+                <span>
+                  {{user_inputs[input].question}}
+                  <v-tooltip bottom v-if="required.includes(input)">
+                    <template v-slot:activator="{ on, attrs }">
+                        <span
+                            v-bind="attrs"
+                            v-on="on"
+                            style="color: red"
+                        >*</span>
+                    </template>
+                    <span>Required input</span>
+                  </v-tooltip>
+                </span>
 
                       <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
                              tile
@@ -1303,24 +1308,24 @@
                 <v-col cols="8" >
                   <div style="width: 100%;">
                     <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                      <span>
-                      <span v-if="input === 'wwt_vol_trea'">
-                        Volume of industrial wastewater sent to the offsite WWTP every day
-                      </span>
-                      <span v-else>
-                        {{user_inputs[input].question}}
-                      </span>
-                      <v-tooltip bottom v-if="required.includes(input)">
-                        <template v-slot:activator="{ on, attrs }">
-                            <span
-                                v-bind="attrs"
-                                v-on="on"
-                                style="color: red"
-                            >*</span>
-                        </template>
-                        <span>Required input</span>
-                      </v-tooltip>
-                    </span>
+                  <span>
+                  <span v-if="input === 'wwt_vol_trea'">
+                    Volume of industrial wastewater sent to the offsite WWTP every day
+                  </span>
+                  <span v-else>
+                    {{user_inputs[input].question}}
+                  </span>
+                  <v-tooltip bottom v-if="required.includes(input)">
+                    <template v-slot:activator="{ on, attrs }">
+                        <span
+                            v-bind="attrs"
+                            v-on="on"
+                            style="color: red"
+                        >*</span>
+                    </template>
+                    <span>Required input</span>
+                  </v-tooltip>
+                </span>
                       <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
                              tile
                              color="#b62373"
@@ -1396,9 +1401,9 @@
                             <v-col cols="8" >
                               <div style="width: 100%;">
                                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                    <span>
-                      {{user_inputs[input].question}}
-                    </span>
+                <span>
+                  {{user_inputs[input].question}}
+                </span>
                                   <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
                                          tile
                                          color="#b62373"
@@ -1464,9 +1469,9 @@
                             <v-col cols="8" >
                               <div style="width: 100%;">
                                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                    <span>
-                      {{user_inputs[input].question}}
-                    </span>
+                <span>
+                  {{user_inputs[input].question}}
+                </span>
                                   <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
                                          tile
                                          color="#b62373"
@@ -1532,9 +1537,9 @@
                             <v-col cols="8" >
                               <div style="width: 100%;">
                                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                    <span>
-                      {{user_inputs[input].question}}
-                    </span>
+                <span>
+                  {{user_inputs[input].question}}
+                </span>
                                   <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
                                          tile
                                          color="#b62373"
@@ -1600,9 +1605,9 @@
                             <v-col cols="8" >
                               <div style="width: 100%;">
                                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                    <span>
-                      {{user_inputs[input].question}}
-                    </span>
+                <span>
+                  {{user_inputs[input].question}}
+                </span>
                                   <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
                                          tile
                                          color="#b62373"
@@ -1668,9 +1673,9 @@
                             <v-col cols="8" >
                               <div style="width: 100%;">
                                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                    <span>
-                      {{user_inputs[input].question}}
-                    </span>
+                <span>
+                  {{user_inputs[input].question}}
+                </span>
                                   <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
                                          tile
                                          color="#b62373"
@@ -1736,9 +1741,9 @@
                             <v-col cols="8" >
                               <div style="width: 100%;">
                                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                    <span>
-                      {{user_inputs[input].question}}
-                    </span>
+                <span>
+                  {{user_inputs[input].question}}
+                </span>
                                   <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
                                          tile
                                          color="#b62373"
@@ -1804,9 +1809,9 @@
                             <v-col cols="8" >
                               <div style="width: 100%;">
                                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                    <span>
-                      {{user_inputs[input].question}}
-                    </span>
+                <span>
+                  {{user_inputs[input].question}}
+                </span>
                                   <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
                                          tile
                                          color="#b62373"
@@ -1872,9 +1877,9 @@
                             <v-col cols="8" >
                               <div style="width: 100%;">
                                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                    <span>
-                      {{user_inputs[input].question}}
-                    </span>
+                <span>
+                  {{user_inputs[input].question}}
+                </span>
                                   <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
                                          tile
                                          color="#b62373"
@@ -1940,9 +1945,9 @@
                             <v-col cols="8" >
                               <div style="width: 100%;">
                                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                    <span>
-                      {{user_inputs[input].question}}
-                    </span>
+                <span>
+                  {{user_inputs[input].question}}
+                </span>
                                   <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
                                          tile
                                          color="#b62373"
@@ -2008,9 +2013,9 @@
                             <v-col cols="8" >
                               <div style="width: 100%;">
                                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                    <span>
-                      {{user_inputs[input].question}}
-                    </span>
+                <span>
+                  {{user_inputs[input].question}}
+                </span>
                                   <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
                                          tile
                                          color="#b62373"
@@ -2076,9 +2081,9 @@
                             <v-col cols="8" >
                               <div style="width: 100%;">
                                 <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                    <span>
-                      {{user_inputs[input].question}}
-                    </span>
+                <span>
+                  {{user_inputs[input].question}}
+                </span>
                                   <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
                                          tile
                                          color="#b62373"
@@ -2183,10 +2188,10 @@
           </v-stepper-content>  <!-- End of questionnaire -->
 
         </v-stepper-items>
-      </v-stepper>
 
 
-    </div>
+      </div>
+    </v-stepper>
 
   </div>
 </template>
@@ -3512,10 +3517,13 @@ export default {
 
     tab_1_disabled(){
       let industry = this.industry_model
-      let disabled = industry.volume_withdrawn != null && industry.volume_withdrawn != "" &&
-          industry.volume_withdrawn_groundwater != null && industry.volume_withdrawn_groundwater != "" &&
-          industry.product_produced != null && industry.product_produced != "" &&
+
+
+      let disabled = industry.volume_withdrawn != null && industry.volume_withdrawn !== "" &&
+          industry.volume_withdrawn_groundwater != null && industry.volume_withdrawn_groundwater !== "" &&
+          industry.product_produced != null && industry.product_produced !== "" &&
           industry.has_onsite_wwtp != null && industry.has_direct_discharge != null && industry.has_offsite_wwtp != null && industry.industry_type != null
+
       return !disabled
     },
 
@@ -3557,5 +3565,12 @@ export default {
 
 .v-btn--disabled{
   background-color: rgba(0, 0, 0, 0.26) !important
+}
+
+.outer_2{
+  width: 100%;
+  height: 100%;
+  background-color: white;
+  position: absolute;
 }
 </style>

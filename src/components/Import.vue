@@ -265,7 +265,8 @@ export default {
       snackbar_text: "",
       imported_file_excel: null,
       imported_file_excel_risk: null,
-      risk_categories: risk_thereshold
+      risk_categories: risk_thereshold,
+      current_thresholds: [[], [0.2, 1, 2], [20, 100, 200], [0.5, 1, 2], [], [], [2, 10, 100], [2, 5, 50]]
     }
   },
   methods: {
@@ -276,7 +277,7 @@ export default {
 
     },
 
-    parseRiskThereshold(risk, lowString, mediumString, highString, very_highString){
+    parseRiskThereshold(risk, lowString, mediumString, highString){
 
 
       let blue = ['#529fee', "Low impact"]
@@ -284,18 +285,9 @@ export default {
       let orange = ['orange', "High impact"]
       let yellow = ['yellow', "Medium impact"]
 
-      let layers = {
-        l: ['#f6f600', "Low risk"],
-        lm: ['#f6cc00', "Low-medium risk"],
-        mh: ['#ff9900', "Medium-high risk"],
-        h: ['#ff1900', "High risk"],
-        eh: ['#990000', "Extremely high risk"],
-      }
-
       let low = 0
       let medium = 0
       let high = 0
-      let very_high = 0
 
       let null_function = function(){
         return null
@@ -305,9 +297,8 @@ export default {
         low = parseFloat(lowString)
         medium = parseFloat(mediumString)
         high = parseFloat(highString)
-        very_high = parseFloat(very_highString)
 
-        if(isNaN(low) || isNaN(medium) || isNaN(high) || isNaN(very_high)){
+        if(isNaN(low) || isNaN(medium) || isNaN(high)){
           return null
         }
       } catch (error){
@@ -317,7 +308,7 @@ export default {
 
       let increasing_better = function(){   //the higher the value, the better
 
-        let arr = [very_high, high, medium, low]
+        let arr = [high, medium, low]
         if(!utils.equals(arr, utils.highestToLowest(arr))){
           return null_function
         }
@@ -326,13 +317,13 @@ export default {
           else if (value < low) return red
           else if (value < medium) return orange
           else if (value < high) return yellow
-          else if (value >= very_high) return blue
+          else if (value >= high) return blue
           return null
         }
       }
 
       let increasing_worse = function(){
-        let arr = [low, medium, high, very_high]
+        let arr = [low, medium, high]
         if(!utils.equals(arr, utils.lowestToHighest(arr))){
           return null_function
         }
@@ -341,40 +332,46 @@ export default {
           else if (value < low) return blue
           else if (value < medium) return yellow
           else if (value < high) return orange
-          else if (value >= very_high) return red
+          else if (value >= high) return red
           return null
         }
       }
 
       try{
         risk = risk.richText[0].text
-        if(risk === "Global warming potential"){
+        console.log(risk)
+
+        if(risk === "GHG emissions from Wastewater"){
           this.risk_categories["global_warming"] = increasing_worse()
-        }else if(risk === "Dilution factor"){
-          this.risk_categories["dilution_factor"] = increasing_better()
-        }else if(risk === "Treated water factor"){
-          this.risk_categories["water_treated"] = increasing_better()
-        }else if(risk === "Consumption available ratio"){
-          this.risk_categories["water_stress_ratio"] = increasing_worse()
-        }else if(risk === "Recycled water factor"){
-          this.risk_categories["recycled_water_factor"] = increasing_better()
-        }else if(risk === "Specific water consumption"){
-          this.risk_categories["specific_water_consumption"] = increasing_better()
-        }else if(risk === "Eutrophication potential"){
-          this.risk_categories["eutrophication"] = increasing_worse()
-        }else if(risk === "Toxic units on the effluent"){
-          this.risk_categories["ecotoxicity"] = increasing_worse()
-        }else if(risk === "Increase in the concentration of the pollutant in the receiving body"){
-          this.risk_categories["delta"] = increasing_worse()
-        }else if(risk === "Average concentration of the pollutants in the effluent (with respect to EQS)"){
-          this.risk_categories["eqs"] = increasing_worse()
+          this.current_thresholds[0] = [low, medium, high]
         }else if(risk === "Increase in toxic units in the receiving water body after discharge"){
           this.risk_categories["delta_ecotoxicity"] = increasing_worse()
-        }else if(risk === "Increase of the average concentration of the pollutants in the receiving water body after discharge (with respect to EQS)"){
+          this.current_thresholds[1] = [low, medium, high]
+        }else if(risk === "Increase of the concentration of the pollutants in the receiving water body after discharge (with respect to EQS)"){
           this.risk_categories["delta_eqs"] = increasing_worse()
-        }else if(risk === "Percentage of treatment efficiency (compared to WWTP influent)"){
-          this.risk_categories["treatment_efficiency"] = increasing_better()
+          this.current_thresholds[2] = [low, medium, high]
+        }else if(risk === "Eutrophication potential"){
+          this.risk_categories["eutrophication"] = increasing_worse()
+          this.current_thresholds[3] = [low, medium, high]
+        }else if(risk === "Toxic units in the effluent"){
+          this.risk_categories["ecotoxicity"] = increasing_worse()
+          this.current_thresholds[4] = [low, medium, high]
+        }else if(risk === "Concentration of the pollutants in the effluent (with respect to EQS)"){
+          this.risk_categories["eqs"] = increasing_worse()
+          this.current_thresholds[5] = [low, medium, high]
+        }else if(risk === "Dilution factor"){
+          this.risk_categories["dilution_factor"] = increasing_better()
+          this.current_thresholds[6] = [low, medium, high]
+        }else if(risk === "Consumption available ratio"){
+          this.risk_categories["water_stress_ratio"] = increasing_worse()
+          this.current_thresholds[7] = [low, medium, high]
+
         }
+
+
+
+
+
         this.snackbar_text = "FILE IMPORTED CORRECTLY"
         this.snackbar_imported_file = true
 
@@ -401,8 +398,8 @@ export default {
             let sheet = workbook.getWorksheet(1)
             sheet.eachRow((row, rowIndex) => {
               if (rowIndex > 3) {
-                let [_, risk, low, medium, high, very_high] = row.values
-                _this.parseRiskThereshold(risk, low, medium, high, very_high)
+                let [_, risk, low, medium, high] = row.values
+                _this.parseRiskThereshold(risk, low, medium, high)
 
               }
             })
