@@ -1,78 +1,91 @@
 <template>
-  <div class="outer_2">
-    <v-stepper v-model="stepper_model" style="width: 100%">
-      <div style="height: 100%; width: 100%;  background-color: white; box-shadow: none">
+  <div class="outer_2" id="top">
+    <span>
+      <h1 style="color: #b62373; padding: 20px 0px 0px 20px">
+      {{ this.industry.name}}
+        <v-tooltip bottom>
+      <template v-slot:activator="{ on, attrs }">
+        <v-hover  v-slot:default="{ hover }" style="margin-right: 10px">
+                <span>
+                  <v-icon
+                      v-bind="attrs"
+                      v-on="on"
+                      class="icon_clickable" :color="hover ? '#555283' : '#1C195B'"
+                      @click = "direct_discharge_modal = true"
+                      style="margin: 0px 0px 4px -6px"
 
-        <div style="padding: 20px 0px 20px 0px;  width: 100%; ">
-          <h1 style="color: #b62373"> {{ this.industry.name}} </h1>
-          <v-stepper-header>
-              <v-stepper-step
-                  step="1"
-                  editable
-              >
-                Water withdrawal and industry
-              </v-stepper-step>
+                  >
+                    mdi-information-outline
+                  </v-icon>
 
-              <v-divider></v-divider>
+                </span>
+        </v-hover>
+      </template>
+      <span>Display information</span>
 
-              <v-stepper-step
-                  step="2"
-                  :editable="industry.has_onsite_wwtp == 1"
-
-              >
-                On-site WWTP
-              </v-stepper-step>
-
-              <v-divider></v-divider>
-
-              <v-stepper-step
-                  step="3"
-                  :editable="industry.has_direct_discharge == 1"
-              >
-                Direct discharge
-              </v-stepper-step>
-
-              <v-divider></v-divider>
-
-              <v-stepper-step
-                  step="4"
-                  :editable="industry.has_offsite_wwtp == 1"
-              >
-                Offsite WWTP
-              </v-stepper-step>
-              <v-stepper-step
-                  v-show="false"
-                  step="5"
-              >
-                Finish page
-              </v-stepper-step>
+    </v-tooltip>
+    </h1>
 
 
-
-            </v-stepper-header>
-
-        </div>
+    </span>
 
 
+    <v-stepper id= "stepper" class="stepper" v-model="stepper_model" style="width: 100%; z-index: 2">
+      <v-stepper-header class="white sticky" style="border-bottom: 2px solid #b62373 !important;">
+        <v-stepper-step
+              step="1"
+              editable
+          >
 
-      </div>
-      <div style="height: 100%; margin-top: 160px;  overflow-y: auto !important;">
+          <span>Water withdrawal and industry</span>
 
-        <v-stepper-items>
+        </v-stepper-step>
+
+        <v-divider></v-divider>
+
+        <v-stepper-step
+              step="2"
+              :editable="industry.has_onsite_wwtp == 1"
+
+          >
+            <span>On-site WWTP</span>
+
+          </v-stepper-step>
+
+        <v-divider></v-divider>
+
+        <v-stepper-step
+              step="3"
+              :editable="industry.has_direct_discharge == 1"
+          >
+          Direct discharge
+
+        </v-stepper-step>
+
+        <v-divider></v-divider>
+
+        <v-stepper-step
+              step="4"
+              :editable="industry.has_offsite_wwtp == 1"
+          >
+          <span>Offsite WWTP</span>
+
+        </v-stepper-step>
+
+        <v-stepper-step
+              v-show="false"
+              step="5"
+          >
+            Finish page
+          </v-stepper-step>
+
+
+
+      </v-stepper-header>
+
+      <v-stepper-items style="z-index: 2; position: relative; padding: 5px 20px 5px 20px">
           <v-stepper-content step="1">
 
-            <!--<v-row>
-              <v-col cols="12">
-                <v-img
-                    :src="water_withdrawal_image"
-                    width="100%"
-                    class="grey darken-4"
-                ></v-img>
-
-              </v-col>
-
-
-            </v-row>-->
             <v-row
                 align="center"
                 v-for = "industry_input in array_intersection(industry_inputs, basic_inputs)"
@@ -286,24 +299,6 @@
           </v-stepper-content>  <!-- Industry -->
 
           <v-stepper-content step="2" >
-            <v-row>
-              <v-col cols="12">
-                <v-img
-                    :src="onsite_external_image"
-                    width="100%"
-                    class="grey darken-4"
-                    v-if="industry.has_offsite_wwtp == 1"
-                ></v-img>
-                <v-img
-                    :src="onsite_no_external_image"
-                    width="100%"
-                    class="grey darken-4"
-                    v-else
-                ></v-img>
-
-              </v-col>
-            </v-row>
-            <br>
             <div v-if="industry.has_onsite_wwtp == 1 && stepper_model == 2">
               <v-row
                   align="center"
@@ -1169,17 +1164,6 @@
 
           <v-stepper-content step="3" >
 
-            <v-row>
-              <v-col cols="12">
-                <v-img
-                    :src="direct_discharge_image"
-                    width="100%"
-                    class="grey darken-4"
-                ></v-img>
-
-              </v-col>
-            </v-row>
-            <br>
 
             <div v-if="industry.has_direct_discharge == 1 && stepper_model == 3">
               <v-row
@@ -1280,24 +1264,7 @@
           </v-stepper-content>  <!-- Direct discharge -->
 
           <v-stepper-content step="4" >
-            <v-row>
-              <v-col cols="12">
-                <v-img
-                    :src="external_internal_image"
-                    width="100%"
-                    class="grey darken-4"
-                    v-if="industry.has_onsite_wwtp == 1"
-                ></v-img>
-                <v-img
-                    :src="external_no_internal_image"
-                    width="100%"
-                    class="grey darken-4"
-                    v-else
-                ></v-img>
 
-              </v-col>
-            </v-row>
-            <br>
             <div v-if="industry.has_offsite_wwtp == 1 && stepper_model == 4">
               <v-row
                   align="center"
@@ -2189,9 +2156,71 @@
 
         </v-stepper-items>
 
+    </v-stepper>
+
+    <v-dialog
+        v-model="direct_discharge_modal"
+        width="900"
+        scrollable
+    >
+      <div style="background-color: white; ">
+
+        <v-card flat style="padding: 40px">
+          In order to calculate some statistics, we need to know some inputs from the industry.
+          We have divided them into different screens, depending on whether they relate to one part of the water treatment cycle or another.
+
+          <br><br>
+          In the <b>first step</b>, we ask inputs related to the industry in general. Depending on the answers here, the questions in the other screens will vary slightly.
+          <br>
+          <v-row style="padding: 10px 0px 10px 0px">
+            <v-img
+                :src="water_withdrawal_image"
+            ></v-img>
+          </v-row>
+
+          In the <b>second step</b>, the questions are related to the treatment in the in-site WWTP (as well as the volume of water reused, or water also discharged and treated in an external treatment plant).
+
+          <v-row style="padding: 0px 0px 0px 0px">
+            <v-col>
+              <v-img
+                  :src="onsite_external_image"
+              ></v-img>
+            </v-col>
+          </v-row>
+
+          The <b>third step</b> is related to water directly discharged to the receiving water body (untreated water).
+
+          <v-row style="padding: 0px 0px 0px 0px">
+            <v-col>
+              <v-img
+                  :src="direct_discharge_image"
+              ></v-img>
+            </v-col>
+          </v-row>
+
+          Finally, the <b>fourth screen</b> contains inputs related to the external treatment plant (and the water sent from the on-site treatment plant, if any).
+
+          <v-row style="padding: 0px 0px 0px 0px">
+            <v-col>
+              <v-img
+                  :src="external_internal_image"
+              ></v-img>
+            </v-col>
+          </v-row>
+
+          <b>Notes:</b>
+          <br>
+          <ul>
+            <li>The information is not saved until the "save and continue" button is pressed.</li>
+            <li>Although it is not mandatory, the water balance in the treatment plants should be maintained: the amount of water that is treated is the same as the amount that comes out.</li>
+
+          </ul>
+
+        </v-card>
 
       </div>
-    </v-stepper>
+    </v-dialog>
+
 
   </div>
 </template>
@@ -2290,6 +2319,8 @@ export default {
       onsite_wwtp_model: {},
       direct_discharge_model: {},
       offsite_wwtp_model: {},
+
+      direct_discharge_modal: false,
     }
   },
   created() {
@@ -2319,6 +2350,8 @@ export default {
     },
 
     stepper_model(step){
+
+      this.scrollToTop()
       let _this = this
       if(step == 2){
 
@@ -2337,6 +2370,7 @@ export default {
     },
     industry_id: function (industry_id) {
       this.industry = this.$assessments[this.assessment_id].industries[this.industry_id]
+
     },
     assessment_id: function (assessment_id) {
       this.industry = this.$assessments[this.assessment_id].industries[this.industry_id]
@@ -2346,9 +2380,9 @@ export default {
         this.$router.push('/')
       }
 
-      [...document.getElementsByClassName('outer')].forEach(div => {
-        div.scrollTo(0, 0)
-      })
+      location.href = "#";
+      location.href = "#top";
+
 
       for (let industry_input of this.industry_inputs) {
         this.industry_model[industry_input] = this.industry[industry_input]
@@ -2367,8 +2401,14 @@ export default {
 
     },
   },
+
+
   methods: {
 
+    scrollToTop() {
+      location.href = "#";
+      location.href = "#top";
+    },
     changeTab(){
       this.$emit('changeFirstMenuTab', 2)
     },
@@ -3396,15 +3436,12 @@ export default {
     },
 
     tab_4_continue(){
-      [...document.getElementsByClassName('outer')].forEach(div => {
-        div.scrollTo(0, 0)
-      })
+      this.scrollToTop()
 
       for(let input of this.offsite_wwtp_inputs){
         if((!isNaN(this.offsite_wwtp_model[input]) || this.offsite_wwtp_model[input]!="") && this.offsite_wwtp_model[input]>=0) this.industry.offsite_wwtp[input] = Number(this.offsite_wwtp_model[input])
       }
 
-      console.log(this.industry.offsite_wwtp['wwt_vol_disc'])
 
       this.industry.offsite_wwtp['wwt_vol_disc'] = this.industry.offsite_wwtp["wwt_vol_trea"]
 
@@ -3413,9 +3450,8 @@ export default {
     },
 
     tab_3_continue(){
-      [...document.getElementsByClassName('outer')].forEach(div => {
-        div.scrollTo(0, 0)
-      })
+      this.scrollToTop()
+
       for(let input of this.direct_discharge_inputs){
         if((!isNaN(this.direct_discharge_model[input] ) || this.direct_discharge_model[input]!="") && this.direct_discharge_model[input]>=0) this.industry.direct_discharge[input] = Number(this.direct_discharge_model[input])
       }
@@ -3427,9 +3463,7 @@ export default {
     },
 
     tab_2_continue(){
-      [...document.getElementsByClassName('outer')].forEach(div => {
-        div.scrollTo(0, 0)
-      })
+      this.scrollToTop()
 
       for(let input of this.onsite_wwtp_inputs){
         if((!isNaN(this.onsite_wwtp_model[input]) || this.onsite_wwtp_model[input]!="") && this.onsite_wwtp_model[input]>=0) this.industry.onsite_wwtp[input] = Number(this.onsite_wwtp_model[input])
@@ -3447,9 +3481,7 @@ export default {
     },
 
     tab_1_continue(){
-      [...document.getElementsByClassName('outer')].forEach(div => {
-        div.scrollTo(0, 0)
-      })
+      this.scrollToTop()
 
 
       for(let input of this.industry_inputs){
@@ -3572,5 +3604,21 @@ export default {
   height: 100%;
   background-color: white;
   position: absolute;
+}
+
+.stepper {
+  overflow: visible;
+  box-shadow: unset !important;
+}
+
+.sticky {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  box-shadow: unset;
+}
+
+.icon_clickable {
+  transition: all .2s ease-in-out;
 }
 </style>
