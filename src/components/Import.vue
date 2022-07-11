@@ -887,7 +887,11 @@ export default {
 
       Object.keys(new_industry).forEach(key => {
         if (key != "onsite_wwtp" && key != "offsite_wwtp" && key!="direct_discharge"){
-          new_industry[key] = industry[key]
+
+          if (industry[key] == undefined && key != "streamflow" && key != "water_stress" ){
+            new_industry[key] = 0
+          }else new_industry[key] = industry[key]
+
         }
       })
 

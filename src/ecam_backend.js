@@ -70,7 +70,7 @@ export class Industry{
         this.offsite_wwtp = new WWTP()
         this.offsite_wwtp_type = "Domestic" //Domestic or Industrial
         this.volume_withdrawn = null   //Amount of superficial water withdrawn from the wb per day(m3/day)
-        this.volume_withdrawn_groundwater = null   //Amount of groundwater water withdrawn from the wb per day(m3/day)
+        this.volume_withdrawn_groundwater = 0   //Amount of groundwater water withdrawn from the wb per day(m3/day)
         this.has_direct_discharge = null
         this.direct_discharge = new Direct_discharge()
         this.industry_type = null

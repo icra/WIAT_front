@@ -47,7 +47,7 @@ let utils = {
 
     is_industry_valid(industry){
         if(industry == null || industry == undefined) return false
-        if(industry.volume_withdrawn!=null && industry.volume_withdrawn_groundwater!=null && industry.product_produced!=null && industry.has_onsite_wwtp!=null && industry.has_offsite_wwtp!=null && industry.has_direct_discharge!=null && industry.industry_type!=null){
+        if(industry.volume_withdrawn!=null && industry.product_produced!=null && industry.has_onsite_wwtp!=null && industry.has_offsite_wwtp!=null && industry.has_direct_discharge!=null && industry.industry_type!=null){
             let arr = [true]
             if(industry.has_onsite_wwtp == 1) {
                 let wwtp = industry.onsite_wwtp
