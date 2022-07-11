@@ -2314,7 +2314,7 @@ export default {
       advanced_truck_transportation: ["wwt_trck_typ", "wwt_vol_tslu"],
 
 
-      required: ["volume_withdrawn", "volume_withdrawn_groundwater", "product_produced", "has_onsite_wwtp", "has_offsite_wwtp", "has_direct_discharge", "industry_type", "wwt_vol_trea", "wwt_vol_disc", "dd_vol_disc" ],
+      required: ["volume_withdrawn", "product_produced", "has_onsite_wwtp", "has_offsite_wwtp", "has_direct_discharge", "industry_type", "wwt_vol_trea", "wwt_vol_disc", "dd_vol_disc" ],
       industry_model: {},
       onsite_wwtp_model: {},
       direct_discharge_model: {},
@@ -3552,7 +3552,6 @@ export default {
 
 
       let disabled = industry.volume_withdrawn != null && industry.volume_withdrawn !== "" &&
-          industry.volume_withdrawn_groundwater != null && industry.volume_withdrawn_groundwater !== "" &&
           industry.product_produced != null && industry.product_produced !== "" &&
           industry.has_onsite_wwtp != null && industry.has_direct_discharge != null && industry.has_offsite_wwtp != null && industry.industry_type != null
 

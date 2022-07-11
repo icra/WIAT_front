@@ -4157,6 +4157,20 @@
 
         </v-dialog>
         <v-dialog
+            v-model="info_effluent_load_tp"
+            width="60%"
+        >
+          <div class="dialog_detail" style="background-color: white">
+            <h3> TP effluent load </h3>
+            <br>
+            Concentration of TP discharged by the industry.
+            <br>
+            Reducing TP will contribute to reducing your GHG emissions associated to "water discharged"
+          </div>
+
+        </v-dialog>
+
+        <v-dialog
             v-model="co2_ghg_ratio_info"
             width="60%"
         >
@@ -4483,6 +4497,8 @@ export default {
       info_efficiency_influent_tp: false,
       info_effluent_load_tn: false,
       info_effluent_load_cod: false,
+      info_effluent_load_tp: false,
+
       info_pollutant_concentration: false,
       co2_ghg_ratio_info: false,
       n2o_ghg_ratio_info: false,
@@ -5387,7 +5403,7 @@ export default {
         }
 
         let tn = {value: _this.table_title.pollutants.tn, unit: "gTN/m3", info: "info_effluent_load_tn"}
-        let tp = {value: _this.table_title.pollutants.tp, unit: "gTP/m3",}
+        let tp = {value: _this.table_title.pollutants.tp, unit: "gTP/m3", info: "info_effluent_load_tp"}
         let cod = {value: _this.table_title.pollutants.cod, unit: "gCOD/m3", info: "info_effluent_load_cod"}
 
         let key = this.industry.name
@@ -5406,6 +5422,8 @@ export default {
 
         pollutants_table.value.push(cod)
         pollutants_table.value.push(tn)
+        pollutants_table.value.push(tp)
+
         return pollutants_table
       } else return {header: [], value: []}
 
@@ -6666,7 +6684,7 @@ export default {
               children: [
                 {id: 19, name: "Energy use", info: "Energy used by the industry to treat a m3 of water"},
                 {id: 20, name: "Wastewater effluent concentration", info: "Concentration of pollutant discharged by the industry"},
-                {id: 21, name: "Biogenic emissions", info: "Biogenic emissions sources are emissions that come from natural sources"},
+                //{id: 21, name: "Biogenic emissions", info: "Biogenic emissions sources are emissions that come from natural sources"},
                 {id: 22, name: "GHG emissions ratio", info: "Amount of CO2, CH4 and N2O during wastewater treatment process"},
                 {id: 23, name: "Sludge management", info: "GHG emissions from sludge management operations (storing, composting, incineration, land application, landfilling, stockpiling and truck transport)"},
               ]
