@@ -32,6 +32,8 @@
               <div style="background-color: white; overflow: hidden">
 
                 <v-card flat style="padding: 40px; height: 100%">
+                  <b>This video is from the older version of the WIAT tool. Some things has changed in this version, but the way assessments and industries are added is the same.</b>
+                  <br><br>
                   <video controls id="video">
                     <source src="demo.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"' />
                   </video>
