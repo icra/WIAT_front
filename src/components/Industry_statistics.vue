@@ -4512,6 +4512,8 @@ export default {
 
   },
   watch: {
+
+    //Open treeview node under imppact and levers for action. If node is base level (pollution, freshwater or carbon) close the previosuly opened nodes
     open_indicator(value) {
       let impact_index = [1, 13, 16] //Index in tree-view where main categories start
       let new_item = value[value.length - 1]
@@ -4524,15 +4526,19 @@ export default {
       }
     },
 
-
+    //Reset informatiob the biogas dialog if popup with information of sludge management is shown
     info_sludge_management: function (value) {
       if (value) {
         this.dialog_biogas_stage = 0
       }
     },
+
+    //Change current industry if user selects new assessment
     assessment_id: function (value) {
       this.industry = this.created_assessments[value][this.industry_id]
     },
+
+    //Change current industry if user selects new industryh
     industry_id: function (value) {
       this.industry = this.created_assessments[this.assessment_id][value]
     },
@@ -4540,20 +4546,8 @@ export default {
   },
   methods: {
 
+    //Sort strings numerically
     customSort(items, index, isDescending) {
-      // The following is informations as far as I researched.
-      // items: 'food' items
-      // index: Enabled sort headers value. (black arrow status).
-      // isDescending: Whether enabled sort headers is desc
-      /*items.sort((a, b) => {
-        if (index[0] === 'overall_water_risk') {
-          if (isDescending[0]) {
-            return b.overall_water_risk - a.overall_water_risk;
-          } else {
-            return a.overall_water_risk - b.overall_water_risk;
-          }
-        }
-      });*/
       items.sort((a, b) => {
         let x1 = parseFloat(a[index[0]])
         let x2 = parseFloat(b[index[0]])
@@ -4566,6 +4560,8 @@ export default {
       });
       return items
     },
+
+    //Get color of item based on value
     getGISLayerColor(item, value){
       let layer = this.selected_layer.name
       let equals = function(name1, name2){
@@ -4600,10 +4596,12 @@ export default {
       }
     },
 
+    //Overall water risk color
     get_owr_color(item){
       return this.risk_categories["owr"](item["overall_water_risk"])
     },
 
+    //Get data and charts for nodeLater selected under context tab
     async layerTreeSelected(nodeLayer){
       this.selected_layer = null
       this.show_context_chart = false
@@ -4713,7 +4711,7 @@ export default {
       }
     },
 
-
+    //Auxiliar function for creating global GIS layer treeview
     add_identifier: function (category, id){
       let _this = this
       category.id = id
@@ -4730,7 +4728,8 @@ export default {
       return id
     },
 
-    industries_deleted(){ //An industry or assessment has been deleted, if it's the current one return to map
+    //An industry or assessment has been deleted, if it's the current one return to map
+    industries_deleted(){
       let _this = this
       let assessment_index =  this.$assessments.findIndex(assessment => assessment.name === _this.assessment.name)
       if(assessment_index === -1) this.$router.push('/')
@@ -4741,6 +4740,7 @@ export default {
       }
     },
 
+    //In impact and lever for action table, return impact (low, high, very-high, ...) associated to id
     indicator_risk_class: function (id) {
 
 
@@ -4749,6 +4749,7 @@ export default {
 
       let current_industry_name = this.industry.name
       let industry = this.simple_report_table.value.filter(industry => industry.value == current_industry_name)[0]
+
       if (industry == null || industry == undefined) return
       //let ghg_impact = this.risk_categories["global_warming"](industry["carbon_impact"])
 
@@ -4778,7 +4779,6 @@ export default {
       toxicity_load_risk[1] = this.return_avg_risk([delta_eqs_impact, delta_ecotox_impact])
       let effluent_toxicity_risk = [null, null]
       effluent_toxicity_risk[1] = this.return_avg_risk([eqs_impact, ecotox_impact])*/
-
 
 
       let return_color_class = function (value) {
@@ -4819,20 +4819,21 @@ export default {
       }
     },
 
+    //Return very high impact if there is a very high impact in factors, high impact if there is a high impact in factors, ..., until low impact level is reached
     return_avg_risk(factors) {
       let factors_not_null = factors.filter(factor => factor != null && factor != "-").map(factor => factor[1])
       if (factors_not_null.length === 0) {
         return null
-      } else if (factors_not_null.includes(risk_thereshold.impact_strings.vh)) {
+      } else if (factors_not_null.includes(risk_thereshold.impact_strings.vh)) {  //Very high
         return risk_thereshold.impact_strings.vh
-      } else if (factors_not_null.includes(risk_thereshold.impact_strings.h)) return risk_thereshold.impact_strings.h
-      else if (factors_not_null.includes(risk_thereshold.impact_strings.m)) return risk_thereshold.impact_strings.m
-      else if (factors_not_null.includes(risk_thereshold.impact_strings.l)) return risk_thereshold.impact_strings.l
+      } else if (factors_not_null.includes(risk_thereshold.impact_strings.h)) return risk_thereshold.impact_strings.h  //High
+      else if (factors_not_null.includes(risk_thereshold.impact_strings.m)) return risk_thereshold.impact_strings.m  //Medium
+      else if (factors_not_null.includes(risk_thereshold.impact_strings.l)) return risk_thereshold.impact_strings.l  //Low
       return null
     },
 
 
-
+    //Get impact associated to item (related to freshwater)
     getAvailabilityColor(item) {
       if (item.value == this.table_title.availability_quantity.dilution_factor) {
         return this.risk_categories["dilution_factor"](item[this.industry.name])
@@ -4848,10 +4849,12 @@ export default {
       return null
     },
 
+    //Get impact associated to item (related to eutrophication potential)
     getEutrophicationColor(item) {
       return this.risk_categories["eutrophication"](item[this.industry.name])
     },
 
+    //Get impact associated to item (related to ecotoxicity delta)
     getDeltaEcotoxColor(item) {
       /*if (item.value == this.table_title.pollutants.total){
         return this.risk_categories["delta_ecotoxicity"](item[value] / 11)
@@ -4861,45 +4864,53 @@ export default {
       return this.risk_categories["delta_ecotoxicity"](item[this.industry.name])
     },
 
-    getDelta(item) {
-      return this.risk_categories["delta"](item[this.industry.name])
-    },
-
+    //Get impact associated to item (related to environmental quality standards)
     getEQSColor(item) {
       return this.risk_categories["eqs"](item[this.industry.name])
     },
+
+    //Get impact associated to item (related to carbon impact)
     getGlobalWarming(item) {
       return this.risk_categories["global_warming"](item[this.industry.name])
     },
 
+    //Get impact associated to item (related to toxic units)
     getEcotoxicity(item) {
       return this.risk_categories["ecotoxicity"](item[this.industry.name])
     },
 
+    //Get impact associated to item (related to delta of environmental quality standards)
     getDeltaEQSColor(item) {
       return this.risk_categories["delta_eqs"](item[this.industry.name])
     },
 
+    //Get impact associated to item (related to treatment efficiency)
     getTreatmentEfficiencyColor(item) {
       return this.risk_categories["treatment_efficiency"](item[this.industry.name])
     },
+
+    //Get impact associated to item (related to treatment efficiency on the influent)
     getTreatmentEfficiencyInfluentColor(item) {
       return this.risk_categories["influent_treatment_efficiency"](item[this.industry.name])
     },
 
+    //Bold item if hovered
     itemRowBold: function (item) {
       return item.value == "Total" ? 'style-1' : 'style-2'
     },
 
+    //Get color based on str
     chooseColor(str) {
       return Object.values(colors)[this.hashCode(str) % Object.values(colors).length]
     },
 
+    //Calculate hash code of s
     hashCode(s) {
       let ADLER32 = require('adler-32');
       return ADLER32.str(s)
     },
 
+    //Carbon impact table
     generate_emissions_table() {
 
       let _this = this
@@ -5039,6 +5050,7 @@ export default {
 
     },
 
+    //GHG emissions ratio table
     generate_ghg_ratio_table() {
 
       let _this = this
@@ -5137,7 +5149,7 @@ export default {
 
     },
 
-
+    //sludge management table
     generate_sludge_management_table() {
 
       let _this = this
@@ -5236,6 +5248,7 @@ export default {
 
     },
 
+    //Concentration of pollutants table
     async generate_concentration_table() {
       let _this = this
 
@@ -5318,7 +5331,7 @@ export default {
 
     },
 
-
+    //Biogas valorisation table
     generate_biogas_valorised_table() {
 
       let _this = this
@@ -5360,7 +5373,7 @@ export default {
 
     },
 
-
+    //Energy use table
     generate_energy_use_table() {
 
       let _this = this
@@ -5391,6 +5404,7 @@ export default {
 
     },
 
+    //Wastewater effluent concentration table
     generate_effluent_load_table() {
 
       let _this = this
@@ -5429,6 +5443,7 @@ export default {
 
     },
 
+    //Eutrophication potential table
     generate_eutrophication_table() {
 
       let _this = this
@@ -5523,6 +5538,7 @@ export default {
 
     },
 
+    //"Toxic units in the effluent" table
     generate_ecotoxicity_table() {
 
       let _this = this
@@ -5674,6 +5690,7 @@ export default {
 
     },
 
+    //"Increase of the concentration of the pollutants in the receiving water body after discharge (with respect to EQS)" table
     async generate_delta_eqs_table() {
 
       let _this = this
@@ -5806,6 +5823,7 @@ export default {
 
     },
 
+    //"Increase in toxic units in the receiving water body after discharge" table
     async generate_delta_ecotox_table() {
 
       let _this = this
@@ -5956,6 +5974,7 @@ export default {
 
     },
 
+    //"Concentration of the pollutants in the effluent (with respect to EQS)"
     generate_eqs_table() {
 
       let _this = this
@@ -6084,6 +6103,7 @@ export default {
 
     },
 
+    //Calculates all statistics for current industry (for calculating and evaluating industry impact for showing colors in treeview)
     async generate_simple_report_table() {
 
       if (this.industry !== undefined) {
@@ -6144,6 +6164,7 @@ export default {
 
     },
 
+    //Freshwater impact
     async generate_water_quality_table() {
 
       let _this = this
@@ -6256,6 +6277,7 @@ export default {
 
     },
 
+    //Freshwater lever for action
     async generate_freshwater_lever_for_action_table() {
 
       let _this = this
@@ -6304,6 +6326,7 @@ export default {
 
     },
 
+    //Treated water factor
     async generate_treated_table() {
 
       let _this = this
@@ -6341,6 +6364,7 @@ export default {
 
     },
 
+    //Percentatge of treatment efficiency (compared to WWTP influent)
     generate_treatment_efficiency_table() {
 
       let _this = this
@@ -6470,6 +6494,7 @@ export default {
 
     },
 
+    //Percentage of treatment efficiency (compared to intake water)
     generate_treatment_efficiency_influent_table() {
 
       let _this = this
@@ -6543,6 +6568,7 @@ export default {
 
     },
 
+    //Default context table
     async generate_industry_table() {
 
       let _this = this
@@ -6562,7 +6588,7 @@ export default {
 
        for (let supply_chain of arr){
 
-         //calcular overall water index
+         //calculate overall water risk index
          let owr = await utils.overall_water_risk(supply_chain.location.lat, supply_chain.location.lng)
          owr = owr.toFixed(3)
          table.value.push({
@@ -6623,6 +6649,7 @@ export default {
 
   computed: {
 
+    //Generate context treeview
     layer_tree: function () {
       let _this = this
       let id = 1
@@ -6633,7 +6660,7 @@ export default {
       return this.layers
     },
 
-
+    //Generate impact and lever for action treeview
     indicators_industry() {
       return [
         {

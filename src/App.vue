@@ -426,9 +426,6 @@
                       </template>
                       <span>Click to enter or modify data related to the industrial site</span>
                     </v-tooltip>
-
-
-
                   </div>
                 </v-expansion-panel-content>
                 <div v-if="created_assessments[assessment_index].industries.length == 0 && assessment_expansion_panel == assessment_index" style="margin: 10px 15px 10px 15px; min-width: 100px; color: #3b3b3b; font-size: 13px">
@@ -990,8 +987,7 @@ export default {
   },
 
   watch: {
-
-
+    //If opened, sets video tutorial under "how to use" to the beginning
     dialog_tour: function(opened){
       if(!opened){
         let video = document.querySelector("#video");
@@ -1000,6 +996,7 @@ export default {
       }
     },
 
+    //When the selected assessment changes, if the user was adding a supply chain or industry form another assessment, the operation is cancelled
     assessment_expansion_panel: function(assessment){
       try {
         this.$refs.reference.close_supply_chain_mode()
@@ -1008,6 +1005,7 @@ export default {
       } catch (error) {}
     },
 
+    //Change index (first side bar) uf URL changes
     '$route' (to, from){
       let page = to.name
       let index = 0
@@ -1026,7 +1024,7 @@ export default {
   },
 
   methods: {
-
+    //Call function from map component
     add_supply_chain_industry(){
       try {
         this.$refs.reference.enter_supply_chain_mode()
@@ -1079,12 +1077,13 @@ export default {
       event.returnValue = ""
     },
 
-
+    //Global layer selected
     layerTreeSelected(nodeLayer){
       if(nodeLayer.length > 0) this.applyLayer(nodeLayer[0].name)
       else this.applyLayer(this.selected_layer)
     },
 
+    //Auxiliar function for creating global layers tree selector
     add_identifier: function (category, id){
       let _this = this
       category.id = id
@@ -1100,6 +1099,7 @@ export default {
       return id
     },
 
+    //Clicked icon on first sidebar menu
     left_side_menu_icon_selected(index){
       this.selected_layer=null;
       this.secondMenu=false;
@@ -1108,6 +1108,7 @@ export default {
       if (this.icon_selected !== 0 && this.right_sidebar_content === 6) this.rightMenu=false  //Close layer selection menu if map is not active
     },
 
+    //Apply or remove clicked global layer
     applyLayer(key){  //Selected layer to apply
       if (this.selected_layer === key){
         this.actived_layers.splice(0,this.actived_layers.length)
@@ -1118,6 +1119,7 @@ export default {
       }
     },
 
+    //Update markers from map
     update_markers(){
       let _this = this
       this.$location_markers.splice(0,this.$location_markers.length)
@@ -1160,7 +1162,7 @@ export default {
       }
     },
 
-    closeRightMenu(){ //Open or close layer selection menu
+    closeRightMenu(){ //Close layer selection menu
       this.rightMenu = false
     },
 
@@ -1196,6 +1198,8 @@ export default {
 
 
     },
+
+
     open_create_assessment_tab(){
       this.rightMenu = true;
       this.right_sidebar_content = 1;
@@ -1271,10 +1275,6 @@ export default {
         this.$refs.reference.pan_location(this.created_assessments[assessment_index].industries[industry_index].location)
         this.$refs.reference.close_supply_chain_mode()
       } catch (error) {}
-
-
-
-
     },
     open_edit_supply_chain_tab(assessment_index, industry_index, sc_index){
       this.right_sidebar_content = 8
@@ -1289,10 +1289,6 @@ export default {
         this.$refs.reference.pan_location(this.created_assessments[assessment_index].industries[industry_index].supply_chain[sc_index].location)
         this.$refs.reference.close_supply_chain_mode()
       } catch (error) {}
-
-
-
-
     },
 
     edit_industry(){
@@ -1340,7 +1336,7 @@ export default {
       else return "Industry/supplier with same name already exists"
 
     },
-    rules_required(value) {  //Rules for creating new factory
+    rules_required(value) {
       if(!!value) return true
       else return 'Required.'
     },
@@ -1363,6 +1359,8 @@ export default {
       if (assessments_with_same_name.length === 0 || (assessments_with_same_name.length === 1 && this.created_assessments[this.selected_assessment].name === value)) return true
       else return 'An assessment with same name already exists.' //If there is an assessment with the same name, must be the edited assessment
     },
+
+    //Hide/show markers in map
     hide_show_industries(assessment_index){
       this.assessment_active[assessment_index] = !this.assessment_active[assessment_index] //hide/show industries of the assessment
 
@@ -1390,6 +1388,7 @@ export default {
   },
   computed: {
 
+    //Generate global layers selector tree
     layer_tree: function () {
       let _this = this
       let id = 1
@@ -1400,8 +1399,8 @@ export default {
       return this.layers_description
     },
 
+    //Apply css classes depending on side menus opened
     manageContentClass: function(){
-
       //Right sidebar is the right lateral menu (except for the layer selection menu, which is map_sidebar)
       return {
         'left_sidebar_opened': this.secondMenu,

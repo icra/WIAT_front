@@ -529,11 +529,13 @@ export default {
 
   watch: {
 
+    //Updates baseline_future_model whan baseline_future_slider changes
     baseline_future_slider: function(value){
       if(value == 0) this.baseline_future_model = 'baseline'
       else this.baseline_future_model = 'future'
     },
 
+    //change map location by address
     address_model: function(address) {
       if(address !== null){
         this.onMapClick({latlng: address.latlng})
@@ -546,6 +548,7 @@ export default {
 
     },
 
+    //Return list of suggestions that match adress
     searchAddress: function (address) {
 
       //if (this.address_suggestions.length > 0) return
@@ -570,12 +573,14 @@ export default {
 
     },
 
+    //Delete current markers on the map and place new markers
     location_markers: function (markers) {
       //Delete markers first
       this.delete_markers()
       this.place_markers(markers)
     },
 
+    //Remove current layer from the map, apply new layer
     selected_layer: function (new_layer, old_layer) {
 
       this.delete_layer(old_layer, this.baseline_future_model, this.annual_monthly_model, this.months_model)
@@ -595,6 +600,8 @@ export default {
       //if(old_layer !== null) this.layers[old_layer].layer.delete()
 
     },
+
+    //Switch from baseline to future, or vice versa
     baseline_future_model: function (new_value, old_value) {
       if(this.listenToWatch){
         let old_layer = this.selected_layer
@@ -603,6 +610,8 @@ export default {
         this.add_layer(new_layer)
       }
     },
+
+    //Change current month
     months_model: function (new_value, old_value) {
       if(this.listenToWatch){
         let old_layer = this.selected_layer
@@ -612,6 +621,8 @@ export default {
       }
 
     },
+
+    //Change from annual to monthly, or vice versa
     annual_monthly_model: function (new_value, old_value) {
       if(this.listenToWatch){
         let old_layer = this.selected_layer
@@ -623,17 +634,21 @@ export default {
     },
 },
   methods: {
+    //Stop placing supply chain industries on map
     close_supply_chain_mode(){
       this.adding_supply_chain = false
     },
+    //Start placing supply chain industries on map
     enter_supply_chain_mode(){
       this.adding_supply_chain = true
     },
 
+    //Change map center to location
     pan_location(location){
       this.mapDiv.panTo(location)
     },
 
+    //Map clicked, if location is correct, show layer value, if needed create industry or supply chain
     async onMapClick(e) {
 
       let _this = this
@@ -677,13 +692,13 @@ export default {
         });
       }
       else{
-
         _this.$emit('wrongLocation', latlng)
       }
 
 
     },
 
+    //Change map location to degrees coordinates
     searchCoordinates(){
 
       let lat_decimal = Number.parseFloat(this.latitude_degree) + Number.parseFloat(this.latitude_minutes)/60 + Number.parseFloat(this.latitude_seconds)/3600
@@ -714,6 +729,7 @@ export default {
 
     },
 
+    //Change map location to decimal coordinates
     searchDecimalsDegrees(){
       let _this = this
       let e = {
@@ -727,6 +743,7 @@ export default {
       this.onMapClick(e)
     },
 
+    //Calls function "toggleLayerSelection" in App.vue file
     toggle_layer_selection_menu(){
       this.$emit('selectLayer');
     },
@@ -736,6 +753,8 @@ export default {
       this.mapDiv.removeLayer(this.clicked_marker)
       this.clicked_marker = null
     },
+
+    //Get required layer
     get_layer(layer, baseline_future, annual_monthly, months_model){
       if(layer !== null){
         if(baseline_future === "baseline"){
@@ -752,6 +771,7 @@ export default {
       }
     },
 
+    //Delete specified layer
     delete_layer(layer, baseline_future, annual_monthly, months_model){
 
       if(this.clicked_marker !== null) this.mapDiv.removeLayer(this.clicked_marker)
@@ -760,6 +780,8 @@ export default {
         current_layer.delete()
       }
     },
+
+    //Add specified layer
     add_layer(layer, baseline_future=this.baseline_future_model, annual_monthly=this.annual_monthly_model, months_model=this.months_model){
       let current_layer = this.get_layer(layer, baseline_future, annual_monthly, months_model)
       if(current_layer !== null){
@@ -767,6 +789,8 @@ export default {
         current_layer.apply()
       }
     },
+
+
     toggle_popup(text, add_industry=true){  //if add_industry, adds button for adding industry on clicked point
       if(this.popup_info===null) {
         this.popup_info=this.clicked_marker.bindPopup()
@@ -780,6 +804,8 @@ export default {
       this.popup_info.setPopupContent(text)
       this.popup_info.openPopup()
     },
+
+    //Create new layer stored on CARTO server
     define_carto_layer(dataset, style, label, carto_client, username, url, temporal_resolution, change_unit = false, old_units = "", new_units = "", unit_scale_factor = 1){
       let _this = this
       let obj = {}
@@ -897,6 +923,7 @@ export default {
       return obj
     },
 
+    //Create new layer stored on CARTO server updated
     define_carto_layer_v2(dataset, style, label, carto_client, username, url, temporal_resolution, color_legend, label_legend, noData, unit_scale_factor = 1, units=""){
       let _this = this
       let obj = {}
@@ -998,6 +1025,7 @@ export default {
       return obj
     },
 
+    //Create raster layer stored on wiat-server
     define_raster_layer(geotiff_file_data, geotiff_file_palette, color_function, color_legend, label_legend, url, temporal_resolution, units="", scale=1, resolution=16, noData=null){
       let _this = this
       let obj = {}
@@ -1184,6 +1212,7 @@ export default {
       })
     },
 
+    //Return data from raster named file_nale at lat lng location
     get_raster_data(lat, lng, file_name) {
       //http://localhost:3000/bona?longitude=2.16992&latitude=41.3879
       let call = "https://wiat-server.icradev.cat/data_point?filename="+file_name+"&longitude="+lng+"&latitude="+lat
@@ -1198,6 +1227,7 @@ export default {
 
     },
 
+    //leaflet configuration
     setupLeafletMap() {
       let _this = this
 

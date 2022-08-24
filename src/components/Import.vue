@@ -271,14 +271,15 @@ export default {
   },
   methods: {
 
+    //if industry_input[i] is float, return it. Otherwise, return null if mandatory, else return 0
     parse_i(industry_input, i, mandatory = false){
       if(mandatory) return !isNaN(industry_input[i]) ? parseFloat(industry_input[i]) : null
       else return !isNaN(industry_input[i]) ? parseFloat(industry_input[i]) : 0
 
     },
 
+    //Parse row of risk threshold excel
     parseRiskThereshold(risk, lowString, mediumString, highString){
-
 
       let blue = ['#529fee', "Low impact"]
       let red = ['red', "Very high impact"]
@@ -383,6 +384,7 @@ export default {
 
     },
 
+    //Uploaded risk threshold excel
     onUploadExcelRisk(){
 
       let _this = this
@@ -407,8 +409,9 @@ export default {
         }
       }
     },
-    onUploadExcel(){
 
+    //Uploaded excel session
+    onUploadExcel(){
       if(this.imported_file_excel != null){
         const wb = new Excel.Workbook();
         const reader = new FileReader()
@@ -882,6 +885,7 @@ export default {
       }
     },
 
+    //Make copy of industry
     copyIndustry(industry){
       let new_industry = new Industry()
 
@@ -910,6 +914,7 @@ export default {
 
     },
 
+    //Download eceñ session
     async download_excel(){
       axios.get('/download/template/file/'+file, {responseType: 'arraybuffer'}).then(res=>{
         let blob = new Blob([res.data], {type:'application/*'})
@@ -921,6 +926,8 @@ export default {
       })
 
     },
+
+    //Download json session
     download_json(){
       let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.created_assessments));
       let downloadAnchorNode = document.createElement('a');
@@ -930,6 +937,8 @@ export default {
       downloadAnchorNode.click();
       downloadAnchorNode.remove();
     },
+
+    //.JSON to json object
     async fileToJSON(file) {
       return new Promise((resolve, reject) => {
         const fileReader = new FileReader()
@@ -938,6 +947,8 @@ export default {
         fileReader.readAsText(file)
       })
     },
+
+    //replace current assessments with imported assessments
     async import_replace(){
       let _this=this
       //Empty arrays
@@ -974,6 +985,8 @@ export default {
         _this.$assessment_active.push(true)
       })
     },
+
+    //append current assessments to new assessments
     async import_append(){
       let _this=this
 
@@ -1019,6 +1032,8 @@ export default {
 
       })
     },
+
+    //json session uploaded
     async onUpload(){
       let _this = this
       try {
