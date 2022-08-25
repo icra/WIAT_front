@@ -2325,7 +2325,6 @@ export default {
   },
   created() {
 
-    this.$emit('changeFirstMenuTab', -1)
     if (this.industry === undefined) this.$router.push('/')
 
     for (let industry_input of this.industry_inputs) {
@@ -2344,11 +2343,7 @@ export default {
   },
   watch: {
 
-    operation_type(new_value){
-      if(new_value == "Supply chain") this.industry_provided = this.final_product_industries[0].value
-      else if(new_value == "Final product") this.industry_provided = null
-    },
-
+    //Changed step in the questionnaire, if step is onsite WWTP add or don't inputs related to offsite WWTP
     stepper_model(step){
 
       this.scrollToTop()
@@ -2368,13 +2363,18 @@ export default {
         }
       }
     },
+
+    //Changed current  industry
     industry_id: function (industry_id) {
       this.industry = this.$assessments[this.assessment_id].industries[this.industry_id]
-
     },
+
+    //Changed current assessment
     assessment_id: function (assessment_id) {
       this.industry = this.$assessments[this.assessment_id].industries[this.industry_id]
     },
+
+    //Changed industry
     industry: function (industry) {
       if (industry === undefined) {
         this.$router.push('/')
@@ -2409,9 +2409,6 @@ export default {
       location.href = "#";
       location.href = "#top";
     },
-    changeTab(){
-      this.$emit('changeFirstMenuTab', 2)
-    },
 
     array_intersection(arrA, arrB){
       let intersection = arrA.filter(x => arrB.includes(x));
@@ -2423,6 +2420,7 @@ export default {
       return difference
     },
 
+    //Effluent concentration of external WWTP after receiving water from onsite WWTP (if any) and water from industry (if any) and applying treatment
     concentration_effluent_load(pollutant_ind, pollutant_wwtp, pollutant_table){
 
       let wwtp = this.industry.onsite_wwtp
@@ -3267,6 +3265,8 @@ export default {
       }
       return estimations[code]()
     },
+
+    //Select estimations
     select_estimations(code){
       let wwt_model = this.onsite_wwtp_model
       if(this.stepper_model == 4){
@@ -3435,6 +3435,7 @@ export default {
       return rules[code]()
     },
 
+
     tab_4_continue(){
       this.scrollToTop()
 
@@ -3531,21 +3532,6 @@ export default {
   },
 
   computed: {
-    final_product_industries(){
-      let _this = this
-      let final_product_industries = this.assessment.industries.filter(industry => {
-        return industry.operation_type === "Final product" && industry.name !== _this.industry.name
-        //return industry.operation_type === "final_product"
-      })
-
-      return final_product_industries.map(industry => {
-        return {
-          text: industry.name,
-          value: industry.name
-        }
-      })
-
-    },
 
     tab_1_disabled(){
       let industry = this.industry_model
@@ -3575,12 +3561,8 @@ export default {
       let disabled = wwtp.wwt_vol_trea != null && wwtp.wwt_vol_trea != ""
       return !disabled
     },
-
   }
-
-
-
-
+  
 };
 </script>
 

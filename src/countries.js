@@ -1,11 +1,7 @@
-/* List of countries, with: - Conversion factor - Protein consumption - Bod per day (IPCC TABLE 6.4)
+/* List of countries, with: - Conversion factor
    UPDATED TABLE (20/5/2021)
-   2: https://www.eib.org/attachments/strategies/eib_project_carbon_footprint_methodologies_en.pdf
-   3: IPCC, 2006, Guidelines for National Greenhouse Gas Inventories Volume 5 Waste
-   4: currencies: https://www.countries-ofthe-world.com/world-currencies.html (checked on 2020-12-10)
    conv_kwh_co2 -> gCO2/kWh (converted to kg after the definition of the table)
-   prot_con     -> kg/person/year
-   bod_pday     -> g/person/day
+
 */
 
 let Countries = {
