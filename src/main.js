@@ -528,7 +528,6 @@ Vue.prototype.$layers_description = [
   },*/
 ]
 
-
 new Vue({
   router,
   vuetify,

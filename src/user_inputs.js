@@ -233,6 +233,8 @@ export let user_inputs = {
     "wwt_vol_disc" :{question:"Volume of water discharged to water body every day", value: 0, unit: "m3/day"},
     "dd_vol_disc" :{question:"Volume of water discharged to water body every day (direct discharge of untreated water)", value: 0, unit: "m3/day"},
 
+    "wwt_pollutants_effl": {value: 0, unit: "g/m3"},
+
     "wwt_cod_effl": {
         question: "Concentration of COD in the WWTP effluent",
         value: 0,
@@ -396,21 +398,25 @@ export let user_inputs = {
     "ind_nonilfenols_effl": {question: "Concentration of nonylphenols in the industry effluent", value: 0, unit: "g/m3"},
     "ind_tetracloroetile_effl": {question: "Concentration of tetrachloroethene in the industry effluent", value: 0, unit: "g/m3"},
     "ind_tricloroetile_effl": {question: "Concentration of trichloroethylene in the industry effluent", value: 0, unit: "g/m3"},
+    "ind_pollutants_effl": {value: 0, unit: "g/m3"},
+    "ind_pollutants_infl": {value: 0, unit: "g/m3"},
+
+
 
 }
 
 //Inputs related to industry step
-export let industry_inputs = ["volume_withdrawn", "volume_withdrawn_groundwater", "has_onsite_wwtp", "has_direct_discharge", "has_offsite_wwtp", "industry_type", "product_produced", "ind_cod_infl", "ind_tn_infl", "ind_tp_infl", "ind_cod_effl", "ind_tn_effl", "ind_tp_effl", "ind_diclo_effl", "ind_cadmium_effl", "ind_hexaclorobenzene_effl", "ind_mercury_effl", "ind_plomo_effl", "ind_niquel_effl", "ind_chloro_effl", "ind_hexaclorobutadie_effl", "ind_nonilfenols_effl", "ind_tetracloroetile_effl", "ind_tricloroetile_effl" ]
+export let industry_inputs = ["volume_withdrawn", "volume_withdrawn_groundwater", "has_onsite_wwtp", "has_direct_discharge", "has_offsite_wwtp", "industry_type", "product_produced", "pollutants_list", "ind_pollutants_effl", "ind_pollutants_infl"]
 
 //Inputs related to onsite WWTP step (without external WWTP)
-export let onsite_wwtp_no_offsite = ["wwt_treatment_type", "wwt_vol_trea", "wwt_vol_disc", "wwt_vol_reused", "wwt_cod_effl", "wwt_tn_effl", "wwt_tp_effl", "wwt_diclo_effl", "wwt_cadmium_effl", "wwt_hexaclorobenzene_effl", "wwt_mercury_effl", "wwt_plomo_effl", "wwt_niquel_effl", "wwt_chloro_effl", "wwt_hexaclorobutadie_effl", "wwt_nonilfenols_effl", "wwt_tetracloroetile_effl", "wwt_tricloroetile_effl", "wwt_nrg_cons", "wwt_conv_kwh", "wwt_mass_slu", "wwt_cod_slud", "wwt_ch4_efac_tre", "wwt_n2o_efac_tre", "wwt_ch4_efac_dis", "wwt_n2o_efac_dis", "wwt_fuel_typ", "wwt_vol_fuel",
+export let onsite_wwtp_no_offsite = ["wwt_treatment_type", "wwt_vol_trea", "wwt_vol_disc", "wwt_vol_reused", "wwt_pollutants_effl", "wwt_cod_effl", "wwt_tn_effl", "wwt_tp_effl", "wwt_diclo_effl", "wwt_cadmium_effl", "wwt_hexaclorobenzene_effl", "wwt_mercury_effl", "wwt_plomo_effl", "wwt_niquel_effl", "wwt_chloro_effl", "wwt_hexaclorobutadie_effl", "wwt_nonilfenols_effl", "wwt_tetracloroetile_effl", "wwt_tricloroetile_effl", "wwt_nrg_cons", "wwt_conv_kwh", "wwt_mass_slu", "wwt_cod_slud", "wwt_ch4_efac_tre", "wwt_n2o_efac_tre", "wwt_ch4_efac_dis", "wwt_n2o_efac_dis", "wwt_fuel_typ", "wwt_vol_fuel",
     "wwt_biog_pro", "wwt_biog_fla", "wwt_biog_val", "wwt_biog_lkd", "wwt_biog_sold", "wwt_ch4_biog", "wwt_dige_typ", "wwt_fuel_dig", "wwt_reus_trck_typ", "wwt_reus_vol_trck",
     "wwt_mass_slu_sto", "wwt_time_slu_sto", "wwt_slu_sto_TVS", "wwt_slu_sto_f_CH4", "wwt_slu_sto_EF", "wwt_mass_slu_comp", "wwt_slu_comp_emis_treated_or_piles_covered", "wwt_slu_comp_solids_content", "wwt_slu_comp_TVS", "wwt_slu_comp_N_cont", "wwt_slu_comp_low_CN_EF", "wwt_slu_comp_uncovered_pile_EF", "wwt_slu_comp_seqst_rate",
     "wwt_mass_slu_inc", "wwt_temp_inc", "wwt_slu_inc_N_cont", "wwt_slu_inc_SNCR", "wwt_mass_slu_app", "wwt_slu_la_solids_content", "wwt_slu_la_TVS", "wwt_slu_la_N_cont", "wwt_slu_la_EF",
     "wwt_mass_slu_land", "wwt_slu_lf_TVS", "wwt_slu_lf_uncertainty", "wwt_slu_lf_CH4_in_gas", "wwt_slu_lf_DOCf", "wwt_slu_lf_decomp_3yr", "wwt_slu_lf_MCF", "wwt_slu_lf_N_cont", "wwt_slu_lf_low_CN_EF", "wwt_mass_slu_stock", "wwt_slu_sp_lifespan", "wwt_trck_typ", "wwt_vol_tslu"]
 
 //Inputs related to onsite WWTP step (with external WWTP)
-export let onsite_wwtp_with_offsite_wwtp_inputs = ["wwt_treatment_type", "wwt_vol_trea", "wwt_vol_disc", "wwt_vol_reused", "wwt_vol_treated_external", "wwt_cod_effl", "wwt_tn_effl", "wwt_tp_effl", "wwt_diclo_effl", "wwt_cadmium_effl", "wwt_hexaclorobenzene_effl", "wwt_mercury_effl", "wwt_plomo_effl", "wwt_niquel_effl", "wwt_chloro_effl", "wwt_hexaclorobutadie_effl", "wwt_nonilfenols_effl", "wwt_tetracloroetile_effl", "wwt_tricloroetile_effl", "wwt_nrg_cons", "wwt_conv_kwh", "wwt_mass_slu", "wwt_cod_slud", "wwt_ch4_efac_tre", "wwt_n2o_efac_tre", "wwt_ch4_efac_dis", "wwt_n2o_efac_dis", "wwt_fuel_typ", "wwt_vol_fuel",
+export let onsite_wwtp_with_offsite_wwtp_inputs = ["wwt_treatment_type", "wwt_vol_trea", "wwt_vol_disc", "wwt_vol_reused", "wwt_vol_treated_external", "wwt_pollutants_effl", "wwt_cod_effl", "wwt_tn_effl", "wwt_tp_effl", "wwt_diclo_effl", "wwt_cadmium_effl", "wwt_hexaclorobenzene_effl", "wwt_mercury_effl", "wwt_plomo_effl", "wwt_niquel_effl", "wwt_chloro_effl", "wwt_hexaclorobutadie_effl", "wwt_nonilfenols_effl", "wwt_tetracloroetile_effl", "wwt_tricloroetile_effl", "wwt_nrg_cons", "wwt_conv_kwh", "wwt_mass_slu", "wwt_cod_slud", "wwt_ch4_efac_tre", "wwt_n2o_efac_tre", "wwt_ch4_efac_dis", "wwt_n2o_efac_dis", "wwt_fuel_typ", "wwt_vol_fuel",
     "wwt_biog_pro", "wwt_biog_fla", "wwt_biog_val", "wwt_biog_lkd", "wwt_biog_sold", "wwt_ch4_biog", "wwt_dige_typ", "wwt_fuel_dig", "wwt_reus_trck_typ", "wwt_reus_vol_trck",
     "wwt_mass_slu_sto", "wwt_time_slu_sto", "wwt_slu_sto_TVS", "wwt_slu_sto_f_CH4", "wwt_slu_sto_EF", "wwt_mass_slu_comp", "wwt_slu_comp_emis_treated_or_piles_covered", "wwt_slu_comp_solids_content", "wwt_slu_comp_TVS", "wwt_slu_comp_N_cont", "wwt_slu_comp_low_CN_EF", "wwt_slu_comp_uncovered_pile_EF", "wwt_slu_comp_seqst_rate",
     "wwt_mass_slu_inc", "wwt_temp_inc", "wwt_slu_inc_N_cont", "wwt_slu_inc_SNCR", "wwt_mass_slu_app", "wwt_slu_la_solids_content", "wwt_slu_la_TVS", "wwt_slu_la_N_cont", "wwt_slu_la_EF",
@@ -420,7 +426,7 @@ export let onsite_wwtp_with_offsite_wwtp_inputs = ["wwt_treatment_type", "wwt_vo
 export let direct_discharge_inputs = ["dd_vol_disc", "wwt_ch4_efac_dis", "wwt_n2o_efac_dis"]
 
 //Inputs related to external WWTP
-export let offsite_wwtp_inputs =  ["wwt_treatment_type", "wwt_vol_trea", "wwt_vol_disc", "wwt_cod_effl", "wwt_tn_effl", "wwt_tp_effl", "wwt_diclo_effl", "wwt_cadmium_effl", "wwt_hexaclorobenzene_effl", "wwt_mercury_effl", "wwt_plomo_effl", "wwt_niquel_effl", "wwt_chloro_effl", "wwt_hexaclorobutadie_effl", "wwt_nonilfenols_effl", "wwt_tetracloroetile_effl", "wwt_tricloroetile_effl", "wwt_nrg_cons", "wwt_conv_kwh", "wwt_mass_slu", "wwt_cod_slud", "wwt_ch4_efac_tre", "wwt_n2o_efac_tre", "wwt_ch4_efac_dis", "wwt_n2o_efac_dis", "wwt_fuel_typ", "wwt_vol_fuel",
+export let offsite_wwtp_inputs =  ["wwt_treatment_type", "wwt_vol_trea", "wwt_vol_disc", "wwt_pollutants_effl", "wwt_cod_effl", "wwt_tn_effl", "wwt_tp_effl", "wwt_diclo_effl", "wwt_cadmium_effl", "wwt_hexaclorobenzene_effl", "wwt_mercury_effl", "wwt_plomo_effl", "wwt_niquel_effl", "wwt_chloro_effl", "wwt_hexaclorobutadie_effl", "wwt_nonilfenols_effl", "wwt_tetracloroetile_effl", "wwt_tricloroetile_effl", "wwt_nrg_cons", "wwt_conv_kwh", "wwt_mass_slu", "wwt_cod_slud", "wwt_ch4_efac_tre", "wwt_n2o_efac_tre", "wwt_ch4_efac_dis", "wwt_n2o_efac_dis", "wwt_fuel_typ", "wwt_vol_fuel",
     "wwt_biog_pro", "wwt_biog_fla", "wwt_biog_val", "wwt_biog_lkd", "wwt_biog_sold", "wwt_ch4_biog", "wwt_dige_typ", "wwt_fuel_dig", "wwt_reus_trck_typ", "wwt_reus_vol_trck",
     "wwt_mass_slu_sto", "wwt_time_slu_sto", "wwt_slu_sto_TVS", "wwt_slu_sto_f_CH4", "wwt_slu_sto_EF", "wwt_mass_slu_comp", "wwt_slu_comp_emis_treated_or_piles_covered", "wwt_slu_comp_solids_content", "wwt_slu_comp_TVS", "wwt_slu_comp_N_cont", "wwt_slu_comp_low_CN_EF", "wwt_slu_comp_uncovered_pile_EF", "wwt_slu_comp_seqst_rate",
     "wwt_mass_slu_inc", "wwt_temp_inc", "wwt_slu_inc_N_cont", "wwt_slu_inc_SNCR", "wwt_mass_slu_app", "wwt_slu_la_solids_content", "wwt_slu_la_TVS", "wwt_slu_la_N_cont", "wwt_slu_la_EF",

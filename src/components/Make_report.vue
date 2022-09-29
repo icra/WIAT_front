@@ -964,7 +964,6 @@ export default {
 
 
       Vue.nextTick(async function () {
-        //Taules a mantenir
         _this.simple_report_table = await _this.generate_simple_report_table()
         _this.selected_layers.splice(0, _this.selected_layers.length)
         _this.radio_layers = null
@@ -978,7 +977,6 @@ export default {
         _this.external_indicators_table.cdp._2_1_a = await _this.generate_cdp_2_1_a_table()
         _this.external_indicators_table.gri._303_3 = await _this.generate_gri_303_3_table()
         _this.external_indicators_table.gri._clause_2_2_1 = await _this.generate_gri_clause_2_2_1_table()
-
         _this.external_indicators_table.gri._303_4 = await _this.generate_gri_303_4_table()
 
 
@@ -987,9 +985,6 @@ export default {
   },
   methods: {
 
-    prova(key){
-      console.log(key)
-    },
 
     get_slot_cdp(key){
       try {
@@ -1000,7 +995,6 @@ export default {
     },
 
     get_slot_gri(key){
-      console.log(key)
       try {
         return this.external_indicators_table["gri"]['_'+key].header[0].value
       } catch (error) {
@@ -1615,7 +1609,7 @@ export default {
           industry_row["country"] = utils.get_country_code_from_coordinates(industry.location.lat, industry.location.lng)
           industry_row["supply_chain_number"] = industry.supply_chain.length
 
-          //calcular overall water index a partir d'una mitjana entre la industria i els seus suppliers
+          //calculate  overall water index using avg between industry and its suppliers
           let avg_owr = 0
           const locations = [industry.location, ...industry.supply_chain.map(x => x.location)]
           for (const location of locations){

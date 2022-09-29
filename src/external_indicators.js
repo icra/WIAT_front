@@ -26,9 +26,9 @@ let external_indicators = {
             text: "Water discharge",
             description:  {
                 body: {
-                    "Tertiary treatment": 'Water treated up to tertiary level by onsite WWTP. Includes directly discharged water, reused water and water sent to an external WWTP.',
-                    "Secondary treatment": 'Water treated to secondary level by onsite WWTP. Includes directly discharged water, reused water and water sent to an external WWTP.',
-                    "Primary treatment only": 'Water treated up to primary level by onsite WWTP. Includes directly discharged water, reused water and water sent to an external WWTP.',
+                    "Tertiary treatment": 'Water treated up to tertiary level by onsite WWTP.',
+                    "Secondary treatment": 'Water treated to secondary level by onsite WWTP.',
+                    "Primary treatment only": 'Water treated up to primary level by onsite WWTP.',
                     "Discharge to the natural environment without treatment": 'Directly discharge water.',
                     "Discharge to a third party without treatment": 'Water directly treated in external WWTP.',
 
@@ -70,8 +70,8 @@ let external_indicators = {
             text: "Provide total water discharge data by destination",
             description:  {
                 body: {
-                    "Fresh surface water": 'Water treated in an on-site WWTP and directly discharged water',
-                    "Third party destinations": 'Water treaded in an off-site WWTP. Includes water sent by on-site WWTP.',
+                    "Fresh surface water": 'Water discharged in on-site WWTP and directly discharged water',
+                    "Third party destinations": 'Water discharged in external WWTP. Includes water sent by on-site WWTP.',
 
                 }
             }
@@ -86,9 +86,9 @@ let external_indicators = {
                     "percentage": 'Proportion of your organization’s facilities for which the volume reported accounts for.'
                 },
                 body: {
-                    "Tertiary treatment": 'Water treated up to tertiary level by onsite WWTP. Includes directly discharged water, reused water and water sent to an external WWTP.',
-                    "Secondary treatment": 'Water treated to secondary level by onsite WWTP. Includes directly discharged water, reused water and water sent to an external WWTP.',
-                    "Primary treatment only": 'Water treated up to primary level by onsite WWTP. Includes directly discharged water, reused water and water sent to an external WWTP.',
+                    "Tertiary treatment": 'Water treated up to tertiary level by onsite WWTP.',
+                    "Secondary treatment": 'Water treated to secondary level by onsite WWTP.',
+                    "Primary treatment only": 'Water treated up to primary level by onsite WWTP.',
                     "Discharge to the natural environment without treatment": 'Directly discharge water.',
                     "Discharge to a third party without treatment": 'Water directly treated in external WWTP.',
                 }

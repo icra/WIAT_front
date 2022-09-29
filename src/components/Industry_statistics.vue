@@ -4075,7 +4075,7 @@
             <ul>
               <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water</li>
               <li><span v-katex="'COD_{effl}'"></span>: load of COD in the effluent</li>
-              <li><span v-katex="'COD_{infl}'"></span>:  Industry withdrawal water COD concentration (surface water only) </li>
+              <li><span v-katex="'COD_{infl}'"></span>:  Industry withdrawal water COD load (surface water only) </li>
 
             </ul>
             <br>
@@ -4098,7 +4098,7 @@
             <ul>
               <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water</li>
               <li><span v-katex="'TN_{effl}'"></span>: load of TN in the effluent</li>
-              <li><span v-katex="'TN_{infl}'"></span>:  Industry withdrawal water TN concentration (surface water only) </li>
+              <li><span v-katex="'TN_{infl}'"></span>:  Industry withdrawal water TN load (surface water only) </li>
 
             </ul>
             <br>
@@ -4121,7 +4121,7 @@
             <ul>
               <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water</li>
               <li><span v-katex="'TP_{effl}'"></span>: load of TP in the effluent</li>
-              <li><span v-katex="'TP_{infl}'"></span>:  Industry withdrawal water TP concentration (surface water only) </li>
+              <li><span v-katex="'TP_{infl}'"></span>:  Industry withdrawal water TP load (surface water only) </li>
 
             </ul>
             <br>
@@ -4601,7 +4601,7 @@ export default {
       return this.risk_categories["owr"](item["overall_water_risk"])
     },
 
-    //Get data and charts for nodeLater selected under context tab
+    //Get data and charts for nodeLayer selected under context tab
     async layerTreeSelected(nodeLayer){
       this.selected_layer = null
       this.show_context_chart = false
@@ -4889,7 +4889,7 @@ export default {
       return this.risk_categories["treatment_efficiency"](item[this.industry.name])
     },
 
-    //Get impact associated to item (related to treatment efficiency on the influent)
+    //Get impact associated to item (related to treatment efficiency compared to intake water)
     getTreatmentEfficiencyInfluentColor(item) {
       return this.risk_categories["influent_treatment_efficiency"](item[this.industry.name])
     },
@@ -5549,6 +5549,16 @@ export default {
           header: [{text: "", value: "value", sortable: false}],
           value: []
         }
+
+
+        for (let pollutant of this.industry.pollutants_selected){
+          let obj = {
+            value: pollutant,
+            unit: "TU/day",
+            info: 'info_tu_diclo',
+          }
+        }
+
 
         let dichloroethane = {value: _this.table_title.pollutants.diclo, unit: "TU/day", info: "info_tu_diclo"}
         let cadmium = {value: _this.table_title.pollutants.cadmium, unit: "TU/day", info: "info_tu_cadmium"}

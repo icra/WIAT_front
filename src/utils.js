@@ -5,6 +5,7 @@ let main = require("./main")
 //sum array of numbers
 Array.prototype.sum=function(){return this.reduce((p,c)=>(p+c),0)};
 
+//Sum objs
 function sumObjectsByKey(...objs) {
     return objs.reduce((a, b) => {
         for (let k in b) {
@@ -14,9 +15,12 @@ function sumObjectsByKey(...objs) {
         return a;
     }, {});
 }
-
+/***************
+ Some basic functions used by other components
+ */
 let utils = {
 
+    //Keys is [str1, str2, ..., str_n]. Says if dict[str1][str2][...][str_n] exists
     exists_in_dict(dict, keys) {
         try {
             let dict_aux = dict
@@ -30,6 +34,7 @@ let utils = {
         }
     },
 
+    //Return avg water stress  from industries (%)
     async water_stress(industries, global_layers){
         let ws = global_layers["Water stress"].layers.baseline.annual.layer
         let ws_value = await Promise.all(
@@ -45,6 +50,7 @@ let utils = {
         return filtered.sum() / filtered.length
     },
 
+    //Says if industry has the required inputs for being correct
     is_industry_valid(industry){
         if(industry == null || industry == undefined) return false
         if(industry.volume_withdrawn!=null && industry.product_produced!=null && industry.has_onsite_wwtp!=null && industry.has_offsite_wwtp!=null && industry.has_direct_discharge!=null && industry.industry_type!=null){
@@ -94,6 +100,7 @@ let utils = {
         return basin
     },
 
+    //Opens file_name raster, and retrieve data at (lat lng)
     async get_raster_data(file_name, lat, lng){
         let call = "https://wiat-server.icradev.cat/data_point?filename="+file_name+"&longitude="+lng+"&latitude="+lat
         return axios
@@ -109,6 +116,7 @@ let utils = {
             })
     },
 
+    //Opens dataset from carto server, and retrieve label data at (lat lng)
     async get_carto_data(dataset, label, lat, lng){
         return fetch("https://wri-rw.carto.com:443/api/v2/sql?q=select "+label+" from "+dataset+" where ST_Intersects( the_geom, cdb_latlng("+lat+","+lng+"))")
             // we transform the response from the Fetch API into a JSON format
@@ -129,6 +137,7 @@ let utils = {
             });
     },
 
+    //Says if the location at lat lng is land or water
     async areCoordsLand(lat, lng){
         let file_name = "baseline_population"
         let population_data = (await this.get_raster_data(file_name, lat, lng))
@@ -137,6 +146,7 @@ let utils = {
         else return false
     },
 
+    //Overall water risk (dimensionless)
     async overall_water_risk(lat, lng){
         let file_name = "owr"
         let data = (await this.get_raster_data(file_name, lat, lng))
@@ -144,27 +154,23 @@ let utils = {
         else return null
     },
 
-    getRandomColor(){
-        let letters = '0123456789ABCDEF';
-        let color = '#';
-        for (let  i = 0; i < 6; i++) {
-            color += letters[Math.floor(Math.random() * 16)];
-        }
-        return color
-    },
-
+    //Days between date2string and date1string (in days)
     daysBetween(date1String, date2String){
         let d1 = new Date(date1String);
         let d2 = new Date(date2String);
         return (d2-d1)/(1000*3600*24);
     },
 
+    //Says if n is natural number
     is_Natural(n){
         if (typeof n !== 'number') return false
         else return (n >= 0.0) && (Math.floor(n) === n) && n !== Infinity;
     },
 
-    //FUNCTIONS FOR GETTING AND CHANGE FORMAT OF DATA LAYER
+    /*********
+    FUNCTIONS FOR GETTING AND CHANGE FORMAT OF DATA LAYER
+     *********/
+
     format_layer_description(categories){
         let _this = this
         let object_to_return = {}
@@ -192,38 +198,42 @@ let utils = {
 
 }
 
-
-async function withdrawn_factor(industries, global_layers){     //S'ha de mirar
+/***************
+ Functions used by metrics object below
+ */
+async function withdrawn_factor(industries, global_layers){
 
     let streamflow_value = await streamflow(industries, global_layers) //streamflow (m3/day)
-    let water_withdrawn = calculate_water_withdrawn(industries)
-    let factor = water_withdrawn / streamflow_value //Withdrawals that account for an average of five percent or more of the annual average significantly affects the water source
+    let water_withdrawn = calculate_water_withdrawn(industries) //m3/day
+    let factor = water_withdrawn / streamflow_value
     if(isNaN(factor)) return (0).toFixed(3)
-    return (factor*100).toFixed(3)
+    return (factor*100).toFixed(3) //%
 }
 
 async function discharged_factor(industries, global_layers){
 
     let streamflow_value = await streamflow(industries, global_layers) //streamflow (m3/day)
 
-    let wd = calculate_water_discharged(industries)
+    let wd = calculate_water_discharged(industries)  //Amount of water discharged by industries (m3/day)
 
-    let factor = 100*wd/streamflow_value //Withdrawals that account for an average of five percent or more of the annual average significantly affects the water source
+    let factor = 100*wd/streamflow_value //%
     if(isNaN(factor)) return (0).toFixed(3)
     return factor.toFixed(3)
 }
 
-
+//Load of pollutant_effl discharged by industries (g/day)
 function calculate_effluent_load(industries, pollutant_effl){
     let load = industries.map(industry => industry.effl_pollutant_load(pollutant_effl)).sum()
     return load
 }
 
+//Load of pollutant from the surface water withdrawn by industries (g/day)
 function calculate_influent_load(industries, pollutant){
     let load = industries.map(industry => industry.infl_pollutant_load(pollutant)).sum()
     return load
 }
 
+//Concentratin of pollutant_effl discharged by industries (g/m3)
 function effl_concentration(industries, pollutant_effl){
     let load = calculate_effluent_load(industries, pollutant_effl)
     let discharged = calculate_water_discharged(industries)
@@ -231,25 +241,27 @@ function effl_concentration(industries, pollutant_effl){
     return load/discharged
 }
 
+//Water discharged by industries (m3/day)
 function calculate_water_discharged(industries){
     return industries.map(industry => industry.water_discharged()).sum()
 }
 
-//superficial
+//Amount of surface water withdrawn by industries (m3/day)
 function calculate_surface_water_withdrawn(industries){
     return industries.map(industry => industry.volume_of_surface_water_withdrawn()).sum()
 }
 
-//groundwater
+//Amount of groundwater withdrawn by industries (m3/day)
 function calculate_groundwater_water_withdrawn(industries){
     return industries.map(industry => industry.volume_of_groundwater_water_withdrawn()).sum()
 }
 
-//Groundwater + superficial
+//Groundwater + superficial (m3/day)
 function calculate_water_withdrawn(industries){
     return industries.map(industry => industry.volume_of_water_withdrawn()).sum()
 }
 
+//(m3/day)
 async function calculate_water_withdrawn_in_water_stress(industries, global_layers){
     let volume = 0
     for(let industry of industries){
@@ -260,7 +272,7 @@ async function calculate_water_withdrawn_in_water_stress(industries, global_laye
     }
     return volume
 }
-
+//(m3/day)
 async function calculate_surface_water_withdrawn_in_water_stress(industries, global_layers){
     let volume = 0
     for(let industry of industries){
@@ -271,7 +283,7 @@ async function calculate_surface_water_withdrawn_in_water_stress(industries, glo
     }
     return volume
 }
-
+//(m3/day)
 async function calculate_groundwater_water_withdrawn_in_water_stress(industries, global_layers){
     let volume = 0
     for(let industry of industries){
@@ -282,15 +294,15 @@ async function calculate_groundwater_water_withdrawn_in_water_stress(industries,
     }
     return volume
 }
-
+//Does not include third-party WWTP (m3/day)
 function calculate_water_discharged_surface(industries){
     return industries.map(industry => industry.water_discharged_onsite()+industry.water_directly_discharged()).sum()
 }
-
+//(m3/day)
 function calculate_water_discharged_third_party(industries){
     return industries.map(industry => industry.water_discharged_offsite()).sum()
 }
-
+//(m3/day)
 async function calculate_water_discharged_surface_in_water_stress(industries, global_layers){
     let volume = 0
     for(let industry of industries){
@@ -301,7 +313,7 @@ async function calculate_water_discharged_surface_in_water_stress(industries, gl
     }
     return volume
 }
-
+//(m3/day)
 async function calculate_water_discharged_third_party_in_water_stress(industries, global_layers){
     let volume = 0
     for(let industry of industries){
@@ -312,19 +324,20 @@ async function calculate_water_discharged_third_party_in_water_stress(industries
     }
     return volume
 }
-
+//(m3/day)
 function calculate_water_treated(industries){
     return industries.map(industry => industry.volume_of_water_treated()).sum()
 }
-
+//(m3/day)
 function calculate_water_recycled(industries){
     return industries.map(industry => industry.water_recycled()).sum()
 }
-
+//tonnes/day
 function calculate_product_produced(industries){
     return industries.map(industry => industry.tonnes_of_product()).sum()
 }
 
+//Increase in the concentration of the receiving water body due to the discharges of the industry (g/m3)
 async function effl_delta(industries, effl, global_layers){
 
     let load = calculate_effluent_load(industries, effl)
@@ -339,6 +352,7 @@ async function effl_delta(industries, effl, global_layers){
     return delta.toExponential(3) //g/m3
 }
 
+//Added streamflow of industries
 async function streamflow(industries, global_layers){
 
     let streamflow = global_layers["Streamflow"].layers.baseline.annual.layer
@@ -355,6 +369,8 @@ async function streamflow(industries, global_layers){
     return streamflow_value.filter(x => x!= null).sum()
 
 }
+
+//avg groundwater decline (mm/year)
 async function groundwater_table_decline(industries, global_layers){
 
     let ws = global_layers["Groundwater table decline"].layers.baseline.annual.layer
@@ -370,6 +386,8 @@ async function groundwater_table_decline(industries, global_layers){
     let filtered = ws_value.filter(x => x!= null)
     return filtered.sum() / filtered.length
 }
+
+//no sanitatin avg (%)
 async function no_sanitation(industries, global_layers){
 
     let ws = global_layers["Unimproved/No Sanitation"].layers.baseline.annual.layer
@@ -385,6 +403,8 @@ async function no_sanitation(industries, global_layers){
     let filtered = ws_value.filter(x => x!= null)
     return filtered.sum() / filtered.length
 }
+
+//avg seasonal variability (dimensionless)
 async function seasonal_variability(industries, global_layers){
 
     let ws = global_layers["Seasonal variability"].layers.baseline.annual.layer
@@ -400,6 +420,8 @@ async function seasonal_variability(industries, global_layers){
     let filtered = ws_value.filter(x => x!= null)
     return filtered.sum() / filtered.length
 }
+
+//avg interannual variability (dimensionless)
 async function interannual_variability(industries, global_layers){
 
     let ws = global_layers["Interannual variability"].layers.baseline.annual.layer
@@ -415,6 +437,8 @@ async function interannual_variability(industries, global_layers){
     let filtered = ws_value.filter(x => x!= null)
     return filtered.sum() / filtered.length
 }
+
+//Avg drought risk
 async function drought_risk(industries, global_layers){
 
     let ws = global_layers["Drought risk"].layers.baseline.annual.layer
@@ -461,16 +485,18 @@ async function coastal_flood_risk(industries, global_layers){
     return filtered.sum() / filtered.length
 }
 
+//Says if industries are in water stress area (avg industries water stress > 40% )
 async function has_water_stress(industries, global_layers){
     let ws = await utils.water_stress(industries, global_layers)
     return (ws >= 40) ? "Yes" : "No"
 }
 
+//Amount of pollutant removed by applying WWTP's treatment (g/day)
 function water_filtered(industries, industry_effluent, wwtp_effluent){
-    return industries.map(industry => industry.filtered_pollutant_load(industry_effluent, wwtp_effluent))
+    return industries.map(industry => industry.filtered_pollutant_load(industry_effluent, wwtp_effluent)).sum()
 }
-
-function effl_efficiency(industries, industry_effluent, wwtp_effluent){   //Amount of pollutant filtered
+//Amount of pollutant filtered compared to the pollutant generated by the industries (%)
+function effl_efficiency(industries, industry_effluent, wwtp_effluent){
 
     let filtered = water_filtered(industries, industry_effluent, wwtp_effluent)
     let generated = calculate_pollutant_generated(industries, industry_effluent)
@@ -481,14 +507,16 @@ function effl_efficiency(industries, industry_effluent, wwtp_effluent){   //Amou
     else return (eff*100).toFixed(3)
 }
 
+//Amount of water treated by onsite WWTP + amount of water treated by external WWTP + directly discharged water (m3/day)
 function calculate_water_generated(industries){
     return industries.map(industry => industry.water_generated()).sum()
 }
 
+//m3/day
 function calculate_water_consumed(industries){
     return industries.map(industry => industry.volume_of_water_withdrawn() - industry.water_discharged()).sum()
 }
-
+//g/day
 function calculate_pollutant_generated(industries, pollutant){
     return industries.map(industry => industry.generated_pollutant_load(pollutant)).sum()
 }
@@ -512,6 +540,7 @@ function better_treatment(industries){
     else if (Math.max(...scores) == 3) return "Tertiary"
 }
 
+//Says for each type of treatment, volume of water treated and number of sites where it is applied
 function highest_level_of_treatment(industries){
 
     let treatments = {
@@ -562,9 +591,12 @@ function highest_level_of_treatment(industries){
 
 }
 
+/***************
+Impact and levers for action
+ */
 let metrics = {
 
-
+    //Emissions separated by use
     emissions_and_descriptions(industries, days_factor){
 
         let industries_emissions = industries.map(industry => industry.ghg())
@@ -576,7 +608,7 @@ let metrics = {
         })
         return aggregated
     },
-
+    //GHG deglossed by CO2, CH4 and N2O
     emissions_deglossed(industries){
 
         let industries_emissions = industries.map(industry => industry.ghg_deglossed())
@@ -589,7 +621,7 @@ let metrics = {
         return aggregated
     },
 
-
+    //Dilution factor (dimensionless)
     async dilution_factor(global_layers, industries){
 
         let water_discharged = calculate_water_discharged(industries)    // m3/day
@@ -604,7 +636,7 @@ let metrics = {
         return dilution_factor.toExponential(2)
 
     },
-
+    //Consumption available ratio (%)
     async available_ratio(global_layers, industries){
 
         let streamflow_value = await streamflow(industries, global_layers) //streamflow (m3/day)
@@ -616,7 +648,7 @@ let metrics = {
         else return (available_ratio*100).toFixed(2)
 
     },
-
+    // Recycled water factor  (%)
     recycled_water_factor(industries){
         let water_generated = calculate_water_generated(industries)
         let recycled_water = calculate_water_recycled(industries)
@@ -628,6 +660,7 @@ let metrics = {
         return "-"
     },
 
+    //Treated water factor (%)
     treated_water_factor(industries){
 
         let water_discharged = calculate_water_generated(industries)    // m3/day
@@ -637,6 +670,7 @@ let metrics = {
         else return (100*water_treated/water_discharged).toFixed(2)
     },
 
+    // Specific water consumption  (%)
     efficiency_factor(industries){
         let product_produced = calculate_product_produced(industries)
         let vol_withdrawn = calculate_water_withdrawn(industries)
@@ -644,31 +678,7 @@ let metrics = {
         return "-"
     },
 
-    nqa(industries){
-
-        let pollutant_above_law_factor = industries.map(industry => {
-            let nqa_per_pollutant = {
-                diclo: effl_concentration([industry], "wwt_diclo_effl")/0.01,
-                cadmium: effl_concentration([industry], "wwt_cadmium_effl")/0.001,
-                hexaclorobenzene: effl_concentration([industry], "wwt_hexaclorobenzene_effl")/0.0005,
-                mercury: effl_concentration([industry], "wwt_mercury_effl")/0.00007,
-                lead: effl_concentration([industry], "wwt_plomo_effl")/0.0072,
-                nickel: effl_concentration([industry], "wwt_niquel_effl")/0.02,
-                chloroalkanes: effl_concentration([industry], "wwt_chloro_effl")/0.0014,
-                hexaclorobutadie: effl_concentration([industry], "wwt_hexaclorobutadie_effl")/0.0006,
-                nonylphenols: effl_concentration([industry], "wwt_nonilfenols_effl")/0.002,
-                tetracloroetile: effl_concentration([industry], "wwt_tetracloroetile_effl")/0.01,
-                tricloroetile: effl_concentration([industry], "wwt_tricloroetile_effl")/0.01,
-            }
-
-            let pollutant_above_law = Object.values(nqa_per_pollutant).filter(p => {return p > 1}).length
-            return pollutant_above_law
-        }).sum()   //Number of pollutants which concentration is above the permission
-
-        //Porcentage of pollutants which concentration is above the permission
-        return (100*pollutant_above_law_factor/11).toFixed(3)
-    },
-
+    // For each pollutant, says the concentration of the water discharged (with respect to EQS, %)
     environmental_quality_standards(industries){
 
         let obj = {
@@ -697,7 +707,7 @@ let metrics = {
 
     },
 
-
+    // For each pollutant, says the concentration of the water discharged (g/m3)
     pollutant_concentration(industries){
 
         let obj = {
@@ -725,7 +735,7 @@ let metrics = {
         return obj
 
     },
-
+    // For each pollutant, says the increase of the concentration in the receiving water body due to discharge (g/m3)
     async pollutant_delta(industries, global_layers){
 
         let obj = {
@@ -746,7 +756,7 @@ let metrics = {
 
     },
 
-
+    // avg concentration of pollutants expressed as EQS
     eqs_avg(industries){
         let eqs = this.environmental_quality_standards(industries)
 
@@ -883,6 +893,7 @@ let metrics = {
         return value
     },
 
+    // Says if the water discharged by the industry to the receiving water body is cleaner (< 100) or more polluted (> 100) than the water withdrawn
     amount_water_influent_cleaned(industries){
         let cod_infl = calculate_influent_load(industries, "ind_cod_infl")
         let tn_infl = calculate_influent_load(industries, "ind_tn_infl")
@@ -1304,7 +1315,7 @@ let metrics = {
     },
 
 
-    ecotoxicity_potential_tu(industries) { //concentration of tu (tu/day)
+    ecotoxicity_potential_tu(industries) { //concentration of tu in the water discharged(tu/day)
         let toxic_units = {
             diclo: effl_concentration(industries, "wwt_diclo_effl")/150,
             cadmium: effl_concentration(industries, "wwt_cadmium_effl")/0.0095,
@@ -1329,7 +1340,7 @@ let metrics = {
 
         return toxic_units
     },
-    async delta_tu(industries, global_layers){ //concentration of tu (tu/day)
+    async delta_tu(industries, global_layers){ //increase of tu in the receiving water body due to discharging the water(tu/day)
         let toxic_units = {
             diclo: await effl_delta(industries, "wwt_diclo_effl", global_layers)/150,
             cadmium: await effl_delta(industries, "wwt_cadmium_effl", global_layers)/0.0095,
@@ -1354,7 +1365,7 @@ let metrics = {
 
         return toxic_units
     },
-    async delta_eqs(industries, global_layers){ //concentration of tu (tu/day)
+    async delta_eqs(industries, global_layers){ //Increase in the concentration of the receiving water body (compared to EQS) due to  discharging the water(%)
         let toxic_units = {
             diclo: await effl_delta(industries, "wwt_diclo_effl", global_layers)*100/0.01,
             cadmium: await effl_delta(industries, "wwt_cadmium_effl", global_layers)*100/0.001,
@@ -1377,7 +1388,7 @@ let metrics = {
 
         return toxic_units
     },
-    async delta_eqs_avg(industries, global_layers){ //concentration of tu (tu/day)
+    async delta_eqs_avg(industries, global_layers){
         let eqs = await this.delta_eqs(industries, global_layers)
 
         let avg = Object.values(eqs).sum() / Object.values(eqs).length

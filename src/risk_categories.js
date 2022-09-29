@@ -6,10 +6,10 @@ let impact_strings = {
     vh: "Very high impact",
 }
 
-let blue = ['#529fee', impact_strings.l]
-let red = ['red', impact_strings.vh]
-let orange = ['orange', impact_strings.h]
-let yellow = ['yellow', impact_strings.m]
+let blue = ['#529fee', impact_strings.l]    //Low impact
+let red = ['red', impact_strings.vh]        //Very high impact
+let orange = ['orange', impact_strings.h]   //High impact
+let yellow = ['yellow', impact_strings.m]   //Medium impact
 
 let layers = {
     l: ['#f6f600', "Low risk"],
@@ -23,9 +23,7 @@ let layers = {
 
 let risk_category = {
 
-
     impact_strings: impact_strings,
-
 
     quality_quantity(value){
         if(value == impact_strings.l) return blue
@@ -51,6 +49,12 @@ let risk_category = {
     global_warming: function(value){
         return null
     },
+
+    /**************************
+     Impact
+     **************************/
+
+    //Dilution factor
     dilution_factor: function(value){
         if(value < 0) return null
         else if (value < 2) return red
@@ -59,6 +63,7 @@ let risk_category = {
         else if (value >= 100) return blue
         return null
     },
+    //Recycled water factor
     recycled_water_factor: function(value){
         if(value < 0) return null
         else if (value < 2) return red
@@ -67,6 +72,7 @@ let risk_category = {
         else if (value >= 20) return blue
         return null
     },
+    //Treated water factor
     water_treated: function(value){
         if(value < 0) return null
         else if (value < 2) return red
@@ -75,6 +81,7 @@ let risk_category = {
         else if (value >= 20) return blue
         return null
     },
+    //Consumption available ratio
     water_stress_ratio: function(value){
         if(value < 0) return null
         else if (value < 2) return blue
@@ -83,9 +90,11 @@ let risk_category = {
         else if (value >= 20) return red
         return null
     },
+    //Specific water consumption
     specific_water_consumption: function(){
         return null
     },
+    //eutrophication potential
     eutrophication: function(value){
         if(value < 0) return null
         else if (value < 0.5) return blue
@@ -95,6 +104,7 @@ let risk_category = {
         return null
     },
 
+    //toxic units
     ecotoxicity: function(){
         return null
     },
@@ -103,10 +113,12 @@ let risk_category = {
         return null
     },
 
+    //Concentration of the pollutants in the effluent (with respect to EQS)
     eqs: function(){
         return null
     },
 
+    //Increase of the concentration of the pollutants in the receiving water body after discharge (with respect to EQS)
     delta_eqs: function(value){
         if(value < 0) return null
         else if (value < 2) return blue
@@ -115,6 +127,8 @@ let risk_category = {
         else if (value >= 20) return red
         return null
     },
+
+    //Increase in toxic units in the receiving water body after discharge
     delta_ecotoxicity: function(value){
         if(value < 0) return null
         else if (value < 0.2) return blue
@@ -123,6 +137,8 @@ let risk_category = {
         else if (value >= 2) return red
         return null
     },
+
+    //treatment efficiency (compared to WWTP influent)
     treatment_efficiency: function(value){
         if(value < 0) return null
         else if (value < 25) return red
@@ -131,12 +147,16 @@ let risk_category = {
         else if (value >= 75) return blue
         return null
     },
+
+    //Percentage of treatment efficiency (compared to intake water)
     influent_treatment_efficiency: function(value){
         if(value < 0) return null
         else if (value <= 100) return blue
         else if (value > 100) return red
         return null
     },
+
+    //Overall water risk
     owr: function(value){
         if(value < 1) return layers.l
         else if (value < 2) return layers.lm
@@ -145,6 +165,10 @@ let risk_category = {
         else if (value >= 4) return layers.eh
         return null
     },
+
+    /**************************
+    Layers from aqueduct
+     **************************/
     seasonal_variability: function(value){
         if(value < 0.33) return layers.l
         else if (value < 0.66) return layers.lm
