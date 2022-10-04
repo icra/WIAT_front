@@ -7,6 +7,7 @@ const Import = () => import('../components/Import')
 const Make_report = () => import('../components/Make_report')
 const New_industry = () => import('../components/New_industry')
 const Industry_statistics = () => import('../components/Industry_statistics')
+const General_config = () => import('../components/General_config')
 
 
 Vue.use(VueRouter)
@@ -45,6 +46,11 @@ const routes = [
     name: 'statistics',
     props: true,
     component: Industry_statistics
+  },
+  {
+    path: '/configuration',
+    name: 'general_configuration',
+    component: General_config
   },
 
 

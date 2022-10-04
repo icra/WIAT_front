@@ -2,19 +2,42 @@
   <div style="height: 100%;" class="outer">
 
     <div v-if="utils.is_industry_valid(industry)">
-      <v-tabs
-          id="main_tab"
-          v-model="main_tab"
-          style="padding: 5px 0px 5px 0px"
-      >
-        <v-tabs-slider color="#b62373"></v-tabs-slider>
 
-        <v-tab style="border-color: #b62373">CONTEXT</v-tab>
-        <v-tab style="border-color: #b62373">IMPACT AND LEVERS FOR ACTION</v-tab>
+      <v-row>
+        <v-col cols="7">
+          <v-tabs
+              id="main_tab"
+              v-model="main_tab"
+              style="padding: 5px 0px 5px 0px"
+          >
+            <v-tabs-slider color="#b62373"></v-tabs-slider>
+
+            <v-tab style="border-color: #b62373">CONTEXT</v-tab>
+            <v-tab style="border-color: #b62373">IMPACT AND LEVERS FOR ACTION</v-tab>
 
 
-      </v-tabs>
-      <div v-if="industry != null" style="background-color: white">
+          </v-tabs>
+        </v-col>
+        <v-col cols="5" class="d-flex text-center">
+          <v-hover v-slot="{ hover }">
+            <v-alert
+                shaped
+                type="warning"
+                prominent
+                border="left"
+                @click="set_pollutants_factors"
+                :outlined = "!hover"
+                v-if="pollutants_without_factor"
+            >
+              You have some conversion factors (to calculate some statistics) unset. Click here to set them.
+            </v-alert>
+          </v-hover>
+
+
+
+        </v-col>
+      </v-row>
+      <div v-if="industry != null" style="background-color: white; padding-top: 1.5rem">
         <div
             v-if="main_tab == 0"
         >
@@ -4270,23 +4293,23 @@
 let _ = require('lodash');
 import {utils, metrics} from "../utils"
 import external_indicators from "../external_indicators"
-
 import colors from "../colors"
 import risk_thereshold from "..//risk_categories"
 import VueKatex from 'vue-katex';
 import 'katex/dist/katex.min.css';
 import Vue from "vue";
-
 Vue.use(VueKatex, {});
-
 import BarChart from "./BarChart";
 import PieChart from "./PieChart";
+import Conversion_factors from "@/conversion_factors";
+
 export default {
   name: "Industry_statistics",
   components: { BarChart, PieChart },
   props: ['assessment_id', 'industry_id'],
   data() {
     return {
+      pollutants_without_factor: false,
       selected_layer: null,
       utils,
       assessment: null,
@@ -4545,7 +4568,9 @@ export default {
 
   },
   methods: {
-
+    set_pollutants_factors(){
+      this.$router.push({name: 'general_configuration'})
+    },
     //Sort strings numerically
     customSort(items, index, isDescending) {
       items.sort((a, b) => {
@@ -6618,8 +6643,8 @@ export default {
 
   created() {
     let _this = this
-
     this.selected_assessment = this.created_assessments[this.assessment_id].name
+    this.pollutants_without_factor = Object.values(Conversion_factors).map(pollutant => Object.values(pollutant)).flat().filter(value => value == null).length > 0
 
   },
   async mounted() {

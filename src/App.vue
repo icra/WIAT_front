@@ -928,6 +928,8 @@ export default {
         { title: "Maps and Datasets", icon: 'mdi-map', to:"map" },
         { title: "Import/Export", icon: 'mdi-import', to:"import"},
         { title: "Report", icon: 'mdi-file-chart', to:"report" },
+        { title: "Parameter configuration", icon: 'mdi-cog', to:"general_configuration" },
+
       ],
       created_assessments: this.$assessments,  //Created assessments
       assessment_name: null,     //V-model name for creating/editing an assessment
@@ -1012,6 +1014,7 @@ export default {
       if(page == "map") index = 0
       else if(page == "import") index = 1
       else if(page == "report") index = 2
+      else if(page == "general_configuration") index = 3
       else index = -1
       this.icon_selected = index
 

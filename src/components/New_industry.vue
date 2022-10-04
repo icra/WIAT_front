@@ -2303,6 +2303,7 @@ import Vue from 'vue'
 import {utils, metrics} from "../utils"
 import standard_industries_classification from "../standard_industrial_classification"
 import Countries from "@/countries";
+import Conversion_factors from "@/conversion_factors";
 
 
 export default {
@@ -2387,8 +2388,6 @@ export default {
     }
   },
   created() {
-
-    console.log(this.model_selected_pollutants)
 
     if (this.industry === undefined) this.$router.push('/')
 
@@ -3666,6 +3665,15 @@ export default {
       }
 
       this.industry['pollutants_selected'] = this.model_selected_pollutants
+      for (let pollutant of this.model_selected_pollutants){
+        if (!Conversion_factors.hasOwnProperty(pollutant)){
+          if (pollutant == "COD" || pollutant == "TN" || pollutant == "TP") {
+            Conversion_factors[pollutant] = {eutrophication: null, tu: '-', eqs: '-'}
+          }else{
+            Conversion_factors[pollutant] = {eutrophication: '-', tu: null, eqs: null}
+          }
+        }
+      }
 
       //Local wwtp
       if(this.industry.has_onsite_wwtp == 1){

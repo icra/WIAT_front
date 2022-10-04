@@ -248,6 +248,7 @@ import * as moment from 'moment'
 import standard_industries_classification from "../standard_industrial_classification"
 import {utils} from "../utils"
 import risk_thereshold from "@/risk_categories";
+import Conversion_factors from "@/conversion_factors";
 
 export default {
   name: "import_assessments",
@@ -1137,7 +1138,12 @@ export default {
 
     //Download json session
     download_json(){
-      let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.created_assessments));
+
+      let export_object = {
+        assessments: this.created_assessments,
+        general_configuration: Conversion_factors
+      }
+      let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(export_object));
       let downloadAnchorNode = document.createElement('a');
       downloadAnchorNode.setAttribute("href",     dataStr);
       downloadAnchorNode.setAttribute("download", this.export_file_name + ".json");
@@ -1156,6 +1162,19 @@ export default {
       })
     },
 
+    async read_json_file(file) {
+      let imported_json = await this.fileToJSON(file)
+      if(Array.isArray(imported_json)){ //file from version 1.0
+        return imported_json
+      }else{         //file from version 1.1
+
+        let general_configuration = imported_json.general_configuration
+        for (let key of Object.keys(general_configuration)){
+          Conversion_factors[key] = general_configuration[key]
+        }
+        return imported_json.assessments
+      }
+    },
     //replace current assessments with imported assessments
     async import_replace(){
       let _this=this
@@ -1165,7 +1184,7 @@ export default {
       _this.$assessment_active.splice(0,_this.$assessment_active.length)
 
 
-      let imported_assessments = await this.fileToJSON(this.imported_file)
+      let imported_assessments = await this.read_json_file(this.imported_file)
 
       imported_assessments.forEach((assessment, assessment_index )=> {
 
@@ -1199,7 +1218,7 @@ export default {
     async import_append(){
       let _this=this
 
-      let imported_assessments = await this.fileToJSON(this.imported_file)
+      let imported_assessments = await this.read_json_file(this.imported_file)
 
       imported_assessments.forEach(assessment => {
 
