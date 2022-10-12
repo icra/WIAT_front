@@ -9,7 +9,7 @@ let colors = {
     emerald: "#009b77",
     green: "#00b140",
     purple: "#964fe5",
-    mulberyy: "#b62373"
+    mulbery: "#b62373"
 
 };
 

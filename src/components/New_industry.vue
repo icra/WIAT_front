@@ -196,7 +196,20 @@
                       multiple
                       persistent-hint
                       small-chips
+                      @change="onChangeCombobox"
                   >
+                    <template v-slot:selection="{ attrs, item, parent, selected }">
+                      <v-chip
+                          v-bind="attrs"
+                          :input-value="selected"
+                          :close="item != 'COD' && item != 'TN' && item != 'TP'"
+                          @click:close="remove_chip(item)"
+                      >
+                        <span class="pr-2">
+                          {{ item }}
+                        </span>
+                      </v-chip>
+                    </template>
                     <template v-slot:no-data>
                       <v-list-item>
                         <v-list-item-content>
@@ -2303,7 +2316,7 @@ import Vue from 'vue'
 import {utils, metrics} from "../utils"
 import standard_industries_classification from "../standard_industrial_classification"
 import Countries from "@/countries";
-import Conversion_factors from "@/conversion_factors";
+import conversion_factors from "@/conversion_factors";
 
 
 export default {
@@ -2384,7 +2397,9 @@ export default {
 
       model_selected_pollutants: defaultIndustry.pollutants_selected,
       items_selected_pollutants: ["COD", "TN", "TP", '1,2-Dichloroethane', 'Cadmium', 'Hexaclorobenzene', 'Mercury', 'Lead', 'Nickel', 'Chloroalkanes', 'Hexachlorobutadiene', 'Nonylphenols', 'Tetrachloroethene', 'Trichloroethylene'],
-      search_pollutant: null
+      search_pollutant: null,
+
+
     }
   },
   created() {
@@ -2418,18 +2433,6 @@ export default {
   },
   watch: {
 
-    //Change in pollutant selector
-    model_selected_pollutants(newValue, oldValue){
-      for (let item of newValue){
-        if (!Object.keys(this.industry_model["ind_pollutants_effl"]).includes(item) ){
-          this.$set(this.industry_model["ind_pollutants_effl"], item, 0)
-        }
-        if (!Object.keys(this.industry_model["ind_pollutants_infl"]).includes(item)){
-          this.$set(this.industry_model["ind_pollutants_infl"], item, 0)
-        }
-      }
-
-    },
 
     //Changed step in the questionnaire, if step is onsite WWTP add or don't inputs related to offsite WWTP
     stepper_model(step){
@@ -2505,9 +2508,48 @@ export default {
     },
   },
 
-
+  //Change in pollutant selector
   methods: {
 
+    onChangeCombobox(items){
+
+      //Prevent users deleteing COD, TN or TP
+      if(!items.includes("COD")){
+        this.model_selected_pollutants.splice(0, 0, "COD");
+        return
+      }
+      if(!items.includes("TN")){
+        this.model_selected_pollutants.splice(1, 0, "TN");
+        return
+      }
+      if(!items.includes("TP")){
+        this.model_selected_pollutants.splice(2, 0, "TP");
+        return
+      }
+
+
+      for (let item of items){
+        if (!Object.keys(this.industry_model["ind_pollutants_effl"]).includes(item) ){
+          this.$set(this.industry_model["ind_pollutants_effl"], item, 0)
+        }
+        if (!Object.keys(this.industry_model["ind_pollutants_infl"]).includes(item)){
+          this.$set(this.industry_model["ind_pollutants_infl"], item, 0)
+        }
+      }
+    },
+    remove_chip (itemText) {
+
+      if (itemText === 'COD') {
+        return;
+      } else {
+        this.model_selected_pollutants.forEach(obj => {
+          if (obj === itemText) {
+            this.model_selected_pollutants.splice(this.model_selected_pollutants.indexOf(obj), 1)
+          }
+        })
+        this.model_selected_pollutants = [...this.model_selected_pollutants]
+      }
+    },
     scrollToTop() {
       location.href = "#";
       location.href = "#top";
@@ -3665,12 +3707,13 @@ export default {
       }
 
       this.industry['pollutants_selected'] = this.model_selected_pollutants
+
       for (let pollutant of this.model_selected_pollutants){
-        if (!Conversion_factors.hasOwnProperty(pollutant)){
+        if (!conversion_factors.hasOwnProperty(pollutant)){
           if (pollutant == "COD" || pollutant == "TN" || pollutant == "TP") {
-            Conversion_factors[pollutant] = {eutrophication: null, tu: '-', eqs: '-'}
+            conversion_factors[pollutant] = {eutrophication: null, tu: '-', eqs: '-'}
           }else{
-            Conversion_factors[pollutant] = {eutrophication: '-', tu: null, eqs: null}
+            conversion_factors[pollutant] = {eutrophication: '-', tu: null, eqs: null}
           }
         }
       }
@@ -3696,6 +3739,10 @@ export default {
         this.industry.reset_offsite_wwtp()
       }
 
+      let global_pollutants_created = this.$created_pollutants
+      this.model_selected_pollutants.forEach(item => global_pollutants_created.add(item)) //Update all pollutants created set
+
+
       if(this.industry.has_onsite_wwtp != 1){
         if(this.industry.has_direct_discharge == 1) this.stepper_model = 3
         else if(this.industry.has_offsite_wwtp == 1) this.stepper_model = 4
@@ -3703,6 +3750,7 @@ export default {
       }else{
         this.stepper_model = 2
       }
+
     },
 
     industries_deleted(){ //An industry or assessment has been deleted, if it's the current one return to map

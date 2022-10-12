@@ -1,5 +1,5 @@
 import axios from "axios";
-
+import conversion_factors from "@/conversion_factors";
 let main = require("./main")
 
 //sum array of numbers
@@ -19,6 +19,7 @@ function sumObjectsByKey(...objs) {
  Some basic functions used by other components
  */
 let utils = {
+
 
     //Keys is [str1, str2, ..., str_n]. Says if dict[str1][str2][...][str_n] exists
     exists_in_dict(dict, keys) {
@@ -165,6 +166,37 @@ let utils = {
     is_Natural(n){
         if (typeof n !== 'number') return false
         else return (n >= 0.0) && (Math.floor(n) === n) && n !== Infinity;
+    },
+
+    //Resets global var that store all pollutants created (among all assessments and all industries), and updates it from pollutants created om the assessments
+    reset_and_update_global_pollutants(assessments, pollutants_set){
+        pollutants_set.clear();   //Delete all elements
+
+        assessments.forEach(assessment => {
+            assessment.industries.forEach(industry => {
+                industry.pollutants_selected.forEach(pollutants_set.add, pollutants_set)
+            })
+        })
+    },
+
+    //Return list of pollutants without COD nor TN nor TP
+    remove_nutrients(pollutants){
+        return [...pollutants].filter(pollutant => pollutant != "COD" && pollutant != "TN" && pollutant != "TP")
+    },
+    //Return list of pollutants created in industries (without COD nor TN nor TP)
+    get_pollutants(industries, filter_nutrients = true){
+        let pollutants_set = new Set()
+        for (let industry of industries){
+            for (let pollutant of industry.pollutants_selected){
+                if (filter_nutrients){
+                    if (pollutant != "COD" && pollutant != "TN" && pollutant != "TP" ){
+                        pollutants_set.add(pollutant)
+                    }
+                }else pollutants_set.add(pollutant)
+
+            }
+        }
+        return [...pollutants_set]
     },
 
     /*********
@@ -681,78 +713,41 @@ let metrics = {
     // For each pollutant, says the concentration of the water discharged (with respect to EQS, %)
     environmental_quality_standards(industries){
 
-        let obj = {
-            diclo: 100*effl_concentration(industries, "wwt_diclo_effl")/0.01,
-            cadmium: 100*effl_concentration(industries, "wwt_cadmium_effl")/0.001,
-            hexaclorobenzene: 100*effl_concentration(industries, "wwt_hexaclorobenzene_effl")/0.0005,
-            mercury: 100*effl_concentration(industries, "wwt_mercury_effl")/0.00007,
-            lead: 100*effl_concentration(industries, "wwt_plomo_effl")/0.0072,
-            nickel: 100*effl_concentration(industries, "wwt_niquel_effl")/0.02,
-            chloroalkanes: 100*effl_concentration(industries, "wwt_chloro_effl")/0.0014,
-            hexaclorobutadie: 100*effl_concentration(industries, "wwt_hexaclorobutadie_effl")/0.0006,
-            nonylphenols: 100*effl_concentration(industries, "wwt_nonilfenols_effl")/0.002,
-            tetracloroetile: 100*effl_concentration(industries, "wwt_tetracloroetile_effl")/0.01,
-            tricloroetile: 100*effl_concentration(industries, "wwt_tricloroetile_effl")/0.01,
+        let toxic_units = {}
+        for(let pollutant of utils.get_pollutants(industries)){
+            let eqs_factor = conversion_factors[pollutant]['eqs']
+            let effluent_concentration = effl_concentration(industries, pollutant)
+            let eqs = 100*effluent_concentration/eqs_factor
+
+            if(Number.isFinite(eqs)) toxic_units[pollutant] = eqs.toFixed(3)
+            else toxic_units[pollutant] = "-"
         }
-
-        Object.keys(obj).forEach(pollutant => {
-            let value = obj[pollutant]
-            if(!isNaN(value)) {
-                obj[pollutant] = value.toFixed(2)
-            }
-            else obj[pollutant] = "-"
-        })
-
-        return obj
-
+        return toxic_units
     },
 
     // For each pollutant, says the concentration of the water discharged (g/m3)
     pollutant_concentration(industries){
 
-        let obj = {
-            diclo: effl_concentration(industries, "wwt_diclo_effl"),
-            cadmium: effl_concentration(industries, "wwt_cadmium_effl"),
-            hexaclorobenzene: effl_concentration(industries, "wwt_hexaclorobenzene_effl"),
-            mercury: effl_concentration(industries, "wwt_mercury_effl"),
-            lead: effl_concentration(industries, "wwt_plomo_effl"),
-            nickel: effl_concentration(industries, "wwt_niquel_effl"),
-            chloroalkanes: effl_concentration(industries, "wwt_chloro_effl"),
-            hexaclorobutadie: effl_concentration(industries, "wwt_hexaclorobutadie_effl"),
-            nonylphenols: effl_concentration(industries, "wwt_nonilfenols_effl"),
-            tetracloroetile: effl_concentration(industries, "wwt_tetracloroetile_effl"),
-            tricloroetile: effl_concentration(industries, "wwt_tricloroetile_effl"),
+
+        let concentration = {}
+        for(let pollutant of utils.get_pollutants(industries)){
+            let pollutant_concentration = effl_concentration(industries, pollutant)
+
+            if(Number.isFinite(pollutant_concentration)) concentration[pollutant] = pollutant_concentration.toExponential(3)
+            else concentration[pollutant] = "-"
         }
+        return concentration
 
-        Object.keys(obj).forEach(pollutant => {
-            let value = obj[pollutant]
-            if(!isNaN(value)) {
-                obj[pollutant] = value.toExponential(2)
-            }
-            else obj[pollutant] = "-"
-        })
-
-        return obj
 
     },
     // For each pollutant, says the increase of the concentration in the receiving water body due to discharge (g/m3)
     async pollutant_delta(industries, global_layers){
 
-        let obj = {
-            diclo: await effl_delta(industries, "wwt_diclo_effl", global_layers),
-            cadmium: await effl_delta(industries, "wwt_cadmium_effl", global_layers),
-            hexaclorobenzene: await effl_delta(industries, "wwt_hexaclorobenzene_effl", global_layers),
-            mercury: await effl_delta(industries, "wwt_mercury_effl", global_layers),
-            lead: await effl_delta(industries, "wwt_plomo_effl", global_layers),
-            nickel: await effl_delta(industries, "wwt_niquel_effl", global_layers),
-            chloroalkanes: await effl_delta(industries, "wwt_chloro_effl", global_layers),
-            hexaclorobutadie: await effl_delta(industries, "wwt_hexaclorobutadie_effl", global_layers),
-            nonylphenols: await effl_delta(industries, "wwt_nonilfenols_effl", global_layers),
-            tetracloroetile: await effl_delta(industries, "wwt_tetracloroetile_effl", global_layers),
-            tricloroetile: await effl_delta(industries, "wwt_tricloroetile_effl", global_layers),
+        let delta = {}
+        for(let pollutant of utils.get_pollutants(industries)){
+            delta[pollutant] = await effl_delta(industries, pollutant, global_layers)
         }
-
-        return obj
+        return delta
 
     },
 
@@ -766,148 +761,27 @@ let metrics = {
         else return "-"
     },
 
-    async cod_effl(industries, global_layers){
-        let value = await effl_delta(industries, "wwt_cod_effl", global_layers)
-        return value
-    },
+    //Percentage of treatment efficiency compared to WWTP influent
+    wwtp_efficiency(industries){ //Increase in the concentration of the receiving water body (compared to EQS) due to  discharging the water(%)
 
-    cod_efficiency(industries){
-        let value = effl_efficiency(industries, "ind_cod_effl", "wwt_cod_effl")
-        return value
-    },
-
-    async tn_effl(industries, global_layers){
-        let value = await effl_delta(industries, "wwt_tn_effl", global_layers)
-        return value
-    },
-    tn_efficiency(industries){
-        let value = effl_efficiency(industries, "ind_tn_effl", "wwt_tn_effl")
-        return value
-    },
-
-    async tp_effl(industries, global_layers){
-        let value = await effl_delta(industries, "wwt_tp_effl", global_layers)
-        return value
-    },
-    tp_efficiency(industries){
-        let value = effl_efficiency(industries, "ind_tp_effl", "wwt_tp_effl")
-        return value
-    },
-
-    async dichloroethane_effl(industries, global_layers){
-        let value = await effl_delta(industries, "wwt_diclo_effl", global_layers)
-        return value
-    },
-    dichloroethane_efficiency(industries){
-        let value = effl_efficiency(industries, "ind_diclo_effl", "wwt_diclo_effl")
-        return value
-    },
-
-    async cadmium_effl(industries, global_layers){
-        let value = await effl_delta(industries, "wwt_cadmium_effl", global_layers)
-        return value
-    },
-    cadmium_efficiency(industries){
-        let value = effl_efficiency(industries, "ind_cadmium_effl", "wwt_cadmium_effl")
-        return value
-    },
-
-    async hexaclorobenzene_effl(industries, global_layers){
-        let value = await effl_delta(industries, "wwt_hexaclorobenzene_effl", global_layers)
-        return value
-    },
-    hexaclorobenzene_efficiency(industries){
-        let value = effl_efficiency(industries, "ind_hexaclorobenzene_effl", "wwt_hexaclorobenzene_effl")
-        return value
-    },
-
-    async mercury_effl(industries, global_layers){
-        let value = await effl_delta(industries, "wwt_mercury_effl", global_layers)
-        return value
-    },
-    mercury_efficiency(industries){
-        let value = effl_efficiency(industries, "ind_mercury_effl", "wwt_mercury_effl")
-        return value
-    },
-
-    async lead_effl(industries, global_layers){
-        let value = await effl_delta(industries, "wwt_plomo_effl", global_layers)
-        return value
-    },
-    lead_efficiency(industries){
-        let value = effl_efficiency(industries, "ind_plomo_effl", "wwt_plomo_effl")
-        return value
-    },
-
-    async nickel_effl(industries, global_layers){
-        let value = await effl_delta(industries, "wwt_niquel_effl", global_layers)
-        return value
-    },
-    nickel_efficiency(industries){
-        let value = effl_efficiency(industries, "ind_niquel_effl", "wwt_niquel_effl")
-        return value
-    },
-
-    async chloroalkanes_effl(industries, global_layers){
-        let value = await effl_delta(industries, "wwt_chloro_effl", global_layers)
-        return value
-    },
-    chloroalkanes_efficiency(industries){
-        let value = effl_efficiency(industries, "ind_chloro_effl", "wwt_chloro_effl")
-        return value
-    },
-
-    async hexaclorobutadie_effl(industries, global_layers){
-        let value = await effl_delta(industries, "wwt_hexaclorobutadie_effl", global_layers)
-        return value
-    },
-    hexaclorobutadie_efficiency(industries){
-        let value = effl_efficiency(industries, "ind_hexaclorobutadie_effl", "wwt_hexaclorobutadie_effl")
-        return value
-    },
-
-    async nonylphenols_effl(industries, global_layers){
-        let value = await effl_delta(industries, "wwt_nonilfenols_effl", global_layers)
-        return value
-    },
-    nonylphenols_efficiency(industries){
-        let value = effl_efficiency(industries, "ind_nonilfenols_effl", "wwt_nonilfenols_effl")
-        return value
-    },
-
-    async tetrachloroethene_effl(industries, global_layers){
-        let value = await effl_delta(industries, "wwt_tetracloroetile_effl", global_layers)
-        return value
-    },
-    tetrachloroethene_efficiency(industries){
-        let value = effl_efficiency(industries, "ind_tetracloroetile_effl", "wwt_tetracloroetile_effl")
-        return value
-    },
-
-    async tricloroetile_effl(industries, global_layers){
-        let value = await effl_delta(industries, "wwt_tricloroetile_effl", global_layers)
-        return value
-    },
-    tricloroetile_efficiency(industries){
-        let value = effl_efficiency(industries, "ind_tricloroetile_effl", "wwt_tricloroetile_effl")
-        return value
+        let efficiency = {}
+        for(let pollutant of utils.get_pollutants(industries, false)){
+            let eff = effl_efficiency(industries, pollutant, pollutant)
+            efficiency[pollutant] = eff
+        }
+        return efficiency
     },
 
     // Says if the water discharged by the industry to the receiving water body is cleaner (< 100) or more polluted (> 100) than the water withdrawn
     amount_water_influent_cleaned(industries){
-        let cod_infl = calculate_influent_load(industries, "ind_cod_infl")
-        let tn_infl = calculate_influent_load(industries, "ind_tn_infl")
-        let tp_infl = calculate_influent_load(industries, "ind_tp_infl")
 
-        let cod_effl = calculate_effluent_load(industries, "wwt_cod_effl")
-        let tn_effl = calculate_effluent_load(industries, "wwt_tn_effl")
-        let tp_effl = calculate_effluent_load(industries, "wwt_tp_effl")
-
-        let cod = (cod_infl == 0 || isNaN(cod_infl)) ? "-" : (100*cod_effl/cod_infl).toFixed(2)
-        let tn = (tn_infl == 0 || isNaN(tn_infl)) ? "-" : (100*tn_effl/tn_infl).toFixed(2)
-        let tp = (tp_infl == 0 || isNaN(tp_infl)) ? "-" : (100*tp_effl/tp_infl).toFixed(2)
-
-        return {cod, tn, tp}
+        let efficiency = {}
+        for(let pollutant of utils.get_pollutants(industries, false)){
+            let infl = calculate_influent_load(industries, pollutant)
+            let effl = calculate_effluent_load(industries, pollutant)
+            efficiency[pollutant] = (infl == 0 || isNaN(infl)) ? "-" : (100*effl/infl).toFixed(2)
+        }
+        return efficiency
     },
 
     avg_influent_efficiency(industries){
@@ -923,13 +797,8 @@ let metrics = {
     },
 
     avg_treatment_efficiency(industries){
-        let treatment_efficiency = [this.cod_efficiency(industries), this.tn_efficiency(industries),
-            this.tp_efficiency(industries), this.dichloroethane_efficiency(industries), this.cadmium_efficiency(industries),
-            this.hexaclorobenzene_efficiency(industries), this.mercury_efficiency(industries), this.lead_efficiency(industries),
-            this.nickel_efficiency(industries), this.chloroalkanes_efficiency(industries), this.hexaclorobutadie_efficiency(industries),
-            this.nonylphenols_efficiency(industries), this.tetrachloroethene_efficiency(industries), this.tricloroetile_efficiency(industries)
-        ]
 
+        let treatment_efficiency = Object.values(this.wwtp_efficiency(industries))
         let treatment_efficiency_filtered = treatment_efficiency.filter(x => !Number.isNaN(parseFloat(x))).map(x => parseFloat(x))
 
         if(treatment_efficiency_filtered.length == 0) return "-"
@@ -1316,104 +1185,83 @@ let metrics = {
 
 
     ecotoxicity_potential_tu(industries) { //concentration of tu in the water discharged(tu/day)
-        let toxic_units = {
-            diclo: effl_concentration(industries, "wwt_diclo_effl")/150,
-            cadmium: effl_concentration(industries, "wwt_cadmium_effl")/0.0095,
-            hexaclorobenzene: effl_concentration(industries, "wwt_hexaclorobenzene_effl")/0.03,
-            mercury: effl_concentration(industries, "wwt_mercury_effl")/0.0014,
-            lead: effl_concentration(industries, "wwt_plomo_effl")/0.44,
-            nickel: effl_concentration(industries, "wwt_niquel_effl")/1,
-            chloroalkanes: effl_concentration(industries, "wwt_chloro_effl")/65,
-            hexaclorobutadie: effl_concentration(industries, "wwt_hexaclorobutadie_effl")/0.5,
-            nonylphenols: effl_concentration(industries, "wwt_nonilfenols_effl")/0.15,
-            tetracloroetile: effl_concentration(industries, "wwt_tetracloroetile_effl")/3.2,
-            tricloroetile: effl_concentration(industries, "wwt_tricloroetile_effl")/76,
-        }
-        let total_toxic_units = Object.values(toxic_units).sum()
-        toxic_units["total"] = total_toxic_units
 
-        Object.keys(toxic_units).forEach(key => {
-            let value = toxic_units[key]
-            if(Number.isFinite(value)) toxic_units[key] = value.toExponential(2)
-            else toxic_units[key] = "-"
-        })
+        let toxic_units = {}
+        for(let pollutant of utils.get_pollutants(industries)){
+            let tu_factor = conversion_factors[pollutant]['tu']
+            let effluent_concentration = effl_concentration(industries, pollutant)
+            let tu = 1000*effluent_concentration/tu_factor
+
+            if(Number.isFinite(tu)) toxic_units[pollutant] = tu.toExponential(2)
+            else toxic_units[pollutant] = "-"
+        }
+
+        if (Object.values(toxic_units).filter(x => x != "-").length == 0) toxic_units["total"] = '-'
+        else toxic_units["total"] = Object.values(toxic_units).sum().toExponential(2)
 
         return toxic_units
     },
     async delta_tu(industries, global_layers){ //increase of tu in the receiving water body due to discharging the water(tu/day)
-        let toxic_units = {
-            diclo: await effl_delta(industries, "wwt_diclo_effl", global_layers)/150,
-            cadmium: await effl_delta(industries, "wwt_cadmium_effl", global_layers)/0.0095,
-            hexaclorobenzene: await effl_delta(industries, "wwt_hexaclorobenzene_effl", global_layers)/0.03,
-            mercury: await effl_delta(industries, "wwt_mercury_effl", global_layers)/0.0014,
-            lead: await effl_delta(industries, "wwt_plomo_effl", global_layers)/0.44,
-            nickel: await effl_delta(industries, "wwt_niquel_effl", global_layers)/1,
-            chloroalkanes: await effl_delta(industries, "wwt_chloro_effl", global_layers)/65,
-            hexaclorobutadie: await effl_delta(industries, "wwt_hexaclorobutadie_effl", global_layers)/0.5,
-            nonylphenols: await effl_delta(industries, "wwt_nonilfenols_effl", global_layers)/0.15,
-            tetracloroetile: await effl_delta(industries, "wwt_tetracloroetile_effl", global_layers)/3.2,
-            tricloroetile: await effl_delta(industries, "wwt_tricloroetile_effl", global_layers)/76,
-        }
-        let total_toxic_units = Object.values(toxic_units).sum()
-        toxic_units["total"] = total_toxic_units
 
-        Object.keys(toxic_units).forEach(key => {
-            let value = toxic_units[key]
-            if(Number.isFinite(value)) toxic_units[key] = value.toExponential(2)
-            else toxic_units[key] = "-"
-        })
+        let toxic_units = {}
+        for(let pollutant of utils.get_pollutants(industries)){
+            let tu_factor = conversion_factors[pollutant]['tu']
+            let pollutant_delta = await effl_delta(industries, pollutant, global_layers)
+
+            let delta_tu = 1000*pollutant_delta/tu_factor
+
+            if(Number.isFinite(delta_tu)) toxic_units[pollutant] = delta_tu.toExponential(2)
+            else toxic_units[pollutant] = "-"
+
+        }
+
+        if (Object.values(toxic_units).filter(x => x != "-").length == 0) toxic_units["total"] = '-'
+        else toxic_units["total"] = Object.values(toxic_units).sum().toExponential(2)
 
         return toxic_units
     },
     async delta_eqs(industries, global_layers){ //Increase in the concentration of the receiving water body (compared to EQS) due to  discharging the water(%)
-        let toxic_units = {
-            diclo: await effl_delta(industries, "wwt_diclo_effl", global_layers)*100/0.01,
-            cadmium: await effl_delta(industries, "wwt_cadmium_effl", global_layers)*100/0.001,
-            hexaclorobenzene: await effl_delta(industries, "wwt_hexaclorobenzene_effl", global_layers)*100/0.0005,
-            mercury: await effl_delta(industries, "wwt_mercury_effl", global_layers)*100/0.00007,
-            lead: await effl_delta(industries, "wwt_plomo_effl", global_layers)*100/0.0072,
-            nickel: await effl_delta(industries, "wwt_niquel_effl", global_layers)*100/0.02,
-            chloroalkanes: await effl_delta(industries, "wwt_chloro_effl", global_layers)*100/0.0014,
-            hexaclorobutadie: await effl_delta(industries, "wwt_hexaclorobutadie_effl", global_layers)*100/0.0006,
-            nonylphenols: await effl_delta(industries, "wwt_nonilfenols_effl", global_layers)*100/0.002,
-            tetracloroetile: await effl_delta(industries, "wwt_tetracloroetile_effl", global_layers)*100/0.01,
-            tricloroetile: await effl_delta(industries, "wwt_tricloroetile_effl", global_layers)*100/0.01,
-        }
 
-        Object.keys(toxic_units).forEach(key => {
-            let value = toxic_units[key]
-            if(Number.isFinite(value)) toxic_units[key] = value.toFixed(2)
-            else toxic_units[key] = "-"
-        })
+        let toxic_units = {}
+        for(let pollutant of utils.get_pollutants(industries)){
+            let eqs_factor = conversion_factors[pollutant]['eqs']
+            let pollutant_delta = await effl_delta(industries, pollutant, global_layers)
+            let delta_eqs = 100*pollutant_delta/eqs_factor
+
+            if(Number.isFinite(delta_eqs)) toxic_units[pollutant] = delta_eqs.toFixed(3)
+            else toxic_units[pollutant] = "-"
+        }
 
         return toxic_units
     },
     async delta_eqs_avg(industries, global_layers){
         let eqs = await this.delta_eqs(industries, global_layers)
 
+        if (Object.values(eqs).filter(x => x != "-").length == 0) return  '-'
+
         let avg = Object.values(eqs).sum() / Object.values(eqs).length
 
-        if(Number.isFinite(avg)) return avg.toExponential(2)
+        if(Number.isFinite(avg)) return avg.toFixed(3)
         else return "-"
 
     },
 
     eutrophication_potential(industries){
-        let eutrophication = {
-            cod: effl_concentration(industries, "wwt_cod_effl")*0.022,
-            tn: effl_concentration(industries, "wwt_tn_effl")*0.42,
-            tp: effl_concentration(industries, "wwt_tp_effl")*3.06,
+
+        let eutrophication = {}
+        for(let pollutant of ["COD", "TN", "TP"]){
+            let eutrophication_factor = conversion_factors[pollutant]['eutrophication']
+            let effluent_concentration = effl_concentration(industries, pollutant)
+            let eutrophication_value = eutrophication_factor*effluent_concentration
+            if(Number.isFinite(eutrophication_value)) eutrophication[pollutant] = eutrophication_value.toExponential(3)
+            else eutrophication[pollutant] = "-"
         }
 
-        eutrophication["total"] = Object.values(eutrophication).sum()
-
-        Object.keys(eutrophication).forEach(key => {
-            let value = eutrophication[key]
-            if(Number.isFinite(value)) eutrophication[key] = value.toExponential(2)
-            else eutrophication[key] = "-"
-        })
+        eutrophication["total"] = Object.values(eutrophication).sum().toExponential(3)
 
         return eutrophication
+
+
 
     },
 

@@ -527,7 +527,7 @@ Vue.prototype.$layers_description = [
     ]
   },*/
 ]
-
+Vue.prototype.$created_pollutants = new Set() //Created pollutants among all assessments and industries
 new Vue({
   router,
   vuetify,

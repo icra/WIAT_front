@@ -154,7 +154,7 @@ export class Industry{
         return sumObjectsByKey(onsite_wwtp, offsite_wwtp, direct_discharge)
     }
 
-    //GHG from sludge management deglossed by use
+    //GHG from sludge management deglossed by origin
     sludge_management_emissions(){
         let storage = sumObjectsByKey(this.onsite_wwtp.wwt_KPI_GHG_sludge_storage(), this.offsite_wwtp.wwt_KPI_GHG_sludge_storage()).total
         let composting = sumObjectsByKey(this.onsite_wwtp.wwt_KPI_GHG_sludge_composting(), this.offsite_wwtp.wwt_KPI_GHG_sludge_composting()).total
@@ -298,27 +298,50 @@ export class Industry{
     effl_pollutant_load(pollutant){
         let load = 0
         if(this.has_onsite_wwtp == 1) {
-            load += this.onsite_wwtp[pollutant] * this.onsite_wwtp.wwt_vol_disc // g/day
+
+            let concentration = 0
+            if(this.onsite_wwtp.wwt_pollutants_effl.hasOwnProperty(pollutant)){
+                concentration = this.onsite_wwtp.wwt_pollutants_effl[pollutant]
+            }
+            load += concentration * this.onsite_wwtp.wwt_vol_disc // g/day
         }
         if(this.has_direct_discharge == 1) {
-            load += this.direct_discharge[pollutant]  *  this.direct_discharge.dd_vol_disc  // g/day
+            let concentration = 0
+            if(this.direct_discharge.wwt_pollutants_effl.hasOwnProperty(pollutant)){
+                concentration = this.direct_discharge.wwt_pollutants_effl[pollutant]
+            }
+            load += concentration  *  this.direct_discharge.dd_vol_disc  // g/day
+
         }
         if(this.has_offsite_wwtp == 1){
-            load += this.offsite_wwtp[pollutant] * this.offsite_wwtp.wwt_vol_disc  // g/day
+            let concentration = 0
+            if(this.offsite_wwtp.wwt_pollutants_effl.hasOwnProperty(pollutant)){
+                concentration = this.offsite_wwtp.wwt_pollutants_effl[pollutant]
+            }
+            load += concentration * this.offsite_wwtp.wwt_vol_disc  // g/day
+
         }
         return load
     }
 
     //Load of pollutant from the surface water withdrawn by the industry
     infl_pollutant_load(pollutant){
-        return this[pollutant]*this.volume_of_surface_water_withdrawn()
+
+        let concentration = 0
+        if(this.ind_pollutants_infl.hasOwnProperty(pollutant)){
+            concentration = this.ind_pollutants_infl[pollutant]
+        }
+
+        return concentration*this.volume_of_surface_water_withdrawn()
     }
 
     //Adds load of pollutant from onsite WWTP (before being treated), offsite WWTP (before being treated) and directly discharged water
     generated_pollutant_load(pollutant){
         let load = 0
-        let concentration = this[pollutant]
-
+        let concentration = 0
+        if(this.ind_pollutants_effl.hasOwnProperty(pollutant)){
+            concentration = this.ind_pollutants_effl[pollutant]
+        }
         if(this.has_onsite_wwtp == 1) {
             load += concentration * this.onsite_wwtp.wwt_vol_trea // g/day
         }
@@ -436,7 +459,7 @@ export class Direct_discharge{
         }
         this.wwt_tn_effl = 0
         this.wwt_tp_effl = 0
-        this.wwt_cod_effl = 0
+        //this.wwt_cod_effl = 0
         this.wwt_diclo_effl = 0 //1,2-Dichloroethane
         this.wwt_cadmium_effl = 0 //Cadmium
         this.wwt_hexaclorobenzene_effl = 0 //Hexachlorobenzene
@@ -485,8 +508,12 @@ export class Direct_discharge{
     //emissions from water discharged
     wwt_KPI_GHG_disc(){
         let co2   = 0;
-        let ch4   = this.wwt_cod_effl*this.wwt_ch4_efac_dis*Cts.ct_ch4_eq.value;    //Equacio 6.2
-        let n2o   = this.wwt_tn_effl *this.wwt_n2o_efac_dis*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;    //Equacio 6.12
+
+        let cod = this.wwt_pollutants_effl["COD"]
+        let tn = this.wwt_pollutants_effl["TN"]
+
+        let ch4   = cod*this.wwt_ch4_efac_dis*Cts.ct_ch4_eq.value;    //Equation 6.2 IPCC
+        let n2o   = tn*this.wwt_n2o_efac_dis*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;    //Equation 6.12 IPCC
         let total = co2+ch4+n2o;
         return {total,co2,ch4,n2o};
     }
@@ -522,9 +549,9 @@ export class WWTP{
             TP: 0,
         }
 
-        this.wwt_cod_infl_ind = 0           //COD concentration of water that comes directly from industry (without being treated)
-        this.wwt_cod_infl_wwtp = 0          //COD concentration of water that comes from onsite WWTP (already treated)
-        this.wwt_cod_effl = 0               //COD concentration of water discharged by current WWTP (already treated))
+        //this.wwt_cod_infl_ind = 0           //COD concentration of water that comes directly from industry (without being treated)
+        //this.wwt_cod_infl_wwtp = 0          //COD concentration of water that comes from onsite WWTP (already treated)
+        //this.wwt_cod_effl = 0               //COD concentration of water discharged by current WWTP (already treated))
         this.wwt_tn_infl_ind = 0            //TN concentration of water that comes directly from industry (without being treated)
         this.wwt_tn_infl_wwtp = 0           //TN concentration of water that comes from onsite WWTP (already treated)
         this.wwt_tn_effl = 0                //TN concentration of water discharged by current WWTP (already treated))
@@ -694,16 +721,28 @@ export class WWTP{
     //emissions from water discharged
     wwt_KPI_GHG_disc(){
         let co2   = 0;
-        let ch4   = this.wwt_cod_effl*this.wwt_vol_disc*this.wwt_ch4_efac_dis*Cts.ct_ch4_eq.value;    //Equacio 6.2
-        let n2o   = this.wwt_tn_effl *this.wwt_vol_disc*this.wwt_n2o_efac_dis*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;    //Equacio 6.12
+
+        let cod = this.wwt_pollutants_effl["COD"]
+        let tn = this.wwt_pollutants_effl["TN"]
+
+        let ch4   = cod*this.wwt_vol_disc*this.wwt_ch4_efac_dis*Cts.ct_ch4_eq.value;    //Equation 6.2
+        let n2o   = tn *this.wwt_vol_disc*this.wwt_n2o_efac_dis*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;    //Equation 6.12
         let total = co2+ch4+n2o;
         return {total,co2,ch4,n2o};
     }
 
     //emissions from treatment
     wwt_KPI_GHG_tre(){
-        let cod_load = this.wwt_cod_infl_ind*this.wwt_vol_trea + this.wwt_vol_from_external*this.wwt_cod_infl_wwtp
-        let tn_load = this.wwt_tn_infl_ind*this.wwt_vol_trea + this.wwt_vol_from_external*this.wwt_tp_infl_wwtp
+
+        let cod_infl_ind = this.wwt_pollutants_infl_ind["COD"]
+        let tn_infl_ind = this.wwt_pollutants_infl_ind["TN"]
+        let cod_infl_wwtp = this.wwt_pollutants_infl_wwtp["COD"]
+        let tn_infl_wwtp = this.wwt_pollutants_infl_wwtp["TN"]
+
+
+
+        let cod_load = cod_infl_ind*this.wwt_vol_trea + this.wwt_vol_from_external*cod_infl_wwtp
+        let tn_load = tn_infl_ind*this.wwt_vol_trea + this.wwt_vol_from_external*tn_infl_wwtp
 
         let co2   = 0;
         let ch4   = (cod_load-this.wwt_cod_slud)*this.wwt_ch4_efac_tre*Cts.ct_ch4_eq.value;    //Eq. 6.4

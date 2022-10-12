@@ -1302,6 +1302,9 @@ export default {
         })
         this.snackbar_text = "FILE IMPORTED CORRECTLY"
         this.snackbar_imported_file = true
+
+        utils.reset_and_update_global_pollutants(this.created_assessments, this.$created_pollutants)
+
         //_this.$emit('file_imported', "FILE IMPORTED CORRECTLY")
         //this.$router.push('/')
 
