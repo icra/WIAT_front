@@ -805,12 +805,8 @@ export class WWTP{
     wwt_KPI_GHG_biog_flared(){
         let moles_biogas        = this.wwt_moles_biogas_produced(); //moles of biogas produced
         let moles_biogas_flared = moles_biogas*this.wwt_biog_fla/100; //moles of biogas flared
-        let moles_ch4_flared    = moles_biogas_flared*this.wwt_ch4_biog/100; //moles of CH4 flared
 
-        //combustion of 1 mol of CH4 produces 1 mol of CO2
-        //CH4 + 2·O2 -> CO2 + 2·H2O
-        //we do not account moles of CO2 already present into the biogas, because it is biogenic CO2
-        let moles_co2_to_atmosphere = moles_ch4_flared; //moles of CO2
+        let moles_co2_to_atmosphere = moles_biogas_flared; //moles of CO2
         let mass_co2_to_atmosphere = moles_co2_to_atmosphere*(44/1000); //kg of CO2
 
         let co2 = mass_co2_to_atmosphere; //kgCO2
@@ -824,12 +820,8 @@ export class WWTP{
     wwt_KPI_GHG_biog_valorized(){
         let moles_biogas           = this.wwt_moles_biogas_produced(); //moles of biogas produced
         let moles_biogas_valorized = moles_biogas*this.wwt_biog_val/100; //moles of biogas valorized
-        let moles_ch4_valorized    = moles_biogas_valorized*this.wwt_ch4_biog/100; //moles of CH4 valorized
 
-        //combustion of 1 mol of CH4 produces 1 mol of CO2
-        //CH4 + 2·O2 -> CO2 + 2·H2O
-        //we do not account moles of CO2 already present into the biogas, because it is biogenic CO2
-        let moles_co2_to_atmosphere = moles_ch4_valorized; //moles of CO2
+        let moles_co2_to_atmosphere = moles_biogas_valorized; //moles of CO2
         let mass_co2_to_atmosphere = moles_co2_to_atmosphere*(44/1000); //kg of CO2
 
         let co2 = mass_co2_to_atmosphere; //kgCO2

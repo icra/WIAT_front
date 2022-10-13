@@ -1,7 +1,7 @@
 <template>
   <div style="height: 100%;" class="outer">
 
-    <div v-if="utils.is_industry_valid(industry)">
+    <div v-if="utils.is_industry_valid(this.industry)">
 
       <v-row>
         <v-col cols="7">
@@ -2408,7 +2408,7 @@
           <div class="dialog_detail" style="background-color: white">
             <h3>Biogas valorization </h3>
             <div
-                v-katex:display="'biogas_{valorised} = \\sum_{i \\in WWTPS} \\frac{P \\cdot V_i}{R \\cdot T} \\cdot \\frac{biog_{val_i}}{100} \\cdot \\frac{biog_{CH4_i}}{100} \\cdot \\frac{44}{1000}'"></div>
+                v-katex:display="'biogas_{valorised} = \\sum_{i \\in WWTPS} \\frac{P \\cdot V_i}{R \\cdot T} \\cdot \\frac{biog_{val_i}}{100} \\cdot \\frac{44}{1000}'"></div>
 
             <b>Where:</b>
             <br>
@@ -2436,7 +2436,7 @@
           <div class="dialog_detail" style="background-color: white">
             <h3>Biogas flared </h3>
             <div
-                v-katex:display="'biogas_{flared} = \\sum_{i \\in WWTPS} \\frac{P \\cdot V_i}{R \\cdot T} \\cdot \\frac{biog_{fla_i}}{100} \\cdot \\frac{biog_{CH4_i}}{100} \\cdot \\frac{44}{1000}'"></div>
+                v-katex:display="'biogas_{flared} = \\sum_{i \\in WWTPS} \\frac{P \\cdot V_i}{R \\cdot T} \\cdot \\frac{biog_{fla_i}}{100} \\cdot \\frac{44}{1000}'"></div>
 
             <b>Where:</b>
             <br>
@@ -3072,18 +3072,53 @@ export default {
       }
     },
 
-    //Change current industry if user selects new assessment
     assessment_id: function (value) {
-      this.industry = this.created_assessments[value][this.industry_id]
+      this.$router.push({ name: 'report_prop', params: {assessment_id: value}})
     },
 
-    //Change current industry if user selects new industryh
-    industry_id: function (value) {
-      this.industry = this.created_assessments[this.assessment_id][value]
+    //Change current industry if user selects new industry
+    industry_id: async function (value) {
+      this.industry = this.created_assessments[this.assessment_id].industries[value]
+      this.created_function()
+      await this.prepare_table_data()
     },
 
   },
   methods: {
+
+    async prepare_table_data(){
+      let _this = this
+
+      this.assessment = this.created_assessments[this.assessment_id]
+      this.industry = this.created_assessments[this.assessment_id].industries[this.industry_id]
+
+      _this.emissions_table = _this.generate_emissions_table()
+      _this.energy_use_table = _this.generate_energy_use_table()
+      _this.effluent_load_table = _this.generate_effluent_load_table()
+
+      _this.water_quantity = await _this.generate_water_quality_table()
+      _this.treated_table = await _this.generate_treated_table()
+      _this.freshwater_lever_for_action = await _this.generate_freshwater_lever_for_action_table()
+
+      _this.eutrophication_table = _this.generate_eutrophication_table()
+      _this.ecotoxicity_table = _this.generate_ecotoxicity_table()
+      _this.treatment_efficiency_table = _this.generate_treatment_efficiency_table()
+      _this.treatment_efficiency_influent_table = _this.generate_treatment_efficiency_influent_table()
+
+      _this.eqs_table = _this.generate_eqs_table()
+      _this.delta_eqs_table = await _this.generate_delta_eqs_table()
+      _this.delta_ecotox_table = await _this.generate_delta_ecotox_table()
+
+      _this.simple_report_table = await _this.generate_simple_report_table()
+      _this.industry_table = await _this.generate_industry_table()
+      _this.biogas_valorised_table = _this.generate_biogas_valorised_table()
+
+      _this.ghg_ratio_table = _this.generate_ghg_ratio_table()
+      _this.ghg_sludge_management_table = _this.generate_sludge_management_table()
+      _this.concentration_table = await _this.generate_concentration_table()
+
+    },
+
     set_pollutants_factors(){
       this.$router.push({name: 'general_configuration'})
     },
@@ -4778,47 +4813,19 @@ export default {
 
     },
 
+    created_function(){
+      this.selected_assessment = this.created_assessments[this.assessment_id].name
+      this.pollutants_without_factor = Object.values(conversion_factors).map(pollutant => Object.values(pollutant)).flat().filter(value => value == null).length > 0
+    }
+
   },
 
   created() {
     let _this = this
-    this.selected_assessment = this.created_assessments[this.assessment_id].name
-    this.pollutants_without_factor = Object.values(conversion_factors).map(pollutant => Object.values(pollutant)).flat().filter(value => value == null).length > 0
-    console.log(Object.values(conversion_factors).map(pollutant => Object.values(pollutant)).flat())
+    this.created_function()
   },
   async mounted() {
-
-    let _this = this
-
-    this.assessment = this.created_assessments[this.assessment_id]
-    this.industry = this.created_assessments[this.assessment_id].industries[this.industry_id]
-
-    _this.emissions_table = _this.generate_emissions_table()
-    _this.energy_use_table = _this.generate_energy_use_table()
-    _this.effluent_load_table = _this.generate_effluent_load_table()
-
-    _this.water_quantity = await _this.generate_water_quality_table()
-    _this.treated_table = await _this.generate_treated_table()
-    _this.freshwater_lever_for_action = await _this.generate_freshwater_lever_for_action_table()
-
-    _this.eutrophication_table = _this.generate_eutrophication_table()
-    _this.ecotoxicity_table = _this.generate_ecotoxicity_table()
-    _this.treatment_efficiency_table = _this.generate_treatment_efficiency_table()
-    _this.treatment_efficiency_influent_table = _this.generate_treatment_efficiency_influent_table()
-
-    _this.eqs_table = _this.generate_eqs_table()
-    _this.delta_eqs_table = await _this.generate_delta_eqs_table()
-    _this.delta_ecotox_table = await _this.generate_delta_ecotox_table()
-
-    _this.simple_report_table = await _this.generate_simple_report_table()
-    _this.industry_table = await _this.generate_industry_table()
-    _this.biogas_valorised_table = _this.generate_biogas_valorised_table()
-
-    _this.ghg_ratio_table = _this.generate_ghg_ratio_table()
-    _this.ghg_sludge_management_table = _this.generate_sludge_management_table()
-    _this.concentration_table = await _this.generate_concentration_table()
-
-
+    await this.prepare_table_data()
   },
 
   computed: {
@@ -4885,7 +4892,7 @@ export default {
               children: [
                 {id: 19, name: "Energy use", info: "Energy used by the industry to treat a m3 of water"},
                 {id: 20, name: "Wastewater effluent concentration", info: "Concentration of pollutant discharged by the industry"},
-                //{id: 21, name: "Biogenic emissions", info: "Biogenic emissions sources are emissions that come from natural sources"},
+                {id: 21, name: "Biogenic emissions", info: "Biogenic emissions sources are emissions that come from natural sources"},
                 {id: 22, name: "GHG emissions ratio", info: "Amount of CO2, CH4 and N2O during wastewater treatment process"},
                 {id: 23, name: "Sludge management", info: "GHG emissions from sludge management operations (storing, composting, incineration, land application, landfilling, stockpiling and truck transport)"},
               ]
