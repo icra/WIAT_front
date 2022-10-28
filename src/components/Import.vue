@@ -896,7 +896,6 @@ export default {
       let new_industry = new Industry()
 
 
-
       Object.keys(new_industry).forEach(key => {
 
         if (key != "onsite_wwtp" && key != "offsite_wwtp" && key!="direct_discharge"){

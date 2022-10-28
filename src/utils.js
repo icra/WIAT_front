@@ -1207,9 +1207,7 @@ let metrics = {
         for(let pollutant of utils.get_pollutants(industries)){
             let tu_factor = conversion_factors[pollutant]['tu']
             let pollutant_delta = await effl_delta(industries, pollutant, global_layers)
-
             let delta_tu = 1000*pollutant_delta/tu_factor
-
             if(Number.isFinite(delta_tu)) toxic_units[pollutant] = delta_tu.toExponential(2)
             else toxic_units[pollutant] = "-"
 

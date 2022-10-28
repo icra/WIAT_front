@@ -296,6 +296,9 @@
                   </template>
                   <span>{{ item.info }}</span>
                 </v-tooltip>
+                <span v-if="item.name == 'Pollution' || item.name == 'Freshwater'" class="state_of_nature">(Change of state of nature)</span>
+
+
               </template>
 
             </v-treeview>
@@ -2874,7 +2877,7 @@ Vue.use(VueKatex, {});
 import BarChart from "./BarChart";
 import PieChart from "./PieChart";
 import conversion_factors from "@/conversion_factors";
-
+import {industry_impact_legend_category} from '@/industry_impact_legend_category'
 export default {
   name: "Industry_statistics",
   components: { BarChart, PieChart },
@@ -4286,6 +4289,9 @@ export default {
 
 
         for(let pollutant of utils.remove_nutrients(this.industry.pollutants_selected)){
+
+          console.log(industry_impact_legend_category.delta_tu(this.industry, pollutant))
+
           let pollutant_obj = {
             value: pollutant,
             unit: "TU/day",
@@ -4877,13 +4883,13 @@ export default {
           id: 13,
           name: "Freshwater",
           children: [
-            {id: 14, name: "Impact",},
+            {id: 14, name: "Water availability impacts",},
             {id: 15, name: "Levers for action",}
           ]
         },
         {
           id: 16,
-          name: "Carbon",
+          name: "GHG emissions from wastewater treatment",
           children: [
             {id: 17, name: "Impact",},
             {
@@ -4994,6 +5000,12 @@ table {
 }
 .very_high {
   background-color: red;
+}
+
+.state_of_nature{
+  color: #b62373;
+  text-decoration: none;
+  margin-left: -20vw !important;
 }
 
 </style>

@@ -186,22 +186,6 @@ export class Industry{
             if (!wwtp.wwt_pollutants_effl.hasOwnProperty(pollutant)) wwtp.wwt_pollutants_effl[pollutant] = 0
         }
 
-        /*
-        wwtp.wwt_cod_infl_ind = this.ind_cod_effl
-        wwtp.wwt_tn_infl_ind = this.ind_tn_effl
-        wwtp.wwt_tp_infl_ind = this.ind_tp_effl
-        wwtp.wwt_diclo_infl_ind = this.ind_diclo_effl
-        wwtp.wwt_cadmium_infl_ind = this.ind_cadmium_effl
-        wwtp.wwt_hexaclorobenzene_infl_ind = this.ind_hexaclorobenzene_effl
-        wwtp.wwt_mercury_infl_ind = this.ind_mercury_effl
-        wwtp.wwt_plomo_infl_ind = this.ind_plomo_effl
-        wwtp.wwt_niquel_infl_ind = this.ind_niquel_effl
-        wwtp.wwt_chloro_infl_ind = this.ind_chloro_effl
-        wwtp.wwt_hexaclorobutadie_infl_ind = this.ind_hexaclorobutadie_effl
-        wwtp.wwt_nonilfenols_infl_ind = this.ind_nonilfenols_effl
-        wwtp.wwt_tetracloroetile_infl_ind = this.ind_tetracloroetile_effl
-        wwtp.wwt_tricloroetile_infl_ind = this.ind_tricloroetile_effl*/
-
         if(this.has_offsite_wwtp != 1)  wwtp.wwt_vol_treated_external = 0
 
     }
@@ -218,21 +202,6 @@ export class Industry{
         for (let pollutant of this.pollutants_selected){
             direct_discharge.wwt_pollutants_effl[pollutant] = this.ind_pollutants_effl[pollutant]
         }
-        /*
-        direct_discharge.wwt_cod_effl = this.ind_cod_effl
-        direct_discharge.wwt_tn_effl = this.ind_tn_effl
-        direct_discharge.wwt_tp_effl = this.ind_tp_effl
-        direct_discharge.wwt_diclo_effl = this.ind_diclo_effl
-        direct_discharge.wwt_cadmium_effl = this.ind_cadmium_effl
-        direct_discharge.wwt_hexaclorobenzene_effl = this.ind_hexaclorobenzene_effl
-        direct_discharge.wwt_mercury_effl = this.ind_mercury_effl
-        direct_discharge.wwt_plomo_effl = this.ind_plomo_effl
-        direct_discharge.wwt_niquel_effl = this.ind_niquel_effl
-        direct_discharge.wwt_chloro_effl = this.ind_chloro_effl
-        direct_discharge.wwt_hexaclorobutadie_effl = this.ind_hexaclorobutadie_effl
-        direct_discharge.wwt_nonilfenols_effl = this.ind_nonilfenols_effl
-        direct_discharge.wwt_tetracloroetile_effl = this.ind_tetracloroetile_effl
-        direct_discharge.wwt_tricloroetile_effl = this.ind_tricloroetile_effl*/
     }
 
     //Set directly discharged water default values
@@ -248,22 +217,6 @@ export class Industry{
 
 
         wwtp.location = this.location
-        /*
-        wwtp.wwt_cod_infl_ind = this.ind_cod_effl
-        wwtp.wwt_tn_infl_ind = this.ind_tn_effl
-        wwtp.wwt_tp_infl_ind = this.ind_tp_effl
-        wwtp.wwt_diclo_infl_ind = this.ind_diclo_effl
-        wwtp.wwt_cadmium_infl_ind = this.ind_cadmium_effl
-        wwtp.wwt_hexaclorobenzene_infl_ind = this.ind_hexaclorobenzene_effl
-        wwtp.wwt_mercury_infl_ind = this.ind_mercury_effl
-        wwtp.wwt_plomo_infl_ind = this.ind_plomo_effl
-        wwtp.wwt_niquel_infl_ind = this.ind_niquel_effl
-        wwtp.wwt_chloro_infl_ind = this.ind_chloro_effl
-        wwtp.wwt_hexaclorobutadie_infl_ind = this.ind_hexaclorobutadie_effl
-        wwtp.wwt_nonilfenols_infl_ind = this.ind_nonilfenols_effl
-        wwtp.wwt_tetracloroetile_infl_ind = this.ind_tetracloroetile_effl
-        wwtp.wwt_tricloroetile_infl_ind = this.ind_tricloroetile_effl*/
-
 
         for (let pollutant of this.pollutants_selected){
             wwtp.wwt_pollutants_infl_ind[pollutant] = this.ind_pollutants_effl[pollutant]
@@ -457,20 +410,7 @@ export class Direct_discharge{
             TN: 0,
             TP: 0
         }
-        this.wwt_tn_effl = 0
-        this.wwt_tp_effl = 0
-        //this.wwt_cod_effl = 0
-        this.wwt_diclo_effl = 0 //1,2-Dichloroethane
-        this.wwt_cadmium_effl = 0 //Cadmium
-        this.wwt_hexaclorobenzene_effl = 0 //Hexachlorobenzene
-        this.wwt_mercury_effl = 0 //mercury
-        this.wwt_plomo_effl = 0 //lead
-        this.wwt_niquel_effl = 0 //nickel
-        this.wwt_chloro_effl = 0 //chloroalkanes
-        this.wwt_hexaclorobutadie_effl = 0 //Hexachlorobutadiene
-        this.wwt_nonilfenols_effl = 0 //Nonylphenols
-        this.wwt_tetracloroetile_effl = 0 //tetrachloroethene
-        this.wwt_tricloroetile_effl = 0 //Trichloroethylene
+
         this.dd_vol_disc = null
         this.wwt_ch4_efac_dis = 0
         this.wwt_n2o_efac_dis = 0
@@ -548,49 +488,6 @@ export class WWTP{
             TN: 0,
             TP: 0,
         }
-
-        //this.wwt_cod_infl_ind = 0           //COD concentration of water that comes directly from industry (without being treated)
-        //this.wwt_cod_infl_wwtp = 0          //COD concentration of water that comes from onsite WWTP (already treated)
-        //this.wwt_cod_effl = 0               //COD concentration of water discharged by current WWTP (already treated))
-        this.wwt_tn_infl_ind = 0            //TN concentration of water that comes directly from industry (without being treated)
-        this.wwt_tn_infl_wwtp = 0           //TN concentration of water that comes from onsite WWTP (already treated)
-        this.wwt_tn_effl = 0                //TN concentration of water discharged by current WWTP (already treated))
-        this.wwt_tp_infl_ind = 0            //TP concentration of water that comes directly from industry (without being treated)
-        this.wwt_tp_infl_wwtp = 0           //TP concentration of water that comes from onsite WWTP (already treated)
-        this.wwt_tp_effl = 0                //TP concentration of water discharged by current WWTP (already treated))
-        this.wwt_diclo_infl_ind = 0         //1,2-Dichloroethane concentration of water that comes directly from industry (without being treated)
-        this.wwt_diclo_infl_wwtp = 0        //1,2-Dichloroethane concentration of water that comes from onsite WWTP (already treated)
-        this.wwt_diclo_effl = 0             //1,2-Dichloroethane concentration of water discharged by current WWTP (already treated))
-        this.wwt_cadmium_infl_ind = 0       //Cadmium concentration of water that comes directly from industry (without being treated)
-        this.wwt_cadmium_infl_wwtp = 0      //Cadmium concentration of water that comes from onsite WWTP (already treated)
-        this.wwt_cadmium_effl = 0           //Cadmium concentration of water discharged by current WWTP (already treated))
-        this.wwt_hexaclorobenzene_infl_ind = 0  //Hexachlorobenzene concentration of water that comes directly from industry (without being treated)
-        this.wwt_hexaclorobenzene_infl_wwtp = 0 //Hexachlorobenzene concentration of water that comes from onsite WWTP (already treated)
-        this.wwt_hexaclorobenzene_effl = 0      //Hexachlorobenzene concentration of water discharged by current WWTP (already treated))
-        this.wwt_mercury_infl_ind = 0       //mercury concentration of water that comes directly from industry (without being treated)
-        this.wwt_mercury_infl_wwtp = 0      //mercury concentration of water that comes from onsite WWTP (already treated)
-        this.wwt_mercury_effl = 0           //mercury concentration of water discharged by current WWTP (already treated))
-        this.wwt_plomo_infl_ind = 0         //lead concentration of water that comes directly from industry (without being treated)
-        this.wwt_plomo_infl_wwtp = 0        //lead concentration of water that comes from onsite WWTP (already treated)
-        this.wwt_plomo_effl = 0             //lead concentration of water discharged by current WWTP (already treated))
-        this.wwt_niquel_infl_ind = 0        //nickel concentration of water that comes directly from industry (without being treated)
-        this.wwt_niquel_infl_wwtp = 0       //nickel concentration of water that comes from onsite WWTP (already treated)
-        this.wwt_niquel_effl = 0            //nickel concentration of water discharged by current WWTP (already treated))
-        this.wwt_chloro_infl_ind = 0        //chloroalkanes concentration of water that comes directly from industry (without being treated)
-        this.wwt_chloro_infl_wwtp = 0       //chloroalkanes concentration of water that comes from onsite WWTP (already treated)
-        this.wwt_chloro_effl = 0            //chloroalkanes concentration of water discharged by current WWTP (already treated))
-        this.wwt_hexaclorobutadie_infl_ind = 0  //Hexachlorobutadiene concentration of water that comes directly from industry (without being treated)
-        this.wwt_hexaclorobutadie_infl_wwtp = 0 //Hexachlorobutadiene concentration of water that comes from onsite WWTP (already treated)
-        this.wwt_hexaclorobutadie_effl = 0      //Hexachlorobutadiene concentration of water discharged by current WWTP (already treated))
-        this.wwt_nonilfenols_infl_ind = 0   //Nonylphenols concentration of water that comes directly from industry (without being treated)
-        this.wwt_nonilfenols_infl_wwtp = 0  //Nonylphenols concentration of water that comes from onsite WWTP (already treated)
-        this.wwt_nonilfenols_effl = 0       //Nonylphenols concentration of water discharged by current WWTP (already treated))
-        this.wwt_tetracloroetile_infl_ind = 0   //tetrachloroethene concentration of water that comes directly from industry (without being treated)
-        this.wwt_tetracloroetile_infl_wwtp = 0  //tetrachloroethene concentration of water that comes from onsite WWTP (already treated)
-        this.wwt_tetracloroetile_effl = 0       //tetrachloroethene concentration of water discharged by current WWTP (already treated))
-        this.wwt_tricloroetile_infl_ind = 0     //Trichloroethylene concentration of water that comes directly from industry (without being treated)
-        this.wwt_tricloroetile_infl_wwtp = 0    //Trichloroethylene concentration of water that comes from onsite WWTP (already treated)
-        this.wwt_tricloroetile_effl = 0         //Trichloroethylene concentration of water discharged by current WWTP (already treated))
 
         //energy
         this.wwt_nrg_cons = 0
@@ -738,7 +635,6 @@ export class WWTP{
         let tn_infl_ind = this.wwt_pollutants_infl_ind["TN"]
         let cod_infl_wwtp = this.wwt_pollutants_infl_wwtp["COD"]
         let tn_infl_wwtp = this.wwt_pollutants_infl_wwtp["TN"]
-
 
 
         let cod_load = cod_infl_ind*this.wwt_vol_trea + this.wwt_vol_from_external*cod_infl_wwtp
