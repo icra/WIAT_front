@@ -1868,7 +1868,7 @@ export default {
         }
       `
       let water_cep_colors = ['#ffff99', '#ffe600', '#ff9900', '#ff1900', '#990000', '#000000' ]
-      let water_cep_labels = ["Low (<-5 kgC-equivalent/km2/day)", "Low - Medium (-5 to 0 kgC-equivalent/km2/day)", "Medium - High (0 to 1 kgC-equivalent/km2/day)","High (1 to 5 kgC-equivalent/km2/day)", "Extremely High (>5 kgC-equivalent/km2/day)","No Data"]
+      let water_cep_labels = ["Low (<-5 kgC-eq/km2/day)", "Low - Medium (-5 to 0 kgC-eq/km2/day)", "Medium - High (0 to 1 kgC-eq/km2/day)","High (1 to 5 kgC-eq/km2/day)", "Extremely High (>5 kgC-eq/km2/day)","No Data"]
 
       //this.layers["Coastal Eutrophication Potential"].layers.baseline.annual.layer = this.define_carto_layer(baselineCoastalEutrophicationPotentialDataset, baselineCoastalEutrophicationPotentialStyle, "cep_label", wri_client, "wri-rw")
       this.layers["Coastal Eutrophication Potential"].layers.baseline.annual.layer = this.define_carto_layer_v2(baselineCoastalEutrophicationPotentialDataset, baselineCoastalEutrophicationPotentialStyle, "cep_raw", wri_client, "wri-rw", aqueduct_url, temporal_resolution,  water_cep_colors, water_cep_labels, -9999, 1, "kgC-equivalent/km2/day")
