@@ -674,7 +674,6 @@ let metrics = {
         let streamflow_value = await streamflow(industries, global_layers) //streamflow (m3/day)
         let water_withdrawn = calculate_surface_water_withdrawn(industries)
 
-
         let available_ratio = water_withdrawn / streamflow_value
         if (isNaN(available_ratio)) return "-"
         else return (available_ratio*100).toFixed(2)
@@ -1241,7 +1240,26 @@ let metrics = {
 
         if(Number.isFinite(avg)) return avg.toFixed(3)
         else return "-"
+    },
 
+    async number_of_pollutants_above_eqs(industries, global_layers){
+        let eqs = await this.delta_eqs(industries, global_layers)
+        eqs = Object.values(eqs).filter(x => x != "-")
+        return eqs.filter(x => x > 100).length  //Number of pollutants above EQS
+    },
+
+    async surface_net_consumptive_use(industries, global_layers){
+        let number_of_pollutants_above_eqs = await this.number_of_pollutants_above_eqs(industries, global_layers)
+        console.log(number_of_pollutants_above_eqs)
+        if(number_of_pollutants_above_eqs > 0) return calculate_surface_water_withdrawn()
+        else return
+    },
+
+    async net_consumptive_use(industries, global_layers){
+        let number_of_pollutants_above_eqs = await this.number_of_pollutants_above_eqs(industries, global_layers)
+        console.log(number_of_pollutants_above_eqs)
+        if(number_of_pollutants_above_eqs > 0) return calculate_water_withdrawn()
+        else return
     },
 
     eutrophication_potential(industries){

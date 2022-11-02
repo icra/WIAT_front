@@ -4290,8 +4290,6 @@ export default {
 
         for(let pollutant of utils.remove_nutrients(this.industry.pollutants_selected)){
 
-          console.log(industry_impact_legend_category.delta_tu(this.industry, pollutant))
-
           let pollutant_obj = {
             value: pollutant,
             unit: "TU/day",
