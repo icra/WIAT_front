@@ -41,6 +41,8 @@
         <div
             v-if="main_tab == 0"
         >
+
+          <!--comentari bjvhmvhv -->
           <v-row>
             <v-col cols="4">
               <v-treeview
@@ -296,7 +298,7 @@
                   </template>
                   <span>{{ item.info }}</span>
                 </v-tooltip>
-                <span v-if="item.name == 'Pollution' || item.name == 'Freshwater'" class="state_of_nature">(Change of state of nature)</span>
+                <span v-if="item.name == 'Water quality' || item.name == 'Water availability'" class="state_of_nature">(Change of state of nature)</span>
 
 
               </template>
@@ -4850,7 +4852,7 @@ export default {
       return [
         {
           id: 1,
-          name: 'Pollution',
+          name: 'Water quality',
           children: [
             {
               id: 2,
@@ -4879,7 +4881,7 @@ export default {
         },
         {
           id: 13,
-          name: "Freshwater",
+          name: "Water availability",
           children: [
             {id: 14, name: "Water availability impacts",},
             {id: 15, name: "Levers for action",}
