@@ -667,7 +667,6 @@ export class WWTP{
         return {total,co2,ch4,n2o};
     }
 
-
     //emissions from biogas (fuel used in digester)
     wwt_KPI_GHG_dig_fuel(){
         let vol   = this.wwt_fuel_dig;

@@ -168,10 +168,9 @@ let utils = {
         else return (n >= 0.0) && (Math.floor(n) === n) && n !== Infinity;
     },
 
-    //Resets global var that store all pollutants created (among all assessments and all industries), and updates it from pollutants created om the assessments
+    //Resets global var that store all pollutants created (among all assessments and all industries), and updates it from pollutants created on the assessments
     reset_and_update_global_pollutants(assessments, pollutants_set){
         pollutants_set.clear();   //Delete all elements
-
         assessments.forEach(assessment => {
             assessment.industries.forEach(industry => {
                 industry.pollutants_selected.forEach(pollutants_set.add, pollutants_set)
@@ -183,7 +182,8 @@ let utils = {
     remove_nutrients(pollutants){
         return [...pollutants].filter(pollutant => pollutant != "COD" && pollutant != "TN" && pollutant != "TP")
     },
-    //Return list of pollutants created in industries (without COD nor TN nor TP)
+
+    //Return list of pollutants created in industries. If filter nutrients is true, returns the list neither COD nor TN nor TP
     get_pollutants(industries, filter_nutrients = true){
         let pollutants_set = new Set()
         for (let industry of industries){
@@ -727,11 +727,9 @@ let metrics = {
     // For each pollutant, says the concentration of the water discharged (g/m3)
     pollutant_concentration(industries){
 
-
         let concentration = {}
-        for(let pollutant of utils.get_pollutants(industries)){
+        for(let pollutant of utils.get_pollutants(industries, false)){
             let pollutant_concentration = effl_concentration(industries, pollutant)
-
             if(Number.isFinite(pollutant_concentration)) concentration[pollutant] = pollutant_concentration.toExponential(3)
             else concentration[pollutant] = "-"
         }
@@ -743,7 +741,7 @@ let metrics = {
     async pollutant_delta(industries, global_layers){
 
         let delta = {}
-        for(let pollutant of utils.get_pollutants(industries)){
+        for(let pollutant of utils.get_pollutants(industries, false)){
             delta[pollutant] = await effl_delta(industries, pollutant, global_layers)
         }
         return delta
@@ -1272,17 +1270,12 @@ let metrics = {
             if(Number.isFinite(eutrophication_value)) eutrophication[pollutant] = eutrophication_value.toExponential(3)
             else eutrophication[pollutant] = "-"
         }
-
         eutrophication["total"] = Object.values(eutrophication).sum().toExponential(3)
-
         return eutrophication
-
-
 
     },
 
     energy_used(industries){
-
         let energy = industries.map(i => i.energy_used()).sum() / calculate_water_treated(industries)
         if(Number.isFinite(energy)) return energy.toExponential(2)
         else return "-"
@@ -1290,11 +1283,10 @@ let metrics = {
 
     effluent_concentration(industries){
         let load = {
-            cod: effl_concentration(industries, "wwt_cod_effl"),
-            tn: effl_concentration(industries, "wwt_tn_effl"),
-            tp: effl_concentration(industries, "wwt_tp_effl"),
+            cod: effl_concentration(industries, "COD"),
+            tn: effl_concentration(industries, "TN"),
+            tp: effl_concentration(industries, "TP"),
         }
-
         Object.keys(load).forEach(key => {
             let value = load[key]
             if(Number.isFinite(value)) load[key] = value.toExponential(2)
@@ -1307,18 +1299,15 @@ let metrics = {
 
     sludge_management(industries){
         let sludge = sumObjectsByKey(...industries.map(x => x.sludge_management_emissions()))
-
         Object.keys(sludge).forEach(key => {
             let value = sludge[key]
             if(Number.isFinite(value)) sludge[key] = value.toExponential(2)
             else sludge[key] = "-"
         })
-
         return sludge
     },
 
     biogenic_emissions(industries){
-
         let industries_emissions = industries.map(industry => industry.biogenic_emissions())
         let aggregated = sumObjectsByKey(...industries_emissions)
         Object.keys(aggregated).forEach(key => {
@@ -1328,9 +1317,6 @@ let metrics = {
         })
         return aggregated
     },
-
-
-
 
 }
 

@@ -390,7 +390,7 @@ Vue.prototype.$layers_description = [
 
         children: [
             {
-          name: 'Coastal Eutrophication Potential',
+              name: 'Coastal Eutrophication Potential',
               locked: false,
 
               layer: {
@@ -494,6 +494,27 @@ Vue.prototype.$layers_description = [
               info: "Unimproved/no sanitation reflects the percentage of the population using pit latrines without a slab or platform, hanging/bucket latrines, or directly disposing human waste in fields, forests, bushes, open bodies of water, beaches, other open spaces, or with solid waste. <br><br><b> Temporal resolution: 2015</b>"
             }
           },
+          {
+            name: 'River fragmentation',
+            locked: false,
+            layer: {
+              layers: {
+                baseline: {
+                  annual: {
+                    layer: null
+                  },
+                  monthly: []
+                },
+                future: {
+                  layer: null
+                },
+              },
+              monthly: false,
+              future: false,
+              info: "River fragmentation"
+            }
+          },
+
         ]
       },
     ],

@@ -47,9 +47,7 @@ function analyse_stage(inputs, industry, industry_model, stepper_model, wwtp, ww
         let estimation = industry_estimations.get_estimation(input, industry, industry_model, stepper_model, wwtp, wwtp_model, pollutant)
         let current_value = stage[input]
 
-        if (typeof current_value === 'object' && current_value !== null) current_value = current_value[pollutant]
-        console.log(input, estimation, current_value)
-
+        if (typeof current_value === 'object' && current_value !== null) current_value = current_value[pollutant] //dict related with pollutants
         if  (current_value == undefined) {
             return null
         }else if (estimation === current_value){
@@ -132,6 +130,9 @@ let inputs_required = {
         let direct_discharge = []
         return {industry, onsite_wwtp, offsite_wwtp, direct_discharge}
     },
+    calculate_water_withdrawn(){
+        return this.withdrawn_factor()
+    },
     calculate_water_withdrawn_in_water_stress(){
         return this.withdrawn_factor()
     },
@@ -141,6 +142,7 @@ let inputs_required = {
     calculate_groundwater_water_withdrawn_in_water_stress(){
         return this.calculate_groundwater_water_withdrawn()
     },
+    //Does not include third-party
     calculate_water_discharged_surface(){
         let industry = []
         let onsite_wwtp = ['wwt_vol_disc']
@@ -164,8 +166,8 @@ let inputs_required = {
     calculate_water_treated(){
         let industry = []
         let onsite_wwtp = ['wwt_vol_trea']
-        let offsite_wwtp = []
-        let direct_discharge = ['wwt_vol_trea']
+        let offsite_wwtp = ['wwt_vol_trea']
+        let direct_discharge = []
         return {industry, onsite_wwtp, offsite_wwtp, direct_discharge}
     },
     calculate_water_recycled(){
@@ -184,6 +186,9 @@ let inputs_required = {
     },
     effl_delta(){
         return merge_dicts([this.calculate_effluent_load(), this.calculate_water_discharged(), this.calculate_surface_water_withdrawn()])
+    },
+    effl_concentration() {
+        return merge_dicts([this.calculate_effluent_load(), this.calculate_water_discharged()])
     },
     water_filtered(){
         let industry = ['ind_pollutants_effl']
@@ -215,8 +220,195 @@ let inputs_required = {
         let offsite_wwtp = ['wwt_vol_trea']
         let direct_discharge = ['dd_vol_disc']
         return {industry, onsite_wwtp, offsite_wwtp, direct_discharge}
+    },
+    calculate_influent_load(){
+        let industry = ['ind_pollutants_infl', 'volume_withdrawn']
+        let onsite_wwtp = []
+        let offsite_wwtp = []
+        let direct_discharge = []
+        return {industry, onsite_wwtp, offsite_wwtp, direct_discharge}
+    },
 
-    }
+    wwt_KPI_GHG_elec(){
+        let industry = []
+        let onsite_wwtp = ["wwt_vol_trea", "wwt_nrg_cons", 'wwt_conv_kwh']
+        let offsite_wwtp = onsite_wwtp
+        let direct_discharge = []
+        return {industry, onsite_wwtp, offsite_wwtp, direct_discharge}
+    },
+
+    wwt_KPI_GHG_fuel(){
+        let industry = []
+        let onsite_wwtp = ['wwt_vol_fuel', 'wwt_fuel_typ']
+        let offsite_wwtp = onsite_wwtp
+        let direct_discharge = []
+        return {industry, onsite_wwtp, offsite_wwtp, direct_discharge}
+    },
+
+    wwt_KPI_GHG_dig_fuel(){
+        let industry = []
+        let onsite_wwtp = ['wwt_fuel_dig', 'wwt_dige_typ']
+        let offsite_wwtp = offsite_wwtp
+        let direct_discharge = []
+        return {industry, onsite_wwtp, offsite_wwtp, direct_discharge}
+    },
+
+    wwt_KPI_GHG_biog(){
+        return this.wwt_KPI_GHG_biog_leaked()
+    },
+
+    wwt_KPI_GHG_biog_flared(){
+        let industry = []
+        let onsite_wwtp = ['wwt_biog_fla']
+        let offsite_wwtp = onsite_wwtp
+        let direct_discharge = []
+        return merge_dicts([
+            {industry, onsite_wwtp, offsite_wwtp, direct_discharge},
+            this.wwt_moles_biogas_produced()]
+        )
+    },
+
+    wwt_KPI_GHG_biog_valorized(){
+        let industry = []
+        let onsite_wwtp = ['wwt_biog_val']
+        let offsite_wwtp = onsite_wwtp
+        let direct_discharge = []
+        return merge_dicts([
+            {industry, onsite_wwtp, offsite_wwtp, direct_discharge},
+            this.wwt_moles_biogas_produced()]
+        )
+    },
+
+    wwt_KPI_GHG_biog_leaked(){
+        let industry = []
+        let onsite_wwtp = ['wwt_ch4_biog', 'wwt_biog_lkd', ]
+        let offsite_wwtp = onsite_wwtp
+        let direct_discharge = []
+        return merge_dicts([
+            {industry, onsite_wwtp, offsite_wwtp, direct_discharge},
+            this.wwt_moles_biogas_produced()]
+        )
+    },
+
+    wwt_moles_biogas_produced(){
+        let industry = []
+        let onsite_wwtp = ['wwt_biog_pro']
+        let offsite_wwtp = onsite_wwtp
+        let direct_discharge = []
+        return {industry, onsite_wwtp, offsite_wwtp, direct_discharge}
+    },
+
+    //Only for COD and TN
+    wwt_KPI_GHG_disc(){
+        let industry = []
+        let onsite_wwtp = ['wwt_pollutants_effl', 'wwt_vol_disc', 'wwt_ch4_efac_dis']
+        let offsite_wwtp = onsite_wwtp
+        let direct_discharge = ['wwt_pollutants_effl', 'wwt_ch4_efac_dis', 'wwt_n2o_efac_dis']
+        return {industry, onsite_wwtp, offsite_wwtp, direct_discharge}
+    },
+
+    //Only for COD and TN
+    wwt_KPI_GHG_tre(){
+        let industry = []
+        let onsite_wwtp = ['wwt_pollutants_infl_ind', 'wwt_pollutants_infl_wwtp', 'wwt_vol_trea', 'wwt_vol_from_external', 'wwt_cod_slud', 'wwt_ch4_efac_tre', 'wwt_n2o_efac_tre']
+        let offsite_wwtp = onsite_wwtp
+        let direct_discharge = []
+        return {industry, onsite_wwtp, offsite_wwtp, direct_discharge}
+    },
+
+    wwt_KPI_GHG_slu(){
+        return merge_dicts([
+            this.wwt_KPI_GHG_sludge_storage(),
+            this.wwt_KPI_GHG_sludge_composting(),
+            this.wwt_KPI_GHG_sludge_incineration(),
+            this.wwt_KPI_GHG_sludge_land_application(),
+            this.wwt_KPI_GHG_sludge_landfilling(),
+            this.wwt_KPI_GHG_sludge_stockpilling(),
+            this.wwt_KPI_GHG_sludge_transport()
+            ])
+    },
+
+    wwt_KPI_GHG_sludge_storage(){
+        let industry = []
+        let onsite_wwtp = ['wwt_mass_slu_sto', 'wwt_slu_sto_TVS', 'wwt_slu_sto_f_CH4', 'wwt_slu_sto_EF']
+        let offsite_wwtp = onsite_wwtp
+        let direct_discharge = []
+        return {industry, onsite_wwtp, offsite_wwtp, direct_discharge}
+    },
+    wwt_KPI_GHG_sludge_composting(){
+        let industry = []
+        let onsite_wwtp = ['wwt_mass_slu_comp', 'wwt_slu_comp_emis_treated_or_piles_covered', 'wwt_slu_comp_solids_content', 'wwt_slu_comp_TVS', 'wwt_slu_comp_N_cont', 'wwt_slu_comp_low_CN_EF', 'wwt_slu_comp_uncovered_pile_EF']
+        let offsite_wwtp = onsite_wwtp
+        let direct_discharge = []
+        return {industry, onsite_wwtp, offsite_wwtp, direct_discharge}
+    },
+    wwt_KPI_GHG_sludge_incineration(){
+        let industry = []
+        let onsite_wwtp = ['wwt_mass_slu_inc', 'wwt_temp_inc', 'wwt_slu_inc_N_cont', 'wwt_slu_inc_SNCR', ]
+        let offsite_wwtp = onsite_wwtp
+        let direct_discharge = []
+        return {industry, onsite_wwtp, offsite_wwtp, direct_discharge}
+    },
+    wwt_KPI_GHG_sludge_land_application(){
+        let industry = []
+        let onsite_wwtp = ['wwt_mass_slu_app', 'wwt_slu_la_solids_content', 'wwt_slu_la_TVS', 'wwt_slu_la_N_cont', 'wwt_slu_la_EF']
+        let offsite_wwtp = onsite_wwtp
+        let direct_discharge = []
+        return {industry, onsite_wwtp, offsite_wwtp, direct_discharge}
+    },
+    wwt_KPI_GHG_sludge_landfilling(){
+        let industry = []
+        let onsite_wwtp = ['wwt_mass_slu_land', 'wwt_slu_lf_TVS', 'wwt_slu_lf_uncertainty', 'wwt_slu_lf_CH4_in_gas', 'wwt_slu_lf_DOCf', 'wwt_slu_lf_decomp_3yr', 'wwt_slu_lf_MCF', 'wwt_slu_lf_N_cont', 'wwt_slu_lf_low_CN_EF']
+        let offsite_wwtp = onsite_wwtp
+        let direct_discharge = []
+        return {industry, onsite_wwtp, offsite_wwtp, direct_discharge}
+    },
+    wwt_KPI_GHG_sludge_stockpilling(){
+        let industry = []
+        let onsite_wwtp = ['wwt_mass_slu_stock', 'wwt_slu_sp_lifespan', ]
+        let offsite_wwtp = onsite_wwtp
+        let direct_discharge = []
+        return {industry, onsite_wwtp, offsite_wwtp, direct_discharge}
+    },
+    wwt_KPI_GHG_sludge_transport(){
+        let industry = []
+        let onsite_wwtp = ['wwt_vol_tslu', 'wwt_trck_typ', ]
+        let offsite_wwtp = onsite_wwtp
+        let direct_discharge = []
+        return {industry, onsite_wwtp, offsite_wwtp, direct_discharge}
+    },
+    wwt_KPI_GHG_reus_trck(){
+        let industry = []
+        let onsite_wwtp = ['wwt_reus_vol_trck', 'wwt_reus_trck_typ', ]
+        let offsite_wwtp = onsite_wwtp
+        let direct_discharge = []
+        return {industry, onsite_wwtp, offsite_wwtp, direct_discharge}
+    },
+
+    wwt_KPI_GHG_deglossed(){
+        return merge_dicts([
+            this.wwt_KPI_GHG_elec(),
+            this.wwt_KPI_GHG_fuel(),
+            this.wwt_KPI_GHG_tre(),
+            this.wwt_KPI_GHG_biog(),
+            this.wwt_KPI_GHG_dig_fuel(),
+            this.wwt_KPI_GHG_slu(),
+            this.wwt_KPI_GHG_reus_trck(),
+            this.wwt_KPI_GHG_disc()
+        ])
+    },
+    energy_used(){
+        let industry = []
+        let onsite_wwtp = ['wwt_vol_trea', 'wwt_nrg_cons', ]
+        let offsite_wwtp = ['wwt_vol_trea', 'wwt_vol_from_external', 'wwt_nrg_cons']
+        let direct_discharge = []
+        return merge_dicts([
+            {industry, onsite_wwtp, offsite_wwtp, direct_discharge},
+            this.calculate_water_treated()
+        ])
+    },
+
+
 
 
 
@@ -228,8 +420,100 @@ let industry_impact_legend_category = {
 
     delta_tu(industry, pollutant) {
         let inputs = inputs_required.effl_delta()
-        console.log(pollutant, category_of_inputs(industry, inputs, pollutant))
+        return category_of_inputs(industry, inputs, pollutant)
+    },
+    delta_eqs(industry, pollutant) {
+        let inputs = inputs_required.effl_delta()
+        return category_of_inputs(industry, inputs, pollutant)
+    },
+    eutrophication(industry, pollutant) {
+        let inputs = inputs_required.effl_concentration()
+        return category_of_inputs(industry, inputs, pollutant)
+    },
+    ecotoxicity_potential_tu(industry, pollutant) {
+        let inputs = inputs_required.effl_concentration()
+        return category_of_inputs(industry, inputs, pollutant)
+    },
+    environmental_quality_standards(industry, pollutant) {
+        let inputs = inputs_required.effl_concentration()
+        return category_of_inputs(industry, inputs, pollutant)
+    },
+    wwtp_efficiency(industry, pollutant){
+        let inputs = inputs_required.effl_efficiency()
+        return category_of_inputs(industry, inputs, pollutant)
+    },
+    amount_water_influent_cleaned(industry, pollutant){
+        let effluent_load_inputs = inputs_required.calculate_effluent_load()
+        let influent_load_inputs = inputs_required.calculate_influent_load()
 
+        return Math.max(
+            category_of_inputs(industry, effluent_load_inputs, pollutant),
+            category_of_inputs(industry, influent_load_inputs, pollutant)
+        )
+    },
+    treated_water_factor(industry){
+        let water_generated_inputs = inputs_required.calculate_water_generated()
+        let water_treated_inputs = inputs_required.calculate_water_treated()
+        return Math.max(
+            category_of_inputs(industry, water_generated_inputs),
+            category_of_inputs(industry, water_treated_inputs)
+        )
+    },
+    pollutant_concentration(industry, pollutant){
+        let inputs = inputs_required.effl_concentration()
+        return category_of_inputs(industry, inputs, pollutant)
+    },
+    pollutant_delta(industry, pollutant){
+        let inputs = inputs_required.effl_delta()
+        return category_of_inputs(industry, inputs, pollutant)
+    },
+    dilution_factor(industry){
+        let inputs = inputs_required.calculate_water_discharged()
+        return category_of_inputs(industry, inputs)
+    },
+    available_ratio(industry){
+        let inputs = inputs_required.calculate_surface_water_withdrawn()
+        return category_of_inputs(industry, inputs)
+    },
+    recycled_water_factor(industry){
+        let water_generated_inputs = inputs_required.calculate_water_generated()
+        let water_recycled_inputs = inputs_required.calculate_water_recycled()
+        return Math.max(
+            category_of_inputs(industry, water_generated_inputs),
+            category_of_inputs(industry, water_recycled_inputs)
+        )
+    },
+    // Specific water consumption  (%)
+    efficiency_factor(industry){
+        let product_produced = inputs_required.calculate_product_produced()
+        let water_withdrawn = inputs_required.calculate_water_withdrawn()
+        return Math.max(
+            category_of_inputs(industry, product_produced),
+            category_of_inputs(industry, water_withdrawn)
+        )
+    },
+    emissions_and_descriptions(industry) {
+        let inputs = this.wwt_KPI_GHG_deglossed();
+        return Math.max(
+            category_of_inputs(industry, inputs, "COD"),
+            category_of_inputs(industry, inputs, "TN")
+        )
+    },
+    energy_used(industry) {
+        let inputs = this.energy_used();
+        return category_of_inputs(industry, inputs)
+    },
+    biogenic_emissions(industry){
+        return Math.max(
+            category_of_inputs(industry, this.wwt_KPI_GHG_biog_flared()),
+            category_of_inputs(industry, this.wwt_KPI_GHG_biog_valorized())
+        )
+    },
+    emissions_deglossed(industry){
+        return this.emissions_and_descriptions(industry)
+    },
+    sludge_management(industry){
+        return this.wwt_KPI_GHG_slu(industry)
     }
 }
 

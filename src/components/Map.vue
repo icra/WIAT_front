@@ -1379,7 +1379,7 @@ export default {
 
       url = "https://gmd.copernicus.org/articles/12/5213/2019/"
       temporal_resolution = "Temporal resolution: N/A"
-      this.layers["Flow accumulation"].layers.baseline.annual.layer = this.define_raster_layer("flow_accumulated",  "flow_accumulated_palette", undefined, color_legend_baseline_runoff, label_legend_baseline_runoff, url, temporal_resolution,  " m3/year")
+      this.layers["Flow accumulation"].layers.baseline.annual.layer = this.define_raster_layer("flow_accumulated",  "flow_accumulated_palette", undefined, color_legend_baseline_runoff, label_legend_baseline_runoff, url, temporal_resolution,  " m3/year", 1, 32)
       this.layers["Flow accumulation"].layers.future.layer = this.define_raster_layer("flow_acc_bau",  "flow_acc_bau_palette", undefined, color_legend_baseline_runoff, label_legend_baseline_runoff, url, temporal_resolution, " m3/year")
 
       //Streamflow
@@ -2161,6 +2161,25 @@ export default {
       url = "https://gmd.copernicus.org/articles/12/5213/2019/"
       temporal_resolution = "Temporal resolution: N/A"
       this.layers["Coastal Pharmaceutical Pollution"].layers.baseline.annual.layer = this.define_carto_layer_v2(coastal_pollution_dataset, coastal_pollution_style, "dn", own_client, "jsalo", url,temporal_resolution, color_legend_coastal_Pharmaceutical_Pollution, label_legend_coastal_Pharmaceutical_Pollution, -10000000, 1, " g/km*year")
+
+      let color_function_river_fragmentation = function(values) {
+        let value = values[0]
+        if (value < 0) return
+        else if (value === 0) return null
+        else if (value < 20) return '#ebffb6'
+        else if (value < 40) return '#fbff64'
+        else if (value < 60) return '#e7a300'
+        else if (value < 80) return '#dd5300'
+        else return '#8c2d04'
+      }
+      let color_legend_river_fragmentation = ['#ebffb6','#fbff64', '#e7a300', '#dd5300','#8c2d04']
+      let label_legend_river_fragmentation = ["0 people","1-25 people","25-100 people","100-250 people","250-1000 people","1000-5000 people","5000-100000 people",">100000 people"]
+
+      url = "https://sedac.ciesin.columbia.edu/data/set/popdynamics-1-km-downscaled-pop-base-year-projection-ssp-2000-2100-rev01"
+
+      this.layers["River fragmentation"].layers.baseline.annual.layer = this.define_raster_layer("river_fragmentation", null, color_function_river_fragmentation, color_legend_river_fragmentation, label_legend_river_fragmentation, url, "Temporal resolution: 2000", " people", 1, 16 )
+
+
 
 
     },
