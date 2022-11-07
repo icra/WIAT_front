@@ -42,7 +42,6 @@
             v-if="main_tab == 0"
         >
 
-          <!--comentari bjvhmvhv -->
           <v-row>
             <v-col cols="4">
               <v-treeview
@@ -58,7 +57,6 @@
                   style="padding-left: 15px"
                   item-disabled="locked"
                   @update:active="layerTreeSelected"
-
               >
                 <template v-slot:append="{ item }">
                   <v-tooltip bottom v-if="item.layer && item.layer.info" max-width="700px">
@@ -358,19 +356,18 @@
                       :items="delta_ecotox_table.value"
                       class="expanded_table_hover"
                       :item-class="itemRowBold"
-                      disable-pagination
                       :hide-default-footer="true"
                       dense
                       v-if="delta_ecotox_chip === 1"
 
                   >
-                    <template v-slot:item.value="{ item }">
-                    <span v-if="item.info">
-                      {{ item.value }}
+                    <template v-slot:item.name="{ item }">
+                      <span v-if="item.info">
+                      {{ item.name }}
                       <v-btn
                           icon
 
-                          @click="selected_pollutant = item.value; $data[item.info] = true"
+                          @click="selected_pollutant = item.name; $data[item.info] = true"
                           class="icon_clickable"
                           x-small
                       >
@@ -383,11 +380,11 @@
 
 
                     </span>
-                      <span v-else>{{ item.value }}</span>
+                      <span v-else>{{ item.name }}</span>
                     </template>
 
                     <template
-                        v-slot:[`item.${industry.name}`]="{ item }"
+                        v-slot:item.value="{ item }"
                     >
                       <template v-if="getDeltaEcotoxColor(item) != null">
                         <v-tooltip bottom>
@@ -400,7 +397,7 @@
                                 v-on="on"
                                 text-color="#1c1c1b"
                             >
-                              {{ item[industry.name] }}
+                              {{ item.value }}
                             </v-chip>
                           </template>
                           <span>{{ getDeltaEcotoxColor(item)[1] }}</span>
@@ -419,6 +416,28 @@
                       </template>
 
                     </template>
+                    <template
+                        v-slot:item.data="{ item }"
+                    >
+                      <template v-if="getDataTypeColor(item) != null">
+                        <v-tooltip bottom>
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-chip
+                                :color="getDataTypeColor(item)[0]"
+                                dark
+                                :key="industry.name"
+                                text-color="#1c1c1b"
+                                v-bind="attrs"
+                                v-on="on"
+                            >
+                              {{ item.data }}
+                            </v-chip>
+                          </template>
+                          <span>{{getDataTypeColor(item)[1]}}</span>
+                        </v-tooltip>
+                      </template>
+                    </template>
+
                   </v-data-table>
 
                   <div v-else-if="delta_ecotox_chip === 0">
@@ -3013,6 +3032,12 @@ export default {
           ecotoxicology: "Ecotoxicology indicators"
 
         },
+        data_type_table_names: {
+          UD: "User Data",
+          Es: "Estimated",
+          Mo: "Modeled",
+          ID: "Insufficient data"
+        },
       },
 
       info_energy_used: false,
@@ -3340,7 +3365,9 @@ export default {
       let eutrophication_impact = null
       if (this.eutrophication_table.value[0] != undefined) eutrophication_impact = this.risk_categories["eutrophication"](this.eutrophication_table.value[0][current_industry_name])
       let delta_ecotox_impact = null
-      if (this.delta_ecotox_table.value[0] != undefined) delta_ecotox_impact = this.risk_categories["delta_ecotoxicity"](this.delta_ecotox_table.value[0][current_industry_name])
+      if (this.delta_ecotox_table.value[0] != undefined) {
+        delta_ecotox_impact = this.risk_categories["delta_ecotoxicity"](this.delta_ecotox_table.value[0].value)
+      }
       let delta_eqs_impact = null
       if (this.delta_eqs_table.value.length > 0) {
         let delta_eqs_values = this.delta_eqs_table.value.map(x => x[current_industry_name])
@@ -3442,7 +3469,7 @@ export default {
       } else {
         return this.risk_categories["delta_ecotoxicity"](item[value])
       }*/
-      return this.risk_categories["delta_ecotoxicity"](item[this.industry.name])
+      return this.risk_categories["delta_ecotoxicity"](item.value)
     },
 
     //Get impact associated to item (related to environmental quality standards)
@@ -3475,9 +3502,25 @@ export default {
       return this.risk_categories["influent_treatment_efficiency"](item[this.industry.name])
     },
 
+    getDataTypeColor(item){
+      if(item.data == "UD") {
+        return ["#CCFF90", (this.table_title.data_type_table_names[item.data])]
+      }
+      else if(item.data == "Es") {
+        return ["#B2FF59", (this.table_title.data_type_table_names[item.data])]
+      }
+      else if (item.data == "Mo") {
+        return ["#76FF03", (this.table_title.data_type_table_names[item.data])]
+      }
+      else if (item.data == "ID") {
+        return ["#64DD17", (this.table_title.data_type_table_names[item.data])]
+      }
+      return null
+    },
+
     //Bold item if hovered
     itemRowBold: function (item) {
-      return item.value == "Total" ? 'style-1' : 'style-2'
+      return item.name == "Total" ? 'style-1' : 'style-2'
     },
 
     //Get color based on str
@@ -4269,35 +4312,35 @@ export default {
 
       if (_this.industry !== null) {
 
+        let industries = [this.industry]
+
         let pollutants_table = {
-          header: [{text: "", value: "value", sortable: false}],
+          header: [{text: "", value: "name", sortable: false},
+            {text: this.industry.name, value: "value"},
+            {text: "Unit", value: "unit", sortable: false},
+            {text: "Data type", value: "data", sortable: false}
+          ],
           value: []
         }
 
-        let key = this.industry.name
-        let industries = [this.industry]
-
-        pollutants_table.header.push({
-          text: key, value: key,
-        })
         let tu = await metrics.delta_tu(industries, _this.global_layers)
-        let total = {value: _this.table_title.pollutants.total, unit: "TU/day"}
-        total[key] = tu.total
+        let total = {name: _this.table_title.pollutants.total, unit: "TU/day", value: tu.total}
         pollutants_table.value.push(total)
-        pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
 
         let labels_dataset = []
         let values_dataset = []
 
 
         for(let pollutant of utils.remove_nutrients(this.industry.pollutants_selected)){
-
+          let DataType = industry_impact_legend_category.delta_tu(industries[0], pollutant)
           let pollutant_obj = {
-            value: pollutant,
+            name: pollutant,
             unit: "TU/day",
-            info: "info_delta_tu"
+            info: "info_delta_tu",
+            value: tu[pollutant],
+            data: this.get_string_impact_legend(DataType)
+
           }
-          pollutant_obj[key] = tu[pollutant]
           pollutants_table.value.push(pollutant_obj)
 
           labels_dataset.push(pollutant)
@@ -4350,7 +4393,6 @@ export default {
             },
           }
         }
-
 
         return pollutants_table
       } else return {header: [], emissions: []}
@@ -4819,6 +4861,25 @@ export default {
 
     },
 
+    /*Gets the string equivalent to the input
+      UD = User Data = 1
+      Es = Estimated = 2
+      Mo = Modeled = 3
+      ID = Insufficient Data = 4
+     */
+    get_string_impact_legend(value){
+      if (value == 1){
+        return "UD"
+      }
+      else if (value == 2){
+        return "Es"
+      }
+      else if (value == 3){
+        return "Mo"
+      }
+      else return "ID"
+    },
+
     created_function(){
       this.selected_assessment = this.created_assessments[this.assessment_id].name
       this.pollutants_without_factor = Object.values(conversion_factors).map(pollutant => Object.values(pollutant)).flat().filter(value => value == null).length > 0
@@ -5008,6 +5069,12 @@ table {
   margin-left: -20vw !important;
 }
 
+.style-1 {
+  font-weight: bold;
+}
+.style-2 {
+  font-weight: normal;
+}
 </style>
 
 

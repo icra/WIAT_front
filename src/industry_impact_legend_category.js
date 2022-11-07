@@ -228,8 +228,7 @@ let industry_impact_legend_category = {
 
     delta_tu(industry, pollutant) {
         let inputs = inputs_required.effl_delta()
-        console.log(pollutant, category_of_inputs(industry, inputs, pollutant))
-
+        return category_of_inputs(industry, inputs, pollutant)
     }
 }
 
