@@ -514,6 +514,7 @@ let industry_impact_legend_category = {
     },
     sludge_management(industry){
         return this.wwt_KPI_GHG_slu(industry)
+        return category_of_inputs(industry, inputs, pollutant)
     }
 }
 
