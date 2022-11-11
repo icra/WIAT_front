@@ -34,7 +34,6 @@ function merge_dicts(dicts){
 For each input of inputs, says if value has been entered by the user (1), is an estimation of WIAT (2), or has not been set (3)
  */
 function analyse_stage(inputs, industry, industry_model, stepper_model, wwtp, wwtp_model, pollutant){
-
     let stage = industry    //stepper_model == 1
     if (stepper_model == 2){
         stage = industry.onsite_wwtp
@@ -69,7 +68,6 @@ function category_of_inputs(industry, inputs, pollutant = null){
     let industry_model = industry
     let wwtp_model = industry.onsite_wwtp
     let wwtp = industry.onsite_wwtp
-
 
     let stages_evaluation = Object.keys(inputs).map(key => {
         let stepper_model = 1   //Industry stage
@@ -248,7 +246,7 @@ let inputs_required = {
     wwt_KPI_GHG_dig_fuel(){
         let industry = []
         let onsite_wwtp = ['wwt_fuel_dig', 'wwt_dige_typ']
-        let offsite_wwtp = offsite_wwtp
+        let offsite_wwtp = onsite_wwtp
         let direct_discharge = []
         return {industry, onsite_wwtp, offsite_wwtp, direct_discharge}
     },
@@ -499,8 +497,8 @@ let industry_impact_legend_category = {
             category_of_inputs(industry, inputs, "TN")
         )
     },
-    energy_used(industry) {
-        let inputs = this.energy_used();
+    energy_use(industry) {
+        let inputs = inputs_required.energy_used();
         return category_of_inputs(industry, inputs)
     },
     biogenic_emissions(industry){
@@ -509,6 +507,75 @@ let industry_impact_legend_category = {
             category_of_inputs(industry, this.wwt_KPI_GHG_biog_valorized())
         )
     },
+    biogenic_flared(industry){
+        let inputs = inputs_required.wwt_KPI_GHG_biog_flared();
+        return category_of_inputs(industry, inputs)
+    },
+    biogenic_valorized(industry){
+        let inputs = inputs_required.wwt_KPI_GHG_biog_valorized();
+        return category_of_inputs(industry, inputs)
+    },
+    emissions_elec(industry){
+        let inputs = inputs_required.wwt_KPI_GHG_elec();
+        return category_of_inputs(industry, inputs)
+    },
+    emissions_fuel(industry) {
+        let inputs = inputs_required.wwt_KPI_GHG_fuel();
+        return category_of_inputs(industry, inputs)
+    },
+    emissions_tre(industry) {
+        let inputs = inputs_required.wwt_KPI_GHG_tre();
+        return category_of_inputs(industry, inputs)
+    },
+    emissions_biog(industry) {
+        let inputs = inputs_required.wwt_KPI_GHG_biog();
+        return category_of_inputs(industry, inputs)
+    },
+    emissions_dig_fuel(industry) {
+        let inputs = inputs_required.wwt_KPI_GHG_dig_fuel();
+        return category_of_inputs(industry, inputs)
+    },
+    emissions_slu(industry) {
+        let inputs = inputs_required.wwt_KPI_GHG_slu();
+        return category_of_inputs(industry, inputs)
+    },
+    emissions_reus_trck(industry) {
+        let inputs = inputs_required.wwt_KPI_GHG_reus_trck();
+        return category_of_inputs(industry, inputs)
+    },
+    emissions_disc(industry) {
+        let inputs = inputs_required.wwt_KPI_GHG_disc();
+        return category_of_inputs(industry, inputs)
+    },
+    sludge_storage(industry) {
+        let inputs = inputs_required.wwt_KPI_GHG_sludge_storage();
+        return category_of_inputs(industry, inputs)
+    },
+    sludge_composting(industry) {
+        let inputs = inputs_required.wwt_KPI_GHG_sludge_composting();
+        return category_of_inputs(industry, inputs)
+    },
+    sludge_incineration(industry) {
+        let inputs = inputs_required.wwt_KPI_GHG_sludge_incineration();
+        return category_of_inputs(industry, inputs)
+    },
+    sludge_land_application(industry) {
+        let inputs = inputs_required.wwt_KPI_GHG_sludge_land_application();
+        return category_of_inputs(industry, inputs)
+    },
+    sludge_landfilling(industry) {
+        let inputs = inputs_required.wwt_KPI_GHG_sludge_landfilling();
+        return category_of_inputs(industry, inputs)
+    },
+    sludge_stockpilling(industry) {
+        let inputs = inputs_required.wwt_KPI_GHG_sludge_stockpilling();
+        return category_of_inputs(industry, inputs)
+    },
+    sludge_transport(industry) {
+        let inputs = inputs_required.wwt_KPI_GHG_sludge_transport()
+        return category_of_inputs(industry, inputs)
+    },
+
     emissions_deglossed(industry){
         return this.emissions_and_descriptions(industry)
     },

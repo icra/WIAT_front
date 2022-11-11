@@ -85,7 +85,6 @@
                   :headers="industry_table.header"
                   :items="industry_table.value"
                   :hide-default-footer="true"
-                  class="expanded_table_hover"
                   :loading = "loading_context_table"
                   loading-text="Loading... Please wait"
                   :custom-sort="customSort"
@@ -354,7 +353,6 @@
                   <v-data-table
                       :headers="delta_ecotox_table.header"
                       :items="delta_ecotox_table.value"
-                      class="expanded_table_hover"
                       :item-class="itemRowBold"
                       :hide-default-footer="true"
                       dense
@@ -503,7 +501,6 @@
                   <v-data-table
                       :headers="delta_eqs_table.header"
                       :items="delta_eqs_table.value"
-                      class="expanded_table_hover"
                       v-else
 
                       disable-pagination
@@ -511,12 +508,12 @@
                       dense
                   >
 
-                    <template v-slot:item.value="{ item }">
+                    <template v-slot:item.name="{ item }">
                     <span v-if="item.info">
-                      {{ item.value }}
+                      {{ item.name }}
                       <v-btn
                           icon
-                          @click="selected_pollutant = item.value; $data[item.info] = true"
+                          @click="selected_pollutant = item.name; $data[item.info] = true"
                           class="icon_clickable"
                           x-small
                       >
@@ -529,11 +526,11 @@
 
 
                     </span>
-                      <span v-else>{{ item.value }}</span>
+                      <span v-else>{{ item.name }}</span>
                     </template>
 
                     <template
-                        v-slot:[`item.${industry.name}`]="{ item }"
+                        v-slot:item.value="{ item }"
                     >
 
                       <template v-if="getDeltaEQSColor(item) != null">
@@ -547,7 +544,7 @@
                                 v-on="on"
                                 text-color="#1c1c1b"
                             >
-                              {{ item[industry.name] }}
+                              {{ item.value }}
                             </v-chip>
                           </template>
                           <span>{{ getDeltaEQSColor(item)[1] }}</span>
@@ -563,6 +560,27 @@
                         >
                           {{ item[industry.name] }}
                         </v-chip>
+                      </template>
+                    </template>
+                    <template
+                        v-slot:item.data="{ item }"
+                    >
+                      <template v-if="getDataTypeColor(item) != null">
+                        <v-tooltip bottom>
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-chip
+                                :color="getDataTypeColor(item)[0]"
+                                dark
+                                :key="industry.name"
+                                text-color="#1c1c1b"
+                                v-bind="attrs"
+                                v-on="on"
+                            >
+                              {{ item.data }}
+                            </v-chip>
+                          </template>
+                          <span>{{getDataTypeColor(item)[1]}}</span>
+                        </v-tooltip>
                       </template>
                     </template>
 
@@ -604,19 +622,18 @@
                   <v-data-table
                       :headers="eutrophication_table.header"
                       :items="eutrophication_table.value"
-                      class="expanded_table_hover"
                       :item-class="itemRowBold"
                       disable-pagination
                       :hide-default-footer="true"
                       dense
                       v-if="eutrophication_chip === 1"
                   >
-                    <template v-slot:item.value="{ item }">
+                    <template v-slot:item.name="{ item }">
                     <span v-if="item.info">
-                      {{ item.value }}
+                      {{ item.name }}
                       <v-btn
                           icon
-                          @click="selected_pollutant = item.value; $data[item.info] = true"
+                          @click="selected_pollutant = item.name; $data[item.info] = true"
                           class="icon_clickable"
                           x-small
                       >
@@ -628,11 +645,11 @@
                       </v-btn>
 
                     </span>
-                      <span v-else>{{ item.value }}</span>
+                      <span v-else>{{ item.name }}</span>
                     </template>
 
                     <template
-                        v-slot:[`item.${industry.name}`]="{ item }"
+                        v-slot:item.value="{ item }"
                     >
 
                       <template v-if="getEutrophicationColor(item) != null">
@@ -646,7 +663,7 @@
                                 v-on="on"
                                 text-color="#1c1c1b"
                             >
-                              {{ item[industry.name] }}
+                              {{ item.value }}
                             </v-chip>
                           </template>
                           <span>{{ getEutrophicationColor(item)[1] }}</span>
@@ -662,6 +679,27 @@
                         >
                           {{ item[industry.name] }}
                         </v-chip>
+                      </template>
+                    </template>
+                    <template
+                        v-slot:item.data="{ item }"
+                    >
+                      <template v-if="getDataTypeColor(item) != null">
+                        <v-tooltip bottom>
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-chip
+                                :color="getDataTypeColor(item)[0]"
+                                dark
+                                :key="industry.name"
+                                text-color="#1c1c1b"
+                                v-bind="attrs"
+                                v-on="on"
+                            >
+                              {{ item.data }}
+                            </v-chip>
+                          </template>
+                          <span>{{getDataTypeColor(item)[1]}}</span>
+                        </v-tooltip>
                       </template>
                     </template>
 
@@ -717,16 +755,15 @@
                       disable-pagination
                       :hide-default-footer="true"
                       dense
-                      class="expanded_table_hover"
                       :item-class="itemRowBold"
                       v-if="ecotoxicity_chip === 1"
                   >
-                    <template v-slot:item.value="{ item }">
+                    <template v-slot:item.name="{ item }">
                     <span v-if="item.info">
-                      {{ item.value }}
+                      {{ item.name }}
                       <v-btn
                           icon
-                          @click="selected_pollutant = item.value; $data[item.info] = true"
+                          @click="selected_pollutant = item.name; $data[item.info] = true"
                           class="icon_clickable"
                           x-small
                       >
@@ -739,11 +776,11 @@
 
 
                 </span>
-                      <span v-else>{{ item.value }}</span>
+                      <span v-else>{{ item.name }}</span>
                     </template>
                     <template
                         v-for="value in [industry]"
-                        v-slot:[`item.${industry.name}`]="{ item }"
+                        v-slot:item.value="{ item }"
                     >
 
                       <template v-if="getEcotoxicity(item) != null">
@@ -757,7 +794,7 @@
                                 v-on="on"
                                 text-color="#1c1c1b"
                             >
-                              {{ item[industry.name] }}
+                              {{ item.value }}
                             </v-chip>
                           </template>
                           <span>{{ getEcotoxicity(item)[1] }}</span>
@@ -771,8 +808,29 @@
                             text-color="#1c1c1b"
                             class="chip_no_hover"
                         >
-                          {{ item[industry.name] }}
+                          {{ item.value }}
                         </v-chip>
+                      </template>
+                    </template>
+                    <template
+                        v-slot:item.data="{ item }"
+                    >
+                      <template v-if="getDataTypeColor(item) != null">
+                        <v-tooltip bottom>
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-chip
+                                :color="getDataTypeColor(item)[0]"
+                                dark
+                                :key="industry.name"
+                                text-color="#1c1c1b"
+                                v-bind="attrs"
+                                v-on="on"
+                            >
+                              {{ item.data }}
+                            </v-chip>
+                          </template>
+                          <span>{{getDataTypeColor(item)[1]}}</span>
+                        </v-tooltip>
                       </template>
                     </template>
 
@@ -848,16 +906,15 @@
                       disable-pagination
                       :hide-default-footer="true"
                       dense
-                      class="expanded_table_hover"
                       v-else
                   >
 
-                    <template v-slot:item.value="{ item }">
+                    <template v-slot:item.name="{ item }">
                     <span v-if="item.info">
-                      {{ item.value }}
+                      {{ item.name }}
                       <v-btn
                           icon
-                          @click="selected_pollutant = item.value; $data[item.info] = true"
+                          @click="selected_pollutant = item.name; $data[item.info] = true"
                           class="icon_clickable"
                           x-small
                       >
@@ -869,10 +926,10 @@
                       </v-btn>
 
                     </span>
-                      <span v-else>{{ item.value }}</span>
+                      <span v-else>{{ item.name }}</span>
                     </template>
                     <template
-                        v-slot:[`item.${industry.name}`]="{ item }"
+                        v-slot:item.value="{ item }"
                     >
 
                       <template v-if="getEQSColor(item) != null">
@@ -886,7 +943,7 @@
                                 v-on="on"
                                 text-color="#1c1c1b"
                             >
-                              {{ item[industry.name] }}
+                              {{ item.value }}
                             </v-chip>
                           </template>
                           <span>{{ getEQSColor(item)[1] }}</span>
@@ -900,8 +957,29 @@
                             text-color="#1c1c1b"
                             class="chip_no_hover"
                         >
-                          {{ item[industry.name] }}
+                          {{ item.value }}
                         </v-chip>
+                      </template>
+                    </template>
+                    <template
+                        v-slot:item.data="{ item }"
+                    >
+                      <template v-if="getDataTypeColor(item) != null">
+                        <v-tooltip bottom>
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-chip
+                                :color="getDataTypeColor(item)[0]"
+                                dark
+                                :key="industry.name"
+                                text-color="#1c1c1b"
+                                v-bind="attrs"
+                                v-on="on"
+                            >
+                              {{ item.data }}
+                            </v-chip>
+                          </template>
+                          <span>{{getDataTypeColor(item)[1]}}</span>
+                        </v-tooltip>
                       </template>
                     </template>
 
@@ -913,19 +991,17 @@
                   <v-data-table
                       :headers="treatment_efficiency_table.header"
                       :items="treatment_efficiency_table.value"
-                      class="expanded_table_hover"
-
                       disable-pagination
                       :hide-default-footer="true"
                       dense
                   >
 
-                    <template v-slot:item.value="{ item }">
+                    <template v-slot:item.name="{ item }">
                     <span v-if="item.info">
-                      {{ item.value }}
+                      {{ item.name }}
                       <v-btn
                           icon
-                          @click="selected_pollutant = item.value; $data[item.info] = true"
+                          @click="selected_pollutant = item.name; $data[item.info] = true"
                           class="icon_clickable"
                           x-small
                       >
@@ -938,10 +1014,10 @@
 
 
                     </span>
-                      <span v-else>{{ item.value }}</span>
+                      <span v-else>{{ item.name }}</span>
                     </template>
                     <template
-                        v-slot:[`item.${industry.name}`]="{ item }"
+                        v-slot:item.value="{ item }"
                     >
 
                       <template v-if="getTreatmentEfficiencyColor(item) != null">
@@ -955,7 +1031,7 @@
                                 v-on="on"
                                 text-color="#1c1c1b"
                             >
-                              {{ item[industry.name] }}
+                              {{ item.value }}
                             </v-chip>
                           </template>
                           <span>{{ getTreatmentEfficiencyColor(item)[1] }}</span>
@@ -969,8 +1045,29 @@
                             text-color="#1c1c1b"
                             class="chip_no_hover"
                         >
-                          {{ item[industry.name] }}
+                          {{ item.value }}
                         </v-chip>
+                      </template>
+                    </template>
+                    <template
+                        v-slot:item.data="{ item }"
+                    >
+                      <template v-if="getDataTypeColor(item) != null">
+                        <v-tooltip bottom>
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-chip
+                                :color="getDataTypeColor(item)[0]"
+                                dark
+                                :key="industry.name"
+                                text-color="#1c1c1b"
+                                v-bind="attrs"
+                                v-on="on"
+                            >
+                              {{ item.data }}
+                            </v-chip>
+                          </template>
+                          <span>{{getDataTypeColor(item)[1]}}</span>
+                        </v-tooltip>
                       </template>
                     </template>
 
@@ -984,16 +1081,15 @@
                       disable-pagination
                       :hide-default-footer="true"
                       dense
-                      class="expanded_table_hover"
 
                   >
 
-                    <template v-slot:item.value="{ item }">
+                    <template v-slot:item.name="{ item }">
                   <span v-if="item.info">
-                    {{ item.value }}
+                    {{ item.name }}
                     <v-btn
                         icon
-                        @click="selected_pollutant = item.value; $data[item.info] = true"
+                        @click="selected_pollutant = item.name; $data[item.info] = true"
                         class="icon_clickable"
                         x-small
                     >
@@ -1006,11 +1102,11 @@
 
 
                     </span>
-                      <span v-else>{{ item.value }}</span>
+                      <span v-else>{{ item.name }}</span>
                     </template>
 
                     <template
-                        v-slot:[`item.${industry.name}`]="{ item }"
+                        v-slot:item.value="{ item }"
                     >
 
                       <template v-if="getTreatmentEfficiencyInfluentColor(item) != null">
@@ -1024,7 +1120,7 @@
                                 v-on="on"
                                 text-color="#1c1c1b"
                             >
-                              {{ item[industry.name] }}
+                              {{ item.value }}
                             </v-chip>
                           </template>
                           <span>{{ getTreatmentEfficiencyInfluentColor(item)[1] }}</span>
@@ -1038,8 +1134,29 @@
                             text-color="#1c1c1b"
                             class="chip_no_hover"
                         >
-                          {{ item[industry.name] }}
+                          {{ item.value }}
                         </v-chip>
+                      </template>
+                    </template>
+                    <template
+                        v-slot:item.data="{ item }"
+                    >
+                      <template v-if="getDataTypeColor(item) != null">
+                        <v-tooltip bottom>
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-chip
+                                :color="getDataTypeColor(item)[0]"
+                                dark
+                                :key="industry.name"
+                                text-color="#1c1c1b"
+                                v-bind="attrs"
+                                v-on="on"
+                            >
+                              {{ item.data }}
+                            </v-chip>
+                          </template>
+                          <span>{{getDataTypeColor(item)[1]}}</span>
+                        </v-tooltip>
                       </template>
                     </template>
 
@@ -1053,13 +1170,12 @@
                       disable-pagination
                       :hide-default-footer="true"
                       dense
-                      class="expanded_table_hover"
 
                   >
 
-                    <template v-slot:item.value="{ item }">
+                    <template v-slot:item.name="{ item }">
                     <span v-if="item.info">
-                      {{ item.value }}
+                      {{ item.name }}
                       <v-btn
                           icon
                           @click="$data[item.info] = true"
@@ -1073,7 +1189,28 @@
                         </v-icon>
                       </v-btn>
                     </span>
-                      <span v-else>{{ item.value }}</span>
+                      <span v-else>{{ item.name }}</span>
+                    </template>
+                    <template
+                        v-slot:item.data="{ item }"
+                    >
+                      <template v-if="getDataTypeColor(item) != null">
+                        <v-tooltip bottom>
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-chip
+                                :color="getDataTypeColor(item)[0]"
+                                dark
+                                :key="industry.name"
+                                text-color="#1c1c1b"
+                                v-bind="attrs"
+                                v-on="on"
+                            >
+                              {{ item.data }}
+                            </v-chip>
+                          </template>
+                          <span>{{getDataTypeColor(item)[1]}}</span>
+                        </v-tooltip>
+                      </template>
                     </template>
 
                   </v-data-table>
@@ -1086,13 +1223,12 @@
                       disable-pagination
                       :hide-default-footer="true"
                       dense
-                      class="expanded_table_hover"
 
                   >
 
-                    <template v-slot:item.value="{ item }">
+                    <template v-slot:item.name="{ item }">
                       <span v-if="item.info">
-                      {{ item.value }}
+                      {{ item.name }}
                       <v-btn
                           icon
                           @click="$data[item.info] = true"
@@ -1106,7 +1242,28 @@
                         </v-icon>
                       </v-btn>
                     </span>
-                      <span v-else>{{ item.value }}</span>
+                      <span v-else>{{ item.name }}</span>
+                    </template>
+                    <template
+                        v-slot:item.data="{ item }"
+                    >
+                      <template v-if="getDataTypeColor(item) != null">
+                        <v-tooltip bottom>
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-chip
+                                :color="getDataTypeColor(item)[0]"
+                                dark
+                                :key="industry.name"
+                                text-color="#1c1c1b"
+                                v-bind="attrs"
+                                v-on="on"
+                            >
+                              {{ item.data }}
+                            </v-chip>
+                          </template>
+                          <span>{{getDataTypeColor(item)[1]}}</span>
+                        </v-tooltip>
+                      </template>
                     </template>
 
                   </v-data-table>
@@ -1121,9 +1278,9 @@
                       :hide-default-footer="true"
                       dense
                   >
-                    <template v-slot:item.value="{ item }">
+                    <template v-slot:item.name="{ item }">
                     <span v-if="item.info">
-                      {{ item.value }}
+                      {{ item.name }}
                       <v-btn
                           icon
                           @click="$data[item.info] = true"
@@ -1138,11 +1295,11 @@
                       </v-btn>
 
                     </span>
-                      <span v-else>{{ item.value }}</span>
+                      <span v-else>{{ item.name }}</span>
                     </template>
 
                     <template
-                        v-slot:[`item.${industry.name}`]="{ item }"
+                        v-slot:item.value="{ item }"
                     >
 
                       <template v-if="getAvailabilityColor(item) != null">
@@ -1156,7 +1313,7 @@
                                 v-on="on"
                                 text-color="#1c1c1b"
                             >
-                              {{ item[industry.name] }}
+                              {{ item.value }}
                             </v-chip>
                           </template>
                           <span>{{ getAvailabilityColor(item)[1] }}</span>
@@ -1170,10 +1327,32 @@
                             text-color="#1c1c1b"
                             class="chip_no_hover"
                         >
-                          {{ item[industry.name] }}
+                          {{ item.value }}
                         </v-chip>
                       </template>
                     </template>
+                    <template
+                        v-slot:item.data="{ item }"
+                    >
+                      <template v-if="getDataTypeColor(item) != null">
+                        <v-tooltip bottom>
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-chip
+                                :color="getDataTypeColor(item)[0]"
+                                dark
+                                :key="industry.name"
+                                text-color="#1c1c1b"
+                                v-bind="attrs"
+                                v-on="on"
+                            >
+                              {{ item.data }}
+                            </v-chip>
+                          </template>
+                          <span>{{getDataTypeColor(item)[1]}}</span>
+                        </v-tooltip>
+                      </template>
+                    </template>
+
                   </v-data-table>
 
                 </div>
@@ -1184,27 +1363,47 @@
                       disable-pagination
                       :hide-default-footer="true"
                       dense
-                      class="expanded_table_hover"
 
                   >
 
-                    <template v-slot:item.value="{ item }">
-                  <span v-if="item.info">
-                    {{ item.value }}
-                    <v-btn
-                        icon
-                        @click="$data[item.info] = true"
-                        class="icon_clickable"
-                        x-small
+                    <template v-slot:item.name="{ item }">
+                      <span v-if="item.info">
+                        {{ item.name }}
+                        <v-btn
+                            icon
+                            @click="$data[item.info] = true"
+                            class="icon_clickable"
+                            x-small
+                        >
+                          <v-icon
+                              color='#1C195B'
+                          >
+                            mdi-information-outline
+                          </v-icon>
+                        </v-btn>
+                      </span>
+                      <span v-else>{{ item.name }}</span>
+                    </template>
+                    <template
+                        v-slot:item.data="{ item }"
                     >
-                      <v-icon
-                          color='#1C195B'
-                      >
-                        mdi-information-outline
-                      </v-icon>
-                    </v-btn>
-                  </span>
-                      <span v-else>{{ item.value }}</span>
+                      <template v-if="getDataTypeColor(item) != null">
+                        <v-tooltip bottom>
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-chip
+                                :color="getDataTypeColor(item)[0]"
+                                dark
+                                :key="industry.name"
+                                text-color="#1c1c1b"
+                                v-bind="attrs"
+                                v-on="on"
+                            >
+                              {{ item.data }}
+                            </v-chip>
+                          </template>
+                          <span>{{getDataTypeColor(item)[1]}}</span>
+                        </v-tooltip>
+                      </template>
                     </template>
 
                   </v-data-table>
@@ -1252,9 +1451,9 @@
                       dense
                       v-if="emissions_chip === 1"
                   >
-                    <template v-slot:item.value="{ item }">
+                    <template v-slot:item.name="{ item }">
                     <span v-if="item.info">
-                      {{ item.value }}
+                      {{ item.name }}
                       <v-btn
                           icon
                           @click="$data[item.info] = true"
@@ -1268,11 +1467,11 @@
                         </v-icon>
                       </v-btn>
                     </span>
-                      <span v-else>{{ item.value }}</span>
+                      <span v-else>{{ item.name }}</span>
                     </template>
 
                     <template
-                        v-slot:[`item.${industry.name}`]="{ item }"
+                        v-slot:item.value="{ item }"
                     >
 
                       <template v-if="getGlobalWarming(item) != null">
@@ -1286,7 +1485,7 @@
                                 v-on="on"
                                 text-color="#1c1c1b"
                             >
-                              {{ item[industry.name] }}
+                              {{ item.value }}
                             </v-chip>
                           </template>
                           <span>{{ getGlobalWarming(item)[1] }}</span>
@@ -1300,8 +1499,29 @@
                             text-color="#1c1c1b"
                             class="chip_no_hover"
                         >
-                          {{ item[industry.name] }}
+                          {{ item.value }}
                         </v-chip>
+                      </template>
+                    </template>
+                    <template
+                        v-slot:item.data="{ item }"
+                    >
+                      <template v-if="getDataTypeColor(item) != null">
+                        <v-tooltip bottom>
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-chip
+                                :color="getDataTypeColor(item)[0]"
+                                dark
+                                :key="industry.name"
+                                text-color="#1c1c1b"
+                                v-bind="attrs"
+                                v-on="on"
+                            >
+                              {{ item.data }}
+                            </v-chip>
+                          </template>
+                          <span>{{getDataTypeColor(item)[1]}}</span>
+                        </v-tooltip>
                       </template>
                     </template>
 
@@ -1333,9 +1553,9 @@
                       :hide-default-footer="true"
                       dense
                   >
-                    <template v-slot:item.value="{ item }">
+                    <template v-slot:item.name="{ item }">
                     <span v-if="item.info">
-                      {{ item.value }}
+                      {{ item.name }}
                       <v-btn
                           icon
                           @click="$data[item.info] = true"
@@ -1352,6 +1572,27 @@
 
                     </span>
                       <span v-else>{{ item.value }}</span>
+                    </template>
+                    <template
+                        v-slot:item.data="{ item }"
+                    >
+                      <template v-if="getDataTypeColor(item) != null">
+                        <v-tooltip bottom>
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-chip
+                                :color="getDataTypeColor(item)[0]"
+                                dark
+                                :key="industry.name"
+                                text-color="#1c1c1b"
+                                v-bind="attrs"
+                                v-on="on"
+                            >
+                              {{ item.data }}
+                            </v-chip>
+                          </template>
+                          <span>{{getDataTypeColor(item)[1]}}</span>
+                        </v-tooltip>
+                      </template>
                     </template>
 
 
@@ -1367,9 +1608,9 @@
                       :hide-default-footer="true"
                       dense
                   >
-                    <template v-slot:item.value="{ item }">
+                    <template v-slot:item.name="{ item }">
                     <span v-if="item.info">
-                      {{ item.value }}
+                      {{ item.name }}
                       <v-btn
                           icon
                           @click="$data[item.info] = true"
@@ -1385,7 +1626,28 @@
 
 
                     </span>
-                      <span v-else>{{ item.value }}</span>
+                      <span v-else>{{ item.name }}</span>
+                    </template>
+                    <template
+                        v-slot:item.data="{ item }"
+                    >
+                      <template v-if="getDataTypeColor(item) != null">
+                        <v-tooltip bottom>
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-chip
+                                :color="getDataTypeColor(item)[0]"
+                                dark
+                                :key="industry.name"
+                                text-color="#1c1c1b"
+                                v-bind="attrs"
+                                v-on="on"
+                            >
+                              {{ item.data }}
+                            </v-chip>
+                          </template>
+                          <span>{{getDataTypeColor(item)[1]}}</span>
+                        </v-tooltip>
+                      </template>
                     </template>
 
 
@@ -1401,9 +1663,9 @@
                       :hide-default-footer="true"
                       dense
                   >
-                    <template v-slot:item.value="{ item }">
+                    <template v-slot:item.name="{ item }">
                     <span v-if="item.info">
-                      {{ item.value }}
+                      {{ item.name }}
                       <v-btn
                           icon
                           @click="$data[item.info] = true"
@@ -1419,7 +1681,28 @@
 
 
                     </span>
-                      <span v-else>{{ item.value }}</span>
+                      <span v-else>{{ item.name }}</span>
+                    </template>
+                    <template
+                        v-slot:item.data="{ item }"
+                    >
+                      <template v-if="getDataTypeColor(item) != null">
+                        <v-tooltip bottom>
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-chip
+                                :color="getDataTypeColor(item)[0]"
+                                dark
+                                :key="industry.name"
+                                text-color="#1c1c1b"
+                                v-bind="attrs"
+                                v-on="on"
+                            >
+                              {{ item.data }}
+                            </v-chip>
+                          </template>
+                          <span>{{getDataTypeColor(item)[1]}}</span>
+                        </v-tooltip>
+                      </template>
                     </template>
 
 
@@ -1458,16 +1741,15 @@
                   <v-data-table
                       :headers="ghg_ratio_table.header"
                       :items="ghg_ratio_table.value"
-                      class="expanded_table_hover"
                       :item-class="itemRowBold"
                       disable-pagination
                       :hide-default-footer="true"
                       dense
                       v-if="ghg_ratio_chip === 1"
                   >
-                    <template v-slot:item.value="{ item }">
+                    <template v-slot:item.name="{ item }">
                       <span v-if="item.info">
-                      {{ item.value }}
+                      {{ item.name }}
                       <v-btn
                           icon
                           @click="$data[item.info] = true"
@@ -1482,7 +1764,28 @@
                       </v-btn>
 
                     </span>
-                      <span v-else>{{ item.value }}</span>
+                      <span v-else>{{ item.name }}</span>
+                    </template>
+                    <template
+                        v-slot:item.data="{ item }"
+                    >
+                      <template v-if="getDataTypeColor(item) != null">
+                        <v-tooltip bottom>
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-chip
+                                :color="getDataTypeColor(item)[0]"
+                                dark
+                                :key="industry.name"
+                                text-color="#1c1c1b"
+                                v-bind="attrs"
+                                v-on="on"
+                            >
+                              {{ item.data }}
+                            </v-chip>
+                          </template>
+                          <span>{{getDataTypeColor(item)[1]}}</span>
+                        </v-tooltip>
+                      </template>
                     </template>
 
                   </v-data-table>
@@ -1533,16 +1836,15 @@
                   <v-data-table
                       :headers="ghg_sludge_management_table.header"
                       :items="ghg_sludge_management_table.value"
-                      class="expanded_table_hover"
                       :item-class="itemRowBold"
                       disable-pagination
                       :hide-default-footer="true"
                       dense
                       v-if="ghg_sludge_management_chip === 1"
                   >
-                    <template v-slot:item.value="{ item }">
+                    <template v-slot:item.name="{ item }">
                       <span v-if="item.info">
-                      {{ item.value }}
+                      {{ item.name }}
                       <v-btn
                           icon
                           @click="$data[item.info] = true"
@@ -1557,7 +1859,28 @@
                       </v-btn>
 
                     </span>
-                      <span v-else>{{ item.value }}</span>
+                      <span v-else>{{ item.name }}</span>
+                    </template>
+                    <template
+                        v-slot:item.data="{ item }"
+                    >
+                      <template v-if="getDataTypeColor(item) != null">
+                        <v-tooltip bottom>
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-chip
+                                :color="getDataTypeColor(item)[0]"
+                                dark
+                                :key="industry.name"
+                                text-color="#1c1c1b"
+                                v-bind="attrs"
+                                v-on="on"
+                            >
+                              {{ item.data }}
+                            </v-chip>
+                          </template>
+                          <span>{{getDataTypeColor(item)[1]}}</span>
+                        </v-tooltip>
+                      </template>
                     </template>
 
                   </v-data-table>
@@ -3126,7 +3449,7 @@ export default {
       _this.energy_use_table = _this.generate_energy_use_table()
       _this.effluent_load_table = _this.generate_effluent_load_table()
 
-      _this.water_quantity = await _this.generate_water_quality_table()
+      _this.water_quantity = await _this.generate_water_availability_table()
       _this.treated_table = await _this.generate_treated_table()
       _this.freshwater_lever_for_action = await _this.generate_freshwater_lever_for_action_table()
 
@@ -3363,21 +3686,23 @@ export default {
       let freshwater_impact = this.risk_categories["pollution"](industry["freshwater_impact"])
       let pollution_impact = this.risk_categories["pollution"](industry["pollution_impact"])
       let eutrophication_impact = null
-      if (this.eutrophication_table.value[0] != undefined) eutrophication_impact = this.risk_categories["eutrophication"](this.eutrophication_table.value[0][current_industry_name])
+      if (this.eutrophication_table.value[0] != undefined){
+        eutrophication_impact = this.risk_categories["eutrophication"](this.eutrophication_table.value[0].value)
+      }
       let delta_ecotox_impact = null
       if (this.delta_ecotox_table.value[0] != undefined) {
         delta_ecotox_impact = this.risk_categories["delta_ecotoxicity"](this.delta_ecotox_table.value[0].value)
       }
       let delta_eqs_impact = null
       if (this.delta_eqs_table.value.length > 0) {
-        let delta_eqs_values = this.delta_eqs_table.value.map(x => x[current_industry_name])
+        let delta_eqs_values = this.delta_eqs_table.value.map(x => x["value"])
         delta_eqs_impact = this.risk_categories["delta_eqs"](delta_eqs_values.sum() / delta_eqs_values.length)
       }
       let ecotox_impact = null
       if (this.ecotoxicity_table.value[0] != undefined) ecotox_impact = this.risk_categories["ecotoxicity"](this.ecotoxicity_table.value[0][current_industry_name])
       let eqs_impact = null
       if (this.eqs_table.value.length > 0) {
-        let eqs_values = this.eqs_table.value.map(x => x[current_industry_name])
+        let eqs_values = this.eqs_table.value.map(x => x["value"])
         eqs_impact = this.risk_categories["eqs"](eqs_values.sum() / eqs_values.length)
       }
       /*
@@ -3443,23 +3768,23 @@ export default {
 
     //Get impact associated to item (related to freshwater)
     getAvailabilityColor(item) {
-      if (item.value == this.table_title.availability_quantity.dilution_factor) {
-        return this.risk_categories["dilution_factor"](item[this.industry.name])
-      } else if (item.value == this.table_title.availability_quantity.recycled) {
+      if (item.name == this.table_title.availability_quantity.dilution_factor) {
+        return this.risk_categories["dilution_factor"](item.value)
+      /*} else if (item.value == this.table_title.availability_quantity.recycled) {
         return this.risk_categories["recycled_water_factor"](item[this.industry.name])
       } else if (item.value == this.table_title.availability_quantity.treated) {
-        return this.risk_categories["water_treated"](item[this.industry.name])
-      } else if (item.value == this.table_title.availability_quantity.consumption_available) {
-        return this.risk_categories["water_stress_ratio"](item[this.industry.name])
-      } else if (item.value == this.table_title.availability_quantity.specific_water_consumption) {
-        return this.risk_categories["specific_water_consumption"](item[this.industry.name])
+        return this.risk_categories["water_treated"](item[this.industry.name])*/
+      } else if (item.name == this.table_title.availability_quantity.consumption_available) {
+        return this.risk_categories["water_stress_ratio"](item.value)
+      //} else if (item.value == this.table_title.availability_quantity.specific_water_consumption) {
+        //return this.risk_categories["specific_water_consumption"](item[this.industry.name])
       }
       return null
     },
 
     //Get impact associated to item (related to eutrophication potential)
     getEutrophicationColor(item) {
-      return this.risk_categories["eutrophication"](item[this.industry.name])
+      return this.risk_categories["eutrophication"](item.value)
     },
 
     //Get impact associated to item (related to ecotoxicity delta)
@@ -3484,36 +3809,36 @@ export default {
 
     //Get impact associated to item (related to toxic units)
     getEcotoxicity(item) {
-      return this.risk_categories["ecotoxicity"](item[this.industry.name])
+      return this.risk_categories["ecotoxicity"](item.value)
     },
 
     //Get impact associated to item (related to delta of environmental quality standards)
     getDeltaEQSColor(item) {
-      return this.risk_categories["delta_eqs"](item[this.industry.name])
+      return this.risk_categories["delta_eqs"](item.value)
     },
 
     //Get impact associated to item (related to treatment efficiency)
     getTreatmentEfficiencyColor(item) {
-      return this.risk_categories["treatment_efficiency"](item[this.industry.name])
+      return this.risk_categories["treatment_efficiency"](item.value)
     },
 
     //Get impact associated to item (related to treatment efficiency compared to intake water)
     getTreatmentEfficiencyInfluentColor(item) {
-      return this.risk_categories["influent_treatment_efficiency"](item[this.industry.name])
+      return this.risk_categories["influent_treatment_efficiency"](item.value)
     },
 
     getDataTypeColor(item){
       if(item.data == "UD") {
-        return ["#CCFF90", (this.table_title.data_type_table_names[item.data])]
-      }
-      else if(item.data == "Es") {
-        return ["#B2FF59", (this.table_title.data_type_table_names[item.data])]
-      }
-      else if (item.data == "Mo") {
         return ["#76FF03", (this.table_title.data_type_table_names[item.data])]
       }
+      else if(item.data == "Es") {
+        return ["#1DE9B6", (this.table_title.data_type_table_names[item.data])]
+      }
+      else if (item.data == "Mo") {
+        return ["#D500F9", (this.table_title.data_type_table_names[item.data])]
+      }
       else if (item.data == "ID") {
-        return ["#64DD17", (this.table_title.data_type_table_names[item.data])]
+        return ["#F50057", (this.table_title.data_type_table_names[item.data])]
       }
       return null
     },
@@ -3542,52 +3867,90 @@ export default {
       if (_this.industry !== null) {
 
         let emission_table = {
-          header: [{text: "Emissions", value: "value", sortable: false}],
+          header: [{text: "Emissions", value: "name", sortable: false},
+            {text: this.industry.name, value: "value"},
+            {text: "Unit", value: "unit", sortable: false},
+            {text: "Data Type", value: "data", sortable: false}],
           value: []
         }
-
-        let total = {value: _this.table_title.global_warming_potential.total, unit: "kgCO2eq/day"}
-        let elec = {
-          value: _this.table_title.global_warming_potential.elec,
-          unit: "kgCO2eq/day",
-          info: "info_electricity"
-        }
-        let fuel = {
-          value: _this.table_title.global_warming_potential.fuel,
-          unit: "kgCO2eq/day",
-          info: "info_fuel_engines"
-        }
-        let tre = {
-          value: _this.table_title.global_warming_potential.treatment,
-          unit: "kgCO2eq/day",
-          info: "info_treatment"
-        }
-        let biog = {value: _this.table_title.global_warming_potential.biogas, unit: "kgCO2eq/day", info: "info_biogas"}
-
-        let dig_fuel = {value: _this.table_title.global_warming_potential.fuel_digester, unit: "kgCO2eq/day", info: "info_digester_fuel"}
-
-        let slu = {
-          value: _this.table_title.global_warming_potential.sludge,
-          unit: "kgCO2eq/day",
-          info: "info_sludge_management"
-        }
-        let reus = {value: _this.table_title.global_warming_potential.reuse, unit: "kgCO2eq/day", info: "info_reuse"}
-        let disc = {
-          value: _this.table_title.global_warming_potential.discharged,
-          unit: "kgCO2eq/day",
-          info: "info_discharge"
-        }
-
 
         let key = this.industry.name
         let industries = [this.industry]
 
-        emission_table.header.push({
-          text: key, value: key,
-        })
+        //emission_table.header.push({
+        //text: key, value: key,
+        //})
         let emissions = metrics.emissions_and_descriptions(industries, 1)
+        //let DataType = industry_impact_legend_category.emissions_and_descriptions(industries[0])
 
-        total[key] = emissions["total"]
+        let total = {
+          name: _this.table_title.global_warming_potential.total,
+          unit: "kgCO2eq/day",
+          value: emissions["total"]
+        }
+        let elec = {
+          name: _this.table_title.global_warming_potential.elec,
+          unit: "kgCO2eq/day",
+          info: "info_electricity",
+          value: emissions["elec"],
+          data: this.get_string_impact_legend(industry_impact_legend_category.emissions_elec(industries[0]))
+        }
+        let fuel = {
+          name: _this.table_title.global_warming_potential.fuel,
+          unit: "kgCO2eq/day",
+          info: "info_fuel_engines",
+          value: emissions["fuel"],
+          data: this.get_string_impact_legend(industry_impact_legend_category.emissions_fuel(industries[0]))
+        }
+        let tre = {
+          name: _this.table_title.global_warming_potential.treatment,
+          unit: "kgCO2eq/day",
+          info: "info_treatment",
+          value: emissions["treatment"],
+          data: this.get_string_impact_legend(industry_impact_legend_category.emissions_tre(industries[0]))
+        }
+        let biog = {
+          name: _this.table_title.global_warming_potential.biogas,
+          unit: "kgCO2eq/day",
+          info: "info_biogas",
+          value: emissions["biog"],
+          data: this.get_string_impact_legend(industry_impact_legend_category.emissions_biog(industries[0]))
+        }
+
+        let dig_fuel = {
+          name: _this.table_title.global_warming_potential.fuel_digester,
+          unit: "kgCO2eq/day",
+          info: "info_digester_fuel",
+          value: emissions["digester_fuel"],
+          data: this.get_string_impact_legend(industry_impact_legend_category.emissions_dig_fuel(industries[0]))
+
+        }
+
+        let slu = {
+          name: _this.table_title.global_warming_potential.sludge,
+          unit: "kgCO2eq/day",
+          info: "info_sludge_management",
+          value: emissions["slu"],
+          data: this.get_string_impact_legend(industry_impact_legend_category.emissions_slu(industries[0]))
+        }
+        let reus = {
+          name: _this.table_title.global_warming_potential.reuse,
+          unit: "kgCO2eq/day",
+          info: "info_reuse",
+          value: emissions["reuse"],
+          data: this.get_string_impact_legend(industry_impact_legend_category.emissions_reus_trck(industries[0]))
+        }
+        let disc = {
+          name: _this.table_title.global_warming_potential.discharged,
+          unit: "kgCO2eq/day",
+          info: "info_discharge",
+          value: emissions["disc"],
+          data: this.get_string_impact_legend(industry_impact_legend_category.emissions_disc(industries[0]))
+        }
+
+
+
+        /*total[key] = emissions["total"]
         elec[key] = emissions["elec"]
         fuel[key] = emissions["fuel"]
         tre[key] = emissions["treatment"]
@@ -3595,10 +3958,10 @@ export default {
         dig_fuel[key] = emissions["digester_fuel"]
         slu[key] = emissions["slu"]
         reus[key] = emissions["reuse"]
-        disc[key] = emissions["disc"]
+        disc[key] = emissions["disc"]*/
 
 
-        emission_table.header.push({text: "Unit", value: "unit", sortable: false,})
+       // emission_table.header.push({text: "Unit", value: "unit", sortable: false,})
         emission_table.value.push(total)
         emission_table.value.push(elec)
         emission_table.value.push(fuel)
@@ -3627,7 +3990,7 @@ export default {
             datasets: [
               {
                 backgroundColor: ['#1c195b', '#0095c6', '#5bc9bf', '#00b140', '#ff386b', '#f89c27', '#964fe5'],
-                data: [elec[key], fuel[key], tre[key], biog[key], dig_fuel[key], slu[key], reus[key], disc[key]]
+                data: [elec.value, fuel.value, tre.value, biog.value, dig_fuel.value, slu.value, reus.value, disc.value]
               }
             ]
           },
@@ -3682,36 +4045,51 @@ export default {
       if (_this.industry !== null) {
 
         let emission_table = {
-          header: [{text: "Emissions", value: "value", sortable: false}],
+          header: [{text: "Emissions", value: "name", sortable: false},
+            {text: this.industry.name, value: "value"},
+            {text: "Unit", value: "unit", sortable: false},
+            {text: "Data Type", value: "data", sortable: false}],
           value: []
         }
 
-        let co2 = {value: "CO2 emissions", unit: "kgCO2eq/day", info: "co2_ghg_ratio_info"}
-        let ch4 = {
-          value: "CH4 emissions",
-          unit: "kgCO2eq/day",
-          info: "ch4_ghg_ratio_info"
-        }
-        let n2o = {
-          value: "N2O emissions",
-          unit: "kgCO2eq/day",
-          info: "n2o_ghg_ratio_info"
-        }
-
-        let key = this.industry.name
         let industries = [this.industry]
 
-        emission_table.header.push({
-          text: key, value: key,
-        })
         let emissions = metrics.emissions_deglossed(industries)
 
+        let co2 = {
+          name: "CO2 emissions",
+          unit: "kgCO2eq/day",
+          info: "co2_ghg_ratio_info",
+          value: emissions["co2"],
+          data: "ID"
+        }
+        let ch4 = {
+          name: "CH4 emissions",
+          unit: "kgCO2eq/day",
+          info: "ch4_ghg_ratio_info",
+          value: emissions["ch4"],
+          data: "ID"
+        }
+        let n2o = {
+          name: "N2O emissions",
+          unit: "kgCO2eq/day",
+          info: "n2o_ghg_ratio_info",
+          value: emissions["n2o"],
+          data: "ID"
+        }
 
-        co2[key] = emissions["co2"]
+        //let key = this.industry.name
+
+        //emission_table.header.push({
+          //text: key, value: key,
+        //})
+
+
+        /*co2[key] = emissions["co2"]
         ch4[key] = emissions["ch4"]
-        n2o[key] = emissions["n2o"]
+        n2o[key] = emissions["n2o"]*/
 
-        emission_table.header.push({text: "Unit", value: "unit", sortable: false,})
+        //emission_table.header.push({text: "Unit", value: "unit", sortable: false,})
         emission_table.value.push(co2)
         emission_table.value.push(ch4)
         emission_table.value.push(n2o)
@@ -3726,7 +4104,7 @@ export default {
             datasets: [
               {
                 backgroundColor: ['#1c195b', '#0095c6', '#5bc9bf', ],
-                data: [co2[key], ch4[key], n2o[key]]
+                data: [co2.value, ch4.value, n2o.value]
               }
             ]
           },
@@ -3780,38 +4158,85 @@ export default {
 
       if (_this.industry !== null) {
         let emission_table = {
-          header: [{text: "Emissions", value: "value", sortable: false}],
+          header: [{text: "Emissions", value: "name", sortable: false},
+            {text: this.industry.name, value: "value"},
+            {text: "Unit", value: "unit", sortable: false},
+            {text: "Data Type", value: "data", sortable: false}],
           value: []
         }
 
-        let storage = {value: "Sludge storage", unit: "kgCO2eq/day", info: "info_sludge_management"}
-        let composting = {value: "Sludge composted", unit: "kgCO2eq/day", info: "info_sludge_management"}
-        let incineration = {value: "Sludge incineration", unit: "kgCO2eq/day", info: "info_sludge_management"}
-        let land_application = {value: "Land application of sludge", unit: "kgCO2eq/day", info: "info_sludge_management"}
-        let landfilling = {value: "Emissions from landfilled biosolids", unit: "kgCO2eq/day", info: "info_sludge_management"}
-        let stockpilling = {value: "Sludge stockpiling", unit: "kgCO2eq/day", info: "info_sludge_management"}
-        let transport = {value: "Sludge transport off-site", unit: "kgCO2eq/day", info: "info_sludge_management"}
-
-
-        let key = this.industry.name
         let industries = [this.industry]
 
-        emission_table.header.push({
-          text: key, value: key,
-        })
         let emissions = metrics.sludge_management(industries)
 
+        let storage = {
+          name: "Sludge storage",
+          unit: "kgCO2eq/day",
+          info: "info_sludge_management",
+          value: emissions["storage"],
+          data: this.getDataTypeColor(industry_impact_legend_category.sludge_storage(industries[0]))
+        }
+        let composting = {
+          name: "Sludge composted",
+          unit: "kgCO2eq/day",
+          info: "info_sludge_management",
+          value: emissions["composting"],
+          data: this.getDataTypeColor(industry_impact_legend_category.sludge_composting(industries[0]))
+        }
+        let incineration = {
+          name: "Sludge incineration",
+          unit: "kgCO2eq/day",
+          info: "info_sludge_management",
+          value: emissions["incineration"],
+          data: this.getDataTypeColor(industry_impact_legend_category.sludge_incineration(industries[0]))
+        }
+        let land_application = {
+          name: "Land application of sludge",
+          unit: "kgCO2eq/day",
+          info: "info_sludge_management",
+          value: emissions["land_application"],
+          data: this.getDataTypeColor(industry_impact_legend_category.sludge_land_application(industries[0]))
+        }
+        let landfilling = {
+          name: "Emissions from landfilled biosolids",
+          unit: "kgCO2eq/day",
+          info: "info_sludge_management",
+          value: emissions["landfilling"],
+          data: this.getDataTypeColor(industry_impact_legend_category.sludge_landfilling(industries[0]))
+        }
+        let stockpilling = {
+          name: "Sludge stockpiling",
+          unit: "kgCO2eq/day",
+          info: "info_sludge_management",
+          value: emissions["landfilling"],
+          data: this.getDataTypeColor(industry_impact_legend_category.sludge_stockpilling(industries[0]))
+        }
+        let transport = {
+          name: "Sludge transport off-site",
+          unit: "kgCO2eq/day",
+          info: "info_sludge_management",
+          value: emissions["sludge_transport"],
+          data: this.getDataTypeColor(industry_impact_legend_category.sludge_transport(industries[0]))
+        }
 
-        storage[key] = emissions["storage"]
+
+        //let key = this.industry.name
+
+        //emission_table.header.push({
+          //text: key, value: key,
+        //})
+
+
+        /*storage[key] = emissions["storage"]
         composting[key] = emissions["composting"]
         incineration[key] = emissions["incineration"]
         land_application[key] = emissions["land_application"]
         landfilling[key] = emissions["landfilling"]
         stockpilling[key] = emissions["stockpilling"]
-        transport[key] = emissions["sludge_transport"]
+        transport[key] = emissions["sludge_transport"]*/
 
 
-        emission_table.header.push({text: "Unit", value: "unit", sortable: false,})
+        //emission_table.header.push({text: "Unit", value: "unit", sortable: false,})
         emission_table.value.push(storage)
         emission_table.value.push(composting)
         emission_table.value.push(incineration)
@@ -3825,12 +4250,12 @@ export default {
         _this.ghg_sludge_management_chart = {
           chartData: {
             labels: [
-              storage['value'], composting['value'], incineration['value'], land_application['value'], landfilling['value'], stockpilling['value'], transport['value']
+              storage.name, composting.name, incineration.name, land_application.name, landfilling.name, stockpilling.name, transport.name
             ],
             datasets: [
               {
                 backgroundColor: ['#1c195b', '#0095c6', '#5bc9bf', '#00b140', '#ff386b', '#f89c27', '#964fe5'],
-                data: [storage[key], composting[key], incineration[key], land_application[key], landfilling[key], stockpilling[key], transport[key]]
+                data: [storage.value, composting.value, incineration.value, land_application.value, landfilling.value, stockpilling.value, transport.value]
               }
             ]
           },
@@ -3880,19 +4305,19 @@ export default {
       if (_this.industry !== null) {
 
         let pollutants_table = {
-          header: [{text: "", value: "value", sortable: false}],
+          header: [{text: "", value: "name", sortable: false},
+            {text: "Concentration of the water discharged (g/m3)", value: 'concentration'},
+            {text: "Increase of the concentration in the receiving water body (g/m3)", value: 'delta',},
+            {text: "Data Type", value: "data", sortable: false}],
           value: []
         }
 
-        let key = 'concentration'
+        //let key = 'concentration'
         let industries = [this.industry]
 
-        pollutants_table.header.push({
-          text: "Concentration of the water discharged (g/m3)", value: 'concentration',
-        })
-        pollutants_table.header.push({
-          text: "Increase of the concentration in the receiving water body (g/m3)", value: 'delta',
-        })
+        //pollutants_table.header.push({
+          //text: "Concentration of the water discharged (g/m3)", value: 'concentration'},{
+          //text: "Increase of the concentration in the receiving water body (g/m3)", value: 'delta',})
 
 
         let tu = metrics.pollutant_concentration(industries)
@@ -3901,9 +4326,11 @@ export default {
         //dichloroethane[key] = tu.diclo
         //dichloroethane['delta'] = delta.diclo
         for(let pollutant of utils.remove_nutrients(this.industry.pollutants_selected)){
+          let DataType = industry_impact_legend_category.pollutant_concentration(industries[0], pollutant)
           let pollutant_obj = {
-            value: pollutant,
-            info: "info_pollutant_concentration"
+            name: pollutant,
+            info: "info_pollutant_concentration",
+            data: this.get_string_impact_legend(DataType)
           }
           pollutant_obj['concentration'] = tu[pollutant]
           pollutant_obj['delta'] = delta[pollutant]
@@ -3926,28 +4353,48 @@ export default {
       if (_this.industry !== null) {
 
         let emission_table = {
-          header: [{text: "Emissions", value: "value", sortable: false}],
+          header: [{text: "Emissions", value: "name", sortable: false},
+            {text: this.industry.name, value: "value"},
+            {text: "Unit", value: "unit", sortable: false},
+            {text: "DataType", value: "data", sortable: false}],
           value: []
         }
 
-        let total = {value: "Total", unit: "kgCO2eq/day"}
-        let flared = {value: _this.table_title.global_warming_potential.biogas_flared, unit: "kgCO2eq/day", info: "info_biogas_flared"}
-        let valorized = {value: _this.table_title.global_warming_potential.biogas_valorized, unit: "kgCO2eq/day", info: "info_biogas_valorised"}
-
-        let key = this.industry.name
         let industries = [this.industry]
 
-        emission_table.header.push({
-          text: key, value: key,
-        })
         let emissions = metrics.biogenic_emissions(industries)
 
-        total[key] = emissions["total"]
+        let total = {
+          name: "Total",
+          unit: "kgCO2eq/day",
+          value: emissions["total"]
+        }
+        let flared = {
+          name: _this.table_title.global_warming_potential.biogas_flared,
+          unit: "kgCO2eq/day",
+          info: "info_biogas_flared",
+          value: emissions["flared"],
+          data: this.getDataTypeColor(industry_impact_legend_category.biogenic_flared(industries[0]))
+        }
+        let valorized = {
+          name: _this.table_title.global_warming_potential.biogas_valorized,
+          unit: "kgCO2eq/day",
+          info: "info_biogas_valorised",
+          value: emissions["valorized"],
+          data: this.getDataTypeColor(industry_impact_legend_category.biogenic_valorized(industries[0]))
+        }
+        //let key = this.industry.name
+
+        //emission_table.header.push({
+          //text: key, value: key,
+        //})
+
+        /*total[key] = emissions["total"]
         flared[key] = emissions["flared"]
-        valorized[key] = emissions["valorized"]
+        valorized[key] = emissions["valorized"]*/
 
 
-        emission_table.header.push({text: "Unit", value: "unit", sortable: false,})
+        //emission_table.header.push({text: "Unit", value: "unit", sortable: false,})
 
         emission_table.value.push(total)
         emission_table.value.push(flared)
@@ -3968,22 +4415,28 @@ export default {
       if (_this.industry !== null) {
 
         let pollutants_table = {
-          header: [{text: "", value: "value", sortable: false}],
+          header: [{text: "", value: "name", sortable: false},
+            {text: this.industry.name, value: "value"},
+            {text: "Unit", value: "unit", sortable: false},
+            {text: "Data Type", value: "data", sortable: false}],
           value: []
         }
 
-        let energy = {value: "Energy used per day", unit: "kWh/m3", info: "info_energy_used"}
-
-        let key = this.industry.name
         let industries = [this.industry]
+        let DataType = industry_impact_legend_category.energy_use(industries[0])
 
-        pollutants_table.header.push({
-          text: key, value: key,
-        })
+        let energy = {name: "Energy used per day", unit: "kWh/m3", info: "info_energy_used", value: metrics.energy_used(industries), data: this.get_string_impact_legend(DataType)}
 
-        energy[key] = metrics.energy_used(industries)
+        //let key = this.industry.name
 
-        pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
+
+        //pollutants_table.header.push({
+          //text: key, value: key,
+        //})
+
+        //energy[this.industry.name] = metrics.energy_used(industries)
+
+        //pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
 
         pollutants_table.value.push(energy)
         return pollutants_table
@@ -3999,27 +4452,51 @@ export default {
       if (_this.industry != null) {
 
         let pollutants_table = {
-          header: [{text: "", value: "value", sortable: false}],
+          header: [{text: "", value: "name", sortable: false},
+            {text: this.industry.name, value: "value"},
+            {text: "Unit", value: "unit", sortable: false },
+            {text: "Data Type", value: "data", sortable: false}],
           value: []
         }
 
-        let tn = {value: _this.table_title.pollutants.tn, unit: "gTN/m3", info: "info_effluent_load_tn"}
-        let tp = {value: _this.table_title.pollutants.tp, unit: "gTP/m3", info: "info_effluent_load_tp"}
-        let cod = {value: _this.table_title.pollutants.cod, unit: "gCOD/m3", info: "info_effluent_load_cod"}
-
-        let key = this.industry.name
         let industries = [this.industry]
 
-        pollutants_table.header.push({
-          text: key, value: key,
-        })
-
         let load = metrics.effluent_concentration(industries)
+
+        let tn = {
+          name: _this.table_title.pollutants.tn,
+          unit: "gTN/m3",
+          info: "info_effluent_load_tn",
+          value: load.tn,
+          data: "ID"
+        }
+        let tp = {
+          name: _this.table_title.pollutants.tp,
+          unit: "gTP/m3",
+          info: "info_effluent_load_tp",
+          value: load.tp,
+          data: "ID"
+        }
+        let cod = {
+          name: _this.table_title.pollutants.cod,
+          unit: "gCOD/m3",
+          info: "info_effluent_load_cod",
+          value: load.cod,
+          data: "ID"
+        }
+
+        //let key = this.industry.name
+
+        //pollutants_table.header.push({
+          //text: key, value: key,
+        //})
+
+        /*let load = metrics.effluent_concentration(industries)
         tn[key] = load.tn
         cod[key] = load.cod
-        tp[key] = load.tp
+        tp[key] = load.tp*/
 
-        pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
+        //pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
 
         pollutants_table.value.push(cod)
         pollutants_table.value.push(tn)
@@ -4038,33 +4515,40 @@ export default {
       if (_this.industry !== null) {
 
         let pollutants_table = {
-          header: [{text: "", value: "value", sortable: false}],
+          header: [{text: "", value: "name", sortable: false},
+            {text: this.industry.name, value: "value"},
+            {text: "Unit", value: "unit", sortable: false},
+            {text: "Data type", value: "data", sortable: false}],
           value: []
         }
 
-        let key = this.industry.name
+        //let key = this.industry.name
         let industries = [this.industry]
 
-        pollutants_table.header.push({
-          text: key, value: key,
-        })
-        pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
+        //pollutants_table.header.push({
+          //text: key, value: key,
+        //})
+        //pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
 
         let eutrophication = metrics.eutrophication_potential(industries)
-        let total = {value: _this.table_title.pollutants.total, unit: "gPO4eq/m3"}
-        total[key] = eutrophication.total
+        let total = {name: _this.table_title.pollutants.total, value: eutrophication.total, unit: "gPO4eq/m3"}
+        //total[this.industry.name] = eutrophication.total
         pollutants_table.value.push(total)
 
         let labels_dataset = ["COD", "TN", "TP"]
         let values_dataset = []
 
         for(let pollutant of labels_dataset){
+          let DataType = industry_impact_legend_category.eutrophication(industries[0], pollutant)
           let pollutant_obj = {
-            value: pollutant,
+            name: pollutant,
             unit: "gPO4eq/m3",
-            info: "info_eutrophication"
+            info: "info_eutrophication",
+            value: eutrophication[pollutant],
+            data: this.get_string_impact_legend(DataType)
+
           }
-          pollutant_obj[key] = eutrophication[pollutant]
+          //pollutant_obj[key] = eutrophication[pollutant]
           pollutants_table.value.push(pollutant_obj)
           values_dataset.push(eutrophication[pollutant])
 
@@ -4130,25 +4614,28 @@ export default {
       if (_this.industry !== null) {
 
         let pollutants_table = {
-          header: [{text: "", value: "value", sortable: false}],
+          header: [{text: "", value: "name", sortable: false},
+            {text: this.industry.name, value: "value"},
+            {text: "Unit", value: "unit", sortable: false},
+            {text: "Data Type", value: "data", sortable: false}],
           value: []
         }
 
 
         //let dichloroethane = {value: _this.table_title.pollutants.diclo, unit: "TU/day", info: "info_tu_diclo"}
 
-        let key = this.industry.name
+        //let key = this.industry.name
         let industries = [this.industry]
         let tu = metrics.ecotoxicity_potential_tu(industries)
-        let total = {value: _this.table_title.pollutants.total, unit: "TU/day"}
-        total[key] = tu.total
+        let total = {name: _this.table_title.pollutants.total, value: tu.total,  unit: "TU/day"}
+        //total[this.industry.name] = tu.total
         pollutants_table.value.push(total)
 
 
-        pollutants_table.header.push({
-          text: key, value: key,
-        })
-        pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
+        //pollutants_table.header.push({
+          //text: key, value: key,
+        //})
+        //pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
 
 
         let labels_dataset = []
@@ -4156,12 +4643,15 @@ export default {
 
 
         for(let pollutant of utils.remove_nutrients(this.industry.pollutants_selected)){
+          let DataType = industry_impact_legend_category.ecotoxicity_potential_tu(industries[0], pollutant)
           let pollutant_obj = {
-            value: pollutant,
+            name: pollutant,
             unit: "TU/day",
-            info: "info_tu"
+            info: "info_tu",
+            value: tu[pollutant],
+            data: this.get_string_impact_legend(DataType)
           }
-          pollutant_obj[key] = tu[pollutant]
+          //pollutant_obj[key] = tu[pollutant]
           pollutants_table.value.push(pollutant_obj)
 
           labels_dataset.push(pollutant)
@@ -4229,16 +4719,19 @@ export default {
       if (_this.industry !== null) {
 
         let pollutants_table = {
-          header: [{text: "", value: "value", sortable: false}],
+          header: [{text: "", value: "name", sortable: false},
+            {text: this.industry.name, value: "value", sorable: false},
+            {text:"Unit", value:"unit", sortable: false},
+            {text: "Data Type", value: "data", sortable: false}],
           value: []
         }
-        let key = this.industry.name
+        //let key = this.industry.name
         let industries = [this.industry]
 
-        pollutants_table.header.push({
-          text: key, value: key,
-        })
-        pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
+        //pollutants_table.header.push({
+          //text: key, value: key,
+        //})
+        //pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
 
         //let dichloroethane = {value: _this.table_title.pollutants.diclo, unit: "%", info: "info_delta_eqs_diclo"}
         let tu = await metrics.delta_eqs(industries, _this.global_layers)
@@ -4246,12 +4739,15 @@ export default {
         let labels_dataset = []
         let values_dataset = []
         for(let pollutant of utils.remove_nutrients(this.industry.pollutants_selected)){
+          let DataType = industry_impact_legend_category.delta_eqs(industries[0], pollutant)
           let pollutant_obj = {
-            value: pollutant,
+            name: pollutant,
             unit: "%",
-            info: "info_delta_eqs"
+            info: "info_delta_eqs",
+            value: tu[pollutant],
+            data: this.get_string_impact_legend(DataType)
           }
-          pollutant_obj[key] = tu[pollutant]
+          //pollutant_obj[key] = tu[pollutant]
           pollutants_table.value.push(pollutant_obj)
 
           labels_dataset.push(pollutant)
@@ -4408,16 +4904,19 @@ export default {
       if (_this.industry !== null) {
 
         let pollutants_table = {
-          header: [{text: "", value: "value", sortable: false}],
+          header: [{text: "", value: "name", sortable: false},
+            {text: this.industry.name, value: "value"},
+            {text: "Unit", value: "unit", sortable: false},
+            {text: "Data type", value: "data", sortable: false}],
           value: []
         }
 
-        let key = this.industry.name
+        //let key = this.industry.name
         let industries = [this.industry]
 
-        pollutants_table.header.push({
-          text: key, value: key,
-        })
+        //pollutants_table.header.push({
+          //text: key, value: key,
+        //})
 
         let tu = metrics.environmental_quality_standards(industries)
 
@@ -4425,19 +4924,22 @@ export default {
         let labels_dataset = []
         let values_dataset = []
         for(let pollutant of utils.remove_nutrients(this.industry.pollutants_selected)){
+          let DataType = industry_impact_legend_category.pollutant_concentration(industries[0], pollutant)
           let pollutant_obj = {
-            value: pollutant,
+            name: pollutant,
             unit: "%",
-            info: "info_eqs"
+            info: "info_eqs",
+            value:  tu[pollutant],
+            data: this.get_string_impact_legend(DataType)
           }
-          pollutant_obj[key] = tu[pollutant]
+          //pollutant_obj[key] = tu[pollutant]
           pollutants_table.value.push(pollutant_obj)
 
           labels_dataset.push(pollutant)
           values_dataset.push(tu[pollutant])
         }
 
-        pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
+        //pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
 
         this.eqs_chart = {
           chartData: {
@@ -4551,33 +5053,46 @@ export default {
     },
 
     //Freshwater impact
-    async generate_water_quality_table() {
+    async generate_water_availability_table() {
 
       let _this = this
 
       if (_this.industry != null) {
 
         let pollutants_table = {
-          header: [{text: "", value: "value", sortable: false}],
+          header: [{text: "", value: "name", sortable: false},
+            {text: this.industry.name, value: "value"},
+            {text: "Unit", value: "unit", sortable: false},
+            {text: "Data Type", value: "data", sortable: false}],
           value: []
         }
 
+        let industries = [this.industry]
+
+        let dilution_factor_value = await metrics.dilution_factor(this.global_layers, industries)
+
+        let available_ratio_value = await metrics.available_ratio(this.global_layers, industries)
+
         let dilution_factor_row = {
-          value: _this.table_title.availability_quantity.dilution_factor,
+          name: _this.table_title.availability_quantity.dilution_factor,
           unit: "-",
-          info: "info_dilution_factor"
+          info: "info_dilution_factor",
+          value: dilution_factor_value,
+          data: this.get_string_impact_legend(industry_impact_legend_category.dilution_factor(industries[0]))
         }
-        let treated_factor = {
-          value: _this.table_title.availability_quantity.treated,
-          unit: "%",
-          info: "info_treated_factor"
-        }
+        //let treated_factor = {
+          //value: _this.table_title.availability_quantity.treated,
+          //unit: "%",
+          //info: "info_treated_factor"
+        //}
         let available_ratio = {
-          value: _this.table_title.availability_quantity.consumption_available,
+          name: _this.table_title.availability_quantity.consumption_available,
           unit: "%",
-          info: "info_water_stress"
+          info: "info_water_stress",
+          value: available_ratio_value,
+          data: this.get_string_impact_legend(industry_impact_legend_category.available_ratio(industries[0]))
         }
-        let recycled_factor = {
+        /*let recycled_factor = {
           value: _this.table_title.availability_quantity.recycled,
           unit: "%",
           info: "info_recycled_factor"
@@ -4593,31 +5108,28 @@ export default {
         let data_chart = {
           labels: ["Recycled water factor", "Treated water factor", "Consumption available ratio"],
           datasets: []
-        };
+        };*/
 
 
-        let key = this.industry.name
-        let industries = [this.industry]
+        //let key = this.industry.name
 
-        pollutants_table.header.push({
-          text: key, value: key,
-        })
+        //pollutants_table.header.push({
+          //text: key, value: key,
+        //})
 
-        let dilution_factor_value = await metrics.dilution_factor(this.global_layers, industries)
-        dilution_factor_row[key] = dilution_factor_value
+        //dilution_factor_row[key] = dilution_factor_value
 
-        recycled_factor[key] = metrics.recycled_water_factor(industries)
+        //recycled_factor[key] = metrics.recycled_water_factor(industries)
 
-        treated_factor[key] = metrics.treated_water_factor(industries)
+        //treated_factor[key] = metrics.treated_water_factor(industries)
 
-        let available_ratio_value = await metrics.available_ratio(this.global_layers, industries)
-        available_ratio[key] = available_ratio_value
+        //available_ratio[key] = available_ratio_value
 
-        efficiency_factor[key] = metrics.efficiency_factor(industries)
+        //efficiency_factor[key] = metrics.efficiency_factor(industries)
 
         //water_quality_standards[key] = metrics.nqa(industries)
 
-        data_chart.datasets.push({
+        /*data_chart.datasets.push({
           data: [recycled_factor[key], treated_factor[key], available_ratio_value],
           label: key,
           backgroundColor: this.chooseColor(key).concat("70"),
@@ -4646,9 +5158,9 @@ export default {
         _this.quantity_chart = {
           chartData: data_chart,
           options: options
-        }
+        }*/
 
-        pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
+        //pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
 
         pollutants_table.value.push(dilution_factor_row)
         //pollutants_table.value.push(recycled_factor)
@@ -4671,38 +5183,46 @@ export default {
       if (_this.industry != null) {
 
         let pollutants_table = {
-          header: [{text: "", value: "value", sortable: false}],
+          header: [{text: "", value: "name", sortable: false},
+            {text: this.industry.name, value: "value"},
+            {text: "Unit", value: "unit", sortable: false},
+            {text: "Data Type", value: "data", sortable: false}],
           value: []
         }
 
-        let recycled_factor = {
-          value: _this.table_title.availability_quantity.recycled,
-          unit: "%",
-          info: "info_recycled_factor"
-        }
-        let efficiency_factor = {
-          value: _this.table_title.availability_quantity.specific_water_consumption,
-          unit: "tonnes/m3",
-          info: "info_specific_consumption"
-        }
-
-
-        let data_chart = {
-          labels: ["Recycled water factor", "Treated water factor", "Consumption available ratio"],
-          datasets: []
-        };
-
-        let key = this.industry.name
         let industries = [this.industry]
 
-        pollutants_table.header.push({
-          text: key, value: key,
-        })
+        let recycled_factor = {
+          name: _this.table_title.availability_quantity.recycled,
+          unit: "%",
+          info: "info_recycled_factor",
+          value: metrics.recycled_water_factor(industries),
+          data: this.get_string_impact_legend(industry_impact_legend_category.recycled_water_factor(industries[0]))
+        }
+        let efficiency_factor = {
+          name: _this.table_title.availability_quantity.specific_water_consumption,
+          unit: "tonnes/m3",
+          info: "info_specific_consumption",
+          value: metrics.efficiency_factor(industries),
+          data: this.get_string_impact_legend(industry_impact_legend_category.efficiency_factor(industries[0]))
+        }
 
-        recycled_factor[key] = metrics.recycled_water_factor(industries)
-        efficiency_factor[key] = metrics.efficiency_factor(industries)
 
-        pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
+        /*let data_chart = {
+          labels: ["Recycled water factor", "Treated water factor", "Consumption available ratio"],
+          datasets: []
+        };*/
+
+        //let key = this.industry.name
+
+        //pollutants_table.header.push({
+          //text: key, value: key,
+        //})
+
+        //recycled_factor[key] = metrics.recycled_water_factor(industries)
+        //efficiency_factor[key] = metrics.efficiency_factor(industries)
+
+        //pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
 
         pollutants_table.value.push(recycled_factor)
         pollutants_table.value.push(efficiency_factor)
@@ -4721,27 +5241,36 @@ export default {
       if (_this.industry != null) {
 
         let pollutants_table = {
-          header: [{text: "", value: "value", sortable: false}],
+          header: [{text: "", value: "name", sortable: false},
+            {text: this.industry.name, value: "value"},
+            {text: "Unit", value: "unit", sortable: false},
+            {text: "Data Type", value: "data", sortable: false}],
           value: []
         }
 
+        let industries = [this.industry]
+
+        let DataType = industry_impact_legend_category.treated_water_factor(industries[0])
+
         let treated_factor = {
-          value: _this.table_title.availability_quantity.treated,
+          name: _this.table_title.availability_quantity.treated,
           unit: "%",
-          info: "info_treated_factor"
+          info: "info_treated_factor",
+          data: this.get_string_impact_legend(DataType),
+          value: metrics.treated_water_factor(industries)
         }
 
 
-        let key = this.industry.name
-        let industries = [this.industry]
+        //let key = this.industry.name
 
-        pollutants_table.header.push({
-          text: key, value: key,
-        })
 
-        treated_factor[key] = metrics.treated_water_factor(industries)
+        //pollutants_table.header.push({
+          //text: key, value: key,
+        //})
 
-        pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
+        //treated_factor[this.industry.name] = metrics.treated_water_factor(industries)
+
+        //pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
 
         pollutants_table.value.push(treated_factor)
 
@@ -4758,28 +5287,34 @@ export default {
       if (_this.industry !== null) {
 
         let pollutants_table = {
-          header: [{text: "", value: "value", sortable: false}],
+          header: [{text: "", value: "name", sortable: false},
+            {text: this.industry.name, value: "value"},
+            {text: "Unit", value: "unit", sortable: false},
+            {text: "Data Type", value: "data", sortable: false}],
           value: []
         }
 
-        let key = this.industry.name
+        //let key = this.industry.name
         let industries = [this.industry]
 
-        pollutants_table.header.push({
-          text: key, value: key,
-        })
+        //pollutants_table.header.push({
+          //text: key, value: key,
+        //})
 
-        pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
+        //pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
 
         let efficiency = metrics.wwtp_efficiency(industries)
 
         for(let pollutant of this.industry.pollutants_selected){
+          let DataType = industry_impact_legend_category.wwtp_efficiency(industries[0], pollutant)
           let pollutant_obj = {
-            value: pollutant,
+            name: pollutant,
             unit: "%",
-            info: "info_efficiency"
+            info: "info_efficiency",
+            value: efficiency[pollutant],
+            data: this.get_string_impact_legend(DataType)
           }
-          pollutant_obj[key] = efficiency[pollutant]
+          //pollutant_obj[key] = efficiency[pollutant]
           pollutants_table.value.push(pollutant_obj)
         }
 
@@ -4796,29 +5331,36 @@ export default {
       if (_this.industry !== null) {
 
         let pollutants_table = {
-          header: [{text: "", value: "value", sortable: false}],
+          header: [{text: "", value: "name", sortable: false},
+            {text: this.industry.name, value: "value"},
+            {text: "Unit", value: "unit", sortable: false},
+            {text: "Data Type", value: "data", sortable: false}],
           value: []
         }
 
-        let key = this.industry.name
+        //let key = this.industry.name
         let industries = [this.industry]
-        pollutants_table.header.push({
-          text: key, value: key,
-        })
+        //pollutants_table.header.push({
+          //text: key, value: key,
+        //})
 
         let efficiency = metrics.amount_water_influent_cleaned(industries)
 
         for(let pollutant of this.industry.pollutants_selected){
+          let DataType = industry_impact_legend_category.amount_water_influent_cleaned(industries[0], pollutant)
           let pollutant_obj = {
-            value: pollutant,
+            name: pollutant,
             unit: "%",
-            info: "info_efficiency_influent"
+            info: "info_efficiency_influent",
+            value: efficiency[pollutant],
+            data: this.get_string_impact_legend(DataType)
+
           }
-          pollutant_obj[key] = efficiency[pollutant]
+          //pollutant_obj[key] = efficiency[pollutant]
           pollutants_table.value.push(pollutant_obj)
         }
 
-        pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
+        //pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
 
         return pollutants_table
       } else return {header: [], emissions: []}
