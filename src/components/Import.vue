@@ -249,6 +249,7 @@ import standard_industries_classification from "../standard_industrial_classific
 import {utils} from "../utils"
 import risk_thereshold from "@/risk_categories";
 import Conversion_factors from "@/conversion_factors";
+import industry_estimations from "@/industry_estimation";
 
 export default {
   name: "import_assessments",
@@ -274,7 +275,9 @@ export default {
         "wwt_cod_infl_wwtp", "wwt_tn_infl_wwtp", "wwt_tp_infl_wwtp", "wwt_diclo_infl_wwtp", "wwt_cadmium_infl_wwtp", "wwt_hexaclorobenzene_infl_wwtp", "wwt_mercury_infl_wwtp", "wwt_plomo_infl_wwtp", "wwt_niquel_infl_wwtp", "wwt_chloro_infl_wwtp", "wwt_hexaclorobutadie_infl_wwtp", "wwt_nonilfenols_infl_wwtp", "wwt_tetracloroetile_infl_wwtp", "wwt_tricloroetile_infl_wwtp",
         "wwt_cod_infl_ind", "wwt_tn_infl_ind", "wwt_tp_infl_ind", "wwt_diclo_infl_ind", "wwt_cadmium_infl_ind", "wwt_hexaclorobenzene_infl_ind", "wwt_mercury_infl_ind", "wwt_plomo_infl_ind", "wwt_niquel_infl_ind", "wwt_chloro_infl_ind", "wwt_hexaclorobutadie_infl_ind", "wwt_nonilfenols_infl_ind", "wwt_tetracloroetile_infl_ind", "wwt_tricloroetile_infl_ind",
         "wwt_cod_effl", "wwt_tn_effl", "wwt_tp_effl", "wwt_diclo_effl", "wwt_cadmium_effl", "wwt_hexaclorobenzene_effl", "wwt_mercury_effl", "wwt_plomo_effl", "wwt_niquel_effl", "wwt_chloro_effl", "wwt_hexaclorobutadie_effl", "wwt_nonilfenols_effl", "wwt_tetracloroetile_effl", "wwt_tricloroetile_effl",
-      ]
+      ],
+      pollutants_from_older_version: ["COD", "TN", "TP",  "1,2-Dichloroethane", "Cadmium", "Hexaclorobenzene", "Mercury", "Lead",
+        "Nickel", "Chloroalkanes", "Hexachlorobutadiene", "Nonylphenols", "Tetrachloroethene", "Trichloroethylene"]
     }
 
   },
@@ -891,6 +894,59 @@ export default {
       }
     },
 
+    set_level_of_certainty(industry, stepper_model){
+
+      /*
+      stepper_model == 1 ---> industry stage
+      stepper_model == 2 ---> onsite wwtp stage
+      stepper_model == 3 ---> directly discharge stage
+      stepper_model == 4 ---> external wwtp stage
+      */
+      let stage = industry    //stepper_model == 1
+      if (stepper_model == 2){
+          stage = industry.onsite_wwtp
+      }else if (stepper_model == 3){
+          stage = industry.direct_discharge
+      }else if (stepper_model == 4){
+          stage = industry.offsite_wwtp
+      }
+
+      let wwtp = null
+
+      let keys_without_level_of_certainty = new Set(['name', 'location', 'streamflow', 'water_stress', 'onsite_wwtp', 'has_onsite_wwtp', 'offsite_wwtp', 'has_offsite_wwtp',  'direct_discharge', 'has_direct_discharge', 'pollutants_selected', 'level_of_certainty', 'industry_type', 'supply_chain'])
+      let needs_pollutant = new Set(['ind_pollutants_effl', 'ind_pollutants_infl'])
+      let level_of_certainty = {}
+      Object.keys(stage).forEach(input => {
+        if (!keys_without_level_of_certainty.has(input)){
+          if(!needs_pollutant.has(input)){
+            let estimation = industry_estimations.get_estimation(input, industry, industry, stepper_model, wwtp, wwtp, null)
+            if(stage[input] == 0 || stage[input] == null || stage[input] == '' ){
+              level_of_certainty[input] = 'no_data'
+            }else if (stage[input] == estimation){
+              level_of_certainty[input] = 'estimated'
+            }else{
+              level_of_certainty[input] = 'user_data'
+            }
+          }else{
+            level_of_certainty[input] = {}
+            for (let pollutant of industry['pollutants_selected']){
+              let estimation = industry_estimations.get_estimation(input, industry, industry, stepper_model, wwtp, wwtp, pollutant)
+              if(stage[input][pollutant] == 0 || stage[input][pollutant] == null || stage[input][pollutant] == '' ){
+                level_of_certainty[input][pollutant] = 'no_data'
+              }else if (stage[input][pollutant] == estimation){
+                level_of_certainty[input][pollutant] = 'estimated'
+              }else{
+                level_of_certainty[input][pollutant] = 'user_data'
+              }
+            }
+
+          }
+        }
+      })
+      console.log(level_of_certainty)
+      return level_of_certainty
+    },
+
     //Make copy of industry (from json file to obj)
     copyIndustry(industry){
       let new_industry = new Industry()
@@ -898,11 +954,11 @@ export default {
 
       Object.keys(new_industry).forEach(key => {
 
+
         if (key != "onsite_wwtp" && key != "offsite_wwtp" && key!="direct_discharge"){
           if (industry[key] == undefined && key != "streamflow" && key != "water_stress"){
 
-            if (key == "ind_pollutants_effl"){      //ind_pollutants_effl not in imported industry (created using another version of WIAT)
-
+            if (key == "ind_pollutants_effl"){      //ind_pollutants_effl not in imported industry (created using WIAT 1.0)
                 new_industry["ind_pollutants_effl"] = {
                   COD: industry["ind_cod_effl"],
                   TN: industry["ind_tn_effl"],
@@ -921,7 +977,7 @@ export default {
                 }
               }
 
-            else if (key == "ind_pollutants_infl"){     //Find_pollutants_infl not in imported industry (created using another version of WIAT)
+            else if (key == "ind_pollutants_infl"){     //Find_pollutants_infl not in imported industry (created using WIAT 1.0)
               new_industry["ind_pollutants_infl"] = {
                 "1,2-Dichloroethane": 0,
                 Cadmium: 0,
@@ -955,14 +1011,14 @@ export default {
             }
 
             else if (key == "pollutants_selected"){
-              new_industry["pollutants_selected"] = ["COD", "TN", "TP",  "1,2-Dichloroethane", "Cadmium", "Hexaclorobenzene", "Mercury", "Lead",
-                "Nickel", "Chloroalkanes", "Hexachlorobutadiene", "Nonylphenols", "Tetrachloroethene", "Trichloroethylene"]
+              new_industry["pollutants_selected"] = this.pollutants_from_older_version
             }
+
+
 
             else {
               new_industry[key] = 0
             }
-
           }
 
           else new_industry[key] = industry[key]
@@ -970,7 +1026,6 @@ export default {
 
 
       })
-
 
       Object.keys(new_industry.onsite_wwtp).forEach(key => {
         if(key=="wwt_pollutants_infl_ind"){                   //Adapt from WIAT 1.1 version
@@ -1071,7 +1126,8 @@ export default {
             Tetrachloroethene: industry["onsite_wwtp"]["wwt_tetracloroetile_effl"],
             Trichloroethylene: industry["onsite_wwtp"]["wwt_tricloroetile_effl"]
           }
-        }else if(key=="wwt_pollutants_effl"){                   //Adapt from WIAT 1.1 version
+        }
+        else if(key=="wwt_pollutants_effl"){                   //Adapt from WIAT 1.1 version
           new_industry.offsite_wwtp.wwt_pollutants_effl = {
             COD: industry.offsite_wwtp.wwt_cod_effl,
             TN: industry["offsite_wwtp"]["wwt_tn_effl"],
@@ -1117,6 +1173,10 @@ export default {
         }
       })
 
+      //Imported from WIAT 1.0
+      if (new_industry['level_of_certainty'] == 0){
+        new_industry["level_of_certainty"] = this.set_level_of_certainty(new_industry, new_industry, 1)
+      }
 
       return new_industry
 
@@ -1166,7 +1226,6 @@ export default {
       if(Array.isArray(imported_json)){ //file from version 1.0
         return imported_json
       }else{         //file from version 1.1
-
         let general_configuration = imported_json.general_configuration
         for (let key of Object.keys(general_configuration)){
           Conversion_factors[key] = general_configuration[key]

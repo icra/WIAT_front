@@ -33,7 +33,8 @@ function merge_dicts(dicts){
 /*
 For each input of inputs, says if value has been entered by the user (1), is an estimation of WIAT (2), or has not been set (3)
  */
-function analyse_stage(inputs, industry, industry_model, stepper_model, wwtp, wwtp_model, pollutant){
+
+/*function analyse_stage(inputs, industry, industry_model, stepper_model, wwtp, wwtp_model, pollutant){
     let stage = industry    //stepper_model == 1
     if (stepper_model == 2){
         stage = industry.onsite_wwtp
@@ -57,7 +58,29 @@ function analyse_stage(inputs, industry, industry_model, stepper_model, wwtp, ww
             return 3
         }
     })
+}*/
+
+function analyse_stage(inputs, level_of_certainty_obj, pollutant=null){
+    if (level_of_certainty_obj == undefined || level_of_certainty_obj == null) return null
+    return inputs.map(input => {
+        let level_of_certainty = null
+        if (pollutant == null){
+            level_of_certainty = level_of_certainty_obj[input]
+        }else{
+            level_of_certainty = level_of_certainty_obj[input][pollutant]
+        }
+
+        if (level_of_certainty == 'user_data') return 1
+        else if (level_of_certainty == 'estimated') return 2
+        else if (level_of_certainty == 'modeled') return 3
+        else if (level_of_certainty == 'no_data') return 4
+
+
+
+
+    })
 }
+
 
 /*
 Returns 1 if all the values has been entered by the user
@@ -65,23 +88,20 @@ Returns 2 if all values are set, but at least one is estimated
 Returns 3 if at least any value is not set (or is 0)
  */
 function category_of_inputs(industry, inputs, pollutant = null){
-    let industry_model = industry
-    let wwtp_model = industry.onsite_wwtp
-    let wwtp = industry.onsite_wwtp
+
 
     let stages_evaluation = Object.keys(inputs).map(key => {
-        let stepper_model = 1   //Industry stage
+        let level_of_certainty_obj = undefined
+        if (key=='onsite_wwtp' || key=='offsite_wwtp' || key=='direct_discharge'){
+            level_of_certainty_obj = industry[key]['level_of_certainty']
+            return 0
+        }else{
+            level_of_certainty_obj = industry['level_of_certainty']   //Industry stage
+            return analyse_stage(inputs[key], level_of_certainty_obj, pollutant)
 
-        if (key=='onsite_wwtp') stepper_model = 2
-        else if (key=='offsite_wwtp') stepper_model = 3
-        else if (key=='direct_discharge') stepper_model = 4
-
-        if(stepper_model == 4){
-            wwtp_model = industry.offsite_wwtp
-            wwtp = industry.offsite_wwtp
         }
 
-        return analyse_stage(inputs[key], industry, industry_model, stepper_model, wwtp, wwtp_model, pollutant)
+        //return analyse_stage(inputs[key], level_of_certainty_obj, pollutant)
     })
     return Math.max(...stages_evaluation.flat().filter(x => x != null))
 
@@ -405,12 +425,6 @@ let inputs_required = {
             this.calculate_water_treated()
         ])
     },
-
-
-
-
-
-
 }
 
 
@@ -513,6 +527,8 @@ let industry_impact_legend_category = {
     },
     biogenic_valorized(industry){
         let inputs = inputs_required.wwt_KPI_GHG_biog_valorized();
+        //console.log(category_of_inputs(industry, inputs))
+
         return category_of_inputs(industry, inputs)
     },
     emissions_elec(industry){
@@ -584,10 +600,5 @@ let industry_impact_legend_category = {
         return category_of_inputs(industry, inputs, pollutant)
     }
 }
-
-
-
-
-
 
 export {industry_impact_legend_category}

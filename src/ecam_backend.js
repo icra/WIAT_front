@@ -68,7 +68,6 @@ export class Industry{
         this.has_onsite_wwtp = null
         this.has_offsite_wwtp = null
         this.offsite_wwtp = new WWTP()
-        this.offsite_wwtp_type = "Domestic" //Domestic or Industrial
         this.volume_withdrawn = null   //Amount of superficial water withdrawn from the wb per day(m3/day)
         this.volume_withdrawn_groundwater = 0   //Amount of groundwater water withdrawn from the wb per day(m3/day)
         this.has_direct_discharge = null
@@ -88,32 +87,9 @@ export class Industry{
         }
 
         this.pollutants_selected = ["COD", "TN", "TP"]
-
-
-        this.ind_cod_infl= 0    //Concentration of COD in the industry influent (upstream the industry)
-        this.ind_tn_infl = 0    //Concentration of TN in the industry influent (upstream the industry)
-        this.ind_tp_infl = 0    //Concentration of TP in the industry influent (upstream the industry)
-        this.ind_cod_effl= 0    //Concentration of COD in the industry effluent (before being treated by WWTP)
-        this.ind_tn_effl = 0    //Concentration of TN in the industry effluent (before being treated by WWTP)
-        this.ind_tp_effl = 0    //Concentration of TP in the industry effluent (before being treated by WWTP)
         this.product_produced = null
-
-
-
-        //Priority pollutants
-        this.ind_diclo_effl = 0 //Concentration of  1,2-Dichloroethane in the industry effluent (before being treated by WWTP)
-        this.ind_cadmium_effl = 0 //Concentration of  Cadmium in the industry effluent (water discharged after being used and treated)
-        this.ind_hexaclorobenzene_effl = 0 //Concentration of  Hexachlorobenzene in the industry effluent (before being treated by WWTP)
-        this.ind_mercury_effl = 0 //Concentration of  mercury  in the industry effluent (before being treated by WWTP)
-        this.ind_plomo_effl = 0 //Concentration of  lead in the industry effluent (before being treated by WWTP)
-        this.ind_niquel_effl = 0 //Concentration of  nickel in the industry effluent (before being treated by WWTP)
-        this.ind_chloro_effl = 0 //Concentration of  chloroalkanes in the industry effluent (before being treated by WWTP)
-        this.ind_hexaclorobutadie_effl = 0 //Concentration of  Hexachlorobutadiene in the industry before being treated by WWTP)
-        this.ind_nonilfenols_effl = 0 //Concentration of  Nonylphenols in the industry effluent (before being treated by WWTP)
-        this.ind_tetracloroetile_effl = 0 //Concentration of  tetrachloroethene in the industry effluent (before being treated by WWTP)
-        this.ind_tricloroetile_effl = 0 //Concentration of  Trichloroethylene in the industry effluent (before being treated by WWTP)
-
         this.supply_chain = []  //Suppliers
+        this.level_of_certainty = {}
 
     }
     //emissions from biogenic emissions
@@ -572,10 +548,9 @@ export class WWTP{
         this.wwt_trck_typ = 0; //Option | fuel type
         this.wwt_vol_tslu = 0; //L | volume of fuel
     }
-
     /*
-  GHG emissions (kgCO2eq)
-*/
+    GHG emissions (kgCO2eq)
+    */
     //total GHG emissions deglossed by use
     wwt_KPI_GHG(){
 

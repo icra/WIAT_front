@@ -4374,8 +4374,11 @@ export default {
           unit: "kgCO2eq/day",
           info: "info_biogas_flared",
           value: emissions["flared"],
-          data: this.getDataTypeColor(industry_impact_legend_category.biogenic_flared(industries[0]))
+          data: this.get_string_impact_legend(industry_impact_legend_category.biogenic_flared(industries[0]))
+          //data: this.getDataTypeColor(industry_impact_legend_category.biogenic_flared(industries[0]))
+
         }
+
         let valorized = {
           name: _this.table_title.global_warming_potential.biogas_valorized,
           unit: "kgCO2eq/day",
