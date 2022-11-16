@@ -4061,21 +4061,21 @@ export default {
           unit: "kgCO2eq/day",
           info: "co2_ghg_ratio_info",
           value: emissions["co2"],
-          data: "ID"
+          data: this.get_string_impact_legend(industry_impact_legend_category.emissions_and_descriptions(industries[0]))
         }
         let ch4 = {
           name: "CH4 emissions",
           unit: "kgCO2eq/day",
           info: "ch4_ghg_ratio_info",
           value: emissions["ch4"],
-          data: "ID"
+          data: this.get_string_impact_legend(industry_impact_legend_category.emissions_and_descriptions(industries[0]))
         }
         let n2o = {
           name: "N2O emissions",
           unit: "kgCO2eq/day",
           info: "n2o_ghg_ratio_info",
           value: emissions["n2o"],
-          data: "ID"
+          data: this.get_string_impact_legend(industry_impact_legend_category.emissions_and_descriptions(industries[0]))
         }
 
         //let key = this.industry.name
@@ -4174,49 +4174,49 @@ export default {
           unit: "kgCO2eq/day",
           info: "info_sludge_management",
           value: emissions["storage"],
-          data: this.getDataTypeColor(industry_impact_legend_category.sludge_storage(industries[0]))
+          data: this.get_string_impact_legend(industry_impact_legend_category.sludge_storage(industries[0]))
         }
         let composting = {
           name: "Sludge composted",
           unit: "kgCO2eq/day",
           info: "info_sludge_management",
           value: emissions["composting"],
-          data: this.getDataTypeColor(industry_impact_legend_category.sludge_composting(industries[0]))
+          data: this.get_string_impact_legend(industry_impact_legend_category.sludge_composting(industries[0]))
         }
         let incineration = {
           name: "Sludge incineration",
           unit: "kgCO2eq/day",
           info: "info_sludge_management",
           value: emissions["incineration"],
-          data: this.getDataTypeColor(industry_impact_legend_category.sludge_incineration(industries[0]))
+          data: this.get_string_impact_legend(industry_impact_legend_category.sludge_incineration(industries[0]))
         }
         let land_application = {
           name: "Land application of sludge",
           unit: "kgCO2eq/day",
           info: "info_sludge_management",
           value: emissions["land_application"],
-          data: this.getDataTypeColor(industry_impact_legend_category.sludge_land_application(industries[0]))
+          data: this.get_string_impact_legend(industry_impact_legend_category.sludge_land_application(industries[0]))
         }
         let landfilling = {
           name: "Emissions from landfilled biosolids",
           unit: "kgCO2eq/day",
           info: "info_sludge_management",
           value: emissions["landfilling"],
-          data: this.getDataTypeColor(industry_impact_legend_category.sludge_landfilling(industries[0]))
+          data: this.get_string_impact_legend(industry_impact_legend_category.sludge_landfilling(industries[0]))
         }
         let stockpilling = {
           name: "Sludge stockpiling",
           unit: "kgCO2eq/day",
           info: "info_sludge_management",
           value: emissions["landfilling"],
-          data: this.getDataTypeColor(industry_impact_legend_category.sludge_stockpilling(industries[0]))
+          data: this.get_string_impact_legend(industry_impact_legend_category.sludge_stockpilling(industries[0]))
         }
         let transport = {
           name: "Sludge transport off-site",
           unit: "kgCO2eq/day",
           info: "info_sludge_management",
           value: emissions["sludge_transport"],
-          data: this.getDataTypeColor(industry_impact_legend_category.sludge_transport(industries[0]))
+          data: this.get_string_impact_legend(industry_impact_legend_category.sludge_transport(industries[0]))
         }
 
 
@@ -4374,14 +4374,14 @@ export default {
           unit: "kgCO2eq/day",
           info: "info_biogas_flared",
           value: emissions["flared"],
-          data: this.getDataTypeColor(industry_impact_legend_category.biogenic_flared(industries[0]))
+          data: this.get_string_impact_legend(industry_impact_legend_category.biogenic_flared(industries[0]))
         }
         let valorized = {
           name: _this.table_title.global_warming_potential.biogas_valorized,
           unit: "kgCO2eq/day",
           info: "info_biogas_valorised",
           value: emissions["valorized"],
-          data: this.getDataTypeColor(industry_impact_legend_category.biogenic_valorized(industries[0]))
+          data: this.get_string_impact_legend(industry_impact_legend_category.biogenic_valorized(industries[0]))
         }
         //let key = this.industry.name
 

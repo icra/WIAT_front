@@ -491,7 +491,7 @@ let industry_impact_legend_category = {
         )
     },
     emissions_and_descriptions(industry) {
-        let inputs = this.wwt_KPI_GHG_deglossed();
+        let inputs = inputs_required.wwt_KPI_GHG_deglossed();
         return Math.max(
             category_of_inputs(industry, inputs, "COD"),
             category_of_inputs(industry, inputs, "TN")
