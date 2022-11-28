@@ -55,7 +55,8 @@
           </div>
         </v-col>
         <!-- Response -->
-        <v-col cols="3">
+        <v-col
+            :cols="keys_without_level_of_certainty.has(industry_input) ? 5 : 3">
           <div>
             <div>
               <span v-if="type_option[industry_input]">
@@ -87,9 +88,10 @@
           <v-select
               label="Level of certainty"
               :items = level_of_certainty
-              v-model="industry_level_of_certainty[industry_input]"
+              v-model="industry_model.level_of_certainty[industry_input]"
               item-text="text"
               item-value="key"
+              v-if="!keys_without_level_of_certainty.has(industry_input)"
           ></v-select>
 
         </v-col>
@@ -100,7 +102,7 @@
       >
         <v-col cols="12">
           <v-combobox
-              v-model="model_selected_pollutants"
+              v-model="model_selected_pollutants_data"
               :items="items_selected_pollutants"
               :search-input.sync="search_pollutant"
               hide-selected
@@ -191,7 +193,7 @@
           <v-select
               label="Level of certainty"
               :items = level_of_certainty
-              v-model="industry_level_of_certainty[industry_input][pollutant]"
+              v-model="industry_model.level_of_certainty[industry_input][pollutant]"
               item-text="text"
               item-value="key"
           ></v-select>
@@ -251,7 +253,7 @@
                 <v-select
                     label="Level of certainty"
                     :items = level_of_certainty
-                    v-model="industry_level_of_certainty[industry_input][pollutant]"
+                    v-model="industry_model.level_of_certainty[industry_input][pollutant]"
                     item-text="text"
                     item-value="key"
                 ></v-select>
@@ -271,14 +273,16 @@
 <script>
 
 import { updatedDiff } from 'deep-object-diff';
+import {level_of_certainty} from "@/level_of_certainty";
 
 export default {
   name: "industry_questionnaire",
   props: [ 'array_intersection', 'industry_inputs', 'basic_inputs', 'user_inputs', 'required',
     'button_estimations', 'select_estimation', 'type_option', 'industry_model', 'required_item_select_rule',
   'items_selected_pollutants', 'search_pollutant', 'onChangeCombobox', 'model_selected_pollutants', 'button_estimation', 'array_difference',
-    'remove_chip', 'required_item_text_rule', 'industry_level_of_certainty'],
+    'remove_chip', 'required_item_text_rule', 'stepper_model'],
   data(){
+    let _this = this
     return {
       level_of_certainty: [
         { text: 'User data', key: 'user_data' },
@@ -286,34 +290,11 @@ export default {
         { text: 'Modeled', key: 'modeled' },
         { text: 'No data', key: 'no_data' },
       ],
+      keys_without_level_of_certainty: level_of_certainty.keys_without_level_of_certainty,
+      model_selected_pollutants_data: _this.model_selected_pollutants
     }
   },
 
-  methods: {
-    update_level_of_certainty(input, pollutant = null){
-
-      if (input == "ind_pollutants_effl" || input == "ind_pollutants_infl"){
-        let estimation = this.button_estimations(input, pollutant)
-        if(this.industry_model[input][pollutant] == 0 || this.industry_model[input][pollutant] == null || this.industry_model[input][pollutant] == '' ){
-          this.industry_level_of_certainty[input][pollutant] = 'no_data'
-        }else if (this.industry_model[input][pollutant] == estimation){
-          this.industry_level_of_certainty[input][pollutant] = 'estimated'
-        }else{
-          this.industry_level_of_certainty[input][pollutant] = 'user_data'
-        }
-      }
-      else {
-        let estimation = this.button_estimations(input)
-        if(this.industry_model[input] == 0 || this.industry_model[input] == null || this.industry_model[input] == '' ){
-          this.industry_level_of_certainty[input] = 'no_data'
-        }else if (this.industry_model[input] == estimation){
-          this.industry_level_of_certainty[input] = 'estimated'
-        }else{
-          this.industry_level_of_certainty[input] = 'user_data'
-        }
-      }
-    }
-  },
   computed:{
     clonedIndustry: function(){
       return JSON.parse(JSON.stringify(this.industry_model))
@@ -328,7 +309,7 @@ export default {
         pollutant = Object.keys(value_diff)[0]
       }
 
-      this.update_level_of_certainty(input_diff, pollutant)
+      level_of_certainty.update_level_of_certainty(this.industry_model, this.industry_model, this.stepper_model, input_diff, pollutant )
     },
   }
 

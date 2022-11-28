@@ -4,6 +4,7 @@
 */
 import {utils} from "./utils"
 import Countries from "./countries"
+import {level_of_certainty} from "@/level_of_certainty";
 
 //sum array of numbers
 Array.prototype.sum=function(){return this.reduce((p,c)=>(parseFloat(p)+parseFloat(c)),0)};
@@ -64,14 +65,11 @@ export class Industry{
         this.location = null
         this.streamflow = null
         this.water_stress = null
-        this.onsite_wwtp = new WWTP()
         this.has_onsite_wwtp = null
         this.has_offsite_wwtp = null
-        this.offsite_wwtp = new WWTP()
         this.volume_withdrawn = null   //Amount of superficial water withdrawn from the wb per day(m3/day)
         this.volume_withdrawn_groundwater = 0   //Amount of groundwater water withdrawn from the wb per day(m3/day)
         this.has_direct_discharge = null
-        this.direct_discharge = new Direct_discharge()
         this.industry_type = null
 
         this.ind_pollutants_effl = { //Concentration of pollutants in the industry effluent (before being treated by WWTP)
@@ -89,7 +87,14 @@ export class Industry{
         this.pollutants_selected = ["COD", "TN", "TP"]
         this.product_produced = null
         this.supply_chain = []  //Suppliers
-        this.level_of_certainty = {}
+
+        this.level_of_certainty = level_of_certainty.set_level_of_certainty(this, 1, true)
+        //this.level_of_certainty = {}
+
+        this.direct_discharge = new Direct_discharge(this)
+        this.onsite_wwtp = new WWTP(2, this)
+        this.offsite_wwtp = new WWTP(4, this)
+
 
     }
     //emissions from biogenic emissions
@@ -161,14 +166,17 @@ export class Industry{
             wwtp.wwt_pollutants_infl_wwtp[pollutant] = 0
             if (!wwtp.wwt_pollutants_effl.hasOwnProperty(pollutant)) wwtp.wwt_pollutants_effl[pollutant] = 0
         }
+        //wwtp.level_of_certainty['wwt_pollutants_infl_ind'] = JSON.parse(JSON.stringify(this.level_of_certainty["ind_pollutants_effl"]))
 
         if(this.has_offsite_wwtp != 1)  wwtp.wwt_vol_treated_external = 0
+        wwtp["level_of_certainty"] = level_of_certainty.set_level_of_certainty(this, 2)
+
 
     }
 
     //Set onsite WWTP default values
     reset_onsite_wwtp(){
-        this.onsite_wwtp = new WWTP()
+        this.onsite_wwtp = new WWTP(2, this)
     }
 
     //Update directly discharged water
@@ -178,11 +186,15 @@ export class Industry{
         for (let pollutant of this.pollutants_selected){
             direct_discharge.wwt_pollutants_effl[pollutant] = this.ind_pollutants_effl[pollutant]
         }
+        //direct_discharge.level_of_certainty['wwt_pollutants_effl'] = JSON.parse(JSON.stringify(this.level_of_certainty["ind_pollutants_effl"]))
+        direct_discharge["level_of_certainty"] = level_of_certainty.set_level_of_certainty(this, 3)
+
+
     }
 
     //Set directly discharged water default values
     reset_direct_discharge(){
-        this.direct_discharge = new Direct_discharge()
+        this.direct_discharge = new Direct_discharge(this)
     }
 
     //Update offsite wwtp if industry or connected onsite WWTP has changed
@@ -201,25 +213,18 @@ export class Industry{
 
         wwtp.wwt_vol_from_external = _this.has_onsite_wwtp == 1 ? onsite_wwtp.wwt_vol_treated_external : 0
 
+        /*wwtp.level_of_certainty['wwt_pollutants_infl_ind'] = JSON.parse(JSON.stringify(this.level_of_certainty["ind_pollutants_effl"]))
+        if (_this.has_onsite_wwtp == 1){
+            wwtp.level_of_certainty['wwt_pollutants_infl_wwtp'] = JSON.parse(JSON.stringify(this.onsite_wwtp.level_of_certainty["wwt_pollutants_effl"]))
+        }*/
+        wwtp["level_of_certainty"] = level_of_certainty.set_level_of_certainty(this, 4)
 
-        /*
-        let offsite_and_onsite_inputs = [["wwt_cod_infl_wwtp", "wwt_cod_effl"],["wwt_tn_infl_wwtp", "wwt_tn_effl"], ["wwt_tp_infl_wwtp", "wwt_tp_effl"], ["wwt_diclo_infl_wwtp", "wwt_diclo_effl"], ["wwt_cadmium_infl_wwtp", "wwt_cadmium_effl"],
-            ["wwt_hexaclorobenzene_infl_wwtp", "wwt_hexaclorobenzene_effl"], ["wwt_mercury_infl_wwtp", "wwt_mercury_effl"], ["wwt_plomo_infl_wwtp", "wwt_plomo_effl"], ["wwt_niquel_infl_wwtp", "wwt_niquel_effl"], ["wwt_chloro_infl_wwtp", "wwt_chloro_effl"],
-            ["wwt_hexaclorobutadie_infl_wwtp", "wwt_hexaclorobutadie_effl"], ["wwt_nonilfenols_infl_wwtp", "wwt_nonilfenols_effl"], ["wwt_tetracloroetile_infl_wwtp", "wwt_tetracloroetile_effl"], ["wwt_tricloroetile_infl_wwtp", "wwt_tricloroetile_effl"],
-            ["wwt_vol_from_external", "wwt_vol_treated_external"]]
-
-
-        offsite_and_onsite_inputs.forEach(input => {
-            let offsite_input = input[0]
-            let onsite_input = input[1]
-            wwtp[offsite_input] = _this.has_onsite_wwtp == 1 ? onsite_wwtp[onsite_input] : 0
-        })*/
 
     }
 
     //Set offsite WWTP default values
     reset_offsite_wwtp(){
-        this.offsite_wwtp = new WWTP()
+        this.offsite_wwtp = new WWTP(4, this)
     }
 
 
@@ -380,7 +385,9 @@ export class Industry{
 
 export class Direct_discharge{
 
-    constructor(){
+    constructor(industry = null, set_level_of_certainty = true){
+        this.level_of_certainty = {}
+
         this.wwt_pollutants_effl = {
             COD: 0,
             TN: 0,
@@ -390,6 +397,10 @@ export class Direct_discharge{
         this.dd_vol_disc = null
         this.wwt_ch4_efac_dis = 0
         this.wwt_n2o_efac_dis = 0
+
+        if (set_level_of_certainty) this.level_of_certainty = level_of_certainty.set_level_of_certainty(industry, 3, true)
+        else this.level_of_certainty = {}
+
     }
 
     /*
@@ -437,9 +448,12 @@ export class Direct_discharge{
 };  //Direct discharge
 
 export class WWTP{
-    constructor(){
+    //if step==2, onsite WWTP, if step == 4 external WWTP
+    constructor(step, industry = null, set_level_of_certainty = true){
 
         this.location = null
+        if (industry != null) this.location = industry.location
+
         this.wwt_treatment_type = 0
         this.wwt_vol_trea = null            //Amount of water treated by WWTP
         this.wwt_vol_disc = null            //Amount of water discharged by WWTP
@@ -547,6 +561,11 @@ export class WWTP{
         //sludge truck transport
         this.wwt_trck_typ = 0; //Option | fuel type
         this.wwt_vol_tslu = 0; //L | volume of fuel
+
+        if (set_level_of_certainty) this.level_of_certainty = level_of_certainty.set_level_of_certainty(industry, step, true)
+        else this.level_of_certainty = {}
+
+
     }
     /*
     GHG emissions (kgCO2eq)
@@ -610,7 +629,6 @@ export class WWTP{
         let tn_infl_ind = this.wwt_pollutants_infl_ind["TN"]
         let cod_infl_wwtp = this.wwt_pollutants_infl_wwtp["COD"]
         let tn_infl_wwtp = this.wwt_pollutants_infl_wwtp["TN"]
-
 
         let cod_load = cod_infl_ind*this.wwt_vol_trea + this.wwt_vol_from_external*cod_infl_wwtp
         let tn_load = tn_infl_ind*this.wwt_vol_trea + this.wwt_vol_from_external*tn_infl_wwtp

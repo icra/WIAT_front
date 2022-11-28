@@ -105,9 +105,8 @@
               :button_estimation = button_estimation
               :array_difference = array_difference
               :remove_chip = remove_chip
-              :industry_level_of_certainty = industry_level_of_certainty
-
-
+              :stepper_model = 1
+              ref="industry_questionnaire"
 
           />
           <br>
@@ -131,8 +130,149 @@
 
         </v-stepper-content>  <!-- Industry -->
 
+        <v-stepper-content step="2" >
+          <Wwtp_questionnaire
+              :industry = industry
+              :stepper_model = 2
+              :array_intersection = array_intersection
+              :array_difference = array_difference
+              :wwtp_inputs = onsite_wwtp_inputs
+              :basic_inputs = basic_inputs
+              :user_inputs = user_inputs
+              :required = required
+              :button_estimation = button_estimation
+              :select_estimation = select_estimation
+              :type_option = type_option
+              :wwtp_model = onsite_wwtp_model
+              :button_estimations = button_estimations
+              :select_estimations = select_estimations
+              :advanced_truck_transportation = advanced_truck_transportation
+              :advanced_stockpiling = advanced_stockpiling
+              :advanced_landfilling = advanced_landfilling
+              :advanced_application = advanced_application
+              :advanced_sludge_incineration = advanced_sludge_incineration
+              :advanced_sludge_composting = advanced_sludge_composting
+              :advanced_sludge_storage = advanced_sludge_storage
+              :advanced_water_reuse_trucks = advanced_water_reuse_trucks
+              :advanced_biogas_from_anaerobic = advanced_biogas_from_anaerobic
+              :advanced_fuel_engines = advanced_fuel_engines
+              :model_selected_pollutants = model_selected_pollutants
 
-          <v-stepper-content step="5">
+
+          ></Wwtp_questionnaire>
+
+          <br>
+          <v-tooltip bottom :disabled="!tab_2_disabled">
+            <template v-slot:activator="{ on }">
+              <div v-on="on" class="d-inline-block">
+                <v-btn
+                    @click="tab_2_continue"
+                    :disabled="tab_2_disabled"
+                    tile
+                    color="#b62373"
+
+                >
+                  SAVE AND CONTINUE
+                </v-btn>
+              </div>
+            </template>
+            <span>Please, fill in the required items before continue.</span>
+          </v-tooltip>
+
+        </v-stepper-content> <!-- Onsite WWTP -->
+
+        <v-stepper-content step="3" >
+
+          <direct_discharge_questionnaire
+              :industry = industry
+              :stepper_model = 3
+              :model = direct_discharge_model
+              :direct_discharge_inputs = direct_discharge_inputs
+              :user_inputs = user_inputs
+              :required = required
+              :button_estimation = button_estimation
+              :select_estimation = select_estimation
+              :type_option = type_option
+              :select_estimations = select_estimations
+              :button_estimations = button_estimations
+
+          />
+
+
+          <v-tooltip bottom :disabled="!tab_3_disabled">
+            <template v-slot:activator="{ on }">
+              <div v-on="on" class="d-inline-block">
+                <v-btn
+                    @click="tab_3_continue"
+                    :disabled="tab_3_disabled"
+                    tile
+                    color="#b62373"
+
+                >
+                  SAVE AND CONTINUE
+                </v-btn>
+              </div>
+            </template>
+            <span>Please, fill in the required items before continue.</span>
+          </v-tooltip>
+
+        </v-stepper-content>  <!-- Direct discharge -->
+
+        <v-stepper-content step="4">  <!-- Offsite WWTP -->
+
+          <Wwtp_questionnaire
+              :industry = industry
+              :stepper_model = 4
+              :array_intersection = array_intersection
+              :array_difference = array_difference
+              :wwtp_inputs = offsite_wwtp_inputs
+              :basic_inputs = basic_inputs
+              :user_inputs = user_inputs
+              :required = required
+              :button_estimation = button_estimation
+              :select_estimation = select_estimation
+              :type_option = type_option
+              :wwtp_model = offsite_wwtp_model
+              :button_estimations = button_estimations
+              :select_estimations = select_estimations
+              :advanced_truck_transportation = advanced_truck_transportation
+              :advanced_stockpiling = advanced_stockpiling
+              :advanced_landfilling = advanced_landfilling
+              :advanced_application = advanced_application
+              :advanced_sludge_incineration = advanced_sludge_incineration
+              :advanced_sludge_composting = advanced_sludge_composting
+              :advanced_sludge_storage = advanced_sludge_storage
+              :advanced_water_reuse_trucks = advanced_water_reuse_trucks
+              :advanced_biogas_from_anaerobic = advanced_biogas_from_anaerobic
+              :advanced_fuel_engines = advanced_fuel_engines
+              :model_selected_pollutants = model_selected_pollutants
+
+
+          ></Wwtp_questionnaire>
+
+
+          <v-tooltip bottom :disabled="!tab_4_disabled">
+            <template v-slot:activator="{ on }">
+              <div v-on="on" class="d-inline-block">
+                <v-btn
+                    @click="tab_4_continue"
+                    :disabled="tab_4_disabled"
+                    tile
+                    color="#b62373"
+
+                >
+                  SAVE AND CONTINUE
+                </v-btn>
+              </div>
+            </template>
+            <span>Please, fill in the required items before continue.</span>
+          </v-tooltip>
+
+        </v-stepper-content>
+
+
+
+        <v-stepper-content step="5">
 
             <h3>
               You have finished entering all the required data, but you can continue editing them if you wish.
@@ -247,13 +387,17 @@ import {utils, metrics} from "../utils"
 import standard_industries_classification from "../standard_industrial_classification"
 import Countries from "@/countries";
 import conversion_factors from "@/conversion_factors";
-import industry_estimations from "@/industry_estimation"
+import {industry_estimations} from "@/industry_estimation"
 import Industry_questionnaire from "@/components/industry_questionnaire";
+import Wwtp_questionnaire from "@/components/wwtp_questionnaire";
+import Direct_discharge_questionnaire from "@/components/direct_discharge_questionnaire";
 
 export default {
   name: "new_assessment",
   props: ['assessment_id', 'industry_id'],
   components: {
+    Direct_discharge_questionnaire,
+    Wwtp_questionnaire,
     Industry_questionnaire,
     Industry,
     Assessment,
@@ -312,7 +456,7 @@ export default {
       advanced_fuel_engines: ["wwt_fuel_typ", "wwt_vol_fuel"],
       advanced_biogas_from_anaerobic: ["wwt_biog_pro", "wwt_biog_fla", "wwt_biog_val", "wwt_biog_lkd", "wwt_biog_sold", "wwt_ch4_biog", "wwt_dige_typ", "wwt_fuel_dig"],
       advanced_water_reuse_trucks: ["wwt_reus_trck_typ", "wwt_reus_vol_trck"],
-      advanced_sludge_Storage: ["wwt_mass_slu_sto", "wwt_time_slu_sto", "wwt_slu_sto_TVS", "wwt_slu_sto_f_CH4", "wwt_slu_sto_EF",],
+      advanced_sludge_storage: ["wwt_mass_slu_sto", "wwt_time_slu_sto", "wwt_slu_sto_TVS", "wwt_slu_sto_f_CH4", "wwt_slu_sto_EF",],
       advanced_sludge_composting: ["wwt_mass_slu_comp", "wwt_slu_comp_emis_treated_or_piles_covered", "wwt_slu_comp_solids_content", "wwt_slu_comp_TVS", "wwt_slu_comp_N_cont", "wwt_slu_comp_low_CN_EF", "wwt_slu_comp_uncovered_pile_EF", "wwt_slu_comp_seqst_rate",],
       advanced_sludge_incineration: ["wwt_mass_slu_inc", "wwt_temp_inc", "wwt_slu_inc_N_cont", "wwt_slu_inc_SNCR"],
       advanced_application: ["wwt_mass_slu_app", "wwt_slu_la_solids_content", "wwt_slu_la_TVS", "wwt_slu_la_N_cont", "wwt_slu_la_EF",],
@@ -323,7 +467,6 @@ export default {
 
       required: ["volume_withdrawn", "product_produced", "has_onsite_wwtp", "has_offsite_wwtp", "has_direct_discharge", "industry_type", "wwt_vol_trea", "wwt_vol_disc", "dd_vol_disc" ],
       industry_model: {},
-      industry_level_of_certainty: {},
       onsite_wwtp_model: {},
       direct_discharge_model: {},
       offsite_wwtp_model: {},
@@ -341,43 +484,10 @@ export default {
 
     if (this.industry === undefined) this.$router.push('/')
 
-    for (let industry_input of this.industry_inputs) {
-
-      //Vars stored as object, for example industry[input][pollutant]
-      if (industry_input == "ind_pollutants_effl" || industry_input == "ind_pollutants_infl"){
-        this.$set(this.industry_model, industry_input, Object.assign({}, this.industry[industry_input]))  //Deep copy
-
-        //Input stored in industry[level_of_certainty]
-        if (this.industry.level_of_certainty.hasOwnProperty(industry_input)){
-          this.$set(this.industry_level_of_certainty, industry_input, Object.assign({}, this.industry.level_of_certainty[industry_input]))
-        }
-      }else {
-
-        //industry[input]
-        this.$set(this.industry_model, industry_input, this.industry[industry_input])
-        if (this.industry.level_of_certainty.hasOwnProperty(industry_input)){
-          this.$set(this.industry_level_of_certainty, industry_input, this.industry.level_of_certainty[industry_input])
-        }
-      }
-    }
-
-    for (let input of this.direct_discharge_inputs) {
-      this.$set(this.direct_discharge_model, input, this.industry.direct_discharge[input])
-    }
-    for (let input of this.offsite_wwtp_inputs) {
-      if (input == "wwt_pollutants_effl"){  //Deep copy of variables  that are objects
-        this.$set(this.offsite_wwtp_model, input, Object.assign({}, this.industry.offsite_wwtp[input]))
-      }else this.$set(this.offsite_wwtp_model, input, this.industry.offsite_wwtp[input])
-
-    }
-    for (let input of this.onsite_wwtp_with_offsite_wwtp_inputs) {
-      if (input == "wwt_pollutants_effl"){  //Deep copy of variables  that are objects
-        this.$set(this.onsite_wwtp_model, input, Object.assign({}, this.industry.onsite_wwtp[input]))
-      }else this.$set(this.onsite_wwtp_model, input, this.industry.onsite_wwtp[input])
-    }
-
-
-
+    this.industry_to_model()
+    this.direct_discharge_to_model()
+    this.offsite_wwtp_to_model()
+    this.onsite_wwtp_to_model()
   },
   watch: {
 
@@ -436,32 +546,71 @@ export default {
       location.href = "#top";
 
 
-      for (let industry_input of this.industry_inputs) {
-        this.industry_model[industry_input] = this.industry[industry_input]
-      }
-      for (let input of this.direct_discharge_inputs) {
-        this.direct_discharge_model[input] = this.industry.direct_discharge[input]
-      }
-      for (let input of this.offsite_wwtp_inputs) {
-        this.offsite_wwtp_model[input] = this.industry.offsite_wwtp[input]
-      }
-      for (let input of this.onsite_wwtp_with_offsite_wwtp_inputs) {
-        this.onsite_wwtp_model[input] = this.industry.onsite_wwtp[input]
-      }
-
-      this.model_selected_pollutants = industry.pollutants_selected
-
       this.stepper_model = 1
+
+      this.model_selected_pollutants.splice(0, this.model_selected_pollutants.length, ...this.industry.pollutants_selected)
+
+      console.log(this.model_selected_pollutants)
+
+      this.industry_to_model()
+      this.direct_discharge_to_model()
+      this.offsite_wwtp_to_model()
+      this.onsite_wwtp_to_model()
 
     },
   },
 
   methods: {
 
-    //Change in pollutant selecto
+    industry_to_model(){
+      for (let industry_input of [...this.industry_inputs, 'level_of_certainty']) {
+
+        //Vars stored as object, for example industry[input][pollutant]
+        if (industry_input == "ind_pollutants_effl" || industry_input == "ind_pollutants_infl" || industry_input == "level_of_certainty"){
+          this.$set(this.industry_model, industry_input, JSON.parse(JSON.stringify(this.industry[industry_input])))  //Deep copy
+        }else {
+          //industry[input]
+          this.$set(this.industry_model, industry_input, this.industry[industry_input])
+
+        }
+      }
+    },
+    onsite_wwtp_to_model(){
+      for (let input of ['level_of_certainty', ...this.onsite_wwtp_with_offsite_wwtp_inputs]) {
+        if (input == "wwt_pollutants_effl" || input == "level_of_certainty"){  //Deep copy of variables  that are objects
+          if (this.industry.onsite_wwtp[input] !== undefined) {
+            this.$set(this.onsite_wwtp_model, input, JSON.parse(JSON.stringify(this.industry.onsite_wwtp[input])))
+          }
+        }
+        else this.$set(this.onsite_wwtp_model, input, this.industry.onsite_wwtp[input])
+      }
+    },
+    direct_discharge_to_model(){
+      for (let input of ['level_of_certainty', ...this.direct_discharge_inputs]) {
+        if (input == "level_of_certainty"){  //Deep copy of variables  that are objects
+          if (this.industry.direct_discharge[input] !== undefined) {
+            this.$set(this.direct_discharge_model, input, JSON.parse(JSON.stringify(this.industry.direct_discharge[input])))
+          }
+        }
+        else this.$set(this.direct_discharge_model, input, this.industry.direct_discharge[input])
+      }
+    },
+    offsite_wwtp_to_model(){
+      for (let input of ['level_of_certainty', ...this.offsite_wwtp_inputs]) {
+        if (input == "wwt_pollutants_effl" || input == "level_of_certainty"){  //Deep copy of variables  that are objects
+          if (this.industry.offsite_wwtp[input] !== undefined){
+            this.$set(this.offsite_wwtp_model, input, JSON.parse(JSON.stringify(this.industry.offsite_wwtp[input])))
+          }
+        }else this.$set(this.offsite_wwtp_model, input, this.industry.offsite_wwtp[input])
+
+      }
+
+    },
+
+    //Change in pollutant select
     onChangeCombobox(items){
 
-      //Prevent users deleteing COD, TN or TP
+      //Prevent users deleting COD, TN or TP
       if(!items.includes("COD")){
         this.model_selected_pollutants.splice(0, 0, "COD");
         return
@@ -548,13 +697,16 @@ export default {
     tab_4_continue(){
       this.scrollToTop()
 
-      for(let input of this.offsite_wwtp_inputs){
+      for(let input of ['level_of_certainty', ...this.offsite_wwtp_inputs]){
         if((!isNaN(this.offsite_wwtp_model[input]) || this.offsite_wwtp_model[input]!="") && this.offsite_wwtp_model[input]>=0) this.industry.offsite_wwtp[input] = Number(this.offsite_wwtp_model[input])
         else if (input == "wwt_pollutants_effl") {
           this.industry.offsite_wwtp[input] = {}
           for (let pollutant of this.model_selected_pollutants){
             this.industry.offsite_wwtp[input][pollutant] = this.offsite_wwtp_model[input][pollutant]
           }
+        }
+        else if (input == "level_of_certainty") {
+          this.industry.offsite_wwtp[input] = JSON.parse(JSON.stringify(this.offsite_wwtp_model[input]))
         }
       }
 
@@ -569,6 +721,8 @@ export default {
         if((!isNaN(this.direct_discharge_model[input] ) || this.direct_discharge_model[input]!="") && this.direct_discharge_model[input]>=0) this.industry.direct_discharge[input] = Number(this.direct_discharge_model[input])
       }
 
+      this.industry.direct_discharge['level_of_certainty'] = JSON.parse(JSON.stringify(this.direct_discharge_model['level_of_certainty']))
+
       if(this.industry.has_offsite_wwtp == 1) {
         this.stepper_model = 4
       }
@@ -578,13 +732,15 @@ export default {
     tab_2_continue(){
       this.scrollToTop()
 
-      for(let input of this.onsite_wwtp_inputs){
+      for(let input of ['level_of_certainty', ...this.onsite_wwtp_inputs]){
         if((!isNaN(this.onsite_wwtp_model[input]) || this.onsite_wwtp_model[input]!="") && this.onsite_wwtp_model[input]>=0) this.industry.onsite_wwtp[input] = Number(this.onsite_wwtp_model[input])
         else if (input == "wwt_pollutants_effl") {
           this.industry.onsite_wwtp[input] = {}
           for (let pollutant of this.model_selected_pollutants){
             this.industry.onsite_wwtp[input][pollutant] = this.onsite_wwtp_model[input][pollutant]
           }
+        } else if (input == "level_of_certainty") {
+          this.industry.onsite_wwtp[input] = JSON.parse(JSON.stringify(this.onsite_wwtp_model[input]))
         }
       }
 
@@ -602,15 +758,20 @@ export default {
     tab_1_continue(){
       this.scrollToTop()
 
+
+      let selected_pollutants = JSON.parse(JSON.stringify(this.$refs.industry_questionnaire.model_selected_pollutants_data))
+
       //Industry inputs
-      for(let input of this.industry_inputs){
+      for(let input of ['level_of_certainty', ...this.industry_inputs]){
         if((!isNaN(this.industry_model[input]) || this.industry_model[input]!="") &&  this.industry_model[input]>=0) this.industry[input] = Number(this.industry_model[input])
+
         else if (input == "ind_pollutants_effl") {
           this.industry['ind_pollutants_effl'] = {}
           for (let pollutant of this.model_selected_pollutants){
             this.industry['ind_pollutants_effl'][pollutant] = this.industry_model['ind_pollutants_effl'][pollutant]
           }
         }
+
         else if (input == "ind_pollutants_infl") {
           this.industry['ind_pollutants_infl'] = {}
           for (let pollutant of this.model_selected_pollutants){
@@ -618,12 +779,15 @@ export default {
           }
         }
 
+        else if (input == "level_of_certainty") {
+          this.industry[input] = JSON.parse(JSON.stringify(this.industry_model[input]))
+        }
+
       }
 
-      this.industry['pollutants_selected'] = this.model_selected_pollutants
-      this.industry['level_of_certainty'] = this.industry_level_of_certainty
+      this.industry['pollutants_selected'] = selected_pollutants
 
-      for (let pollutant of this.model_selected_pollutants){
+      for (let pollutant of selected_pollutants){
         if (!conversion_factors.hasOwnProperty(pollutant)){
           if (pollutant == "COD" || pollutant == "TN" || pollutant == "TP") {
             conversion_factors[pollutant] = {eutrophication: null, tu: '-', eqs: '-'}
@@ -638,6 +802,7 @@ export default {
         this.industry.update_onsite_wwtp()
       }else{
         this.industry.reset_onsite_wwtp()
+        this.onsite_wwtp_to_model()
       }
 
       //Direct discharge
@@ -645,6 +810,7 @@ export default {
         this.industry.update_direct_discharge()
       }else{
         this.industry.reset_direct_discharge()
+        this.direct_discharge_to_model()
       }
 
       //Offsite wwtp
@@ -652,6 +818,7 @@ export default {
         this.industry.update_offsite_wwtp()
       }else{
         this.industry.reset_offsite_wwtp()
+        this.offsite_wwtp_to_model()
       }
 
       let global_pollutants_created = this.$created_pollutants

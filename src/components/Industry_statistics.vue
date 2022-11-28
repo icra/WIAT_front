@@ -38,10 +38,7 @@
         </v-col>
       </v-row>
       <div v-if="industry != null" style="background-color: white; padding-top: 1.5rem">
-        <div
-            v-if="main_tab == 0"
-        >
-
+        <div v-if="main_tab == 0">
           <v-row>
             <v-col cols="4">
               <v-treeview
@@ -245,121 +242,129 @@
               />
             </v-col>
           </v-row>
-
         </div>
-        <v-row
-            class="pa-4"
-            justify="space-between"
-            v-else-if="main_tab == 1"
-        >
-          <v-col cols="6">
-            <h3>{{ industry.name }} </h3>
 
-            <v-treeview
-                :active.sync="active_indicator"
-                :items="indicators_industry"
-                activatable
-                open-on-click
-                transition
-                dense
-                :open.sync="open_indicator"
-
-            >
-              <template v-slot:prepend="{ item, open }" style="height: 120%; margin-top: -10px; padding-bottom: -30px;">
-                <v-tooltip left v-if="indicator_risk_class(item) != null">
-                  <template v-slot:activator="{ on, attrs }">
-                    <div
-                        style="width: 5px;"
-                        :class="indicator_risk_class(item)[0]"
-                        v-bind="attrs"
-                        v-on="on"
-                    >
-                      &nbsp
-                    </div>
-
-                  </template>
-                  <span>{{indicator_risk_class(item)[1]}}</span>
-                </v-tooltip>
-              </template>
-              <template v-slot:append="{ item }">
-                <v-tooltip bottom max-width="700px" v-if="item.info">
-                  <template v-slot:activator="{ on, attrs }">
-                    <v-icon
-                        color='#1C195B'
-                        style="padding-right: 10px"
-                        v-bind="attrs"
-                        v-on="on"
-                    >
-                      mdi-information-outline
-                    </v-icon>
-                  </template>
-                  <span>{{ item.info }}</span>
-                </v-tooltip>
-                <span v-if="item.name == 'Water quality' || item.name == 'Water availability'" class="state_of_nature">(Change of state of nature)</span>
-
-
-              </template>
-
-            </v-treeview>
-          </v-col>
-
-          <v-divider vertical></v-divider>
-
-          <v-col
-              class="d-flex text-center"
-              cols="6"
+        <div v-else-if="main_tab == 1">
+          <v-row
+              class="pa-4"
+              justify="space-between"
           >
-            <v-scroll-y-transition mode="out-in">
-              <div
-                  class="text-h6 grey--text text--lighten-1 font-weight-light"
-                  style="align-self: center;"
-                  v-if="active_indicator.length == 0"
+            <v-col cols="6">
+              <v-row>
+                <h3 style="margin-left: 50px; ">
+                  <span style="color: #b62373">{{industry.name}}</span>: evaluation of impacts of industrial wastewater
+                </h3>
+
+              </v-row>
+              <br>
+
+
+              <v-treeview
+                  :active.sync="active_indicator"
+                  :items="indicators_industry"
+                  activatable
+                  open-on-click
+                  transition
+                  dense
+                  :open.sync="open_indicator"
+
               >
-                Select an indicator
-              </div>
-              <div v-else style="width: 100%">
-                <div v-if="active_indicator[0] == 3">
+                <template v-slot:prepend="{ item, open }" style="height: 120%; margin-top: -10px; padding-bottom: -30px;">
+                  <v-tooltip left v-if="indicator_risk_class(item) != null">
+                    <template v-slot:activator="{ on, attrs }">
+                      <div
+                          style="width: 5px;"
+                          :class="indicator_risk_class(item)[0]"
+                          v-bind="attrs"
+                          v-on="on"
+                      >
+                        &nbsp
+                      </div>
 
-
-                  <v-chip-group
-                      mandatory
-                      v-model="delta_ecotox_chip"
-                  >
-                    <v-chip
-                        color="primary"
-                        outlined
-                        class="ma-2"
-                        pill
-                    >
-                      <v-icon left>
-                        mdi-chart-pie
+                    </template>
+                    <span>{{indicator_risk_class(item)[1]}}</span>
+                  </v-tooltip>
+                </template>
+                <template v-slot:append="{ item }">
+                  <v-tooltip bottom max-width="700px" v-if="item.info">
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-icon
+                          color='#1C195B'
+                          style="padding-right: 10px"
+                          v-bind="attrs"
+                          v-on="on"
+                      >
+                        mdi-information-outline
                       </v-icon>
-                      Chart
-                    </v-chip>
+                    </template>
+                    <span>{{ item.info }}</span>
+                  </v-tooltip>
+                  <span v-if="item.name == 'Water quality' || item.name == 'Water availability'" class="state_of_nature">(Change of state of nature)</span>
 
-                    <v-chip
-                        color="primary"
-                        outlined
-                        pill
-                        class="ma-2"
+
+                </template>
+
+              </v-treeview>
+            </v-col>
+
+            <v-divider vertical></v-divider>
+
+            <v-col
+                class="d-flex text-center"
+                cols="6"
+            >
+              <v-scroll-y-transition mode="out-in">
+                <div
+                    class="text-h6 grey--text text--lighten-1 font-weight-light"
+                    style="align-self: center;"
+                    v-if="active_indicator.length == 0"
+                >
+                  Select an indicator
+                </div>
+                <div v-else style="width: 100%">
+                  <div v-if="active_indicator[0] == 3">
+
+
+                    <v-chip-group
+                        mandatory
+                        v-model="delta_ecotox_chip"
                     >
-                      <v-icon left>
-                        mdi-table
-                      </v-icon>
-                      Table
+                      <v-chip
+                          color="primary"
+                          outlined
+                          class="ma-2"
+                          pill
+                      >
+                        <v-icon left>
+                          mdi-chart-pie
+                        </v-icon>
+                        Chart
+                      </v-chip>
 
-                    </v-chip>
-                  </v-chip-group>
-                  <v-data-table
-                      :headers="delta_ecotox_table.header"
-                      :items="delta_ecotox_table.value"
-                      :item-class="itemRowBold"
-                      :hide-default-footer="true"
-                      dense
-                      v-if="delta_ecotox_chip === 1"
+                      <v-chip
+                          color="primary"
+                          outlined
+                          pill
+                          class="ma-2"
+                      >
+                        <v-icon left>
+                          mdi-table
+                        </v-icon>
+                        Table
 
-                  >
-                    <template v-slot:item.name="{ item }">
+                      </v-chip>
+                    </v-chip-group>
+                    <v-data-table
+                        :headers="delta_ecotox_table.header"
+                        :items="delta_ecotox_table.value"
+                        :item-class="itemRowBold"
+                        :hide-default-footer="true"
+                        disable-pagination
+                        dense
+                        v-if="delta_ecotox_chip === 1"
+
+                    >
+                      <template v-slot:item.name="{ item }">
                       <span v-if="item.info">
                       {{ item.name }}
                       <v-btn
@@ -378,387 +383,386 @@
 
 
                     </span>
-                      <span v-else>{{ item.name }}</span>
-                    </template>
-
-                    <template
-                        v-slot:item.value="{ item }"
-                    >
-                      <template v-if="getDeltaEcotoxColor(item) != null">
-                        <v-tooltip bottom>
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-chip
-                                :color="getDeltaEcotoxColor(item)[0]"
-                                dark
-                                :key="industry.name"
-                                v-bind="attrs"
-                                v-on="on"
-                                text-color="#1c1c1b"
-                            >
-                              {{ item.value }}
-                            </v-chip>
-                          </template>
-                          <span>{{ getDeltaEcotoxColor(item)[1] }}</span>
-                        </v-tooltip>
+                        <span v-else>{{ item.name }}</span>
                       </template>
-                      <template v-else>
-                        <v-chip
-                            color="transparent"
-                            dark
-                            :key="industry.name"
-                            text-color="#1c1c1b"
-                            class="chip_no_hover"
+
+                      <template
+                          v-slot:item.value="{ item }"
+                      >
+                        <template v-if="getDeltaEcotoxColor(item) != null">
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-chip
+                                  :color="getDeltaEcotoxColor(item)[0]"
+                                  dark
+                                  :key="industry.name"
+                                  v-bind="attrs"
+                                  v-on="on"
+                                  text-color="#1c1c1b"
+                              >
+                                {{ item.value }}
+                              </v-chip>
+                            </template>
+                            <span>{{ getDeltaEcotoxColor(item)[1] }}</span>
+                          </v-tooltip>
+                        </template>
+                        <template v-else>
+                          <v-chip
+                              color="transparent"
+                              dark
+                              :key="industry.name"
+                              text-color="#1c1c1b"
+                              class="chip_no_hover"
+                          >
+                            {{ item[industry.name] }}
+                          </v-chip>
+                        </template>
+
+                      </template>
+                      <template
+                          v-slot:item.data="{ item }"
+                      >
+                        <template v-if="getDataTypeColor(item) != null">
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-chip
+                                  :color="getDataTypeColor(item)[0]"
+                                  dark
+                                  :key="industry.name"
+                                  text-color="#1c1c1b"
+                                  v-bind="attrs"
+                                  v-on="on"
+                              >
+                                {{ item.data }}
+                              </v-chip>
+                            </template>
+                            <span>{{getDataTypeColor(item)[1]}}</span>
+                          </v-tooltip>
+                        </template>
+                      </template>
+
+                    </v-data-table>
+
+                    <div v-else-if="delta_ecotox_chip === 0">
+                      <p class="chart_no_data" v-if="utils.get_pollutants([this.industry]).length == 0">
+                        Current industry doesn't have pollutants selected
+                      </p>
+                      <div v-else>
+                        <PieChart
+                            style="padding-top: 10px"
+                            :chart-data="delta_ecotox_chart.chartData"
+                            :chart-options="delta_ecotox_chart.chartOptions"
+
+                        />
+                        <p class="instructions_2">
+                          *Only labels >5% are shown.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div v-else-if="active_indicator[0] == 4">
+                    <v-chip-group
+                        mandatory
+                        v-model="delta_eqs_chip"
+                    >
+                      <v-chip
+                          color="primary"
+                          outlined
+                          class="ma-2"
+                          pill
+                      >
+                        <v-icon left>
+                          mdi-chart-pie
+                        </v-icon>
+                        Chart
+                      </v-chip>
+
+                      <v-chip
+                          color="primary"
+                          outlined
+                          pill
+                          class="ma-2"
+                      >
+                        <v-icon left>
+                          mdi-table
+                        </v-icon>
+                        Table
+
+                      </v-chip>
+                    </v-chip-group>
+                    <div v-if="delta_eqs_chip == 0">
+                      <p class="chart_no_data" v-if="utils.get_pollutants([this.industry]).length == 0">
+                        Current industry doesn't have pollutants selected
+                      </p>
+                      <BarChart
+                          style="padding-top: 40px;"
+                          :chart-data="delta_eqs_chart.chartData"
+                          :chart-options="delta_eqs_chart.chartOptions"
+                          v-else
+
+                      />
+                    </div>
+
+                    <v-data-table
+                        :headers="delta_eqs_table.header"
+                        :items="delta_eqs_table.value"
+                        v-else
+                        disable-pagination
+                        :hide-default-footer="true"
+                        dense
+                    >
+
+                      <template v-slot:item.name="{ item }">
+                    <span v-if="item.info">
+                      {{ item.name }}
+                      <v-btn
+                          icon
+                          @click="selected_pollutant = item.name; $data[item.info] = true"
+                          class="icon_clickable"
+                          x-small
+                      >
+                        <v-icon
+                            color='#1C195B'
                         >
-                          {{ item[industry.name] }}
-                        </v-chip>
+                          mdi-information-outline
+                        </v-icon>
+                      </v-btn>
+
+
+                    </span>
+                        <span v-else>{{ item.name }}</span>
                       </template>
 
-                    </template>
-                    <template
-                        v-slot:item.data="{ item }"
+                      <template
+                          v-slot:item.value="{ item }"
+                      >
+
+                        <template v-if="getDeltaEQSColor(item) != null">
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-chip
+                                  :color="getDeltaEQSColor(item)[0]"
+                                  dark
+                                  :key="industry.name"
+                                  v-bind="attrs"
+                                  v-on="on"
+                                  text-color="#1c1c1b"
+                              >
+                                {{ item.value }}
+                              </v-chip>
+                            </template>
+                            <span>{{ getDeltaEQSColor(item)[1] }}</span>
+                          </v-tooltip>
+                        </template>
+                        <template v-else>
+                          <v-chip
+                              color="transparent"
+                              dark
+                              :key="industry.name"
+                              text-color="#1c1c1b"
+                              class="chip_no_hover"
+                          >
+                            {{ item[industry.name] }}
+                          </v-chip>
+                        </template>
+                      </template>
+                      <template
+                          v-slot:item.data="{ item }"
+                      >
+                        <template v-if="getDataTypeColor(item) != null">
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-chip
+                                  :color="getDataTypeColor(item)[0]"
+                                  dark
+                                  :key="industry.name"
+                                  text-color="#1c1c1b"
+                                  v-bind="attrs"
+                                  v-on="on"
+                              >
+                                {{ item.data }}
+                              </v-chip>
+                            </template>
+                            <span>{{getDataTypeColor(item)[1]}}</span>
+                          </v-tooltip>
+                        </template>
+                      </template>
+
+
+                    </v-data-table>
+
+                  </div>
+                  <div v-else-if="active_indicator[0] == 5">
+
+                    <v-chip-group
+                        mandatory
+                        v-model="eutrophication_chip"
                     >
-                      <template v-if="getDataTypeColor(item) != null">
-                        <v-tooltip bottom>
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-chip
-                                :color="getDataTypeColor(item)[0]"
-                                dark
-                                :key="industry.name"
-                                text-color="#1c1c1b"
-                                v-bind="attrs"
-                                v-on="on"
-                            >
-                              {{ item.data }}
-                            </v-chip>
-                          </template>
-                          <span>{{getDataTypeColor(item)[1]}}</span>
-                        </v-tooltip>
+                      <v-chip
+                          color="primary"
+                          outlined
+                          class="ma-2"
+                          pill
+                      >
+                        <v-icon left>
+                          mdi-chart-pie
+                        </v-icon>
+                        Chart
+                      </v-chip>
+
+                      <v-chip
+                          color="primary"
+                          outlined
+                          pill
+                          class="ma-2"
+                      >
+                        <v-icon left>
+                          mdi-table
+                        </v-icon>
+                        Table
+
+                      </v-chip>
+                    </v-chip-group>
+                    <v-data-table
+                        :headers="eutrophication_table.header"
+                        :items="eutrophication_table.value"
+                        :item-class="itemRowBold"
+                        disable-pagination
+                        :hide-default-footer="true"
+                        dense
+                        v-if="eutrophication_chip === 1"
+                    >
+                      <template v-slot:item.name="{ item }">
+                    <span v-if="item.info">
+                      {{ item.name }}
+                      <v-btn
+                          icon
+                          @click="selected_pollutant = item.name; $data[item.info] = true"
+                          class="icon_clickable"
+                          x-small
+                      >
+                        <v-icon
+                            color='#1C195B'
+                        >
+                          mdi-information-outline
+                        </v-icon>
+                      </v-btn>
+
+                    </span>
+                        <span v-else>{{ item.name }}</span>
                       </template>
-                    </template>
 
-                  </v-data-table>
+                      <template
+                          v-slot:item.value="{ item }"
+                      >
 
-                  <div v-else-if="delta_ecotox_chip === 0">
-                    <p class="chart_no_data" v-if="utils.get_pollutants([this.industry]).length == 0">
-                      Current industry doesn't have pollutants selected
-                    </p>
-                    <div v-else>
+                        <template v-if="getEutrophicationColor(item) != null">
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-chip
+                                  :color="getEutrophicationColor(item)[0]"
+                                  dark
+                                  :key=industry.name
+                                  v-bind="attrs"
+                                  v-on="on"
+                                  text-color="#1c1c1b"
+                              >
+                                {{ item.value }}
+                              </v-chip>
+                            </template>
+                            <span>{{ getEutrophicationColor(item)[1] }}</span>
+                          </v-tooltip>
+                        </template>
+                        <template v-else>
+                          <v-chip
+                              color="transparent"
+                              dark
+                              :key="industry.name"
+                              text-color="#1c1c1b"
+                              class="chip_no_hover"
+                          >
+                            {{ item[industry.name] }}
+                          </v-chip>
+                        </template>
+                      </template>
+                      <template
+                          v-slot:item.data="{ item }"
+                      >
+                        <template v-if="getDataTypeColor(item) != null">
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-chip
+                                  :color="getDataTypeColor(item)[0]"
+                                  dark
+                                  :key="industry.name"
+                                  text-color="#1c1c1b"
+                                  v-bind="attrs"
+                                  v-on="on"
+                              >
+                                {{ item.data }}
+                              </v-chip>
+                            </template>
+                            <span>{{getDataTypeColor(item)[1]}}</span>
+                          </v-tooltip>
+                        </template>
+                      </template>
+
+                    </v-data-table>
+
+                    <div v-else-if="eutrophication_chip === 0">
                       <PieChart
                           style="padding-top: 10px"
-                          :chart-data="delta_ecotox_chart.chartData"
-                          :chart-options="delta_ecotox_chart.chartOptions"
+                          :chart-data="eutrophication_chart.chartData"
+                          :chart-options="eutrophication_chart.chartOptions"
 
                       />
                       <p class="instructions_2">
                         *Only labels >5% are shown.
                       </p>
                     </div>
+
                   </div>
-                </div>
-                <div v-else-if="active_indicator[0] == 4">
-                  <v-chip-group
-                      mandatory
-                      v-model="delta_eqs_chip"
-                  >
-                    <v-chip
-                        color="primary"
-                        outlined
-                        class="ma-2"
-                        pill
+                  <div v-else-if="active_indicator[0] == 6">
+
+                    <v-chip-group
+                        mandatory
+                        v-model="ecotoxicity_chip"
                     >
-                      <v-icon left>
-                        mdi-chart-pie
-                      </v-icon>
-                      Chart
-                    </v-chip>
-
-                    <v-chip
-                        color="primary"
-                        outlined
-                        pill
-                        class="ma-2"
-                    >
-                      <v-icon left>
-                        mdi-table
-                      </v-icon>
-                      Table
-
-                    </v-chip>
-                  </v-chip-group>
-                  <div v-if="delta_eqs_chip == 0">
-                    <p class="chart_no_data" v-if="utils.get_pollutants([this.industry]).length == 0">
-                      Current industry doesn't have pollutants selected
-                    </p>
-                    <BarChart
-                        style="padding-top: 40px;"
-                        :chart-data="delta_eqs_chart.chartData"
-                        :chart-options="delta_eqs_chart.chartOptions"
-                        v-else
-
-                    />
-                  </div>
-
-                  <v-data-table
-                      :headers="delta_eqs_table.header"
-                      :items="delta_eqs_table.value"
-                      v-else
-
-                      disable-pagination
-                      :hide-default-footer="true"
-                      dense
-                  >
-
-                    <template v-slot:item.name="{ item }">
-                    <span v-if="item.info">
-                      {{ item.name }}
-                      <v-btn
-                          icon
-                          @click="selected_pollutant = item.name; $data[item.info] = true"
-                          class="icon_clickable"
-                          x-small
+                      <v-chip
+                          color="primary"
+                          outlined
+                          class="ma-2"
+                          pill
                       >
-                        <v-icon
-                            color='#1C195B'
-                        >
-                          mdi-information-outline
+                        <v-icon left>
+                          mdi-chart-pie
                         </v-icon>
-                      </v-btn>
+                        Chart
+                      </v-chip>
 
-
-                    </span>
-                      <span v-else>{{ item.name }}</span>
-                    </template>
-
-                    <template
-                        v-slot:item.value="{ item }"
-                    >
-
-                      <template v-if="getDeltaEQSColor(item) != null">
-                        <v-tooltip bottom>
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-chip
-                                :color="getDeltaEQSColor(item)[0]"
-                                dark
-                                :key="industry.name"
-                                v-bind="attrs"
-                                v-on="on"
-                                text-color="#1c1c1b"
-                            >
-                              {{ item.value }}
-                            </v-chip>
-                          </template>
-                          <span>{{ getDeltaEQSColor(item)[1] }}</span>
-                        </v-tooltip>
-                      </template>
-                      <template v-else>
-                        <v-chip
-                            color="transparent"
-                            dark
-                            :key="industry.name"
-                            text-color="#1c1c1b"
-                            class="chip_no_hover"
-                        >
-                          {{ item[industry.name] }}
-                        </v-chip>
-                      </template>
-                    </template>
-                    <template
-                        v-slot:item.data="{ item }"
-                    >
-                      <template v-if="getDataTypeColor(item) != null">
-                        <v-tooltip bottom>
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-chip
-                                :color="getDataTypeColor(item)[0]"
-                                dark
-                                :key="industry.name"
-                                text-color="#1c1c1b"
-                                v-bind="attrs"
-                                v-on="on"
-                            >
-                              {{ item.data }}
-                            </v-chip>
-                          </template>
-                          <span>{{getDataTypeColor(item)[1]}}</span>
-                        </v-tooltip>
-                      </template>
-                    </template>
-
-
-                  </v-data-table>
-
-                </div>
-                <div v-else-if="active_indicator[0] == 5">
-
-                  <v-chip-group
-                      mandatory
-                      v-model="eutrophication_chip"
-                  >
-                    <v-chip
-                        color="primary"
-                        outlined
-                        class="ma-2"
-                        pill
-                    >
-                      <v-icon left>
-                        mdi-chart-pie
-                      </v-icon>
-                      Chart
-                    </v-chip>
-
-                    <v-chip
-                        color="primary"
-                        outlined
-                        pill
-                        class="ma-2"
-                    >
-                      <v-icon left>
-                        mdi-table
-                      </v-icon>
-                      Table
-
-                    </v-chip>
-                  </v-chip-group>
-                  <v-data-table
-                      :headers="eutrophication_table.header"
-                      :items="eutrophication_table.value"
-                      :item-class="itemRowBold"
-                      disable-pagination
-                      :hide-default-footer="true"
-                      dense
-                      v-if="eutrophication_chip === 1"
-                  >
-                    <template v-slot:item.name="{ item }">
-                    <span v-if="item.info">
-                      {{ item.name }}
-                      <v-btn
-                          icon
-                          @click="selected_pollutant = item.name; $data[item.info] = true"
-                          class="icon_clickable"
-                          x-small
+                      <v-chip
+                          color="primary"
+                          outlined
+                          pill
+                          class="ma-2"
                       >
-                        <v-icon
-                            color='#1C195B'
-                        >
-                          mdi-information-outline
+                        <v-icon left>
+                          mdi-table
                         </v-icon>
-                      </v-btn>
+                        Table
 
-                    </span>
-                      <span v-else>{{ item.name }}</span>
-                    </template>
-
-                    <template
-                        v-slot:item.value="{ item }"
+                      </v-chip>
+                    </v-chip-group>
+                    <v-data-table
+                        :headers="ecotoxicity_table.header"
+                        :items="ecotoxicity_table.value"
+                        disable-pagination
+                        :hide-default-footer="true"
+                        dense
+                        :item-class="itemRowBold"
+                        v-if="ecotoxicity_chip === 1"
                     >
-
-                      <template v-if="getEutrophicationColor(item) != null">
-                        <v-tooltip bottom>
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-chip
-                                :color="getEutrophicationColor(item)[0]"
-                                dark
-                                :key=industry.name
-                                v-bind="attrs"
-                                v-on="on"
-                                text-color="#1c1c1b"
-                            >
-                              {{ item.value }}
-                            </v-chip>
-                          </template>
-                          <span>{{ getEutrophicationColor(item)[1] }}</span>
-                        </v-tooltip>
-                      </template>
-                      <template v-else>
-                        <v-chip
-                            color="transparent"
-                            dark
-                            :key="industry.name"
-                            text-color="#1c1c1b"
-                            class="chip_no_hover"
-                        >
-                          {{ item[industry.name] }}
-                        </v-chip>
-                      </template>
-                    </template>
-                    <template
-                        v-slot:item.data="{ item }"
-                    >
-                      <template v-if="getDataTypeColor(item) != null">
-                        <v-tooltip bottom>
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-chip
-                                :color="getDataTypeColor(item)[0]"
-                                dark
-                                :key="industry.name"
-                                text-color="#1c1c1b"
-                                v-bind="attrs"
-                                v-on="on"
-                            >
-                              {{ item.data }}
-                            </v-chip>
-                          </template>
-                          <span>{{getDataTypeColor(item)[1]}}</span>
-                        </v-tooltip>
-                      </template>
-                    </template>
-
-                  </v-data-table>
-
-                  <div v-else-if="eutrophication_chip === 0">
-                    <PieChart
-                        style="padding-top: 10px"
-                        :chart-data="eutrophication_chart.chartData"
-                        :chart-options="eutrophication_chart.chartOptions"
-
-                    />
-                    <p class="instructions_2">
-                      *Only labels >5% are shown.
-                    </p>
-                  </div>
-
-                </div>
-                <div v-else-if="active_indicator[0] == 6">
-
-                  <v-chip-group
-                      mandatory
-                      v-model="ecotoxicity_chip"
-                  >
-                    <v-chip
-                        color="primary"
-                        outlined
-                        class="ma-2"
-                        pill
-                    >
-                      <v-icon left>
-                        mdi-chart-pie
-                      </v-icon>
-                      Chart
-                    </v-chip>
-
-                    <v-chip
-                        color="primary"
-                        outlined
-                        pill
-                        class="ma-2"
-                    >
-                      <v-icon left>
-                        mdi-table
-                      </v-icon>
-                      Table
-
-                    </v-chip>
-                  </v-chip-group>
-                  <v-data-table
-                      :headers="ecotoxicity_table.header"
-                      :items="ecotoxicity_table.value"
-                      disable-pagination
-                      :hide-default-footer="true"
-                      dense
-                      :item-class="itemRowBold"
-                      v-if="ecotoxicity_chip === 1"
-                  >
-                    <template v-slot:item.name="{ item }">
+                      <template v-slot:item.name="{ item }">
                     <span v-if="item.info">
                       {{ item.name }}
                       <v-btn
@@ -776,227 +780,227 @@
 
 
                 </span>
-                      <span v-else>{{ item.name }}</span>
-                    </template>
-                    <template
-                        v-for="value in [industry]"
-                        v-slot:item.value="{ item }"
-                    >
-
-                      <template v-if="getEcotoxicity(item) != null">
-                        <v-tooltip bottom>
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-chip
-                                :color="getEcotoxicity(item)[0]"
-                                dark
-                                :key="industry.name"
-                                v-bind="attrs"
-                                v-on="on"
-                                text-color="#1c1c1b"
-                            >
-                              {{ item.value }}
-                            </v-chip>
-                          </template>
-                          <span>{{ getEcotoxicity(item)[1] }}</span>
-                        </v-tooltip>
+                        <span v-else>{{ item.name }}</span>
                       </template>
-                      <template v-else>
-                        <v-chip
-                            color="transparent"
-                            dark
-                            :key="value.name"
-                            text-color="#1c1c1b"
-                            class="chip_no_hover"
-                        >
-                          {{ item.value }}
-                        </v-chip>
+                      <template
+                          v-for="value in [industry]"
+                          v-slot:item.value="{ item }"
+                      >
+
+                        <template v-if="getEcotoxicity(item) != null">
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-chip
+                                  :color="getEcotoxicity(item)[0]"
+                                  dark
+                                  :key="industry.name"
+                                  v-bind="attrs"
+                                  v-on="on"
+                                  text-color="#1c1c1b"
+                              >
+                                {{ item.value }}
+                              </v-chip>
+                            </template>
+                            <span>{{ getEcotoxicity(item)[1] }}</span>
+                          </v-tooltip>
+                        </template>
+                        <template v-else>
+                          <v-chip
+                              color="transparent"
+                              dark
+                              :key="value.name"
+                              text-color="#1c1c1b"
+                              class="chip_no_hover"
+                          >
+                            {{ item.value }}
+                          </v-chip>
+                        </template>
                       </template>
-                    </template>
-                    <template
-                        v-slot:item.data="{ item }"
-                    >
-                      <template v-if="getDataTypeColor(item) != null">
-                        <v-tooltip bottom>
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-chip
-                                :color="getDataTypeColor(item)[0]"
-                                dark
-                                :key="industry.name"
-                                text-color="#1c1c1b"
-                                v-bind="attrs"
-                                v-on="on"
-                            >
-                              {{ item.data }}
-                            </v-chip>
-                          </template>
-                          <span>{{getDataTypeColor(item)[1]}}</span>
-                        </v-tooltip>
+                      <template
+                          v-slot:item.data="{ item }"
+                      >
+                        <template v-if="getDataTypeColor(item) != null">
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-chip
+                                  :color="getDataTypeColor(item)[0]"
+                                  dark
+                                  :key="industry.name"
+                                  text-color="#1c1c1b"
+                                  v-bind="attrs"
+                                  v-on="on"
+                              >
+                                {{ item.data }}
+                              </v-chip>
+                            </template>
+                            <span>{{getDataTypeColor(item)[1]}}</span>
+                          </v-tooltip>
+                        </template>
                       </template>
-                    </template>
 
-                  </v-data-table>
+                    </v-data-table>
 
-                  <div v-else-if="ecotoxicity_chip === 0">
-                    <p class="chart_no_data" v-if="utils.get_pollutants([this.industry]).length == 0">
-                      Current industry doesn't have pollutants selected
-                    </p>
-                    <div v-else>
-                      <PieChart
-                          style="padding-top: 10px"
-                          :chart-data="ecotoxicity_chart.chartData"
-                          :chart-options="ecotoxicity_chart.chartOptions"
-
-
-                      />
-                      <p class="instructions_2">
-                        *Only labels >5% are shown.
+                    <div v-else-if="ecotoxicity_chip === 0">
+                      <p class="chart_no_data" v-if="utils.get_pollutants([this.industry]).length == 0">
+                        Current industry doesn't have pollutants selected
                       </p>
+                      <div v-else>
+                        <PieChart
+                            style="padding-top: 10px"
+                            :chart-data="ecotoxicity_chart.chartData"
+                            :chart-options="ecotoxicity_chart.chartOptions"
+
+
+                        />
+                        <p class="instructions_2">
+                          *Only labels >5% are shown.
+                        </p>
+                      </div>
+
                     </div>
 
+
                   </div>
-
-
-                </div>
-                <div v-else-if="active_indicator[0] == 7">
-                  <v-chip-group
-                      mandatory
-                      v-model="eqs_chip"
-                  >
-                    <v-chip
-                        color="primary"
-                        outlined
-                        class="ma-2"
-                        pill
+                  <div v-else-if="active_indicator[0] == 7">
+                    <v-chip-group
+                        mandatory
+                        v-model="eqs_chip"
                     >
-                      <v-icon left>
-                        mdi-chart-pie
-                      </v-icon>
-                      Chart
-                    </v-chip>
+                      <v-chip
+                          color="primary"
+                          outlined
+                          class="ma-2"
+                          pill
+                      >
+                        <v-icon left>
+                          mdi-chart-pie
+                        </v-icon>
+                        Chart
+                      </v-chip>
 
-                    <v-chip
-                        color="primary"
-                        outlined
-                        pill
-                        class="ma-2"
-                    >
-                      <v-icon left>
-                        mdi-table
-                      </v-icon>
-                      Table
+                      <v-chip
+                          color="primary"
+                          outlined
+                          pill
+                          class="ma-2"
+                      >
+                        <v-icon left>
+                          mdi-table
+                        </v-icon>
+                        Table
 
-                    </v-chip>
-                  </v-chip-group>
-                  <div v-if="eqs_chip == 0">
-                    <p class="chart_no_data" v-if="utils.get_pollutants([this.industry]).length == 0">
-                      Current industry doesn't have pollutants selected
-                    </p>
-                    <BarChart
-                        style="padding-top: 40px;"
-                        :chart-data="eqs_chart.chartData"
-                        :chart-options="eqs_chart.chartOptions"
+                      </v-chip>
+                    </v-chip-group>
+                    <div v-if="eqs_chip == 0">
+                      <p class="chart_no_data" v-if="utils.get_pollutants([this.industry]).length == 0">
+                        Current industry doesn't have pollutants selected
+                      </p>
+                      <BarChart
+                          style="padding-top: 40px;"
+                          :chart-data="eqs_chart.chartData"
+                          :chart-options="eqs_chart.chartOptions"
+                          v-else
+                      />
+                    </div>
+
+
+                    <v-data-table
+                        :headers="eqs_table.header"
+                        :items="eqs_table.value"
+                        disable-pagination
+                        :hide-default-footer="true"
+                        dense
                         v-else
-                    />
+                    >
+
+                      <template v-slot:item.name="{ item }">
+                    <span v-if="item.info">
+                      {{ item.name }}
+                      <v-btn
+                          icon
+                          @click="selected_pollutant = item.name; $data[item.info] = true"
+                          class="icon_clickable"
+                          x-small
+                      >
+                        <v-icon
+                            color='#1C195B'
+                        >
+                          mdi-information-outline
+                        </v-icon>
+                      </v-btn>
+
+                    </span>
+                        <span v-else>{{ item.name }}</span>
+                      </template>
+                      <template
+                          v-slot:item.value="{ item }"
+                      >
+
+                        <template v-if="getEQSColor(item) != null">
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-chip
+                                  :color="getEQSColor(item)[0]"
+                                  dark
+                                  :key="industry.name"
+                                  v-bind="attrs"
+                                  v-on="on"
+                                  text-color="#1c1c1b"
+                              >
+                                {{ item.value }}
+                              </v-chip>
+                            </template>
+                            <span>{{ getEQSColor(item)[1] }}</span>
+                          </v-tooltip>
+                        </template>
+                        <template v-else>
+                          <v-chip
+                              color="transparent"
+                              dark
+                              :key="industry.name"
+                              text-color="#1c1c1b"
+                              class="chip_no_hover"
+                          >
+                            {{ item.value }}
+                          </v-chip>
+                        </template>
+                      </template>
+                      <template
+                          v-slot:item.data="{ item }"
+                      >
+                        <template v-if="getDataTypeColor(item) != null">
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-chip
+                                  :color="getDataTypeColor(item)[0]"
+                                  dark
+                                  :key="industry.name"
+                                  text-color="#1c1c1b"
+                                  v-bind="attrs"
+                                  v-on="on"
+                              >
+                                {{ item.data }}
+                              </v-chip>
+                            </template>
+                            <span>{{getDataTypeColor(item)[1]}}</span>
+                          </v-tooltip>
+                        </template>
+                      </template>
+
+
+                    </v-data-table>
+
                   </div>
-
-
-                  <v-data-table
-                      :headers="eqs_table.header"
-                      :items="eqs_table.value"
-                      disable-pagination
-                      :hide-default-footer="true"
-                      dense
-                      v-else
-                  >
-
-                    <template v-slot:item.name="{ item }">
-                    <span v-if="item.info">
-                      {{ item.name }}
-                      <v-btn
-                          icon
-                          @click="selected_pollutant = item.name; $data[item.info] = true"
-                          class="icon_clickable"
-                          x-small
-                      >
-                        <v-icon
-                            color='#1C195B'
-                        >
-                          mdi-information-outline
-                        </v-icon>
-                      </v-btn>
-
-                    </span>
-                      <span v-else>{{ item.name }}</span>
-                    </template>
-                    <template
-                        v-slot:item.value="{ item }"
+                  <div v-else-if="active_indicator[0] == 9">
+                    <v-data-table
+                        :headers="treatment_efficiency_table.header"
+                        :items="treatment_efficiency_table.value"
+                        disable-pagination
+                        :hide-default-footer="true"
+                        dense
                     >
 
-                      <template v-if="getEQSColor(item) != null">
-                        <v-tooltip bottom>
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-chip
-                                :color="getEQSColor(item)[0]"
-                                dark
-                                :key="industry.name"
-                                v-bind="attrs"
-                                v-on="on"
-                                text-color="#1c1c1b"
-                            >
-                              {{ item.value }}
-                            </v-chip>
-                          </template>
-                          <span>{{ getEQSColor(item)[1] }}</span>
-                        </v-tooltip>
-                      </template>
-                      <template v-else>
-                        <v-chip
-                            color="transparent"
-                            dark
-                            :key="industry.name"
-                            text-color="#1c1c1b"
-                            class="chip_no_hover"
-                        >
-                          {{ item.value }}
-                        </v-chip>
-                      </template>
-                    </template>
-                    <template
-                        v-slot:item.data="{ item }"
-                    >
-                      <template v-if="getDataTypeColor(item) != null">
-                        <v-tooltip bottom>
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-chip
-                                :color="getDataTypeColor(item)[0]"
-                                dark
-                                :key="industry.name"
-                                text-color="#1c1c1b"
-                                v-bind="attrs"
-                                v-on="on"
-                            >
-                              {{ item.data }}
-                            </v-chip>
-                          </template>
-                          <span>{{getDataTypeColor(item)[1]}}</span>
-                        </v-tooltip>
-                      </template>
-                    </template>
-
-
-                  </v-data-table>
-
-                </div>
-                <div v-else-if="active_indicator[0] == 9">
-                  <v-data-table
-                      :headers="treatment_efficiency_table.header"
-                      :items="treatment_efficiency_table.value"
-                      disable-pagination
-                      :hide-default-footer="true"
-                      dense
-                  >
-
-                    <template v-slot:item.name="{ item }">
+                      <template v-slot:item.name="{ item }">
                     <span v-if="item.info">
                       {{ item.name }}
                       <v-btn
@@ -1014,77 +1018,77 @@
 
 
                     </span>
-                      <span v-else>{{ item.name }}</span>
-                    </template>
-                    <template
-                        v-slot:item.value="{ item }"
+                        <span v-else>{{ item.name }}</span>
+                      </template>
+                      <template
+                          v-slot:item.value="{ item }"
+                      >
+
+                        <template v-if="getTreatmentEfficiencyColor(item) != null">
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-chip
+                                  :color="getTreatmentEfficiencyColor(item)[0]"
+                                  dark
+                                  :key="industry.name"
+                                  v-bind="attrs"
+                                  v-on="on"
+                                  text-color="#1c1c1b"
+                              >
+                                {{ item.value }}
+                              </v-chip>
+                            </template>
+                            <span>{{ getTreatmentEfficiencyColor(item)[1] }}</span>
+                          </v-tooltip>
+                        </template>
+                        <template v-else>
+                          <v-chip
+                              color="transparent"
+                              dark
+                              :key="industry.name"
+                              text-color="#1c1c1b"
+                              class="chip_no_hover"
+                          >
+                            {{ item.value }}
+                          </v-chip>
+                        </template>
+                      </template>
+                      <template
+                          v-slot:item.data="{ item }"
+                      >
+                        <template v-if="getDataTypeColor(item) != null">
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-chip
+                                  :color="getDataTypeColor(item)[0]"
+                                  dark
+                                  :key="industry.name"
+                                  text-color="#1c1c1b"
+                                  v-bind="attrs"
+                                  v-on="on"
+                              >
+                                {{ item.data }}
+                              </v-chip>
+                            </template>
+                            <span>{{getDataTypeColor(item)[1]}}</span>
+                          </v-tooltip>
+                        </template>
+                      </template>
+
+                    </v-data-table>
+
+                  </div>
+                  <div v-else-if="active_indicator[0] == 10">
+                    <v-data-table
+                        :headers="treatment_efficiency_influent_table.header"
+                        :items="treatment_efficiency_influent_table.value"
+                        disable-pagination
+                        :hide-default-footer="true"
+                        dense
+
                     >
 
-                      <template v-if="getTreatmentEfficiencyColor(item) != null">
-                        <v-tooltip bottom>
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-chip
-                                :color="getTreatmentEfficiencyColor(item)[0]"
-                                dark
-                                :key="industry.name"
-                                v-bind="attrs"
-                                v-on="on"
-                                text-color="#1c1c1b"
-                            >
-                              {{ item.value }}
-                            </v-chip>
-                          </template>
-                          <span>{{ getTreatmentEfficiencyColor(item)[1] }}</span>
-                        </v-tooltip>
-                      </template>
-                      <template v-else>
-                        <v-chip
-                            color="transparent"
-                            dark
-                            :key="industry.name"
-                            text-color="#1c1c1b"
-                            class="chip_no_hover"
-                        >
-                          {{ item.value }}
-                        </v-chip>
-                      </template>
-                    </template>
-                    <template
-                        v-slot:item.data="{ item }"
-                    >
-                      <template v-if="getDataTypeColor(item) != null">
-                        <v-tooltip bottom>
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-chip
-                                :color="getDataTypeColor(item)[0]"
-                                dark
-                                :key="industry.name"
-                                text-color="#1c1c1b"
-                                v-bind="attrs"
-                                v-on="on"
-                            >
-                              {{ item.data }}
-                            </v-chip>
-                          </template>
-                          <span>{{getDataTypeColor(item)[1]}}</span>
-                        </v-tooltip>
-                      </template>
-                    </template>
-
-                  </v-data-table>
-
-                </div>
-                <div v-else-if="active_indicator[0] == 10">
-                  <v-data-table
-                      :headers="treatment_efficiency_influent_table.header"
-                      :items="treatment_efficiency_influent_table.value"
-                      disable-pagination
-                      :hide-default-footer="true"
-                      dense
-
-                  >
-
-                    <template v-slot:item.name="{ item }">
+                      <template v-slot:item.name="{ item }">
                   <span v-if="item.info">
                     {{ item.name }}
                     <v-btn
@@ -1102,78 +1106,78 @@
 
 
                     </span>
-                      <span v-else>{{ item.name }}</span>
-                    </template>
+                        <span v-else>{{ item.name }}</span>
+                      </template>
 
-                    <template
-                        v-slot:item.value="{ item }"
+                      <template
+                          v-slot:item.value="{ item }"
+                      >
+
+                        <template v-if="getTreatmentEfficiencyInfluentColor(item) != null">
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-chip
+                                  :color="getTreatmentEfficiencyInfluentColor(item)[0]"
+                                  dark
+                                  :key="industry.name"
+                                  v-bind="attrs"
+                                  v-on="on"
+                                  text-color="#1c1c1b"
+                              >
+                                {{ item.value }}
+                              </v-chip>
+                            </template>
+                            <span>{{ getTreatmentEfficiencyInfluentColor(item)[1] }}</span>
+                          </v-tooltip>
+                        </template>
+                        <template v-else>
+                          <v-chip
+                              color="transparent"
+                              dark
+                              :key="industry.name"
+                              text-color="#1c1c1b"
+                              class="chip_no_hover"
+                          >
+                            {{ item.value }}
+                          </v-chip>
+                        </template>
+                      </template>
+                      <template
+                          v-slot:item.data="{ item }"
+                      >
+                        <template v-if="getDataTypeColor(item) != null">
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-chip
+                                  :color="getDataTypeColor(item)[0]"
+                                  dark
+                                  :key="industry.name"
+                                  text-color="#1c1c1b"
+                                  v-bind="attrs"
+                                  v-on="on"
+                              >
+                                {{ item.data }}
+                              </v-chip>
+                            </template>
+                            <span>{{getDataTypeColor(item)[1]}}</span>
+                          </v-tooltip>
+                        </template>
+                      </template>
+
+                    </v-data-table>
+
+                  </div>
+                  <div v-else-if="active_indicator[0] == 11">
+                    <v-data-table
+                        :headers="treated_table.header"
+                        :items="treated_table.value"
+                        disable-pagination
+                        :hide-default-footer="true"
+                        dense
+
                     >
 
-                      <template v-if="getTreatmentEfficiencyInfluentColor(item) != null">
-                        <v-tooltip bottom>
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-chip
-                                :color="getTreatmentEfficiencyInfluentColor(item)[0]"
-                                dark
-                                :key="industry.name"
-                                v-bind="attrs"
-                                v-on="on"
-                                text-color="#1c1c1b"
-                            >
-                              {{ item.value }}
-                            </v-chip>
-                          </template>
-                          <span>{{ getTreatmentEfficiencyInfluentColor(item)[1] }}</span>
-                        </v-tooltip>
-                      </template>
-                      <template v-else>
-                        <v-chip
-                            color="transparent"
-                            dark
-                            :key="industry.name"
-                            text-color="#1c1c1b"
-                            class="chip_no_hover"
-                        >
-                          {{ item.value }}
-                        </v-chip>
-                      </template>
-                    </template>
-                    <template
-                        v-slot:item.data="{ item }"
-                    >
-                      <template v-if="getDataTypeColor(item) != null">
-                        <v-tooltip bottom>
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-chip
-                                :color="getDataTypeColor(item)[0]"
-                                dark
-                                :key="industry.name"
-                                text-color="#1c1c1b"
-                                v-bind="attrs"
-                                v-on="on"
-                            >
-                              {{ item.data }}
-                            </v-chip>
-                          </template>
-                          <span>{{getDataTypeColor(item)[1]}}</span>
-                        </v-tooltip>
-                      </template>
-                    </template>
-
-                  </v-data-table>
-
-                </div>
-                <div v-else-if="active_indicator[0] == 11">
-                  <v-data-table
-                      :headers="treated_table.header"
-                      :items="treated_table.value"
-                      disable-pagination
-                      :hide-default-footer="true"
-                      dense
-
-                  >
-
-                    <template v-slot:item.name="{ item }">
+                      <template v-slot:item.name="{ item }">
                     <span v-if="item.info">
                       {{ item.name }}
                       <v-btn
@@ -1189,49 +1193,49 @@
                         </v-icon>
                       </v-btn>
                     </span>
-                      <span v-else>{{ item.name }}</span>
-                    </template>
-                    <template
-                        v-slot:item.data="{ item }"
-                    >
-                      <template v-if="getDataTypeColor(item) != null">
-                        <v-tooltip bottom>
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-chip
-                                :color="getDataTypeColor(item)[0]"
-                                dark
-                                :key="industry.name"
-                                text-color="#1c1c1b"
-                                v-bind="attrs"
-                                v-on="on"
-                            >
-                              {{ item.data }}
-                            </v-chip>
-                          </template>
-                          <span>{{getDataTypeColor(item)[1]}}</span>
-                        </v-tooltip>
+                        <span v-else>{{ item.name }}</span>
                       </template>
-                    </template>
+                      <template
+                          v-slot:item.data="{ item }"
+                      >
+                        <template v-if="getDataTypeColor(item) != null">
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-chip
+                                  :color="getDataTypeColor(item)[0]"
+                                  dark
+                                  :key="industry.name"
+                                  text-color="#1c1c1b"
+                                  v-bind="attrs"
+                                  v-on="on"
+                              >
+                                {{ item.data }}
+                              </v-chip>
+                            </template>
+                            <span>{{getDataTypeColor(item)[1]}}</span>
+                          </v-tooltip>
+                        </template>
+                      </template>
 
-                  </v-data-table>
-                </div>
-                <div v-else-if="active_indicator[0] == 12">
+                    </v-data-table>
+                  </div>
+                  <div v-else-if="active_indicator[0] == 12">
 
-                  <v-data-table
-                      :headers="concentration_table.header"
-                      :items="concentration_table.value"
-                      disable-pagination
-                      :hide-default-footer="true"
-                      dense
+                    <v-data-table
+                        :headers="concentration_table.header"
+                        :items="concentration_table.value"
+                        disable-pagination
+                        :hide-default-footer="true"
+                        dense
 
-                  >
+                    >
 
-                    <template v-slot:item.name="{ item }">
+                      <template v-slot:item.name="{ item }">
                       <span v-if="item.info">
                       {{ item.name }}
                       <v-btn
                           icon
-                          @click="$data[item.info] = true"
+                          @click="selected_pollutant = item.name; $data[item.info] = true"
                           class="icon_clickable"
                           x-small
                       >
@@ -1242,43 +1246,43 @@
                         </v-icon>
                       </v-btn>
                     </span>
-                      <span v-else>{{ item.name }}</span>
-                    </template>
-                    <template
-                        v-slot:item.data="{ item }"
-                    >
-                      <template v-if="getDataTypeColor(item) != null">
-                        <v-tooltip bottom>
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-chip
-                                :color="getDataTypeColor(item)[0]"
-                                dark
-                                :key="industry.name"
-                                text-color="#1c1c1b"
-                                v-bind="attrs"
-                                v-on="on"
-                            >
-                              {{ item.data }}
-                            </v-chip>
-                          </template>
-                          <span>{{getDataTypeColor(item)[1]}}</span>
-                        </v-tooltip>
+                        <span v-else>{{ item.name }}</span>
                       </template>
-                    </template>
+                      <template
+                          v-slot:item.data="{ item }"
+                      >
+                        <template v-if="getDataTypeColor(item) != null">
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-chip
+                                  :color="getDataTypeColor(item)[0]"
+                                  dark
+                                  :key="industry.name"
+                                  text-color="#1c1c1b"
+                                  v-bind="attrs"
+                                  v-on="on"
+                              >
+                                {{ item.data }}
+                              </v-chip>
+                            </template>
+                            <span>{{getDataTypeColor(item)[1]}}</span>
+                          </v-tooltip>
+                        </template>
+                      </template>
 
-                  </v-data-table>
+                    </v-data-table>
 
-                </div>
-                <div v-else-if="active_indicator[0] == 14">
-                  <v-data-table
-                      :headers="water_quantity.header"
-                      :items="water_quantity.value"
+                  </div>
+                  <div v-else-if="active_indicator[0] == 14">
+                    <v-data-table
+                        :headers="water_quantity.header"
+                        :items="water_quantity.value"
 
-                      disable-pagination
-                      :hide-default-footer="true"
-                      dense
-                  >
-                    <template v-slot:item.name="{ item }">
+                        disable-pagination
+                        :hide-default-footer="true"
+                        dense
+                    >
+                      <template v-slot:item.name="{ item }">
                     <span v-if="item.info">
                       {{ item.name }}
                       <v-btn
@@ -1295,78 +1299,78 @@
                       </v-btn>
 
                     </span>
-                      <span v-else>{{ item.name }}</span>
-                    </template>
+                        <span v-else>{{ item.name }}</span>
+                      </template>
 
-                    <template
-                        v-slot:item.value="{ item }"
+                      <template
+                          v-slot:item.value="{ item }"
+                      >
+
+                        <template v-if="getAvailabilityColor(item) != null">
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-chip
+                                  :color="getAvailabilityColor(item)[0]"
+                                  dark
+                                  :key="industry.name"
+                                  v-bind="attrs"
+                                  v-on="on"
+                                  text-color="#1c1c1b"
+                              >
+                                {{ item.value }}
+                              </v-chip>
+                            </template>
+                            <span>{{ getAvailabilityColor(item)[1] }}</span>
+                          </v-tooltip>
+                        </template>
+                        <template v-else>
+                          <v-chip
+                              color="transparent"
+                              dark
+                              :key="industry.name"
+                              text-color="#1c1c1b"
+                              class="chip_no_hover"
+                          >
+                            {{ item.value }}
+                          </v-chip>
+                        </template>
+                      </template>
+                      <template
+                          v-slot:item.data="{ item }"
+                      >
+                        <template v-if="getDataTypeColor(item) != null">
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-chip
+                                  :color="getDataTypeColor(item)[0]"
+                                  dark
+                                  :key="industry.name"
+                                  text-color="#1c1c1b"
+                                  v-bind="attrs"
+                                  v-on="on"
+                              >
+                                {{ item.data }}
+                              </v-chip>
+                            </template>
+                            <span>{{getDataTypeColor(item)[1]}}</span>
+                          </v-tooltip>
+                        </template>
+                      </template>
+
+                    </v-data-table>
+
+                  </div>
+                  <div v-else-if="active_indicator[0] == 15">
+                    <v-data-table
+                        :headers="freshwater_lever_for_action.header"
+                        :items="freshwater_lever_for_action.value"
+                        disable-pagination
+                        :hide-default-footer="true"
+                        dense
+
                     >
 
-                      <template v-if="getAvailabilityColor(item) != null">
-                        <v-tooltip bottom>
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-chip
-                                :color="getAvailabilityColor(item)[0]"
-                                dark
-                                :key="industry.name"
-                                v-bind="attrs"
-                                v-on="on"
-                                text-color="#1c1c1b"
-                            >
-                              {{ item.value }}
-                            </v-chip>
-                          </template>
-                          <span>{{ getAvailabilityColor(item)[1] }}</span>
-                        </v-tooltip>
-                      </template>
-                      <template v-else>
-                        <v-chip
-                            color="transparent"
-                            dark
-                            :key="industry.name"
-                            text-color="#1c1c1b"
-                            class="chip_no_hover"
-                        >
-                          {{ item.value }}
-                        </v-chip>
-                      </template>
-                    </template>
-                    <template
-                        v-slot:item.data="{ item }"
-                    >
-                      <template v-if="getDataTypeColor(item) != null">
-                        <v-tooltip bottom>
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-chip
-                                :color="getDataTypeColor(item)[0]"
-                                dark
-                                :key="industry.name"
-                                text-color="#1c1c1b"
-                                v-bind="attrs"
-                                v-on="on"
-                            >
-                              {{ item.data }}
-                            </v-chip>
-                          </template>
-                          <span>{{getDataTypeColor(item)[1]}}</span>
-                        </v-tooltip>
-                      </template>
-                    </template>
-
-                  </v-data-table>
-
-                </div>
-                <div v-else-if="active_indicator[0] == 15">
-                  <v-data-table
-                      :headers="freshwater_lever_for_action.header"
-                      :items="freshwater_lever_for_action.value"
-                      disable-pagination
-                      :hide-default-footer="true"
-                      dense
-
-                  >
-
-                    <template v-slot:item.name="{ item }">
+                      <template v-slot:item.name="{ item }">
                       <span v-if="item.info">
                         {{ item.name }}
                         <v-btn
@@ -1382,178 +1386,178 @@
                           </v-icon>
                         </v-btn>
                       </span>
-                      <span v-else>{{ item.name }}</span>
-                    </template>
-                    <template
-                        v-slot:item.data="{ item }"
-                    >
-                      <template v-if="getDataTypeColor(item) != null">
-                        <v-tooltip bottom>
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-chip
-                                :color="getDataTypeColor(item)[0]"
-                                dark
-                                :key="industry.name"
-                                text-color="#1c1c1b"
-                                v-bind="attrs"
-                                v-on="on"
-                            >
-                              {{ item.data }}
-                            </v-chip>
-                          </template>
-                          <span>{{getDataTypeColor(item)[1]}}</span>
-                        </v-tooltip>
+                        <span v-else>{{ item.name }}</span>
                       </template>
-                    </template>
-
-                  </v-data-table>
-
-                </div>
-                <div v-else-if="active_indicator[0] == 17">
-
-                  <v-chip-group
-                      mandatory
-                      v-model="emissions_chip"
-                  >
-                    <v-chip
-                        color="primary"
-                        outlined
-                        class="ma-2"
-                        pill
-                    >
-                      <v-icon left>
-                        mdi-chart-pie
-                      </v-icon>
-                      Chart
-                    </v-chip>
-
-                    <v-chip
-                        color="primary"
-                        outlined
-                        pill
-                        class="ma-2"
-                    >
-                      <v-icon left>
-                        mdi-table
-                      </v-icon>
-                      Table
-
-                    </v-chip>
-                  </v-chip-group>
-
-                  <v-data-table
-                      :headers="emissions_table.header"
-                      :items="emissions_table.value"
-
-                      :item-class="itemRowBold"
-                      disable-pagination
-                      :hide-default-footer="true"
-                      dense
-                      v-if="emissions_chip === 1"
-                  >
-                    <template v-slot:item.name="{ item }">
-                    <span v-if="item.info">
-                      {{ item.name }}
-                      <v-btn
-                          icon
-                          @click="$data[item.info] = true"
-                          class="icon_clickable"
-                          x-small
+                      <template
+                          v-slot:item.data="{ item }"
                       >
-                        <v-icon
-                            color='#1C195B'
-                        >
-                          mdi-information-outline
-                        </v-icon>
-                      </v-btn>
-                    </span>
-                      <span v-else>{{ item.name }}</span>
-                    </template>
-
-                    <template
-                        v-slot:item.value="{ item }"
-                    >
-
-                      <template v-if="getGlobalWarming(item) != null">
-                        <v-tooltip bottom>
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-chip
-                                :color="getGlobalWarming(item)[0]"
-                                dark
-                                :key="industry.name"
-                                v-bind="attrs"
-                                v-on="on"
-                                text-color="#1c1c1b"
-                            >
-                              {{ item.value }}
-                            </v-chip>
-                          </template>
-                          <span>{{ getGlobalWarming(item)[1] }}</span>
-                        </v-tooltip>
+                        <template v-if="getDataTypeColor(item) != null">
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-chip
+                                  :color="getDataTypeColor(item)[0]"
+                                  dark
+                                  :key="industry.name"
+                                  text-color="#1c1c1b"
+                                  v-bind="attrs"
+                                  v-on="on"
+                              >
+                                {{ item.data }}
+                              </v-chip>
+                            </template>
+                            <span>{{getDataTypeColor(item)[1]}}</span>
+                          </v-tooltip>
+                        </template>
                       </template>
-                      <template v-else>
-                        <v-chip
-                            color="transparent"
-                            dark
-                            :key="industry.name"
-                            text-color="#1c1c1b"
-                            class="chip_no_hover"
-                        >
-                          {{ item.value }}
-                        </v-chip>
-                      </template>
-                    </template>
-                    <template
-                        v-slot:item.data="{ item }"
-                    >
-                      <template v-if="getDataTypeColor(item) != null">
-                        <v-tooltip bottom>
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-chip
-                                :color="getDataTypeColor(item)[0]"
-                                dark
-                                :key="industry.name"
-                                text-color="#1c1c1b"
-                                v-bind="attrs"
-                                v-on="on"
-                            >
-                              {{ item.data }}
-                            </v-chip>
-                          </template>
-                          <span>{{getDataTypeColor(item)[1]}}</span>
-                        </v-tooltip>
-                      </template>
-                    </template>
 
-                  </v-data-table>
-                  <div v-else-if="emissions_chip === 0">
-                    <PieChart
-                        style="padding-top: 10px"
-                        :chart-data="emissions_chart.chartData"
-                        :chart-options="emissions_chart.chartOptions"
+                    </v-data-table>
 
-
-                    />
-                    <p class="instructions_2">
-                      *Only labels >5% are shown.
-                    </p>
                   </div>
+                  <div v-else-if="active_indicator[0] == 17">
+
+                    <v-chip-group
+                        mandatory
+                        v-model="emissions_chip"
+                    >
+                      <v-chip
+                          color="primary"
+                          outlined
+                          class="ma-2"
+                          pill
+                      >
+                        <v-icon left>
+                          mdi-chart-pie
+                        </v-icon>
+                        Chart
+                      </v-chip>
+
+                      <v-chip
+                          color="primary"
+                          outlined
+                          pill
+                          class="ma-2"
+                      >
+                        <v-icon left>
+                          mdi-table
+                        </v-icon>
+                        Table
+
+                      </v-chip>
+                    </v-chip-group>
+
+                    <v-data-table
+                        :headers="emissions_table.header"
+                        :items="emissions_table.value"
+
+                        :item-class="itemRowBold"
+                        disable-pagination
+                        :hide-default-footer="true"
+                        dense
+                        v-if="emissions_chip === 1"
+                    >
+                      <template v-slot:item.name="{ item }">
+                    <span v-if="item.info">
+                      {{ item.name }}
+                      <v-btn
+                          icon
+                          @click="$data[item.info] = true"
+                          class="icon_clickable"
+                          x-small
+                      >
+                        <v-icon
+                            color='#1C195B'
+                        >
+                          mdi-information-outline
+                        </v-icon>
+                      </v-btn>
+                    </span>
+                        <span v-else>{{ item.name }}</span>
+                      </template>
+
+                      <template
+                          v-slot:item.value="{ item }"
+                      >
+
+                        <template v-if="getGlobalWarming(item) != null">
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-chip
+                                  :color="getGlobalWarming(item)[0]"
+                                  dark
+                                  :key="industry.name"
+                                  v-bind="attrs"
+                                  v-on="on"
+                                  text-color="#1c1c1b"
+                              >
+                                {{ item.value }}
+                              </v-chip>
+                            </template>
+                            <span>{{ getGlobalWarming(item)[1] }}</span>
+                          </v-tooltip>
+                        </template>
+                        <template v-else>
+                          <v-chip
+                              color="transparent"
+                              dark
+                              :key="industry.name"
+                              text-color="#1c1c1b"
+                              class="chip_no_hover"
+                          >
+                            {{ item.value }}
+                          </v-chip>
+                        </template>
+                      </template>
+                      <template
+                          v-slot:item.data="{ item }"
+                      >
+                        <template v-if="getDataTypeColor(item) != null">
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-chip
+                                  :color="getDataTypeColor(item)[0]"
+                                  dark
+                                  :key="industry.name"
+                                  text-color="#1c1c1b"
+                                  v-bind="attrs"
+                                  v-on="on"
+                              >
+                                {{ item.data }}
+                              </v-chip>
+                            </template>
+                            <span>{{getDataTypeColor(item)[1]}}</span>
+                          </v-tooltip>
+                        </template>
+                      </template>
+
+                    </v-data-table>
+                    <div v-else-if="emissions_chip === 0">
+                      <PieChart
+                          style="padding-top: 10px"
+                          :chart-data="emissions_chart.chartData"
+                          :chart-options="emissions_chart.chartOptions"
+
+
+                      />
+                      <p class="instructions_2">
+                        *Only labels >5% are shown.
+                      </p>
+                    </div>
 
 
 
 
-                </div>
-                <div v-else-if="active_indicator[0] == 19">
-                  <v-data-table
-                      :headers="energy_use_table.header"
-                      :items="energy_use_table.value"
+                  </div>
+                  <div v-else-if="active_indicator[0] == 19">
+                    <v-data-table
+                        :headers="energy_use_table.header"
+                        :items="energy_use_table.value"
 
-                      :item-class="itemRowBold"
-                      disable-pagination
-                      :hide-default-footer="true"
-                      dense
-                  >
-                    <template v-slot:item.name="{ item }">
+                        :item-class="itemRowBold"
+                        disable-pagination
+                        :hide-default-footer="true"
+                        dense
+                    >
+                      <template v-slot:item.name="{ item }">
                     <span v-if="item.info">
                       {{ item.name }}
                       <v-btn
@@ -1571,44 +1575,44 @@
 
 
                     </span>
-                      <span v-else>{{ item.value }}</span>
-                    </template>
-                    <template
-                        v-slot:item.data="{ item }"
-                    >
-                      <template v-if="getDataTypeColor(item) != null">
-                        <v-tooltip bottom>
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-chip
-                                :color="getDataTypeColor(item)[0]"
-                                dark
-                                :key="industry.name"
-                                text-color="#1c1c1b"
-                                v-bind="attrs"
-                                v-on="on"
-                            >
-                              {{ item.data }}
-                            </v-chip>
-                          </template>
-                          <span>{{getDataTypeColor(item)[1]}}</span>
-                        </v-tooltip>
+                        <span v-else>{{ item.value }}</span>
                       </template>
-                    </template>
+                      <template
+                          v-slot:item.data="{ item }"
+                      >
+                        <template v-if="getDataTypeColor(item) != null">
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-chip
+                                  :color="getDataTypeColor(item)[0]"
+                                  dark
+                                  :key="industry.name"
+                                  text-color="#1c1c1b"
+                                  v-bind="attrs"
+                                  v-on="on"
+                              >
+                                {{ item.data }}
+                              </v-chip>
+                            </template>
+                            <span>{{getDataTypeColor(item)[1]}}</span>
+                          </v-tooltip>
+                        </template>
+                      </template>
 
 
-                  </v-data-table>
-                </div>
-                <div v-else-if="active_indicator[0] == 20">
-                  <v-data-table
-                      :headers="effluent_load_table.header"
-                      :items="effluent_load_table.value"
+                    </v-data-table>
+                  </div>
+                  <div v-else-if="active_indicator[0] == 20">
+                    <v-data-table
+                        :headers="biogas_valorised_table.header"
+                        :items="biogas_valorised_table.value"
 
-                      :item-class="itemRowBold"
-                      disable-pagination
-                      :hide-default-footer="true"
-                      dense
-                  >
-                    <template v-slot:item.name="{ item }">
+                        :item-class="itemRowBold"
+                        disable-pagination
+                        :hide-default-footer="true"
+                        dense
+                    >
+                      <template v-slot:item.name="{ item }">
                     <span v-if="item.info">
                       {{ item.name }}
                       <v-btn
@@ -1626,128 +1630,73 @@
 
 
                     </span>
-                      <span v-else>{{ item.name }}</span>
-                    </template>
-                    <template
-                        v-slot:item.data="{ item }"
-                    >
-                      <template v-if="getDataTypeColor(item) != null">
-                        <v-tooltip bottom>
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-chip
-                                :color="getDataTypeColor(item)[0]"
-                                dark
-                                :key="industry.name"
-                                text-color="#1c1c1b"
-                                v-bind="attrs"
-                                v-on="on"
-                            >
-                              {{ item.data }}
-                            </v-chip>
-                          </template>
-                          <span>{{getDataTypeColor(item)[1]}}</span>
-                        </v-tooltip>
+                        <span v-else>{{ item.name }}</span>
                       </template>
-                    </template>
-
-
-                  </v-data-table>
-                </div>
-                <div v-else-if="active_indicator[0] == 21">
-                  <v-data-table
-                      :headers="biogas_valorised_table.header"
-                      :items="biogas_valorised_table.value"
-
-                      :item-class="itemRowBold"
-                      disable-pagination
-                      :hide-default-footer="true"
-                      dense
-                  >
-                    <template v-slot:item.name="{ item }">
-                    <span v-if="item.info">
-                      {{ item.name }}
-                      <v-btn
-                          icon
-                          @click="$data[item.info] = true"
-                          class="icon_clickable"
-                          x-small
+                      <template
+                          v-slot:item.data="{ item }"
                       >
-                        <v-icon
-                            color='#1C195B'
-                        >
-                          mdi-information-outline
-                        </v-icon>
-                      </v-btn>
-
-
-                    </span>
-                      <span v-else>{{ item.name }}</span>
-                    </template>
-                    <template
-                        v-slot:item.data="{ item }"
-                    >
-                      <template v-if="getDataTypeColor(item) != null">
-                        <v-tooltip bottom>
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-chip
-                                :color="getDataTypeColor(item)[0]"
-                                dark
-                                :key="industry.name"
-                                text-color="#1c1c1b"
-                                v-bind="attrs"
-                                v-on="on"
-                            >
-                              {{ item.data }}
-                            </v-chip>
-                          </template>
-                          <span>{{getDataTypeColor(item)[1]}}</span>
-                        </v-tooltip>
+                        <template v-if="getDataTypeColor(item) != null">
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-chip
+                                  :color="getDataTypeColor(item)[0]"
+                                  dark
+                                  :key="industry.name"
+                                  text-color="#1c1c1b"
+                                  v-bind="attrs"
+                                  v-on="on"
+                              >
+                                {{ item.data }}
+                              </v-chip>
+                            </template>
+                            <span>{{getDataTypeColor(item)[1]}}</span>
+                          </v-tooltip>
+                        </template>
                       </template>
-                    </template>
 
 
-                  </v-data-table>
-                </div>
-                <div v-else-if="active_indicator[0] == 22">
-                  <v-chip-group
-                      mandatory
-                      v-model="ghg_ratio_chip"
-                  >
-                    <v-chip
-                        color="primary"
-                        outlined
-                        class="ma-2"
-                        pill
+                    </v-data-table>
+                  </div>
+                  <div v-else-if="active_indicator[0] == 21">
+                    <v-chip-group
+                        mandatory
+                        v-model="ghg_ratio_chip"
                     >
-                      <v-icon left>
-                        mdi-chart-pie
-                      </v-icon>
-                      Chart
-                    </v-chip>
+                      <v-chip
+                          color="primary"
+                          outlined
+                          class="ma-2"
+                          pill
+                      >
+                        <v-icon left>
+                          mdi-chart-pie
+                        </v-icon>
+                        Chart
+                      </v-chip>
 
-                    <v-chip
-                        color="primary"
-                        outlined
-                        pill
-                        class="ma-2"
+                      <v-chip
+                          color="primary"
+                          outlined
+                          pill
+                          class="ma-2"
+                      >
+                        <v-icon left>
+                          mdi-table
+                        </v-icon>
+                        Table
+
+                      </v-chip>
+                    </v-chip-group>
+                    <v-data-table
+                        :headers="ghg_ratio_table.header"
+                        :items="ghg_ratio_table.value"
+                        :item-class="itemRowBold"
+                        disable-pagination
+                        :hide-default-footer="true"
+                        dense
+                        v-if="ghg_ratio_chip === 1"
                     >
-                      <v-icon left>
-                        mdi-table
-                      </v-icon>
-                      Table
-
-                    </v-chip>
-                  </v-chip-group>
-                  <v-data-table
-                      :headers="ghg_ratio_table.header"
-                      :items="ghg_ratio_table.value"
-                      :item-class="itemRowBold"
-                      disable-pagination
-                      :hide-default-footer="true"
-                      dense
-                      v-if="ghg_ratio_chip === 1"
-                  >
-                    <template v-slot:item.name="{ item }">
+                      <template v-slot:item.name="{ item }">
                       <span v-if="item.info">
                       {{ item.name }}
                       <v-btn
@@ -1764,85 +1713,85 @@
                       </v-btn>
 
                     </span>
-                      <span v-else>{{ item.name }}</span>
-                    </template>
-                    <template
-                        v-slot:item.data="{ item }"
-                    >
-                      <template v-if="getDataTypeColor(item) != null">
-                        <v-tooltip bottom>
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-chip
-                                :color="getDataTypeColor(item)[0]"
-                                dark
-                                :key="industry.name"
-                                text-color="#1c1c1b"
-                                v-bind="attrs"
-                                v-on="on"
-                            >
-                              {{ item.data }}
-                            </v-chip>
-                          </template>
-                          <span>{{getDataTypeColor(item)[1]}}</span>
-                        </v-tooltip>
+                        <span v-else>{{ item.name }}</span>
                       </template>
-                    </template>
+                      <template
+                          v-slot:item.data="{ item }"
+                      >
+                        <template v-if="getDataTypeColor(item) != null">
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-chip
+                                  :color="getDataTypeColor(item)[0]"
+                                  dark
+                                  :key="industry.name"
+                                  text-color="#1c1c1b"
+                                  v-bind="attrs"
+                                  v-on="on"
+                              >
+                                {{ item.data }}
+                              </v-chip>
+                            </template>
+                            <span>{{getDataTypeColor(item)[1]}}</span>
+                          </v-tooltip>
+                        </template>
+                      </template>
 
-                  </v-data-table>
+                    </v-data-table>
 
-                  <div v-else-if="ghg_ratio_chip === 0">
-                    <PieChart
-                        style="padding-top: 10px"
-                        :chart-data="ghg_ratio_chart.chartData"
-                        :chart-options="ghg_ratio_chart.chartOptions"
+                    <div v-else-if="ghg_ratio_chip === 0">
+                      <PieChart
+                          style="padding-top: 10px"
+                          :chart-data="ghg_ratio_chart.chartData"
+                          :chart-options="ghg_ratio_chart.chartOptions"
 
-                    />
-                    <p class="instructions_2">
-                      *Only labels >5% are shown.
-                    </p>
+                      />
+                      <p class="instructions_2">
+                        *Only labels >5% are shown.
+                      </p>
+                    </div>
+
                   </div>
-
-                </div>
-                <div v-else-if="active_indicator[0] == 23">
-                  <v-chip-group
-                      mandatory
-                      v-model="ghg_sludge_management_chip"
-                  >
-                    <v-chip
-                        color="primary"
-                        outlined
-                        class="ma-2"
-                        pill
+                  <div v-else-if="active_indicator[0] == 22">
+                    <v-chip-group
+                        mandatory
+                        v-model="ghg_sludge_management_chip"
                     >
-                      <v-icon left>
-                        mdi-chart-pie
-                      </v-icon>
-                      Chart
-                    </v-chip>
+                      <v-chip
+                          color="primary"
+                          outlined
+                          class="ma-2"
+                          pill
+                      >
+                        <v-icon left>
+                          mdi-chart-pie
+                        </v-icon>
+                        Chart
+                      </v-chip>
 
-                    <v-chip
-                        color="primary"
-                        outlined
-                        pill
-                        class="ma-2"
+                      <v-chip
+                          color="primary"
+                          outlined
+                          pill
+                          class="ma-2"
+                      >
+                        <v-icon left>
+                          mdi-table
+                        </v-icon>
+                        Table
+
+                      </v-chip>
+                    </v-chip-group>
+                    <v-data-table
+                        :headers="ghg_sludge_management_table.header"
+                        :items="ghg_sludge_management_table.value"
+                        :item-class="itemRowBold"
+                        disable-pagination
+                        :hide-default-footer="true"
+                        dense
+                        v-if="ghg_sludge_management_chip === 1"
                     >
-                      <v-icon left>
-                        mdi-table
-                      </v-icon>
-                      Table
-
-                    </v-chip>
-                  </v-chip-group>
-                  <v-data-table
-                      :headers="ghg_sludge_management_table.header"
-                      :items="ghg_sludge_management_table.value"
-                      :item-class="itemRowBold"
-                      disable-pagination
-                      :hide-default-footer="true"
-                      dense
-                      v-if="ghg_sludge_management_chip === 1"
-                  >
-                    <template v-slot:item.name="{ item }">
+                      <template v-slot:item.name="{ item }">
                       <span v-if="item.info">
                       {{ item.name }}
                       <v-btn
@@ -1859,47 +1808,49 @@
                       </v-btn>
 
                     </span>
-                      <span v-else>{{ item.name }}</span>
-                    </template>
-                    <template
-                        v-slot:item.data="{ item }"
-                    >
-                      <template v-if="getDataTypeColor(item) != null">
-                        <v-tooltip bottom>
-                          <template v-slot:activator="{ on, attrs }">
-                            <v-chip
-                                :color="getDataTypeColor(item)[0]"
-                                dark
-                                :key="industry.name"
-                                text-color="#1c1c1b"
-                                v-bind="attrs"
-                                v-on="on"
-                            >
-                              {{ item.data }}
-                            </v-chip>
-                          </template>
-                          <span>{{getDataTypeColor(item)[1]}}</span>
-                        </v-tooltip>
+                        <span v-else>{{ item.name }}</span>
                       </template>
-                    </template>
+                      <template
+                          v-slot:item.data="{ item }"
+                      >
+                        <template v-if="getDataTypeColor(item) != null">
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-chip
+                                  :color="getDataTypeColor(item)[0]"
+                                  dark
+                                  :key="industry.name"
+                                  text-color="#1c1c1b"
+                                  v-bind="attrs"
+                                  v-on="on"
+                              >
+                                {{ item.data }}
+                              </v-chip>
+                            </template>
+                            <span>{{getDataTypeColor(item)[1]}}</span>
+                          </v-tooltip>
+                        </template>
+                      </template>
 
-                  </v-data-table>
+                    </v-data-table>
 
-                  <div v-else-if="ghg_sludge_management_chip === 0">
-                    <BarChart
-                        style="padding-top: 10px"
-                        :chart-data="ghg_sludge_management_chart.chartData"
-                        :chart-options="ghg_sludge_management_chart.chartOptions"
-                    />
+                    <div v-else-if="ghg_sludge_management_chip === 0">
+                      <BarChart
+                          style="padding-top: 10px"
+                          :chart-data="ghg_sludge_management_chart.chartData"
+                          :chart-options="ghg_sludge_management_chart.chartOptions"
+                      />
+                    </div>
+
                   </div>
 
+
                 </div>
+              </v-scroll-y-transition>
+            </v-col>
+          </v-row>
+        </div>
 
-
-              </div>
-            </v-scroll-y-transition>
-          </v-col>
-        </v-row>
 
 
       </div>
@@ -3072,45 +3023,6 @@
           </div>
 
         </v-dialog>
-        <v-dialog
-            v-model="info_effluent_load_cod"
-            width="60%"
-        >
-          <div class="dialog_detail" style="background-color: white">
-            <h3> COD effluent load </h3>
-            <br>
-            Concentration of COD discharged by the industry.
-            <br>
-            Reducing COD will contribute to reducing your GHG emissions associated to "water discharged"
-          </div>
-
-        </v-dialog>
-        <v-dialog
-            v-model="info_effluent_load_tn"
-            width="60%"
-        >
-          <div class="dialog_detail" style="background-color: white">
-            <h3> TN effluent load </h3>
-            <br>
-            Concentration of TN discharged by the industry.
-            <br>
-            Reducing TN will contribute to reducing your GHG emissions associated to "water discharged"
-          </div>
-
-        </v-dialog>
-        <v-dialog
-            v-model="info_effluent_load_tp"
-            width="60%"
-        >
-          <div class="dialog_detail" style="background-color: white">
-            <h3> TP effluent load </h3>
-            <br>
-            Concentration of TP discharged by the industry.
-            <br>
-            Reducing TP will contribute to reducing your GHG emissions associated to "water discharged"
-          </div>
-
-        </v-dialog>
 
         <v-dialog
             v-model="co2_ghg_ratio_info"
@@ -3121,7 +3033,8 @@
             <br>
             CO2 emissions in the wastewater treatment process.
             <br>
-            For more information, see Carbon impact.          </div>
+            For more information, see <b>Impact on industrial wastewater on GHG emissions</b>.
+          </div>
 
         </v-dialog>
         <v-dialog
@@ -3133,7 +3046,7 @@
             <br>
             N2O emissions in the wastewater treatment process.
             <br>
-            For more information, see Carbon impact.
+            For more information, see <b>Impact on industrial wastewater on GHG emissions</b>.
           </div>
 
         </v-dialog>
@@ -3146,8 +3059,8 @@
             <br>
             CH4 emissions in the wastewater treatment process.
             <br>
-            For more information, see Carbon impact.          </div>
-
+            For more information, see <b>Impact on industrial wastewater on GHG emissions</b>.
+          </div>
         </v-dialog>
         <v-dialog
             v-model="info_pollutant_concentration"
@@ -3175,6 +3088,10 @@
 
             </ul>
             <br>
+            <div v-if="selected_pollutant == 'COD' || selected_pollutant == 'TN' || selected_pollutant == 'TP'">
+              Reducing {{ selected_pollutant }} will contribute to reducing your <b>GHG emissions</b> associated to <b>water discharged</b>
+            </div>
+
 
           </div>
         </v-dialog>
@@ -3286,7 +3203,6 @@ export default {
       emissions_chart: {chartData: {}, chartOptions: {}},
       emissions_chip: 0,
       energy_use_table: {header: [], value: []},
-      effluent_load_table: {header: [], value: []},
       biogas_valorised_table: {header: [], value: []},
 
       simple_report_table: {header: [], value: []},
@@ -3387,9 +3303,6 @@ export default {
       info_delta_eqs: false,
       info_efficiency: false,
       info_efficiency_influent: false,
-      info_effluent_load_tn: false,
-      info_effluent_load_cod: false,
-      info_effluent_load_tp: false,
 
       info_pollutant_concentration: false,
       co2_ghg_ratio_info: false,
@@ -3447,7 +3360,6 @@ export default {
 
       _this.emissions_table = _this.generate_emissions_table()
       _this.energy_use_table = _this.generate_energy_use_table()
-      _this.effluent_load_table = _this.generate_effluent_load_table()
 
       _this.water_quantity = await _this.generate_water_availability_table()
       _this.treated_table = await _this.generate_treated_table()
@@ -3828,17 +3740,17 @@ export default {
     },
 
     getDataTypeColor(item){
-      if(item.data == "UD") {
-        return ["#76FF03", (this.table_title.data_type_table_names[item.data])]
+      if(item.data == this.table_title.data_type_table_names.UD) {
+        return ["#76FF03", item.data]
       }
-      else if(item.data == "Es") {
-        return ["#1DE9B6", (this.table_title.data_type_table_names[item.data])]
+      else if(item.data == this.table_title.data_type_table_names.Es) {
+        return ["#1DE9B6", item.data]
       }
-      else if (item.data == "Mo") {
-        return ["#D500F9", (this.table_title.data_type_table_names[item.data])]
+      else if (item.data == this.table_title.data_type_table_names.Mo) {
+        return ["#D500F9", item.data]
       }
-      else if (item.data == "ID") {
-        return ["#F50057", (this.table_title.data_type_table_names[item.data])]
+      else if (item.data == this.table_title.data_type_table_names.ID) {
+        return ["#F50057", item.data]
       }
       return null
     },
@@ -4325,7 +4237,7 @@ export default {
         //let dichloroethane = {value: _this.table_title.pollutants.diclo,  info: "info_pollutant_concentration"}
         //dichloroethane[key] = tu.diclo
         //dichloroethane['delta'] = delta.diclo
-        for(let pollutant of utils.remove_nutrients(this.industry.pollutants_selected)){
+        for(let pollutant of this.industry.pollutants_selected){
           let DataType = industry_impact_legend_category.pollutant_concentration(industries[0], pollutant)
           let pollutant_obj = {
             name: pollutant,
@@ -4442,69 +4354,6 @@ export default {
         //pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
 
         pollutants_table.value.push(energy)
-        return pollutants_table
-      } else return {header: [], value: []}
-
-    },
-
-    //Wastewater effluent concentration table
-    generate_effluent_load_table() {
-
-      let _this = this
-
-      if (_this.industry != null) {
-
-        let pollutants_table = {
-          header: [{text: "", value: "name", sortable: false},
-            {text: this.industry.name, value: "value"},
-            {text: "Unit", value: "unit", sortable: false },
-            {text: "Data Type", value: "data", sortable: false}],
-          value: []
-        }
-
-        let industries = [this.industry]
-
-        let load = metrics.effluent_concentration(industries)
-
-        let tn = {
-          name: _this.table_title.pollutants.tn,
-          unit: "gTN/m3",
-          info: "info_effluent_load_tn",
-          value: load.tn,
-          data: "ID"
-        }
-        let tp = {
-          name: _this.table_title.pollutants.tp,
-          unit: "gTP/m3",
-          info: "info_effluent_load_tp",
-          value: load.tp,
-          data: "ID"
-        }
-        let cod = {
-          name: _this.table_title.pollutants.cod,
-          unit: "gCOD/m3",
-          info: "info_effluent_load_cod",
-          value: load.cod,
-          data: "ID"
-        }
-
-        //let key = this.industry.name
-
-        //pollutants_table.header.push({
-          //text: key, value: key,
-        //})
-
-        /*let load = metrics.effluent_concentration(industries)
-        tn[key] = load.tn
-        cod[key] = load.cod
-        tp[key] = load.tp*/
-
-        //pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
-
-        pollutants_table.value.push(cod)
-        pollutants_table.value.push(tn)
-        pollutants_table.value.push(tp)
-
         return pollutants_table
       } else return {header: [], value: []}
 
@@ -5408,21 +5257,21 @@ export default {
 
     /*Gets the string equivalent to the input
       UD = User Data = 1
-      Es = Estimated = 2
-      Mo = Modeled = 3
+      Mo = Modeled = 2
+      Es = Estimated = 3
       ID = Insufficient Data = 4
      */
     get_string_impact_legend(value){
       if (value == 1){
-        return "UD"
+        return this.table_title.data_type_table_names.UD
       }
       else if (value == 2){
-        return "Es"
+        return this.table_title.data_type_table_names.Mo
       }
       else if (value == 3){
-        return "Mo"
+        return this.table_title.data_type_table_names.Es
       }
-      else return "ID"
+      else return this.table_title.data_type_table_names.ID
     },
 
     created_function(){
@@ -5462,7 +5311,7 @@ export default {
           children: [
             {
               id: 2,
-              name: 'Impact',
+              name: 'Impact of industrial wastewater',
               children: [
                 {id: 3, name: this.table_title.simple_table.delta_tu, info: "Toxic units in the receiving water body indicates if the concentration after the effluent discharge on the water body exceed the EC50, supposing the receiving water has a concentration of 0 before discharge."},
                 {id: 4, name: this.table_title.simple_table.delta_eqs, info: "Increase of the concentration of the pollutants in the receiving water body after discharge (with respect to EQS), supposing the receiving water has a concentration of 0 before discharge."},
@@ -5489,7 +5338,7 @@ export default {
           id: 13,
           name: "Water availability",
           children: [
-            {id: 14, name: "Water availability impacts",},
+            {id: 14, name: "Impact of industrial wastewater",},
             {id: 15, name: "Levers for action",}
           ]
         },
@@ -5497,16 +5346,15 @@ export default {
           id: 16,
           name: "GHG emissions from wastewater treatment",
           children: [
-            {id: 17, name: "Impact",},
+            {id: 17, name: "Impact of industrial wastewater",},
             {
               id: 18,
               name: "Levers for action",
               children: [
                 {id: 19, name: "Energy use", info: "Energy used by the industry to treat a m3 of water"},
-                {id: 20, name: "Wastewater effluent concentration", info: "Concentration of pollutant discharged by the industry"},
-                {id: 21, name: "Biogenic emissions", info: "Biogenic emissions sources are emissions that come from natural sources"},
-                {id: 22, name: "GHG emissions ratio", info: "Amount of CO2, CH4 and N2O during wastewater treatment process"},
-                {id: 23, name: "Sludge management", info: "GHG emissions from sludge management operations (storing, composting, incineration, land application, landfilling, stockpiling and truck transport)"},
+                {id: 20, name: "Biogenic emissions", info: "Biogenic emissions sources are emissions that come from natural sources"},
+                {id: 21, name: "GHG emissions ratio", info: "Amount of CO2, CH4 and N2O during wastewater treatment process"},
+                {id: 22, name: "Sludge management", info: "GHG emissions from sludge management operations (storing, composting, incineration, land application, landfilling, stockpiling and truck transport)"},
               ]
             },
           ]
@@ -5611,7 +5459,7 @@ table {
 .state_of_nature{
   color: #b62373;
   text-decoration: none;
-  margin-left: -20vw !important;
+  margin-left: -10vw !important;
 }
 
 .style-1 {

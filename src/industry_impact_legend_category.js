@@ -1,7 +1,4 @@
 
-import industry_estimations from "@/industry_estimation"
-
-
 
 function merge_dicts(dicts){
     let industry = new Set()
@@ -60,23 +57,27 @@ For each input of inputs, says if value has been entered by the user (1), is an 
     })
 }*/
 
-function analyse_stage(inputs, level_of_certainty_obj, pollutant=null){
+function analyse_stage(inputs, level_of_certainty_obj, pollutant=null, print=false){
     if (level_of_certainty_obj == undefined || level_of_certainty_obj == null) return null
     return inputs.map(input => {
         let level_of_certainty = null
         if (pollutant == null){
             level_of_certainty = level_of_certainty_obj[input]
         }else{
-            level_of_certainty = level_of_certainty_obj[input][pollutant]
+            let obj = level_of_certainty_obj[input]
+            if (obj!= null && typeof obj == 'object') level_of_certainty = obj[pollutant]
+            else level_of_certainty = obj
+        }
+
+
+        if (print) {
+            console.log(input, '--> ', level_of_certainty)
         }
 
         if (level_of_certainty == 'user_data') return 1
-        else if (level_of_certainty == 'estimated') return 2
-        else if (level_of_certainty == 'modeled') return 3
+        else if (level_of_certainty == 'modeled') return 2
+        else if (level_of_certainty == 'estimated') return 3
         else if (level_of_certainty == 'no_data') return 4
-
-
-
 
     })
 }
@@ -84,25 +85,40 @@ function analyse_stage(inputs, level_of_certainty_obj, pollutant=null){
 
 /*
 Returns 1 if all the values has been entered by the user
-Returns 2 if all values are set, but at least one is estimated
-Returns 3 if at least any value is not set (or is 0)
+Returns 2 if all values are set, but at least one is modeled
+Returns 3 if all values are set, but at least one is modeled
+Returns 4 if at least any value is not set (insufficient data)
  */
-function category_of_inputs(industry, inputs, pollutant = null){
+function category_of_inputs(industry, inputs, pollutant = null, print = false){
 
 
     let stages_evaluation = Object.keys(inputs).map(key => {
         let level_of_certainty_obj = undefined
-        if (key=='onsite_wwtp' || key=='offsite_wwtp' || key=='direct_discharge'){
-            level_of_certainty_obj = industry[key]['level_of_certainty']
-            return 0
+        if (key=='offsite_wwtp'){
+            if (industry.has_offsite_wwtp == 1){
+                level_of_certainty_obj = industry[key]['level_of_certainty']
+                return analyse_stage(inputs[key], level_of_certainty_obj, pollutant, print)
+            }
+            return null
+        }if (key=='direct_discharge'){
+            if (industry.has_direct_discharge == 1){
+                level_of_certainty_obj = industry[key]['level_of_certainty']
+                return analyse_stage(inputs[key], level_of_certainty_obj, pollutant)
+            }
+            return null
+        }else if (key=='onsite_wwtp'){
+            if (industry.has_onsite_wwtp == 1){
+                level_of_certainty_obj = industry[key]['level_of_certainty']
+                return analyse_stage(inputs[key], level_of_certainty_obj, pollutant, print)
+            } else return null
         }else{
             level_of_certainty_obj = industry['level_of_certainty']   //Industry stage
             return analyse_stage(inputs[key], level_of_certainty_obj, pollutant)
-
         }
 
         //return analyse_stage(inputs[key], level_of_certainty_obj, pollutant)
     })
+    if (print) console.log(Math.max(...stages_evaluation.flat().filter(x => x != null)))
     return Math.max(...stages_evaluation.flat().filter(x => x != null))
 
 
@@ -210,9 +226,9 @@ let inputs_required = {
     },
     water_filtered(){
         let industry = ['ind_pollutants_effl']
-        let onsite_wwtp = ['wwt_vol_trea']
-        let offsite_wwtp = ['wwt_vol_trea']
-        let direct_discharge = ['dd_vol_disc']
+        let onsite_wwtp = ['wwt_vol_trea', 'wwt_vol_disc', 'wwt_pollutants_effl']
+        let offsite_wwtp = ['wwt_vol_trea', 'wwt_vol_from_external', 'wwt_vol_disc', 'wwt_pollutants_effl', 'wwt_pollutants_infl_wwtp']
+        let direct_discharge = ['dd_vol_disc', 'wwt_pollutants_effl']
         return {industry, onsite_wwtp, offsite_wwtp, direct_discharge}
     },
     effl_efficiency(){
@@ -327,9 +343,9 @@ let inputs_required = {
 
     //Only for COD and TN
     wwt_KPI_GHG_tre(){
-        let industry = []
-        let onsite_wwtp = ['wwt_pollutants_infl_ind', 'wwt_pollutants_infl_wwtp', 'wwt_vol_trea', 'wwt_vol_from_external', 'wwt_cod_slud', 'wwt_ch4_efac_tre', 'wwt_n2o_efac_tre']
-        let offsite_wwtp = onsite_wwtp
+        let industry = ["ind_pollutants_effl"]
+        let onsite_wwtp = ['wwt_vol_trea', 'wwt_cod_slud', 'wwt_ch4_efac_tre', 'wwt_n2o_efac_tre']
+        let offsite_wwtp = ['wwt_pollutants_infl_wwtp', 'wwt_vol_from_external','wwt_vol_trea', 'wwt_cod_slud', 'wwt_ch4_efac_tre', 'wwt_n2o_efac_tre']
         let direct_discharge = []
         return {industry, onsite_wwtp, offsite_wwtp, direct_discharge}
     },
@@ -506,6 +522,7 @@ let industry_impact_legend_category = {
     },
     emissions_and_descriptions(industry) {
         let inputs = this.wwt_KPI_GHG_deglossed();
+
         return Math.max(
             category_of_inputs(industry, inputs, "COD"),
             category_of_inputs(industry, inputs, "TN")
@@ -541,7 +558,11 @@ let industry_impact_legend_category = {
     },
     emissions_tre(industry) {
         let inputs = inputs_required.wwt_KPI_GHG_tre();
-        return category_of_inputs(industry, inputs)
+
+        return Math.max(
+            category_of_inputs(industry, inputs, "COD", true),
+            category_of_inputs(industry, inputs, "TN", true)
+        )
     },
     emissions_biog(industry) {
         let inputs = inputs_required.wwt_KPI_GHG_biog();

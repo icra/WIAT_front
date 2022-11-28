@@ -494,7 +494,7 @@ Vue.prototype.$layers_description = [
               info: "Unimproved/no sanitation reflects the percentage of the population using pit latrines without a slab or platform, hanging/bucket latrines, or directly disposing human waste in fields, forests, bushes, open bodies of water, beaches, other open spaces, or with solid waste. <br><br><b> Temporal resolution: 2015</b>"
             }
           },
-          {
+          /*{
             name: 'River fragmentation',
             locked: false,
             layer: {
@@ -513,7 +513,7 @@ Vue.prototype.$layers_description = [
               future: false,
               info: "River fragmentation"
             }
-          },
+          },*/
 
         ]
       },
