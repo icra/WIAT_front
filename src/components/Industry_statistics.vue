@@ -15,17 +15,18 @@
               style="color: #b62373; width: 100%"
             >
               <v-btn
+                  tile
+                  style="background-color:#b62373; border:none; width: 70%; font-size: min(1vw, 15px)"
+              >
+                IMPACT AND LEVERS FOR ACTION
+              </v-btn>
+              <v-btn
                 tile
                 style="background-color:#b62373; border:none; width: 30%; font-size: min(1vw, 15px)"
               >
                 CONTEXT
               </v-btn>
-              <v-btn
-                  tile
-                 style="background-color:#b62373; border:none; width: 70%; font-size: min(1vw, 15px)"
-              >
-                IMPACT AND LEVERS FOR ACTION
-              </v-btn>
+
             </v-btn-toggle>
             <!--<v-tabs
                 id="main_tab"
@@ -55,7 +56,7 @@
                   selected-color="#1C195B"
                   style="padding-left: 15px; height: 100%;"
                   item-disabled="locked"
-                  v-if="toggle == 0"
+                  v-if="toggle == 1"
               >
                 <template v-slot:append="{ item }">
                   <v-tooltip bottom v-if="item.layer && item.layer.info" max-width="700px">
@@ -85,7 +86,6 @@
                   transition
                   dense
                   v-else
-                  @update:active="layerTreeSelected"
                   style="padding-left: 15px; height: 100%;"
 
               >
@@ -112,9 +112,6 @@
                   {{ item.name }}
 
                   <span v-if="item.name == 'Water quality' || item.name == 'Water availability'" class="state_of_nature">(Change of state of nature)</span>
-
-
-
 
                 </template>
 
@@ -144,12 +141,11 @@
 
             </div>
 
-
           </v-col>
 
 
           <v-col cols = 7 style="height: 99%; width: 100%; overflow-y: auto;">
-            <div style = "height: 100%; width: 100%;" v-if="toggle == 0">
+            <div style = "height: 100%; width: 100%;" v-if="toggle == 1">
               <v-data-table
                   :headers="industry_table.header"
                   :items="industry_table.value"
@@ -3639,7 +3635,6 @@ export default {
         for(let [i, val] of arr.entries()) {
           this.industry_table.value[i]["baseline"] = null
           this.industry_table.value[i]["future"] = null
-
         }
 
         this.industry_table.header = [
@@ -3728,7 +3723,7 @@ export default {
       else {
         this.industry_table.header =
             [{text: "Type", value: "type"},
-                {text: "Name", value: "supplier_name"},
+              {text: "Name", value: "supplier_name"},
               {text: "Country", value: "country"},
               {text: "Latitude", value: "lat"},
               {text: "Longitude", value: "lng"},
@@ -3925,17 +3920,17 @@ export default {
     },
 
     getDataTypeColor(item){
-      if(item.data == "UD") {
-        return ["#76FF03", (this.table_title.data_type_table_names[item.data])]
+      if(item.data == "User data") {
+        return ["#76FF03", 'All inputs have been entered with user data.']
       }
-      else if(item.data == "Es") {
-        return ["#1DE9B6", (this.table_title.data_type_table_names[item.data])]
+      else if(item.data == "Estimated") {
+        return ["#1DE9B6", 'All the inputs have been introduced, but at least one is estimated']
       }
-      else if (item.data == "Mo") {
-        return ["#D500F9", (this.table_title.data_type_table_names[item.data])]
+      else if (item.data == "Modeled") {
+        return ["#D500F9", 'All the inputs have been introduced, but at least one is modeled']
       }
-      else if (item.data == "ID") {
-        return ["#F50057", (this.table_title.data_type_table_names[item.data])]
+      else if (item.data == "Insufficient data") {
+        return ["#F50057", 'Of all the inputs, at least one is not entered']
       }
       return null
     },
@@ -5509,21 +5504,21 @@ export default {
 
     /*Gets the string equivalent to the input
       UD = User Data = 1
-      Es = Estimated = 2
-      Mo = Modeled = 3
+      Mo = Modeled = 2
+      Es = Estimated = 3
       ID = Insufficient Data = 4
      */
     get_string_impact_legend(value){
       if (value == 1){
-        return "UD"
+        return "User data"
       }
       else if (value == 2){
-        return "Es"
+        return "Modeled"
       }
       else if (value == 3){
-        return "Mo"
+        return "Estimated"
       }
-      else return "ID"
+      else return "Insufficient data"
     },
 
     created_function(){
@@ -5604,7 +5599,6 @@ export default {
               name: "Levers for action",
               children: [
                 {id: 19, name: "Energy use", info: "Energy used by the industry to treat a m3 of water"},
-                {id: 20, name: "Wastewater effluent concentration", info: "Concentration of pollutant discharged by the industry"},
                 {id: 21, name: "Biogenic emissions", info: "Biogenic emissions sources are emissions that come from natural sources"},
                 {id: 22, name: "GHG emissions ratio", info: "Amount of CO2, CH4 and N2O during wastewater treatment process"},
                 {id: 23, name: "Sludge management", info: "GHG emissions from sludge management operations (storing, composting, incineration, land application, landfilling, stockpiling and truck transport)"},
