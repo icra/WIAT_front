@@ -145,6 +145,19 @@
 
 
           <v-col cols = 7 style="height: 99%; width: 100%; overflow-y: auto;">
+            <v-hover v-slot="{ hover }">
+              <v-alert
+                  shaped
+                  type="warning"
+                  prominent
+                  border="left"
+                  @click="set_pollutants_factors"
+                  :outlined = "!hover"
+                  v-if="pollutants_without_factor"
+              >
+                You have some conversion factors (to calculate some statistics) unset. Click here to set them.
+              </v-alert>
+            </v-hover>
             <div style = "height: 100%; width: 100%;" v-if="toggle == 1">
               <v-data-table
                   :headers="industry_table.header"
