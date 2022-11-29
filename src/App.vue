@@ -699,30 +699,6 @@
             </div>
           </div>
 
-          <!-- map info -->
-          <!--
-          <div v-else-if="right_sidebar_content === 4">
-            <div style="margin: 7px; padding: 7px; background-color: white">
-              <h1>Map info</h1>
-              <span
-                  v-for="[key, value] in Object.entries(map_content_info)"
-                  :key="key"
-              >
-                <b>{{key}}</b>: <p>{{value}}</p>
-              </span>
-            </div>
-            <div style="margin: 7px; padding:7px">
-              <v-btn
-                  :disabled="assessment_expansion_panel === undefined"
-                  @click="right_sidebar_content = 5; factory_name = null"
-                  small
-                  outlined
-              >
-                ADD NEW INDUSTRY
-              </v-btn>
-            </div>
-          </div>
-          -->
           <!-- Create industry -->
           <div v-else-if="right_sidebar_content === 5">
             <div style="margin: 7px; padding: 7px; background-color: white">
