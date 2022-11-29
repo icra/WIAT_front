@@ -249,6 +249,7 @@ import standard_industries_classification from "../standard_industrial_classific
 import {utils} from "../utils"
 import risk_thereshold from "@/risk_categories";
 import Conversion_factors from "@/conversion_factors";
+import {level_of_certainty} from "@/level_of_certainty";
 
 export default {
   name: "import_assessments",
@@ -274,7 +275,9 @@ export default {
         "wwt_cod_infl_wwtp", "wwt_tn_infl_wwtp", "wwt_tp_infl_wwtp", "wwt_diclo_infl_wwtp", "wwt_cadmium_infl_wwtp", "wwt_hexaclorobenzene_infl_wwtp", "wwt_mercury_infl_wwtp", "wwt_plomo_infl_wwtp", "wwt_niquel_infl_wwtp", "wwt_chloro_infl_wwtp", "wwt_hexaclorobutadie_infl_wwtp", "wwt_nonilfenols_infl_wwtp", "wwt_tetracloroetile_infl_wwtp", "wwt_tricloroetile_infl_wwtp",
         "wwt_cod_infl_ind", "wwt_tn_infl_ind", "wwt_tp_infl_ind", "wwt_diclo_infl_ind", "wwt_cadmium_infl_ind", "wwt_hexaclorobenzene_infl_ind", "wwt_mercury_infl_ind", "wwt_plomo_infl_ind", "wwt_niquel_infl_ind", "wwt_chloro_infl_ind", "wwt_hexaclorobutadie_infl_ind", "wwt_nonilfenols_infl_ind", "wwt_tetracloroetile_infl_ind", "wwt_tricloroetile_infl_ind",
         "wwt_cod_effl", "wwt_tn_effl", "wwt_tp_effl", "wwt_diclo_effl", "wwt_cadmium_effl", "wwt_hexaclorobenzene_effl", "wwt_mercury_effl", "wwt_plomo_effl", "wwt_niquel_effl", "wwt_chloro_effl", "wwt_hexaclorobutadie_effl", "wwt_nonilfenols_effl", "wwt_tetracloroetile_effl", "wwt_tricloroetile_effl",
-      ]
+      ],
+      pollutants_from_older_version: ["COD", "TN", "TP",  "1,2-Dichloroethane", "Cadmium", "Hexaclorobenzene", "Mercury", "Lead",
+        "Nickel", "Chloroalkanes", "Hexachlorobutadiene", "Nonylphenols", "Tetrachloroethene", "Trichloroethylene"]
     }
 
   },
@@ -895,14 +898,11 @@ export default {
     copyIndustry(industry){
       let new_industry = new Industry()
 
-
       Object.keys(new_industry).forEach(key => {
-
         if (key != "onsite_wwtp" && key != "offsite_wwtp" && key!="direct_discharge"){
           if (industry[key] == undefined && key != "streamflow" && key != "water_stress"){
 
-            if (key == "ind_pollutants_effl"){      //ind_pollutants_effl not in imported industry (created using another version of WIAT)
-
+            if (key == "ind_pollutants_effl"){      //ind_pollutants_effl not in imported industry (created using WIAT 1.0)
                 new_industry["ind_pollutants_effl"] = {
                   COD: industry["ind_cod_effl"],
                   TN: industry["ind_tn_effl"],
@@ -921,7 +921,7 @@ export default {
                 }
               }
 
-            else if (key == "ind_pollutants_infl"){     //Find_pollutants_infl not in imported industry (created using another version of WIAT)
+            else if (key == "ind_pollutants_infl"){     //ind_pollutants_infl not in imported industry (created using WIAT 1.0)
               new_industry["ind_pollutants_infl"] = {
                 "1,2-Dichloroethane": 0,
                 Cadmium: 0,
@@ -955,79 +955,88 @@ export default {
             }
 
             else if (key == "pollutants_selected"){
-              new_industry["pollutants_selected"] = ["COD", "TN", "TP",  "1,2-Dichloroethane", "Cadmium", "Hexaclorobenzene", "Mercury", "Lead",
-                "Nickel", "Chloroalkanes", "Hexachlorobutadiene", "Nonylphenols", "Tetrachloroethene", "Trichloroethylene"]
+              new_industry["pollutants_selected"] = this.pollutants_from_older_version
             }
 
             else {
               new_industry[key] = 0
             }
-
           }
 
           else new_industry[key] = industry[key]
         }
 
-
       })
 
-
       Object.keys(new_industry.onsite_wwtp).forEach(key => {
-        if(key=="wwt_pollutants_infl_ind"){                   //Adapt from WIAT 1.1 version
-          new_industry.onsite_wwtp.wwt_pollutants_infl_ind = {
-            COD: new_industry["ind_pollutants_effl"]["COD"],
-            TN: new_industry["ind_pollutants_effl"]["TN"],
-            TP: new_industry["ind_pollutants_effl"]["TP"],
-            "1,2-Dichloroethane": new_industry["ind_pollutants_effl"]["1,2-Dichloroethane"],
-            Cadmium: new_industry["ind_pollutants_effl"]["Cadmium"],
-            Hexaclorobenzene: new_industry["ind_pollutants_effl"]["Hexaclorobenzene"],
-            Mercury: new_industry["ind_pollutants_effl"]["Mercury"],
-            Lead: new_industry["ind_pollutants_effl"]["Lead"],
-            Nickel: new_industry["ind_pollutants_effl"]["Nickel"],
-            Chloroalkanes: new_industry["ind_pollutants_effl"]["Chloroalkanes"],
-            Hexachlorobutadiene: new_industry["ind_pollutants_effl"]["Hexachlorobutadiene"],
-            Nonylphenols: new_industry["ind_pollutants_effl"]["Nonylphenols"],
-            Tetrachloroethene: new_industry["ind_pollutants_effl"]["Tetrachloroethene"],
-            Trichloroethylene: new_industry["ind_pollutants_effl"]["Trichloroethylene"]
+        if(key=="wwt_pollutants_infl_ind"){
+          if ('wwt_pollutants_infl_ind' in industry.onsite_wwtp){
+            new_industry.onsite_wwtp[key] = industry.onsite_wwtp[key]
+          }else { //Adapt from WIAT 1.0 version
+            new_industry.onsite_wwtp.wwt_pollutants_infl_ind = {
+              COD: new_industry["ind_pollutants_effl"]["COD"],
+              TN: new_industry["ind_pollutants_effl"]["TN"],
+              TP: new_industry["ind_pollutants_effl"]["TP"],
+              "1,2-Dichloroethane": new_industry["ind_pollutants_effl"]["1,2-Dichloroethane"],
+              Cadmium: new_industry["ind_pollutants_effl"]["Cadmium"],
+              Hexaclorobenzene: new_industry["ind_pollutants_effl"]["Hexaclorobenzene"],
+              Mercury: new_industry["ind_pollutants_effl"]["Mercury"],
+              Lead: new_industry["ind_pollutants_effl"]["Lead"],
+              Nickel: new_industry["ind_pollutants_effl"]["Nickel"],
+              Chloroalkanes: new_industry["ind_pollutants_effl"]["Chloroalkanes"],
+              Hexachlorobutadiene: new_industry["ind_pollutants_effl"]["Hexachlorobutadiene"],
+              Nonylphenols: new_industry["ind_pollutants_effl"]["Nonylphenols"],
+              Tetrachloroethene: new_industry["ind_pollutants_effl"]["Tetrachloroethene"],
+              Trichloroethylene: new_industry["ind_pollutants_effl"]["Trichloroethylene"]
+            }
           }
 
         }
-        else if(key=="wwt_pollutants_infl_wwtp") {                   //Adapt from WIAT 1.1 version
-          new_industry.onsite_wwtp.wwt_pollutants_infl_wwtp = {
-            COD: 0,
-            TN: 0,
-            TP: 0,
-            "1,2-Dichloroethane": 0,
-            Cadmium: 0,
-            Hexaclorobenzene: 0,
-            Mercury: 0,
-            Lead: 0,
-            Nickel: 0,
-            Chloroalkanes: 0,
-            Hexachlorobutadiene: 0,
-            Nonylphenols: 0,
-            Tetrachloroethene: 0,
-            Trichloroethylene: 0
+        else if(key=="wwt_pollutants_infl_wwtp") {                   //Adapt from WIAT 1.0 version
+          if ('wwt_pollutants_infl_wwtp' in industry.onsite_wwtp){
+            new_industry.onsite_wwtp[key] = industry.onsite_wwtp[key]
+          }else { //Adapt from WIAT 1.0 version
+            new_industry.onsite_wwtp.wwt_pollutants_infl_wwtp = {
+              COD: 0,
+              TN: 0,
+              TP: 0,
+              "1,2-Dichloroethane": 0,
+              Cadmium: 0,
+              Hexaclorobenzene: 0,
+              Mercury: 0,
+              Lead: 0,
+              Nickel: 0,
+              Chloroalkanes: 0,
+              Hexachlorobutadiene: 0,
+              Nonylphenols: 0,
+              Tetrachloroethene: 0,
+              Trichloroethylene: 0
+            }
+
           }
         }
-        else if(key=="wwt_pollutants_effl"){                   //Adapt from WIAT 1.1 version
-          new_industry.onsite_wwtp.wwt_pollutants_effl = {
-            COD: industry.onsite_wwtp.wwt_cod_effl,
-            TN: industry["onsite_wwtp"]["wwt_tn_effl"],
-            TP: industry["onsite_wwtp"]["wwt_tp_effl"],
-            "1,2-Dichloroethane": industry["onsite_wwtp"]["wwt_diclo_effl"],
-            Cadmium: industry["onsite_wwtp"]["wwt_cadmium_effl"],
-            Hexaclorobenzene: industry["onsite_wwtp"]["wwt_hexaclorobenzene_effl"],
-            Mercury: industry["onsite_wwtp"]["wwt_mercury_effl"],
-            Lead: industry["onsite_wwtp"]["wwt_plomo_effl"],
-            Nickel: industry["onsite_wwtp"]["wwt_niquel_effl"],
-            Chloroalkanes: industry["onsite_wwtp"]["wwt_chloro_effl"],
-            Hexachlorobutadiene: industry["onsite_wwtp"]["wwt_hexaclorobutadie_effl"],
-            Nonylphenols: industry["onsite_wwtp"]["wwt_nonilfenols_effl"],
-            Tetrachloroethene: industry["onsite_wwtp"]["wwt_tetracloroetile_effl"],
-            Trichloroethylene: industry["onsite_wwtp"]["wwt_tricloroetile_effl"]
-          }
+        else if(key=="wwt_pollutants_effl"){
 
+          if ('wwt_pollutants_effl' in industry.onsite_wwtp){
+            new_industry.onsite_wwtp[key] = industry.onsite_wwtp[key]
+          }else{  //Adapt from WIAT 1.0 version
+            new_industry.onsite_wwtp.wwt_pollutants_effl = {
+              COD: industry.onsite_wwtp.wwt_cod_effl,
+              TN: industry["onsite_wwtp"]["wwt_tn_effl"],
+              TP: industry["onsite_wwtp"]["wwt_tp_effl"],
+              "1,2-Dichloroethane": industry["onsite_wwtp"]["wwt_diclo_effl"],
+              Cadmium: industry["onsite_wwtp"]["wwt_cadmium_effl"],
+              Hexaclorobenzene: industry["onsite_wwtp"]["wwt_hexaclorobenzene_effl"],
+              Mercury: industry["onsite_wwtp"]["wwt_mercury_effl"],
+              Lead: industry["onsite_wwtp"]["wwt_plomo_effl"],
+              Nickel: industry["onsite_wwtp"]["wwt_niquel_effl"],
+              Chloroalkanes: industry["onsite_wwtp"]["wwt_chloro_effl"],
+              Hexachlorobutadiene: industry["onsite_wwtp"]["wwt_hexaclorobutadie_effl"],
+              Nonylphenols: industry["onsite_wwtp"]["wwt_nonilfenols_effl"],
+              Tetrachloroethene: industry["onsite_wwtp"]["wwt_tetracloroetile_effl"],
+              Trichloroethylene: industry["onsite_wwtp"]["wwt_tricloroetile_effl"]
+            }
+          }
         }
         else{
           new_industry.onsite_wwtp[key] = industry.onsite_wwtp[key]
@@ -1035,59 +1044,79 @@ export default {
       })
 
       Object.keys(new_industry.offsite_wwtp).forEach(key => {
-        if(key=="wwt_pollutants_infl_ind"){                   //Adapt from WIAT 1.1 version
-          new_industry.offsite_wwtp.wwt_pollutants_infl_ind = {
-            COD: new_industry["ind_pollutants_effl"]["COD"],
-            TN: new_industry["ind_pollutants_effl"]["TN"],
-            TP: new_industry["ind_pollutants_effl"]["TP"],
-            "1,2-Dichloroethane": new_industry["ind_pollutants_effl"]["1,2-Dichloroethane"],
-            Cadmium: new_industry["ind_pollutants_effl"]["Cadmium"],
-            Hexaclorobenzene: new_industry["ind_pollutants_effl"]["Hexaclorobenzene"],
-            Mercury: new_industry["ind_pollutants_effl"]["Mercury"],
-            Lead: new_industry["ind_pollutants_effl"]["Lead"],
-            Nickel: new_industry["ind_pollutants_effl"]["Nickel"],
-            Chloroalkanes: new_industry["ind_pollutants_effl"]["Chloroalkanes"],
-            Hexachlorobutadiene: new_industry["ind_pollutants_effl"]["Hexachlorobutadiene"],
-            Nonylphenols: new_industry["ind_pollutants_effl"]["Nonylphenols"],
-            Tetrachloroethene: new_industry["ind_pollutants_effl"]["Tetrachloroethene"],
-            Trichloroethylene: new_industry["ind_pollutants_effl"]["Trichloroethylene"]
+
+        if(key=="wwt_pollutants_infl_ind"){
+
+          if ('wwt_pollutants_infl_ind' in industry.offsite_wwtp){
+            new_industry.offsite_wwtp[key] = industry.offsite_wwtp[key]
+          }else {  //Adapt from WIAT 1.0 version
+            new_industry.offsite_wwtp.wwt_pollutants_infl_ind = {
+              COD: new_industry["ind_pollutants_effl"]["COD"],
+              TN: new_industry["ind_pollutants_effl"]["TN"],
+              TP: new_industry["ind_pollutants_effl"]["TP"],
+              "1,2-Dichloroethane": new_industry["ind_pollutants_effl"]["1,2-Dichloroethane"],
+              Cadmium: new_industry["ind_pollutants_effl"]["Cadmium"],
+              Hexaclorobenzene: new_industry["ind_pollutants_effl"]["Hexaclorobenzene"],
+              Mercury: new_industry["ind_pollutants_effl"]["Mercury"],
+              Lead: new_industry["ind_pollutants_effl"]["Lead"],
+              Nickel: new_industry["ind_pollutants_effl"]["Nickel"],
+              Chloroalkanes: new_industry["ind_pollutants_effl"]["Chloroalkanes"],
+              Hexachlorobutadiene: new_industry["ind_pollutants_effl"]["Hexachlorobutadiene"],
+              Nonylphenols: new_industry["ind_pollutants_effl"]["Nonylphenols"],
+              Tetrachloroethene: new_industry["ind_pollutants_effl"]["Tetrachloroethene"],
+              Trichloroethylene: new_industry["ind_pollutants_effl"]["Trichloroethylene"]
+            }
+
           }
 
         }
-        else if(key=="wwt_pollutants_infl_wwtp") {                   //Adapt from WIAT 1.1 version
-          new_industry.offsite_wwtp.wwt_pollutants_infl_wwtp = {
-            COD: industry.onsite_wwtp.wwt_cod_effl,
-            TN: industry["onsite_wwtp"]["wwt_tn_effl"],
-            TP: industry["onsite_wwtp"]["wwt_tp_effl"],
-            "1,2-Dichloroethane": industry["onsite_wwtp"]["wwt_diclo_effl"],
-            Cadmium: industry["onsite_wwtp"]["wwt_cadmium_effl"],
-            Hexaclorobenzene: industry["onsite_wwtp"]["wwt_hexaclorobenzene_effl"],
-            Mercury: industry["onsite_wwtp"]["wwt_mercury_effl"],
-            Lead: industry["onsite_wwtp"]["wwt_plomo_effl"],
-            Nickel: industry["onsite_wwtp"]["wwt_niquel_effl"],
-            Chloroalkanes: industry["onsite_wwtp"]["wwt_chloro_effl"],
-            Hexachlorobutadiene: industry["onsite_wwtp"]["wwt_hexaclorobutadie_effl"],
-            Nonylphenols: industry["onsite_wwtp"]["wwt_nonilfenols_effl"],
-            Tetrachloroethene: industry["onsite_wwtp"]["wwt_tetracloroetile_effl"],
-            Trichloroethylene: industry["onsite_wwtp"]["wwt_tricloroetile_effl"]
+        else if(key=="wwt_pollutants_infl_wwtp") {
+
+          if ('wwt_pollutants_infl_wwtp' in industry.offsite_wwtp){
+            new_industry.offsite_wwtp[key] = industry.offsite_wwtp[key]
+          }else{   //Adapt from WIAT 1.0 version
+            new_industry.offsite_wwtp.wwt_pollutants_infl_wwtp = {
+              COD: industry.onsite_wwtp.wwt_cod_effl,
+              TN: industry["onsite_wwtp"]["wwt_tn_effl"],
+              TP: industry["onsite_wwtp"]["wwt_tp_effl"],
+              "1,2-Dichloroethane": industry["onsite_wwtp"]["wwt_diclo_effl"],
+              Cadmium: industry["onsite_wwtp"]["wwt_cadmium_effl"],
+              Hexaclorobenzene: industry["onsite_wwtp"]["wwt_hexaclorobenzene_effl"],
+              Mercury: industry["onsite_wwtp"]["wwt_mercury_effl"],
+              Lead: industry["onsite_wwtp"]["wwt_plomo_effl"],
+              Nickel: industry["onsite_wwtp"]["wwt_niquel_effl"],
+              Chloroalkanes: industry["onsite_wwtp"]["wwt_chloro_effl"],
+              Hexachlorobutadiene: industry["onsite_wwtp"]["wwt_hexaclorobutadie_effl"],
+              Nonylphenols: industry["onsite_wwtp"]["wwt_nonilfenols_effl"],
+              Tetrachloroethene: industry["onsite_wwtp"]["wwt_tetracloroetile_effl"],
+              Trichloroethylene: industry["onsite_wwtp"]["wwt_tricloroetile_effl"]
+            }
           }
-        }else if(key=="wwt_pollutants_effl"){                   //Adapt from WIAT 1.1 version
-          new_industry.offsite_wwtp.wwt_pollutants_effl = {
-            COD: industry.offsite_wwtp.wwt_cod_effl,
-            TN: industry["offsite_wwtp"]["wwt_tn_effl"],
-            TP: industry["offsite_wwtp"]["wwt_tp_effl"],
-            "1,2-Dichloroethane": industry["offsite_wwtp"]["wwt_diclo_effl"],
-            Cadmium: industry["offsite_wwtp"]["wwt_cadmium_effl"],
-            Hexaclorobenzene: industry["offsite_wwtp"]["wwt_hexaclorobenzene_effl"],
-            Mercury: industry["offsite_wwtp"]["wwt_mercury_effl"],
-            Lead: industry["offsite_wwtp"]["wwt_plomo_effl"],
-            Nickel: industry["offsite_wwtp"]["wwt_niquel_effl"],
-            Chloroalkanes: industry["offsite_wwtp"]["wwt_chloro_effl"],
-            Hexachlorobutadiene: industry["offsite_wwtp"]["wwt_hexaclorobutadie_effl"],
-            Nonylphenols: industry["offsite_wwtp"]["wwt_nonilfenols_effl"],
-            Tetrachloroethene: industry["offsite_wwtp"]["wwt_tetracloroetile_effl"],
-            Trichloroethylene: industry["offsite_wwtp"]["wwt_tricloroetile_effl"]
+        }
+        else if(key=="wwt_pollutants_effl"){
+          if ('wwt_pollutants_effl' in industry.offsite_wwtp){
+            new_industry.offsite_wwtp[key] = industry.offsite_wwtp[key]
+          }else{
+            //Adapt from WIAT 1.0 version
+            new_industry.offsite_wwtp.wwt_pollutants_effl = {
+              COD: industry.offsite_wwtp.wwt_cod_effl,
+              TN: industry["offsite_wwtp"]["wwt_tn_effl"],
+              TP: industry["offsite_wwtp"]["wwt_tp_effl"],
+              "1,2-Dichloroethane": industry["offsite_wwtp"]["wwt_diclo_effl"],
+              Cadmium: industry["offsite_wwtp"]["wwt_cadmium_effl"],
+              Hexaclorobenzene: industry["offsite_wwtp"]["wwt_hexaclorobenzene_effl"],
+              Mercury: industry["offsite_wwtp"]["wwt_mercury_effl"],
+              Lead: industry["offsite_wwtp"]["wwt_plomo_effl"],
+              Nickel: industry["offsite_wwtp"]["wwt_niquel_effl"],
+              Chloroalkanes: industry["offsite_wwtp"]["wwt_chloro_effl"],
+              Hexachlorobutadiene: industry["offsite_wwtp"]["wwt_hexaclorobutadie_effl"],
+              Nonylphenols: industry["offsite_wwtp"]["wwt_nonilfenols_effl"],
+              Tetrachloroethene: industry["offsite_wwtp"]["wwt_tetracloroetile_effl"],
+              Trichloroethylene: industry["offsite_wwtp"]["wwt_tricloroetile_effl"]
+            }
           }
+
+
         }
         else{
           new_industry.offsite_wwtp[key] = industry.offsite_wwtp[key]
@@ -1095,7 +1124,8 @@ export default {
       })
 
       Object.keys(new_industry.direct_discharge).forEach(key => {
-        if(key=="wwt_pollutants_effl"){                   //Adapt from WIAT 1.1 version
+
+        if(key=="wwt_pollutants_effl"){
           new_industry.direct_discharge.wwt_pollutants_effl = {
             COD: new_industry["ind_pollutants_effl"]["COD"],
             TN: new_industry["ind_pollutants_effl"]["TN"],
@@ -1117,6 +1147,31 @@ export default {
         }
       })
 
+
+      //Imported from WIAT 1.0
+      if (new_industry['level_of_certainty'] == 0){
+
+        new_industry["level_of_certainty"] = level_of_certainty.set_level_of_certainty(new_industry, 1)
+
+        if(new_industry.has_onsite_wwtp == 1){
+          new_industry['onsite_wwtp']["level_of_certainty"] = level_of_certainty.set_level_of_certainty(new_industry, 2)
+        }else{
+          new_industry['onsite_wwtp']["level_of_certainty"] = level_of_certainty.set_level_of_certainty(new_industry, 2, true)
+        }
+        if(new_industry.has_direct_discharge == 1){
+          new_industry['direct_discharge']["level_of_certainty"] = level_of_certainty.set_level_of_certainty(new_industry, 3)
+        }else{
+          new_industry['direct_discharge']["level_of_certainty"] = level_of_certainty.set_level_of_certainty(new_industry, 3, true)
+        }
+        if(new_industry.has_offsite_wwtp == 1){
+          new_industry['offsite_wwtp']["level_of_certainty"] = level_of_certainty.set_level_of_certainty(new_industry, 4)
+        }else{
+          new_industry['offsite_wwtp']["level_of_certainty"] = level_of_certainty.set_level_of_certainty(new_industry, 4, true)
+        }
+
+
+
+      }
 
       return new_industry
 
@@ -1166,7 +1221,6 @@ export default {
       if(Array.isArray(imported_json)){ //file from version 1.0
         return imported_json
       }else{         //file from version 1.1
-
         let general_configuration = imported_json.general_configuration
         for (let key of Object.keys(general_configuration)){
           Conversion_factors[key] = general_configuration[key]

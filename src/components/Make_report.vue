@@ -1591,7 +1591,7 @@ export default {
       if(_this.tab !== undefined){
 
         let pollutants_table = {
-          header: [{text: "Name", value: "value", sortable: false}, {text: "Country", value: "country", sortable: false}, {text: "Number of suppliers", value: "supply_chain_number", sortable: true}, {text: "Pollution impact", value: "pollution_impact", sortable: false}, {text: "Freshwater impact", value: "freshwater_impact", sortable: false}, {text: "GHG emissions from Wastewater", value: "carbon_impact", sortable: true}, {text: "Overall water risk", value: "owr", sortable: true}],
+          header: [{text: "Name", value: "value", sortable: false}, {text: "Country", value: "country", sortable: false}, {text: "Number of suppliers", value: "supply_chain_number", sortable: true}, {text: "Impact of industrial wastewater on water quality", value: "pollution_impact", sortable: false}, {text: "Impact of industrial wastewater on water availability", value: "freshwater_impact", sortable: false}, {text: "GHG emissions from wastewater treatment", value: "carbon_impact", sortable: true}, {text: "Overall water risk", value: "owr", sortable: true}],
           value: []
         }
 

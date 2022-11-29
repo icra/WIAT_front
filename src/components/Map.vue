@@ -2177,7 +2177,7 @@ export default {
 
       url = "https://sedac.ciesin.columbia.edu/data/set/popdynamics-1-km-downscaled-pop-base-year-projection-ssp-2000-2100-rev01"
 
-      this.layers["River fragmentation"].layers.baseline.annual.layer = this.define_raster_layer("river_fragmentation", null, color_function_river_fragmentation, color_legend_river_fragmentation, label_legend_river_fragmentation, url, "Temporal resolution: 2000", " people", 1, 16 )
+      //this.layers["River fragmentation"].layers.baseline.annual.layer = this.define_raster_layer("river_fragmentation", null, color_function_river_fragmentation, color_legend_river_fragmentation, label_legend_river_fragmentation, url, "Temporal resolution: 2000", " people", 1, 16 )
 
 
 

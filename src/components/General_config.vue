@@ -249,7 +249,6 @@ export default {
       let eqs_parsed = isNaN(parseFloat(this.editedItem.eqs)) ? null : parseFloat(this.editedItem.eqs)
 
       conversion_factors[this.editedItem.name] = {eutrophication: '-', tu: tu_parsed, eqs: eqs_parsed}
-      console.log(conversion_factors[this.editedItem.name])
 
       this.close()
     },
