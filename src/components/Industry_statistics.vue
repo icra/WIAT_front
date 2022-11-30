@@ -40,7 +40,6 @@
 
 
             </v-tabs>-->
-            <!--tree views amb if/else -->
             <div style="height: 92%; overflow-y: auto; width: 100%;">
               <v-treeview
                   :items="layer_tree"
@@ -48,15 +47,17 @@
                   open-all
                   dense
                   hoverable
-                  activatable
-                  selection-type="leaf"
                   return-object
-                  open-on-click
                   color="#1C195B"
                   selected-color="#1C195B"
                   style="padding-left: 15px; height: 100%;"
                   item-disabled="locked"
+
+                  open-on-click
+                  activatable
+
                   v-if="toggle == 1"
+
               >
                 <template v-slot:append="{ item }">
                   <v-tooltip bottom v-if="item.layer && item.layer.info" max-width="700px">
@@ -162,7 +163,7 @@
 
               <div v-if="toggle == 1">
                 <h3>
-                  <span style="color: #b62373;">{{industry.name}}</span>: context layers
+                  <span style="color: #b62373;">{{industry.name}}</span>: Context layers
                 </h3>
                 <v-data-table
                     :headers="industry_table.header"
@@ -3526,12 +3527,14 @@ export default {
 
       toggle: null,
 
+
     }
 
   },
   watch: {
 
-    //Reset informatiob the biogas dialog if popup with information of sludge management is shown
+
+    //Reset information the biogas dialog if popup with information of sludge management is shown
     info_sludge_management: function (value) {
       if (value) {
         this.dialog_biogas_stage = 0
@@ -3647,6 +3650,13 @@ export default {
 
     //Get data and charts for nodeLayer selected under context tab
     async layerTreeSelected(nodeLayer){
+
+      //this.actived_layers.splice(0, this.actived_layers.length, ...nodeLayer)
+      //console.log(nodeLayer)
+      //console.log(this.actived_layers)
+
+      //this.actived_layers = []
+
       this.selected_layer = null
       this.show_context_chart = false
       if(nodeLayer.length > 0){
@@ -5568,6 +5578,7 @@ export default {
         id = _this.add_identifier(category, id)  //id has the new id to add
       })
 
+      console.log(this.layers)
       return this.layers
     },
 
