@@ -72,7 +72,7 @@
                     </template>
                     <span v-html="item.layer.info"></span>
                   </v-tooltip>
-
+                  <span v-if="item.name == 'Change of state of nature'" class="state_of_nature"></span>
 
                 </template>
 
@@ -110,9 +110,6 @@
                 </template>
                 <template v-slot:label="{ item }">
                   {{ item.name }}
-
-                  <span v-if="item.name == 'Water quality' || item.name == 'Water availability'" class="state_of_nature">(Change of state of nature)</span>
-
                 </template>
 
                 <template v-slot:append="{ item }">
@@ -129,6 +126,8 @@
                     </template>
                     <span>{{ item.info }}</span>
                   </v-tooltip>
+                  <span v-if="item.name == 'Change of state of nature'" class="state_of_nature"></span>
+
                   <!--
                   <span v-if="item.name == 'Water quality' || item.name == 'Water availability'" class="state_of_nature">(Change of state of nature)</span>
                   -->
@@ -1917,20 +1916,22 @@
 
                     </div>
                   </div>
-                  <!--<v-div>
+                  <div v-if = "active_indicator <= 15">
+                    <v-divider
+                        style="margin-top: 5%; border-width: 1px; background-color: black"
+                    ></v-divider>
                     <h3
                         style="padding-left: 15px; padding-top: 30px"
                     >Context Table</h3>
 
                     <v-data-table
-                        :headers="delta_ecotox_table.header"
-                        :items="delta_ecotox_table.value"
+                        :headers="context_for_impact_table.header"
+                        :items="context_for_impact_table.value"
                         :item-class="itemRowBold"
                         :hide-default-footer="true"
                         dense
-                        v-if="delta_ecotox_chip === 1"
-
                     >
+                    <!--
                       <template v-slot:item.name="{ item }">
                           <span v-if="item.info">
                           {{ item.name }}
@@ -2006,11 +2007,11 @@
                             <span>{{getDataTypeColor(item)[1]}}</span>
                           </v-tooltip>
                         </template>
-                      </template>
+                      </template>-->
 
                     </v-data-table>
 
-                  </v-div>-->
+                  </div>
                 </div>
               </div>
             </div>
@@ -3418,7 +3419,7 @@ export default {
       show_context_chart: false,
       loading_context_table: false,
 
-      contextualization_table: {header: [], value: []},
+      context_for_impact_table: {header: [], value: []},
 
       table_title: {
         global_warming_potential: {
@@ -3548,6 +3549,9 @@ export default {
       this.created_function()
       await this.prepare_table_data()
     },
+    active_indicator: function(new_value, old_value){
+      this.generate_context_for_impact_table(new_value[0], old_value[0])
+    }
 
   },
   methods: {
@@ -3582,8 +3586,6 @@ export default {
       _this.ghg_ratio_table = _this.generate_ghg_ratio_table()
       _this.ghg_sludge_management_table = _this.generate_sludge_management_table()
       _this.concentration_table = await _this.generate_concentration_table()
-
-      _this.contextualization_table = _this.generate_contextualization_table
 
     },
 
@@ -5517,11 +5519,47 @@ export default {
 
     },
 
-    generate_contextualization_table(){
+    async generate_context_for_impact_table(new_value, old_value){
+      if(!(((new_value >= 1 && new_value <= 12) && (old_value >= 1 && old_value <=12)) || ((new_value >= 13 && new_value <= 15) && (old_value >= 13 && old_value <= 15)))) {
+        let _this = this
+        let table = {
+          header: [
+            {text: "Indicator", value: "indicator", sortable: false},
+            //{text: "Overall water risk", value: "risk", sortable: false},
+            {text: "Baseline", value: "baseline", sortable: false},
+            {text: "Future", value: "future", sortable: false},
+            {text: "Units", value: "unit", sortable: false}],
+          value: []
+        }
 
-      let _this = this
+        let indicators = []
+        if (_this.active_indicator >= 1 && _this.active_indicator <= 12) {
+          indicators = ["Coastal Eutrophication Potential", "Surface Water Pharmaceutical Pollution", "Coastal Pharmaceutical Pollution", "Unimproved/No Drinking Water", "Unimproved/No Sanitation"]
+        } else if (_this.active_indicator >= 13 && _this.active_indicator <= 15) {
+          indicators = ["Seasonal variability", "Interannual variability", "Water stress", "Water depletion", "Aridity index", "Groundwater table decline", "Drought risk"]
+        }
 
+        for (let indicator of indicators) {
+          let location = _this.industry.location
+          //let risk = await utils.overall_water_risk(location.lat, location.lng)
+          //risk = risk.toFixed(3)
+          let baseline = await _this.global_layers[indicator].layers.baseline.annual.layer.data_for_report(location.lat, location.lng)
+          let future = "-"
+          if (_this.global_layers[indicator].future == true) {
+            future = await _this.global_layers[indicator].layers.future.layer.data_for_report(location.lat, location.lng)
+          }
+          let unit = _this.global_layers[indicator].layers.baseline.annual.layer.unit()
+          table.value.push({
+            indicator: indicator,
+            //risk: risk,
+            baseline: baseline,
+            future: future,
+            unit: unit
 
+          })
+          this.context_for_impact_table = table
+        }
+      }
     },
 
     /*Gets the string equivalent to the input
@@ -5580,7 +5618,7 @@ export default {
           children: [
             {
               id: 2,
-              name: 'Impact',
+              name: 'Change of state of nature',
               children: [
                 {id: 3, name: this.table_title.simple_table.delta_tu, info: "Toxic units in the receiving water body indicates if the concentration after the effluent discharge on the water body exceed the EC50, supposing the receiving water has a concentration of 0 before discharge."},
                 {id: 4, name: this.table_title.simple_table.delta_eqs, info: "Increase of the concentration of the pollutants in the receiving water body after discharge (with respect to EQS), supposing the receiving water has a concentration of 0 before discharge."},
@@ -5607,7 +5645,7 @@ export default {
           id: 13,
           name: "Water availability",
           children: [
-            {id: 14, name: "Water availability impacts",},
+            {id: 14, name: "Change of state of nature",},
             {id: 15, name: "Levers for action",}
           ]
         },
@@ -5615,7 +5653,7 @@ export default {
           id: 16,
           name: "GHG emissions from wastewater treatment",
           children: [
-            {id: 17, name: "Impact",},
+            {id: 17, name: "Change of state of nature",},
             {
               id: 18,
               name: "Levers for action",
