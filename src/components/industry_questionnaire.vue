@@ -1,5 +1,6 @@
 <template>
   <div>
+    <!--test -->
     <v-container
         v-for = "industry_input in array_intersection(industry_inputs, basic_inputs)"
         :key="industry_input"
