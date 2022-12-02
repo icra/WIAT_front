@@ -161,7 +161,7 @@
             <div style="height: 100%; display: flex; justify-content: space-between; width: 90%">
               <div>
                 <span>
-                  Concentration of {{pollutant}} in the industry effluent
+                  Concentration of {{pollutant}} in the water used by the industry (and before being treated in a WWTP)
                 </span>
               </div>
               <!-- button estimation -->
