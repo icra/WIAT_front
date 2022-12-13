@@ -4387,7 +4387,7 @@ export default {
         //let dichloroethane = {value: _this.table_title.pollutants.diclo,  info: "info_pollutant_concentration"}
         //dichloroethane[key] = tu.diclo
         //dichloroethane['delta'] = delta.diclo
-        for(let pollutant of utils.remove_nutrients(this.industry.pollutants_selected)){
+        for(let pollutant of this.industry.pollutants_selected){
           let DataType = industry_impact_legend_category.pollutant_concentration(industries[0], pollutant)
           let pollutant_obj = {
             name: pollutant,

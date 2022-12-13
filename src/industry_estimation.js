@@ -66,6 +66,17 @@ export let industry_estimations = {
                 }
                 return null
             },
+            ind_pollutants_infl: function(){
+                if (pollutant == "COD"){
+                    let bod = utils.get_raster_data("bod", industry.location.lat, industry.location.lng)
+                    return bod
+                }else if(pollutant == "TN"){
+                    let nitrates = utils.get_raster_data("nitrates", industry.location.lat, industry.location.lng)
+                    return nitrates
+
+                }else return null
+            },
+
             ind_pollutants_effl: function(){
                 if (pollutant == "COD"){
                     if(industry.industry_type === 1){

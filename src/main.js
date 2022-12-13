@@ -494,6 +494,49 @@ Vue.prototype.$layers_description = [
               info: "Unimproved/no sanitation reflects the percentage of the population using pit latrines without a slab or platform, hanging/bucket latrines, or directly disposing human waste in fields, forests, bushes, open bodies of water, beaches, other open spaces, or with solid waste. <br><br><b> Temporal resolution: 2015</b>"
             }
           },
+          {
+            name: 'BOD',
+            locked: false,
+
+            layer: {
+              layers: {
+                baseline: {
+                  annual: {
+                    layer: null
+                  },
+                  monthly: []
+                },
+                future: {
+                  layer: null
+                },
+              },
+              monthly: false,
+              future: false,
+              info: "Globally gridded dataset of biological oxygen demand (BOD) in surface water for the years 1992-2010, monthly observations. Data is available at the 0.5x0.5 degree gridcell level. Units are milligram per liter (mg/l). Data is generated using a machine learning model, as described in the report Quality Unknown: The Invisible Water Crisis."
+            }
+          },
+          {
+            name: 'Nitrates',
+            locked: false,
+
+            layer: {
+              layers: {
+                baseline: {
+                  annual: {
+                    layer: null
+                  },
+                  monthly: []
+                },
+                future: {
+                  layer: null
+                },
+              },
+              monthly: false,
+              future: false,
+              info: "Globally gridded dataset of nitrate-nitrite in surface water for the years 1992-2010, monthly observations. Data is available at the 0.5x0.5 degree gridcell level. Units are milligram per liter (mg/l). Data is generated using a machine learning model, as described in the report Quality Unknown: The Invisible Water Crisis "
+            }
+          },
+
           /*{
             name: 'River fragmentation',
             locked: false,
