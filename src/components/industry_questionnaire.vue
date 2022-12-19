@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!--test -->
     <v-container
         v-for = "industry_input in array_intersection(industry_inputs, basic_inputs)"
         :key="industry_input"
@@ -233,9 +232,27 @@
                       <span>
                         Industry withdrawal water {{pollutant}} concentration (surface water only)
                       </span>
+                      <v-btn v-if="button_estimation.includes('ind_pollutants_infl') && pollutant == 'COD' && cod_influent_quality != null"
+                             tile
+                             x-small
+                             color="#b62373"
+                             @click="industry_model['ind_pollutants_infl'][pollutant] = cod_influent_quality"
+                      >
+                        Estimation:  {{cod_influent_quality}}<!-- Button estimation -->
+                      </v-btn>
+                      <v-btn v-else-if="button_estimation.includes('ind_pollutants_infl') && pollutant == 'TN' && tn_influent_quality != null"
+                             tile
+                             x-small
+                             color="#b62373"
+                             @click="industry_model['ind_pollutants_infl'][pollutant] = tn_influent_quality"
+                      >
+                        Estimation:  {{tn_influent_quality}}<!-- Button estimation -->
+                      </v-btn>
+
                     </div>
                   </div>
                 </div>
+
               </v-col>
               <!-- Response -->
               <v-col cols="3">
@@ -292,14 +309,23 @@ export default {
         { text: 'No data', key: 'no_data' },
       ],
       keys_without_level_of_certainty: level_of_certainty.keys_without_level_of_certainty,
-      model_selected_pollutants_data: _this.model_selected_pollutants
+      model_selected_pollutants_data: _this.model_selected_pollutants,
+      cod_influent_quality: null,
+      tn_influent_quality: null,
+
     }
   },
 
+  mounted() {
+    this.infl_estimation_cod()
+    this.infl_estimation_tn()
+  },
   computed:{
     clonedIndustry: function(){
       return JSON.parse(JSON.stringify(this.industry_model))
-    }
+    },
+
+
   },
   watch: {
     clonedIndustry(newValue, oldValue){
@@ -312,6 +338,24 @@ export default {
 
       level_of_certainty.update_level_of_certainty(this.industry_model, this.industry_model, this.stepper_model, input_diff, pollutant )
     },
+  },
+
+  methods: {
+    infl_estimation_cod(){
+      let _this = this
+      this.button_estimations('ind_pollutants_infl', 'COD').then((res) => {
+        _this.cod_influent_quality = res / 2.4   //Conversion from BOD to COD
+      });
+      _this.cod_influent_quality = null
+    },
+    infl_estimation_tn(){
+      let _this = this
+      this.button_estimations('ind_pollutants_infl', 'TN').then((res) => {
+        _this.tn_influent_quality = res / 0.1 //Conversion from nitrates to TN
+      });
+      _this.tn_influent_quality = null
+    }
+
   }
 
 }

@@ -2179,7 +2179,38 @@ export default {
 
       //this.layers["River fragmentation"].layers.baseline.annual.layer = this.define_raster_layer("river_fragmentation", null, color_function_river_fragmentation, color_legend_river_fragmentation, label_legend_river_fragmentation, url, "Temporal resolution: 2000", " people", 1, 16 )
 
+      let color_function_bod = function(values) {
+        let value = values[0]
+        if (value < 0) return
+        else if (value === 0) return null
+        else if (value < 1.4) return '#ebffb6'
+        else if (value < 1.7) return '#fbff64'
+        else if (value < 2.5) return '#e7a300'
+        else return '#ea4808'
+      }
+      let color_legend_bod = ['#ebffb6','#fbff64', '#e7a300', '#ea4808']
+      let label_legend_bod = ["0-1.4 mg/L","1.4-1.7 mg/L","1.7-2.5 mg/L",">2.5 mg/L"]
 
+      url = "https://wbwaterdata.org/dataset/global-biological-oxygen-demand-surface-water"
+
+      this.layers["BOD"].layers.baseline.annual.layer = this.define_raster_layer("bod", null, color_function_bod, color_legend_bod, label_legend_bod, url, "Temporal resolution: 1992 - 2010", " mg/L", 1, 128 )
+
+      let color_function_nitrates = function(values) {
+        let value = values[0]
+        if (value < 0) return
+        else if (value === 0) return null
+        else if (value < 0.2) return '#ebffb6'
+        else if (value < 0.35) return '#fbff64'
+        else if (value < 0.65) return '#e7a300'
+        else if (value < 1) return '#ea4808'
+        else return '#ff0000'
+      }
+      let color_legend_nitrates = ['#ebffb6','#fbff64', '#e7a300', '#ea4808', '#ff0000']
+      let label_legend_nitrates = ["0-0.2 mg/L","0.2-0.35 mg/L","0.35-0.65 mg/L","0.65-1 mg/L", ">1 mg/L"]
+
+      url = "https://wbwaterdata.org/dataset/global-nitrate-nitrite-surface-water"
+
+      this.layers["Nitrates"].layers.baseline.annual.layer = this.define_raster_layer("nitrates", null, color_function_nitrates, color_legend_nitrates, label_legend_nitrates, url, "Temporal resolution: 1992 - 2010", " mg/L", 1, 64 )
 
 
     },
