@@ -5623,9 +5623,9 @@ export default {
 
         let indicators = []
         if (_this.active_indicator >= 1 && _this.active_indicator <= 12) {
-          indicators = ["Coastal Eutrophication Potential", "Surface Water Pharmaceutical Pollution", "Coastal Pharmaceutical Pollution", "Unimproved/No Drinking Water", "Unimproved/No Sanitation"]
+          indicators = ["Coastal Eutrophication Potential", "Surface Water Pharmaceutical Pollution", "Coastal Pharmaceutical Pollution", "Unimproved/No Drinking Water", "Unimproved/No Sanitation", "Streamflow"]
         } else if (_this.active_indicator >= 13 && _this.active_indicator <= 15) {
-          indicators = ["Seasonal variability", "Interannual variability", "Water stress", "Water depletion", "Aridity index", "Groundwater table decline", "Drought risk"]
+          indicators = ["Seasonal variability", "Interannual variability", "Water stress", "Water depletion", "Aridity index", "Groundwater table decline", "Drought risk", "Streamflow"]
         }
 
         for (let indicator of indicators) {
