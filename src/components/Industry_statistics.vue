@@ -737,7 +737,7 @@
                       </div>
 
                     </div>
-                    <div v-else-if="active_indicator[0] == 6">
+                    <!--<div v-else-if="active_indicator[0] == 6">
 
                       <v-chip-group
                           mandatory
@@ -875,7 +875,7 @@
                       </div>
 
 
-                    </div>
+                    </div>-->
                     <div v-else-if="active_indicator[0] == 7">
                       <v-chip-group
                           mandatory
@@ -1235,22 +1235,84 @@
                       </v-data-table>
                     </div>
                     <div v-else-if="active_indicator[0] == 12">
+                      <v-chip-group
+                          mandatory
+                          v-model="concentration_chip"
+                      >
+                        <v-chip
+                            color="primary"
+                            outlined
+                            class="ma-2"
+                            pill
+                        >
+                          <v-icon left>
+                            mdi-chart-pie
+                          </v-icon>
+                          Chart
+                        </v-chip>
 
+                        <v-chip
+                            color="primary"
+                            outlined
+                            pill
+                            class="ma-2"
+                        >
+                          <v-icon left>
+                            mdi-table
+                          </v-icon>
+                          Table
+
+                        </v-chip>
+                      </v-chip-group>
+                      <div v-if="concentration_chip === 0">
+                        <div>
+                          <p class="chart_no_data" v-if="utils.get_pollutants([this.industry]).length == 0">
+                            Current industry doesn't have pollutants selected
+                          </p>
+                          <div v-else>
+                            <h3>Toxic units in the effluent chart: </h3>
+                            <PieChart
+                                style="padding-top: 10px"
+                                :chart-data="ecotoxicity_chart.chartData"
+                                :chart-options="ecotoxicity_chart.chartOptions"
+
+
+                            />
+                            <p class="instructions_2">
+                              *Only labels >5% are shown.
+                            </p>
+                          </div>
+
+                        </div>
+                        <div>
+                          <p class="chart_no_data" v-if="utils.get_pollutants([this.industry]).length == 0">
+                            Current industry doesn't have pollutants selected
+                          </p>
+                          <div v-else>
+                            <h3>Concentration of pollutants in the effluent (with respect to EQS) chart:</h3>
+                            <BarChart
+                                style="padding-top: 40px;"
+                                :chart-data="eqs_chart.chartData"
+                                :chart-options="eqs_chart.chartOptions"
+                            />
+                          </div>
+                        </div>
+                      </div>
                       <v-data-table
                           :headers="concentration_table.header"
                           :items="concentration_table.value"
                           disable-pagination
                           :hide-default-footer="true"
                           dense
+                          v-else
 
                       >
-
                         <template v-slot:item.name="{ item }">
                         <span v-if="item.info">
                         {{ item.name }}
                         <v-btn
                             icon
-                            @click="$data[item.info] = true"
+                            @click="selected_pollutant = item.name; $data[item.info] = true"
                             class="icon_clickable"
                             x-small
                         >
@@ -1284,9 +1346,7 @@
                             </v-tooltip>
                           </template>
                         </template>
-
                       </v-data-table>
-
                     </div>
                     <div v-else-if="active_indicator[0] == 14">
                       <v-data-table
@@ -1373,8 +1433,7 @@
                         </template>
 
                       </v-data-table>
-
-                    </div>
+                  </div>
                     <div v-else-if="active_indicator[0] == 15">
                       <v-data-table
                           :headers="freshwater_lever_for_action.header"
@@ -1870,6 +1929,41 @@
                         :hide-default-footer="true"
                         dense
                     >
+                      <!--<template
+                          v-for="value in ['baseline', 'future']"
+                          v-slot:[`item.${value}`]="{ item }"
+                      >
+                        <template v-if="getGISLayerColor(item, value, this.selected_layer) != null">
+                          <v-tooltip bottom>
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-chip
+                                  :color="getGISLayerColor(item, value)[0]"
+                                  dark
+                                  :key="value"
+                                  v-bind="attrs"
+                                  v-on="on"
+                                  text-color="#1c1c1b"
+                              >
+                                {{ item[value] }}
+                              </v-chip>
+                            </template>
+                            <span>{{ getGISLayerColor(item, value)[1] }}</span>
+                          </v-tooltip>
+                        </template>
+                        <template v-else>
+                          <v-chip
+                              color="transparent"
+                              dark
+                              :key="value"
+                              text-color="#1c1c1b"
+                              class= "chip_no_hover"
+                          >
+                            {{ item[value] }}
+                          </v-chip>
+                        </template>
+                      </template> -->
+
+
                     <!--
                       <template v-slot:item.name="{ item }">
                           <span v-if="item.info">
@@ -3262,21 +3356,28 @@
             <h3> Pollutant concentration </h3>
             <br>
 
-            <div v-katex:display="'C = \\frac{\\sum_{i \\in DP} pollutant_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} '"></div>
+            <div v-katex:display="'C = \\frac{\\sum_{i \\in DP} '+this.selected_pollutant+'_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} '"></div>
             <div v-katex:display="' \\Delta = \\frac{C}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}}'"></div>
+            <div v-katex:display="'TU = \\frac{\\sum_{i \\in DP} '+this.selected_pollutant+'_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EC50_{'+this.selected_pollutant+'} \\cdot 10^{-3}}'"></div>
+            <div v-katex:display="'EQS = \\frac{\\sum_{i \\in DP} '+this.selected_pollutant+'_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EQS_{'+this.selected_pollutant+'}} \\cdot 100'"></div>
+
 
             <b>Where:</b>
             <br>
             <ul>
               <li><span v-katex="'C'"></span>: Concentration of pollutants in the water after treatment in the WWTP (g/m3)</li>
               <li><span v-katex="'\\Delta'"></span>: Increase of the concentration in the receiving water body after discharge (g/m3)</li>
+              <li><span v-katex="'TU'"></span>: Toxic Units in the effluent aims to calculete how toxic is industry effluent for ecosystem</li>
+              <li><span v-katex="'EQS'"></span>: Enviromental Quality Standards are the limits aprproved by the EU's Water Framework Directive</li>
 
               <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water</li>
-              <li><span v-katex="'pollutant_{effl}'"></span>: load of pollutant in the effluent</li>
+              <li><span v-katex="this.selected_pollutant+'_{effl}'"></span>: load of pollutant in the effluent</li>
               <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body</li>
               <li><span v-katex="'W_{a}'"></span>: amount of water available in the river <b>(streamflow global
                 indicator)</b></li>
               <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river</li>
+              <li><span v-katex="'EC50_{'+this.selected_pollutant+'}: '+this.conversion_factors[this.selected_pollutant]['eqs']+' \\mu g/L'"></span></li>
+              <li><span v-katex="'EQS_{'+this.selected_pollutant+'}: '+this.conversion_factors[this.selected_pollutant]['eqs']+' mg/L'"></span></li>
 
             </ul>
             <br>
@@ -3386,7 +3487,9 @@ export default {
       ghg_sludge_management_chip: 0,
 
       concentration_table: {header: [], value: []},
-
+      concentration_ecotox_chart: {chartData: {}, chartOptions: {}},
+      concentration_pollutant_chart: {chartData: {}, chartOptions: {}},
+      concentration_chip: 0,
 
       emissions_table: {header: [], value: []},
       emissions_chart: {chartData: {}, chartOptions: {}},
@@ -3593,8 +3696,11 @@ export default {
     },
 
     //Get color of item based on value
-    getGISLayerColor(item, value){
+    getGISLayerColor(item, value, layer_name = null){
       let layer = this.selected_layer.name
+      if(layer_name == null) layer = this.selected_layer.name
+      else layer = layer_name
+
       let equals = function(name1, name2){
         return name1 == name2 || name1 == name2 + " (Value In Year to 2030 Business as usual)"
       }
@@ -4415,7 +4521,9 @@ export default {
         let pollutants_table = {
           header: [{text: "", value: "name", sortable: false},
             {text: "Concentration of the water discharged (g/m3)", value: 'concentration'},
-            {text: "Increase of the concentration in the receiving water body (g/m3)", value: 'delta',},
+            {text: "Increase of the concentration in the receiving water body (g/m3)", value: 'delta'},
+            {text: "Toxic units in the effluent (TU/Day)", value: 'toxicUnits'},
+            {text: "concentration of the pollutants in the effluent (with respect to EQS) (%)", value: 'pollConcentration'},
             {text: "Data Type", value: "data", sortable: false}],
           value: []
         }
@@ -4430,6 +4538,12 @@ export default {
 
         let tu = metrics.pollutant_concentration(industries)
         let delta = await metrics.pollutant_delta(industries, _this.global_layers)
+        let toxicUts = metrics.ecotoxicity_potential_tu(industries)
+        let concentration = metrics.environmental_quality_standards(industries)
+
+        let labels_dataset= []
+        let values_dataset= []
+
         //let dichloroethane = {value: _this.table_title.pollutants.diclo,  info: "info_pollutant_concentration"}
         //dichloroethane[key] = tu.diclo
         //dichloroethane['delta'] = delta.diclo
@@ -4442,11 +4556,103 @@ export default {
           }
           pollutant_obj['concentration'] = tu[pollutant]
           pollutant_obj['delta'] = delta[pollutant]
+          pollutant_obj['toxicUnits'] = toxicUts[pollutant]
+          pollutant_obj['pollConcentration'] = concentration[pollutant]
 
           pollutants_table.value.push(pollutant_obj)
+          labels_dataset.push(pollutant)
+          values_dataset.push(tu[pollutant])
         }
 
+        _this.concentration_ecotox_chart = {
+          chartData: {
+            labels: labels_dataset,
+            datasets: [
+              {
+                backgroundColor: labels_dataset.map(pollutant => this.chooseColor(pollutant)),
+                data: values_dataset
+              }
+            ]
+          },
+          chartOptions: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    let datasets = context.dataset;
+                    let sum = datasets.data.map(x => parseFloat(x)).reduce((a, b) => a + b, 0);
+                    let percentage = ((context.raw / sum) * 100).toFixed(2);
 
+                    return context.label + ": "+context.raw + " TU/day" + " ("+percentage+"%)"
+                  }
+
+                }
+
+              },
+              datalabels: {
+                formatter: function (value, ctx) {
+                  let datasets = ctx.chart.data.datasets;
+                  if (datasets.length > 0) {
+                    let sum = datasets[0].data.map(x => parseFloat(x)).reduce((a, b) => a + b, 0);
+                    let percentage = ((value / sum) * 100).toFixed(2);
+                    if(percentage > 5) {
+
+                      return percentage + "%"
+                    }else return ''
+                  }
+
+                },
+                color: 'white'
+              },
+
+            },
+          }
+
+        }
+        _this.concentration_pollutant_chart = {
+          chartData: {
+            labels: labels_dataset,
+            datasets: [
+              {
+                data: values_dataset,
+                backgroundColor: labels_dataset.map(pollutant => this.chooseColor(pollutant)),
+              },
+
+            ]
+          },
+          chartOptions: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: {
+                display: false
+              },
+              tooltip: {
+                callbacks: {
+                  label: function(context) {
+                    return context.label + ": "+context.raw + "%"
+                  },
+                }
+
+              },
+            },
+            scales: {
+              y: {
+                ticks: {
+                  beginAtZero:true,
+                  callback: function(value, index, values) {
+                    return value + '%';
+                  }
+                },
+              }
+            }
+          },
+
+        }
+
+        console.log(pollutants_table)
         return pollutants_table
       } else return {header: [], emissions: []}
 
@@ -5489,9 +5695,9 @@ export default {
 
         let indicators = []
         if (_this.active_indicator >= 1 && _this.active_indicator <= 12) {
-          indicators = ["Coastal Eutrophication Potential", "Surface Water Pharmaceutical Pollution", "Coastal Pharmaceutical Pollution", "Unimproved/No Drinking Water", "Unimproved/No Sanitation"]
+          indicators = ["Coastal Eutrophication Potential", "Surface Water Pharmaceutical Pollution", "Coastal Pharmaceutical Pollution", "Unimproved/No Drinking Water", "Unimproved/No Sanitation", "Streamflow"]
         } else if (_this.active_indicator >= 13 && _this.active_indicator <= 15) {
-          indicators = ["Seasonal variability", "Interannual variability", "Water stress", "Water depletion", "Aridity index", "Groundwater table decline", "Drought risk"]
+          indicators = ["Seasonal variability", "Interannual variability", "Water stress", "Water depletion", "Aridity index", "Groundwater table decline", "Drought risk", "Streamflow"]
         }
 
         for (let indicator of indicators) {
@@ -5579,10 +5785,10 @@ export default {
                 {id: 3, name: this.table_title.simple_table.delta_tu, info: "Toxic units in the receiving water body indicates if the concentration after the effluent discharge on the water body exceed the EC50, supposing the receiving water has a concentration of 0 before discharge."},
                 {id: 4, name: this.table_title.simple_table.delta_eqs, info: "Increase of the concentration of the pollutants in the receiving water body after discharge (with respect to EQS), supposing the receiving water has a concentration of 0 before discharge."},
                 {id: 5, name: this.table_title.simple_table.eutrophication, info: "Eutrophication potential (EP) is defined as the potential to cause over-fertilization of water and soil, which can result in increased growth of biomass. It will always have positive values; higher values indicate higher impact. It converts the pollutants to PO4 equivalent to calculate the total Eutrophication potential. "},
-                {id: 6, name: this.table_title.simple_table.tu, info: "Toxic units in the effluent aims to calculate haw toxic is industry effluent for the ecosystem. To calculate Toxic units, we have used the PP concentrations values from which in 24h cause the deaths or lack of movement of 50% of Daphnia magna individuals. These values (EC50) have been extracted from different studies compiled into two different databases, the ECOTOX Knowledgebase from the United States Environmental Protection Agency (ECOTOX | Home, n.d.) and from the NORMAN Ecotoxicology Database. (NORMAN Ecotoxicology Database, n.d.)\n" +
-                      "This metric has no impact categories because it calculates with respect to the industry effluent and not with respect to the water body.\n"},
-                {id: 7, name: this.table_title.simple_table.eqs, info: "The Environmental Quality Standards (EQS) are the limits approved by the EU’s Water Framework Directive. The directive sets environmental quality standards for priority pollutants (PP) and eight other pollutants. These substances include the metals cadmium, lead, mercury and nickel, and their compounds; benzene; polyaromatic hydrocarbons (PAH); and several pesticides. Several of these priority substances are classed as hazardous. Each PP has a maximum allowable concentration (MAC) for inland surface waters. The metric of impact indicates if the concentration of the pollutant in the industry effluent is higher than the MAC (> 100%) or lower (< 100%). (Priority Substances - Water - Environment - European Commission, n.d.)\n" +
-                      "This metric has no impact categories because it calculates with respect to the industry effluent and not with respect to the water body.  \n"},
+                //{id: 6, name: this.table_title.simple_table.tu, info: "Toxic units in the effluent aims to calculate haw toxic is industry effluent for the ecosystem. To calculate Toxic units, we have used the PP concentrations values from which in 24h cause the deaths or lack of movement of 50% of Daphnia magna individuals. These values (EC50) have been extracted from different studies compiled into two different databases, the ECOTOX Knowledgebase from the United States Environmental Protection Agency (ECOTOX | Home, n.d.) and from the NORMAN Ecotoxicology Database. (NORMAN Ecotoxicology Database, n.d.)\n" +
+                //      "This metric has no impact categories because it calculates with respect to the industry effluent and not with respect to the water body.\n"},
+                //{id: 7, name: this.table_title.simple_table.eqs, info: "The Environmental Quality Standards (EQS) are the limits approved by the EU’s Water Framework Directive. The directive sets environmental quality standards for priority pollutants (PP) and eight other pollutants. These substances include the metals cadmium, lead, mercury and nickel, and their compounds; benzene; polyaromatic hydrocarbons (PAH); and several pesticides. Several of these priority substances are classed as hazardous. Each PP has a maximum allowable concentration (MAC) for inland surface waters. The metric of impact indicates if the concentration of the pollutant in the industry effluent is higher than the MAC (> 100%) or lower (< 100%). (Priority Substances - Water - Environment - European Commission, n.d.)\n" +
+                //      "This metric has no impact categories because it calculates with respect to the industry effluent and not with respect to the water body.  \n"},
               ]
             },
             {
