@@ -254,8 +254,9 @@ async function discharged_factor(industries, global_layers){
 }
 
 //Load of pollutant_effl discharged by industries (g/day)
-function calculate_effluent_load(industries, pollutant_effl){
-    let load = industries.map(industry => industry.effl_pollutant_load(pollutant_effl)).sum()
+//if only_same_watershed is true, only loads discharged in the same watershed are considered
+function calculate_effluent_load(industries, pollutant_effl, only_same_watershed = false){
+    let load = industries.map(industry => industry.effl_pollutant_load(pollutant_effl, only_same_watershed)).sum()
     return load
 }
 
@@ -265,7 +266,7 @@ function calculate_influent_load(industries, pollutant){
     return load
 }
 
-//Concentratin of pollutant_effl discharged by industries (g/m3)
+//Concentration of pollutant_effl discharged by industries (g/m3)
 function effl_concentration(industries, pollutant_effl){
     let load = calculate_effluent_load(industries, pollutant_effl)
     let discharged = calculate_water_discharged(industries)
@@ -274,8 +275,8 @@ function effl_concentration(industries, pollutant_effl){
 }
 
 //Water discharged by industries (m3/day)
-function calculate_water_discharged(industries){
-    return industries.map(industry => industry.water_discharged()).sum()
+function calculate_water_discharged(industries, only_same_watershed = false){
+    return industries.map(industry => industry.water_discharged(only_same_watershed)).sum()
 }
 
 //Amount of surface water withdrawn by industries (m3/day)
@@ -370,11 +371,12 @@ function calculate_product_produced(industries){
 }
 
 //Increase in the concentration of the receiving water body due to the discharges of the industry (g/m3)
-async function effl_delta(industries, effl, global_layers){
+//if only_same_watershed is true, only discharges from the same watershed where water is withdrawn are considered
+async function effl_delta(industries, effl, global_layers, only_same_watershed = false){
 
-    let load = calculate_effluent_load(industries, effl)
+    let load = calculate_effluent_load(industries, effl, only_same_watershed)
 
-    let water_discharged = calculate_water_discharged(industries)
+    let water_discharged = calculate_water_discharged(industries, only_same_watershed)
     let streamflow_value = await streamflow(industries, global_layers) //streamflow (m3/day)
     let water_withdrawn = calculate_surface_water_withdrawn(industries)
 
@@ -521,6 +523,12 @@ async function coastal_flood_risk(industries, global_layers){
 async function has_water_stress(industries, global_layers){
     let ws = await utils.water_stress(industries, global_layers)
     return (ws >= 40) ? "Yes" : "No"
+}
+
+//Says if industries have groundwater table decline (avg industries groundwater table decline > 40 mm/year )
+async function has_groundwater_table_decline(industries, global_layers){
+    let gw_decline = await groundwater_table_decline(industries, global_layers)
+    return gw_decline >= 40
 }
 
 //Amount of pollutant removed by applying WWTP's treatment (g/day)
@@ -672,9 +680,9 @@ let metrics = {
     async available_ratio(global_layers, industries){
 
         let streamflow_value = await streamflow(industries, global_layers) //streamflow (m3/day)
-        let water_withdrawn = calculate_surface_water_withdrawn(industries)
+        let consumptive_use = await this.calculate_net_consumptive_use(industries, global_layers)
 
-        let available_ratio = water_withdrawn / streamflow_value
+        let available_ratio = consumptive_use / streamflow_value
         if (isNaN(available_ratio)) return "-"
         else return (available_ratio*100).toFixed(2)
 
@@ -701,10 +709,10 @@ let metrics = {
         else return (100*water_treated/water_discharged).toFixed(2)
     },
 
-    // Specific water consumption  (%)
-    efficiency_factor(industries){
+    // Specific water consumption  (m3/tonnes)
+    async efficiency_factor(industries, global_layers){
         let product_produced = calculate_product_produced(industries)
-        let vol_withdrawn = calculate_water_withdrawn(industries)
+        let vol_withdrawn = await this.calculate_net_consumptive_use(industries, global_layers)
         if (vol_withdrawn>0) return (product_produced/vol_withdrawn).toExponential(2)
         return "-"
     },
@@ -1215,12 +1223,12 @@ let metrics = {
 
         return toxic_units
     },
-    async delta_eqs(industries, global_layers){ //Increase in the concentration of the receiving water body (compared to EQS) due to  discharging the water(%)
+    async delta_eqs(industries, global_layers, same_watershed){ //Increase in the concentration of the receiving water body (compared to EQS) due to  discharging the water(%)
 
         let toxic_units = {}
         for(let pollutant of utils.get_pollutants(industries)){
             let eqs_factor = conversion_factors[pollutant]['eqs']
-            let pollutant_delta = await effl_delta(industries, pollutant, global_layers)
+            let pollutant_delta = await effl_delta(industries, pollutant, global_layers, same_watershed)
             let delta_eqs = 100*pollutant_delta/eqs_factor
 
             if(Number.isFinite(delta_eqs)) toxic_units[pollutant] = delta_eqs.toFixed(3)
@@ -1240,24 +1248,27 @@ let metrics = {
         else return "-"
     },
 
-    async number_of_pollutants_above_eqs(industries, global_layers){
-        let eqs = await this.delta_eqs(industries, global_layers)
-        eqs = Object.values(eqs).filter(x => x != "-")
-        return eqs.filter(x => x > 100).length  //Number of pollutants above EQS
+    //From the water discharged in same watershed where is withdrawn, find number of pollutants
+    //that are above EQS
+    async number_of_pollutants_above_eqs_same_watershed(industries, global_layers){
+        let eqs = await this.delta_eqs(industries, global_layers, true)
+        return Object.values(eqs).filter(x => x == "-" || x > 100).length  //Number of pollutants above EQS
     },
 
-    async surface_net_consumptive_use(industries, global_layers){
-        let number_of_pollutants_above_eqs = await this.number_of_pollutants_above_eqs(industries, global_layers)
-        console.log(number_of_pollutants_above_eqs)
-        if(number_of_pollutants_above_eqs > 0) return calculate_surface_water_withdrawn()
-        else return
-    },
 
-    async net_consumptive_use(industries, global_layers){
-        let number_of_pollutants_above_eqs = await this.number_of_pollutants_above_eqs(industries, global_layers)
-        console.log(number_of_pollutants_above_eqs)
-        if(number_of_pollutants_above_eqs > 0) return calculate_water_withdrawn()
-        else return
+    async calculate_net_consumptive_use(industries, global_layers){
+        //From discharges in same watershed, find number of pollutants above EQS
+        let number_of_pollutants_above_eqs_same_watershed = await this.number_of_pollutants_above_eqs_same_watershed(industries, global_layers)
+        let water_withdrawn = calculate_water_withdrawn(industries)
+
+        //If number of pollutants equals 0, return water withdrawn - water discharged in same watershed
+        if(number_of_pollutants_above_eqs_same_watershed == 0){
+            let water_discharged = calculate_water_discharged(industries, true)
+            return water_withdrawn - water_discharged
+        }else{
+            //If number of pollutants > 0, return water withdrawn
+            return water_withdrawn
+        }
     },
 
     eutrophication_potential(industries){
@@ -1317,6 +1328,34 @@ let metrics = {
         })
         return aggregated
     },
+
+    // consumptive use  (m3/year)
+    async net_consumptive_use(industries, global_layers){
+        let netConsumptiveUse = await this.calculate_net_consumptive_use(industries, global_layers)
+        if (netConsumptiveUse>=0) return netConsumptiveUse.toExponential(2)
+        return "-"
+    },
+
+    // groundwater withdrawals in areas with high groundwater decline (m3/year)
+    async groundwater_withdrawals_in_high_groundwater_decline(industries, global_layers){
+        let total_gw_decline = 0
+        for (let industry of industries){
+            let has_gw_decline = await has_groundwater_table_decline([industry], global_layers)
+            let groundwater = industry.volume_of_groundwater_water_withdrawn()
+            if (has_gw_decline) total_gw_decline += groundwater
+        }
+        if (total_gw_decline>=0) return total_gw_decline.toExponential(2)
+        return "-"
+    },
+
+    // from the water withdrawn, amount of water that is considered as consumptive use (m3/year)
+    async net_consumptive_use_percentage(industries, global_layers){
+        let netConsumptiveUse = await this.calculate_net_consumptive_use(industries, global_layers)
+        let waterWithdrawn = calculate_water_withdrawn(industries)
+        if (netConsumptiveUse>=0 && waterWithdrawn>0) return (100*netConsumptiveUse/waterWithdrawn).toFixed(2)
+        return "-"
+    }
+
 
 }
 

@@ -498,12 +498,11 @@ let industry_impact_legend_category = {
         return category_of_inputs(industry, inputs, pollutant)
     },
     dilution_factor(industry){
-        let inputs = inputs_required.calculate_water_discharged()
-        return category_of_inputs(industry, inputs)
+        return this.net_consumptive_use(industry)
     },
+    //Consumption available ratio
     available_ratio(industry){
-        let inputs = inputs_required.calculate_surface_water_withdrawn()
-        return category_of_inputs(industry, inputs)
+        return this.net_consumptive_use(industry)
     },
     recycled_water_factor(industry){
         let water_generated_inputs = inputs_required.calculate_water_generated()
@@ -516,12 +515,28 @@ let industry_impact_legend_category = {
     // Specific water consumption  (%)
     efficiency_factor(industry){
         let product_produced = inputs_required.calculate_product_produced()
-        let water_withdrawn = inputs_required.calculate_water_withdrawn()
         return Math.max(
             category_of_inputs(industry, product_produced),
-            category_of_inputs(industry, water_withdrawn)
+            this.net_consumptive_use(industry)
         )
     },
+    // Consumptive use
+    net_consumptive_use(industry){
+        let effluent_pollutant_load = inputs_required.calculate_effluent_load()
+        let water_withdrawn = inputs_required.calculate_water_withdrawn()
+        let water_discharged = inputs_required.calculate_water_discharged()
+
+        let pollutants = industry.pollutants_selected
+
+        let level_certainty_pollutants = pollutants.map(pollutant => category_of_inputs(industry, effluent_pollutant_load, pollutant))
+
+        return Math.max(
+            ...level_certainty_pollutants,
+            category_of_inputs(industry, water_withdrawn),
+            category_of_inputs(industry, water_discharged),
+        )
+    },
+
     emissions_and_descriptions(industry) {
         let inputs = inputs_required.wwt_KPI_GHG_deglossed();
         return Math.max(
@@ -617,8 +632,15 @@ let industry_impact_legend_category = {
     },
     sludge_management(industry){
         return this.wwt_KPI_GHG_slu(industry)
-        return category_of_inputs(industry, inputs, pollutant)
+    },
+    groundwater_withdrawals_in_high_groundwater_decline(industry){
+        let inputs = inputs_required.calculate_groundwater_water_withdrawn();
+        return category_of_inputs(industry, inputs)
+    },
+    net_consumptive_use_percentage(industry){
+        return this.net_consumptive_use(industry)
     }
+
 }
 
 export {industry_impact_legend_category}

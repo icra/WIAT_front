@@ -124,7 +124,7 @@ let risk_category = {
         else if (value < 2) return blue
         else if (value < 100) return yellow
         else if (value < 200) return orange
-        else if (value >= 20) return red
+        else if (value === '-' || value >= 200) return red
         return null
     },
 
@@ -134,7 +134,7 @@ let risk_category = {
         else if (value < 0.2) return blue
         else if (value < 1) return yellow
         else if (value < 2) return orange
-        else if (value >= 2) return red
+        else if (value === '-' || value >= 2) return red
         return null
     },
 

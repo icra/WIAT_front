@@ -1007,6 +1007,10 @@ export default {
     }
   },
 
+  created() {
+    console.log(this.industry.onsite_wwtp.discharge_same_location_as_withdrawal)
+  },
+
   computed:{
     clonedIndustry: function(){
       return JSON.parse(JSON.stringify(this.wwtp_model))

@@ -229,7 +229,8 @@ export class Industry{
 
 
     //Adds load of pollutant from onsite WWTP (after being treated), offsite WWTP (after being treated) and directly discharged water
-    effl_pollutant_load(pollutant){
+    //if only_same_watershed is true, only loads from the same watershed are added
+    effl_pollutant_load(pollutant, only_same_watershed = false){
         let load = 0
         if(this.has_onsite_wwtp == 1) {
 
@@ -237,22 +238,27 @@ export class Industry{
             if(this.onsite_wwtp.wwt_pollutants_effl.hasOwnProperty(pollutant)){
                 concentration = this.onsite_wwtp.wwt_pollutants_effl[pollutant]
             }
-            load += concentration * this.onsite_wwtp.wwt_vol_disc // g/day
+            if (!only_same_watershed || this.onsite_wwtp.discharge_same_location_as_withdrawal == 1){
+                load += concentration * this.onsite_wwtp.wwt_vol_disc // g/day
+            }
         }
         if(this.has_direct_discharge == 1) {
             let concentration = 0
             if(this.direct_discharge.wwt_pollutants_effl.hasOwnProperty(pollutant)){
                 concentration = this.direct_discharge.wwt_pollutants_effl[pollutant]
             }
-            load += concentration  *  this.direct_discharge.dd_vol_disc  // g/day
-
+            if (!only_same_watershed || this.direct_discharge.discharge_same_location_as_withdrawal == 1){
+                load += concentration  *  this.direct_discharge.dd_vol_disc  // g/day
+            }
         }
         if(this.has_offsite_wwtp == 1){
             let concentration = 0
             if(this.offsite_wwtp.wwt_pollutants_effl.hasOwnProperty(pollutant)){
                 concentration = this.offsite_wwtp.wwt_pollutants_effl[pollutant]
             }
-            load += concentration * this.offsite_wwtp.wwt_vol_disc  // g/day
+            if (!only_same_watershed || this.offsite_wwtp.discharge_same_location_as_withdrawal == 1){
+                load += concentration * this.offsite_wwtp.wwt_vol_disc  // g/day
+            }
 
         }
         return load
@@ -298,11 +304,25 @@ export class Industry{
     }
 
     //Water discharged by the industry
-    water_discharged(){
+    //if only_same_watershed is true, only discharges in same watershed where water was withdrawn are added
+    water_discharged(only_same_watershed = false){
         let water_discharged = 0
-        if(this.has_onsite_wwtp == 1) water_discharged += this.onsite_wwtp.wwt_vol_disc  //m3/day
-        if(this.has_direct_discharge == 1) water_discharged += this.direct_discharge.dd_vol_disc //m3/day
-        if(this.has_offsite_wwtp == 1) water_discharged += this.offsite_wwtp.wwt_vol_disc //m3/day
+        if(this.has_onsite_wwtp == 1) {
+            if (!only_same_watershed || this.onsite_wwtp.discharge_same_location_as_withdrawal == 1){
+                water_discharged += this.onsite_wwtp.wwt_vol_disc
+            }
+        }  //m3/day
+        if(this.has_direct_discharge == 1) {
+            if (!only_same_watershed || this.direct_discharge.discharge_same_location_as_withdrawal == 1){
+                water_discharged += this.direct_discharge.dd_vol_disc
+            }
+        } //m3/day
+        if(this.has_offsite_wwtp == 1) {
+            if (!only_same_watershed || this.offsite_wwtp.discharge_same_location_as_withdrawal == 1){
+                water_discharged += this.offsite_wwtp.wwt_vol_disc
+
+            }
+        } //m3/day
         return water_discharged
     }
 
@@ -387,6 +407,7 @@ export class Direct_discharge{
 
     constructor(industry = null, set_level_of_certainty = true){
         this.level_of_certainty = {}
+        this.discharge_same_location_as_withdrawal = 1  //yes/no
 
         this.wwt_pollutants_effl = {
             COD: 0,
@@ -453,6 +474,7 @@ export class WWTP{
 
         this.location = null
         if (industry != null) this.location = industry.location
+        this.discharge_same_location_as_withdrawal = 1  //yes/no
 
         this.wwt_treatment_type = 0
         this.wwt_vol_trea = null            //Amount of water treated by WWTP

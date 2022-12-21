@@ -1038,6 +1038,13 @@ export default {
             }
           }
         }
+        else if(industry.onsite_wwtp[key] == undefined){
+          if (key == "discharge_same_location_as_withdrawal"){
+            new_industry.onsite_wwtp[key] = 1
+          }else{
+            new_industry.onsite_wwtp[key] = 0
+          }
+        }
         else{
           new_industry.onsite_wwtp[key] = industry.onsite_wwtp[key]
         }
@@ -1066,9 +1073,7 @@ export default {
               Tetrachloroethene: new_industry["ind_pollutants_effl"]["Tetrachloroethene"],
               Trichloroethylene: new_industry["ind_pollutants_effl"]["Trichloroethylene"]
             }
-
           }
-
         }
         else if(key=="wwt_pollutants_infl_wwtp") {
 
@@ -1118,7 +1123,13 @@ export default {
 
 
         }
-        else{
+        else if(industry.offsite_wwtp[key] == undefined) {
+          if (key == "discharge_same_location_as_withdrawal") {
+            new_industry.offsite_wwtp[key] = 1
+          } else {
+            new_industry.offsite_wwtp[key] = 0
+          }
+        } else{
           new_industry.offsite_wwtp[key] = industry.offsite_wwtp[key]
         }
       })
@@ -1142,11 +1153,18 @@ export default {
             Tetrachloroethene: new_industry["ind_pollutants_effl"]["Tetrachloroethene"],
             Trichloroethylene: new_industry["ind_pollutants_effl"]["Trichloroethylene"]
           }
-        }else{
+        }
+
+        else if(industry.direct_discharge[key] == undefined){
+          if (key == "discharge_same_location_as_withdrawal"){
+            new_industry.direct_discharge[key] = 1
+          }else{
+            new_industry.direct_discharge[key] = 0
+          }
+        } else{
           new_industry.direct_discharge[key] = industry.direct_discharge[key]
         }
       })
-
 
       //Imported from WIAT 1.0
       if (new_industry['level_of_certainty'] == 0){
