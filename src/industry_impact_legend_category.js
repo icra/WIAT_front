@@ -143,6 +143,15 @@ let inputs_required = {
         let direct_discharge = []
         return {industry, onsite_wwtp, offsite_wwtp, direct_discharge}
     },
+
+    calculate_external_sources(){
+        let industry = ['volume_external_sources']
+        let onsite_wwtp = []
+        let offsite_wwtp = []
+        let direct_discharge = []
+        return {industry, onsite_wwtp, offsite_wwtp, direct_discharge}
+    },
+
     discharged_factor(){
         return this.calculate_water_discharged()
     },
@@ -525,6 +534,7 @@ let industry_impact_legend_category = {
         let effluent_pollutant_load = inputs_required.calculate_effluent_load()
         let water_withdrawn = inputs_required.calculate_water_withdrawn()
         let water_discharged = inputs_required.calculate_water_discharged()
+        let external_sources = inputs_required.calculate_external_sources()
 
         let pollutants = industry.pollutants_selected
 
@@ -534,6 +544,7 @@ let industry_impact_legend_category = {
             ...level_certainty_pollutants,
             category_of_inputs(industry, water_withdrawn),
             category_of_inputs(industry, water_discharged),
+            category_of_inputs(industry, external_sources)
         )
     },
 

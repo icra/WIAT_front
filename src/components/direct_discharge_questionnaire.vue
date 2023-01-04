@@ -11,6 +11,19 @@
             <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                 <span>
                   {{user_inputs[input].question}}
+                  <v-tooltip bottom v-if="user_inputs[input].hasOwnProperty('description_tooltip')">
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-icon
+                          v-bind="attrs"
+                          v-on="on"
+                          color="primary"
+                          style="margin-left: 2px; margin-right: 2px; font-size: 1.3rem;"
+                      >
+                        mdi-information-outline
+                      </v-icon>
+                    </template>
+                    <span>{{ user_inputs[input]['description_tooltip'] }}</span>
+                  </v-tooltip>
                   <v-tooltip bottom v-if="required.includes(input)">
                     <template v-slot:activator="{ on, attrs }">
                         <span

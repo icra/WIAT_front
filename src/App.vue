@@ -727,6 +727,7 @@
             </div>
 
           </div>
+          <!-- Search global layer -->
           <div v-else-if="right_sidebar_content === 6" style=" height: 100%; display: flex; flex-flow: column; width: 100%; padding: 10px; overflow: hidden">
             <div>
               <v-row dense>
@@ -1171,6 +1172,8 @@ export default {
       this.rightMenu = !this.rightMenu
       this.snackbars.new_assessment.v_model = true
       this.assessment_active.push(true)
+      this.assessment_expansion_panel = this.selected_assessment = this.$assessments.length - 1
+
       try {
         this.$refs.reference.close_supply_chain_mode()
       }catch (error) {}
@@ -1312,15 +1315,14 @@ export default {
       if (this.created_assessments[this.assessment_expansion_panel].industries[this.selected_industry].supply_chain.filter(industry => {
         return industry.name == value
       }).length == 0 && this.created_assessments[this.assessment_expansion_panel].industries[this.selected_industry].name != value) return true
-      else return "Industry/supplier with same name already exists"
-
+      else return "Supplier with same name already exists"
     },
     rules_required(value) {
       if(!!value) return true
       else return 'Required.'
     },
     edit_industry_rules_name(value){ //Rules for editing industry
-      return this.new_supply_chain_rules_name(value)
+      return this.new_factory_rules_name(value)
     },
 
 
@@ -1394,7 +1396,6 @@ export default {
 </script>
 
 <style>
-
 
 
 @import url('https://use.typekit.net/eud5bih.css');

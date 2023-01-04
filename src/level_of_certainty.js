@@ -50,7 +50,7 @@ let level_of_certainty = {
         stepper_model == 3 ---> directly discharge stage
         stepper_model == 4 ---> external wwtp stage
 
-     If set_no_data, all values are set to 'no_data
+     If set_no_data, all values are set to 'no_data'
      */
 
     set_level_of_certainty(industry, stepper_model, set_no_data = false){

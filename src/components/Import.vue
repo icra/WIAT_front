@@ -961,9 +961,8 @@ export default {
             else {
               new_industry[key] = 0
             }
-          }
 
-          else new_industry[key] = industry[key]
+          } else new_industry[key] = industry[key]
         }
 
       })

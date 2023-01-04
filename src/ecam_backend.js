@@ -69,6 +69,7 @@ export class Industry{
         this.has_offsite_wwtp = null
         this.volume_withdrawn = null   //Amount of superficial water withdrawn from the wb per day(m3/day)
         this.volume_withdrawn_groundwater = 0   //Amount of groundwater water withdrawn from the wb per day(m3/day)
+        this.volume_external_sources = 0   //Amount of water from external sources per day(m3/day)
         this.has_direct_discharge = null
         this.industry_type = null
 
@@ -374,6 +375,10 @@ export class Industry{
         return this.volume_withdrawn_groundwater == null ? 0 : this.volume_withdrawn_groundwater
     }
 
+    //external sources
+    volume_of_external_sources() {
+        return this.volume_external_sources == null ? 0 : this.volume_external_sources
+    }
     //Amount of water treated by onsite and external WWTP
     volume_of_water_treated(){
         let water_treated = 0

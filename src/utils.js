@@ -294,6 +294,11 @@ function calculate_water_withdrawn(industries){
     return industries.map(industry => industry.volume_of_water_withdrawn()).sum()
 }
 
+//Volume from external sources (m3/day)
+function calculate_external_sources(industries){
+    return industries.map(industry => industry.volume_of_external_sources()).sum()
+}
+
 //(m3/day)
 async function calculate_water_withdrawn_in_water_stress(industries, global_layers){
     let volume = 0
@@ -712,8 +717,8 @@ let metrics = {
     // Specific water consumption  (m3/tonnes)
     async efficiency_factor(industries, global_layers){
         let product_produced = calculate_product_produced(industries)
-        let vol_withdrawn = await this.calculate_net_consumptive_use(industries, global_layers)
-        if (vol_withdrawn>0) return (product_produced/vol_withdrawn).toExponential(2)
+        let consumptive_use = await this.calculate_net_consumptive_use(industries, global_layers)
+        if (product_produced>0) return (consumptive_use / product_produced).toExponential(2)
         return "-"
     },
 
@@ -1231,12 +1236,15 @@ let metrics = {
             let pollutant_delta = await effl_delta(industries, pollutant, global_layers, same_watershed)
             let delta_eqs = 100*pollutant_delta/eqs_factor
 
-            if(Number.isFinite(delta_eqs)) toxic_units[pollutant] = delta_eqs.toFixed(3)
+            if(pollutant_delta == 0) toxic_units[pollutant] = (0).toFixed(3)
+            else if(Number.isFinite(delta_eqs)) toxic_units[pollutant] = delta_eqs.toFixed(3)
             else toxic_units[pollutant] = "-"
         }
 
         return toxic_units
     },
+
+
     async delta_eqs_avg(industries, global_layers){
         let eqs = await this.delta_eqs(industries, global_layers)
 
@@ -1260,14 +1268,15 @@ let metrics = {
         //From discharges in same watershed, find number of pollutants above EQS
         let number_of_pollutants_above_eqs_same_watershed = await this.number_of_pollutants_above_eqs_same_watershed(industries, global_layers)
         let water_withdrawn = calculate_water_withdrawn(industries)
+        let external_sources = calculate_external_sources(industries)
 
         //If number of pollutants equals 0, return water withdrawn - water discharged in same watershed
         if(number_of_pollutants_above_eqs_same_watershed == 0){
             let water_discharged = calculate_water_discharged(industries, true)
-            return water_withdrawn - water_discharged
+            return water_withdrawn + external_sources - water_discharged
         }else{
             //If number of pollutants > 0, return water withdrawn
-            return water_withdrawn
+            return water_withdrawn + external_sources
         }
     },
 

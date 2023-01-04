@@ -18,6 +18,20 @@
                   <span v-else>
                     {{user_inputs[input].question}}
                   </span>
+                  <v-tooltip bottom v-if="user_inputs[input].hasOwnProperty('description_tooltip')">
+                    <template v-slot:activator="{ on, attrs }">
+                      <v-icon
+                          v-bind="attrs"
+                          v-on="on"
+                          color="primary"
+                          style="margin-left: 2px; margin-right: 2px; font-size: 1.3rem;"
+                      >
+                        mdi-information-outline
+                      </v-icon>
+                    </template>
+                    <span>{{ user_inputs[input]['description_tooltip'] }}</span>
+                  </v-tooltip>
+
                   <v-tooltip bottom v-if="required.includes(input)">
                   <template v-slot:activator="{ on, attrs }">
                     <span
@@ -36,7 +50,7 @@
                        x-small
                        @click="wwtp_model[input] = button_estimations(input)"
                 >
-                  Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
+                  Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Estimation button -->
                 </v-btn>
               </div>
               <div v-if="select_estimation.includes(input)" style="width: 100%">
@@ -127,13 +141,27 @@
                             <span>
                               Concentration of {{pollutant}} in the WWTP effluent
                             </span>
+                            <v-tooltip bottom v-if="user_inputs['wwt_pollutants_effl'].hasOwnProperty('description_tooltip')">
+                              <template v-slot:activator="{ on, attrs }">
+                                <v-icon
+                                    v-bind="attrs"
+                                    v-on="on"
+                                    color="primary"
+                                    style="margin-left: 2px; margin-right: 2px; font-size: 1.3rem;"
+                                >
+                                  mdi-information-outline
+                                </v-icon>
+                              </template>
+                              <span>{{ user_inputs['wwt_pollutants_effl']['description_tooltip'] }}</span>
+                            </v-tooltip>
+
                             <v-btn v-if="button_estimation.includes('wwt_pollutants_effl') && !isNaN(button_estimations('wwt_pollutants_effl', pollutant)) && button_estimations('wwt_pollutants_effl', pollutant) != null"
                                    tile
                                    x-small
                                    color="#b62373"
                                    @click="wwtp_model['wwt_pollutants_effl'][pollutant] = button_estimations('wwt_pollutants_effl', pollutant)"
                             >
-                              Estimation:  {{button_estimations('wwt_pollutants_effl', pollutant)}}<!-- Botó amb estimació -->
+                              Estimation:  {{button_estimations('wwt_pollutants_effl', pollutant)}}<!-- Estimation button -->
                             </v-btn>
                           </div>
                         </div>
@@ -176,6 +204,19 @@
                           <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                             <span>
                               {{user_inputs[input].question}}
+                              <v-tooltip bottom v-if="user_inputs[input].hasOwnProperty('description_tooltip')">
+                                <template v-slot:activator="{ on, attrs }">
+                                  <v-icon
+                                      v-bind="attrs"
+                                      v-on="on"
+                                      color="primary"
+                                      style="margin-left: 2px; margin-right: 2px; font-size: 1.3rem;"
+                                  >
+                                    mdi-information-outline
+                                  </v-icon>
+                                </template>
+                                <span>{{ user_inputs[input]['description_tooltip'] }}</span>
+                              </v-tooltip>
                             </span>
                             <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
                                    tile
@@ -183,7 +224,7 @@
                                    x-small
                                    @click="wwtp_model[input] = button_estimations(input)"
                             >
-                              Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
+                              Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Estimation button -->
                             </v-btn>
                           </div>
                           <div v-if="select_estimation.includes(input)" style="width: 100%">
@@ -256,6 +297,20 @@
                           <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                             <span>
                               {{user_inputs[input].question}}
+                              <v-tooltip bottom v-if="user_inputs[input].hasOwnProperty('description_tooltip')">
+                                <template v-slot:activator="{ on, attrs }">
+                                  <v-icon
+                                      v-bind="attrs"
+                                      v-on="on"
+                                      color="primary"
+                                      style="margin-left: 2px; margin-right: 2px; font-size: 1.3rem;"
+                                  >
+                                    mdi-information-outline
+                                  </v-icon>
+                                </template>
+                                <span>{{ user_inputs[input]['description_tooltip'] }}</span>
+                              </v-tooltip>
+
                             </span>
                             <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
                                    tile
@@ -263,7 +318,7 @@
                                    x-small
                                    @click="wwtp_model[input] = button_estimations(input)"
                             >
-                              Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
+                              Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Estimation button -->
                             </v-btn>
                           </div>
                           <div v-if="select_estimation.includes(input)" style="width: 100%">
@@ -337,6 +392,20 @@
                           <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                             <span>
                               {{user_inputs[input].question}}
+                              <v-tooltip bottom v-if="user_inputs[input].hasOwnProperty('description_tooltip')">
+                                <template v-slot:activator="{ on, attrs }">
+                                  <v-icon
+                                      v-bind="attrs"
+                                      v-on="on"
+                                      color="primary"
+                                      style="margin-left: 2px; margin-right: 2px; font-size: 1.3rem;"
+                                  >
+                                    mdi-information-outline
+                                  </v-icon>
+                                </template>
+                                <span>{{ user_inputs[input]['description_tooltip'] }}</span>
+                              </v-tooltip>
+
                             </span>
                             <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
                                    tile
@@ -344,7 +413,7 @@
                                    x-small
                                    @click="wwtp_model[input] = button_estimations(input)"
                             >
-                              Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
+                              Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Estimation button -->
                             </v-btn>
                           </div>
                           <div v-if="select_estimation.includes(input)" style="width: 100%">
@@ -418,6 +487,20 @@
                           <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                             <span>
                               {{user_inputs[input].question}}
+                              <v-tooltip bottom v-if="user_inputs[input].hasOwnProperty('description_tooltip')">
+                                <template v-slot:activator="{ on, attrs }">
+                                  <v-icon
+                                      v-bind="attrs"
+                                      v-on="on"
+                                      color="primary"
+                                      style="margin-left: 2px; margin-right: 2px; font-size: 1.3rem;"
+                                  >
+                                    mdi-information-outline
+                                  </v-icon>
+                                </template>
+                                <span>{{ user_inputs[input]['description_tooltip'] }}</span>
+                              </v-tooltip>
+
                             </span>
                             <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
                                    tile
@@ -425,7 +508,7 @@
                                    x-small
                                    @click="wwtp_model[input] = button_estimations(input)"
                             >
-                              Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
+                              Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Estimation button -->
                             </v-btn>
                           </div>
                           <div v-if="select_estimation.includes(input)" style="width: 100%">
@@ -499,6 +582,20 @@
                           <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                             <span>
                               {{user_inputs[input].question}}
+                              <v-tooltip bottom v-if="user_inputs[input].hasOwnProperty('description_tooltip')">
+                                <template v-slot:activator="{ on, attrs }">
+                                  <v-icon
+                                      v-bind="attrs"
+                                      v-on="on"
+                                      color="primary"
+                                      style="margin-left: 2px; margin-right: 2px; font-size: 1.3rem;"
+                                  >
+                                    mdi-information-outline
+                                  </v-icon>
+                                </template>
+                                <span>{{ user_inputs[input]['description_tooltip'] }}</span>
+                              </v-tooltip>
+
                             </span>
                             <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
                                    tile
@@ -506,7 +603,7 @@
                                    x-small
                                    @click="wwtp_model[input] = button_estimations(input)"
                             >
-                              Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
+                              Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Estimation button -->
                             </v-btn>
                           </div>
                           <div v-if="select_estimation.includes(input)" style="width: 100%">
@@ -580,6 +677,20 @@
                           <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                             <span>
                               {{user_inputs[input].question}}
+                              <v-tooltip bottom v-if="user_inputs[input].hasOwnProperty('description_tooltip')">
+                                <template v-slot:activator="{ on, attrs }">
+                                  <v-icon
+                                      v-bind="attrs"
+                                      v-on="on"
+                                      color="primary"
+                                      style="margin-left: 2px; margin-right: 2px; font-size: 1.3rem;"
+                                  >
+                                    mdi-information-outline
+                                  </v-icon>
+                                </template>
+                                <span>{{ user_inputs[input]['description_tooltip'] }}</span>
+                              </v-tooltip>
+
                             </span>
                             <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
                                    tile
@@ -587,7 +698,7 @@
                                    x-small
                                    @click="wwtp_model[input] = button_estimations(input)"
                             >
-                              Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
+                              Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Estimation button -->
                             </v-btn>
                           </div>
                           <div v-if="select_estimation.includes(input)" style="width: 100%">
@@ -661,6 +772,20 @@
                           <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                             <span>
                               {{user_inputs[input].question}}
+                              <v-tooltip bottom v-if="user_inputs[input].hasOwnProperty('description_tooltip')">
+                                <template v-slot:activator="{ on, attrs }">
+                                  <v-icon
+                                      v-bind="attrs"
+                                      v-on="on"
+                                      color="primary"
+                                      style="margin-left: 2px; margin-right: 2px; font-size: 1.3rem;"
+                                  >
+                                    mdi-information-outline
+                                  </v-icon>
+                                </template>
+                                <span>{{ user_inputs[input]['description_tooltip'] }}</span>
+                              </v-tooltip>
+
                             </span>
                             <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
                                    tile
@@ -668,7 +793,7 @@
                                    x-small
                                    @click="wwtp_model[input] = button_estimations(input)"
                             >
-                              Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
+                              Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Estimation button -->
                             </v-btn>
                           </div>
                           <div v-if="select_estimation.includes(input)" style="width: 100%">
@@ -742,6 +867,20 @@
                           <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                             <span>
                               {{user_inputs[input].question}}
+                              <v-tooltip bottom v-if="user_inputs[input].hasOwnProperty('description_tooltip')">
+                                <template v-slot:activator="{ on, attrs }">
+                                  <v-icon
+                                      v-bind="attrs"
+                                      v-on="on"
+                                      color="primary"
+                                      style="margin-left: 2px; margin-right: 2px; font-size: 1.3rem;"
+                                  >
+                                    mdi-information-outline
+                                  </v-icon>
+                                </template>
+                                <span>{{ user_inputs[input]['description_tooltip'] }}</span>
+                              </v-tooltip>
+
                             </span>
                             <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
                                    tile
@@ -749,7 +888,7 @@
                                    x-small
                                    @click="wwtp_model[input] = button_estimations(input)"
                             >
-                              Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
+                              Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Estimation button -->
                             </v-btn>
                           </div>
                           <div v-if="select_estimation.includes(input)" style="width: 100%">
@@ -816,21 +955,34 @@
                         align="center"
                         v-for = "input in advanced_stockpiling"
                         :key="input"
-
                     >
                       <v-col cols="7" >
                         <div style="width: 100%;">
                           <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                <span>
-                  {{user_inputs[input].question}}
-                </span>
+                            <span>
+                              {{user_inputs[input].question}}
+                            </span>
+                            <v-tooltip bottom v-if="user_inputs[input].hasOwnProperty('description_tooltip')">
+                              <template v-slot:activator="{ on, attrs }">
+                                <v-icon
+                                    v-bind="attrs"
+                                    v-on="on"
+                                    color="primary"
+                                    style="margin-left: 2px; margin-right: 2px; font-size: 1.3rem;"
+                                >
+                                  mdi-information-outline
+                                </v-icon>
+                              </template>
+                              <span>{{ user_inputs[input]['description_tooltip'] }}</span>
+                            </v-tooltip>
+
                             <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
                                    tile
                                    color="#b62373"
                                    x-small
                                    @click="wwtp_model[input] = button_estimations(input)"
                             >
-                              Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
+                              Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Estimation button -->
                             </v-btn>
                           </div>
                           <div v-if="select_estimation.includes(input)" style="width: 100%">
@@ -905,13 +1057,27 @@
                             <span>
                               {{user_inputs[input].question}}
                             </span>
+                            <v-tooltip bottom v-if="user_inputs[input].hasOwnProperty('description_tooltip')">
+                              <template v-slot:activator="{ on, attrs }">
+                                <v-icon
+                                    v-bind="attrs"
+                                    v-on="on"
+                                    color="primary"
+                                    style="margin-left: 2px; margin-right: 2px; font-size: 1.3rem;"
+                                >
+                                  mdi-information-outline
+                                </v-icon>
+                              </template>
+                              <span>{{ user_inputs[input]['description_tooltip'] }}</span>
+                            </v-tooltip>
+
                             <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
                                    tile
                                    color="#b62373"
                                    x-small
                                    @click="wwtp_model[input] = button_estimations(input)"
                             >
-                              Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Botó amb estimació -->
+                              Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Estimation button -->
                             </v-btn>
                           </div>
                           <div v-if="select_estimation.includes(input)" style="width: 100%">

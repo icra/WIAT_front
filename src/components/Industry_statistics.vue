@@ -737,275 +737,6 @@
                       </div>
 
                     </div>
-                    <!--<div v-else-if="active_indicator[0] == 6">
-
-                      <v-chip-group
-                          mandatory
-                          v-model="ecotoxicity_chip"
-                      >
-                        <v-chip
-                            color="primary"
-                            outlined
-                            class="ma-2"
-                            pill
-                        >
-                          <v-icon left>
-                            mdi-chart-pie
-                          </v-icon>
-                          Chart
-                        </v-chip>
-
-                        <v-chip
-                            color="primary"
-                            outlined
-                            pill
-                            class="ma-2"
-                        >
-                          <v-icon left>
-                            mdi-table
-                          </v-icon>
-                          Table
-
-                        </v-chip>
-                      </v-chip-group>
-                      <v-data-table
-                          :headers="ecotoxicity_table.header"
-                          :items="ecotoxicity_table.value"
-                          disable-pagination
-                          :hide-default-footer="true"
-                          dense
-                          :item-class="itemRowBold"
-                          v-if="ecotoxicity_chip === 1"
-                      >
-                        <template v-slot:item.name="{ item }">
-                      <span v-if="item.info">
-                        {{ item.name }}
-                        <v-btn
-                            icon
-                            @click="selected_pollutant = item.name; $data[item.info] = true"
-                            class="icon_clickable"
-                            x-small
-                        >
-                          <v-icon
-                              color='#1C195B'
-                          >
-                            mdi-information-outline
-                          </v-icon>
-                        </v-btn>
-
-
-                  </span>
-                          <span v-else>{{ item.name }}</span>
-                        </template>
-                        <template
-                            v-for="value in [industry]"
-                            v-slot:item.value="{ item }"
-                        >
-
-                          <template v-if="getEcotoxicity(item) != null">
-                            <v-tooltip bottom>
-                              <template v-slot:activator="{ on, attrs }">
-                                <v-chip
-                                    :color="getEcotoxicity(item)[0]"
-                                    dark
-                                    :key="industry.name"
-                                    v-bind="attrs"
-                                    v-on="on"
-                                    text-color="#1c1c1b"
-                                >
-                                  {{ item.value }}
-                                </v-chip>
-                              </template>
-                              <span>{{ getEcotoxicity(item)[1] }}</span>
-                            </v-tooltip>
-                          </template>
-                          <template v-else>
-                            <v-chip
-                                color="transparent"
-                                dark
-                                :key="value.name"
-                                text-color="#1c1c1b"
-                                class="chip_no_hover"
-                            >
-                              {{ item.value }}
-                            </v-chip>
-                          </template>
-                        </template>
-                        <template
-                            v-slot:item.data="{ item }"
-                        >
-                          <template v-if="getDataTypeColor(item) != null">
-                            <v-tooltip bottom>
-                              <template v-slot:activator="{ on, attrs }">
-                                <v-chip
-                                    :color="getDataTypeColor(item)[0]"
-                                    dark
-                                    :key="industry.name"
-                                    text-color="#1c1c1b"
-                                    v-bind="attrs"
-                                    v-on="on"
-                                >
-                                  {{ item.data }}
-                                </v-chip>
-                              </template>
-                              <span>{{getDataTypeColor(item)[1]}}</span>
-                            </v-tooltip>
-                          </template>
-                        </template>
-
-                      </v-data-table>
-
-                      <div v-else-if="ecotoxicity_chip === 0">
-                        <p class="chart_no_data" v-if="utils.get_pollutants([this.industry]).length == 0">
-                          Current industry doesn't have pollutants selected
-                        </p>
-                        <div v-else>
-                          <PieChart
-                              style="padding-top: 10px"
-                              :chart-data="ecotoxicity_chart.chartData"
-                              :chart-options="ecotoxicity_chart.chartOptions"
-
-
-                          />
-                          <p class="instructions_2">
-                            *Only labels >5% are shown.
-                          </p>
-                        </div>
-
-                      </div>
-
-
-                    </div>-->
-                    <div v-else-if="active_indicator[0] == 7">
-                      <v-chip-group
-                          mandatory
-                          v-model="eqs_chip"
-                      >
-                        <v-chip
-                            color="primary"
-                            outlined
-                            class="ma-2"
-                            pill
-                        >
-                          <v-icon left>
-                            mdi-chart-pie
-                          </v-icon>
-                          Chart
-                        </v-chip>
-
-                        <v-chip
-                            color="primary"
-                            outlined
-                            pill
-                            class="ma-2"
-                        >
-                          <v-icon left>
-                            mdi-table
-                          </v-icon>
-                          Table
-
-                        </v-chip>
-                      </v-chip-group>
-                      <div v-if="eqs_chip == 0">
-                        <p class="chart_no_data" v-if="utils.get_pollutants([this.industry]).length == 0">
-                          Current industry doesn't have pollutants selected
-                        </p>
-                        <BarChart
-                            style="padding-top: 40px;"
-                            :chart-data="eqs_chart.chartData"
-                            :chart-options="eqs_chart.chartOptions"
-                            v-else
-                        />
-                      </div>
-
-
-                      <v-data-table
-                          :headers="eqs_table.header"
-                          :items="eqs_table.value"
-                          disable-pagination
-                          :hide-default-footer="true"
-                          dense
-                          v-else
-                      >
-
-                        <template v-slot:item.name="{ item }">
-                      <span v-if="item.info">
-                        {{ item.name }}
-                        <v-btn
-                            icon
-                            @click="selected_pollutant = item.name; $data[item.info] = true"
-                            class="icon_clickable"
-                            x-small
-                        >
-                          <v-icon
-                              color='#1C195B'
-                          >
-                            mdi-information-outline
-                          </v-icon>
-                        </v-btn>
-
-                      </span>
-                          <span v-else>{{ item.name }}</span>
-                        </template>
-                        <template
-                            v-slot:item.value="{ item }"
-                        >
-
-                          <template v-if="getEQSColor(item) != null">
-                            <v-tooltip bottom>
-                              <template v-slot:activator="{ on, attrs }">
-                                <v-chip
-                                    :color="getEQSColor(item)[0]"
-                                    dark
-                                    :key="industry.name"
-                                    v-bind="attrs"
-                                    v-on="on"
-                                    text-color="#1c1c1b"
-                                >
-                                  {{ item.value }}
-                                </v-chip>
-                              </template>
-                              <span>{{ getEQSColor(item)[1] }}</span>
-                            </v-tooltip>
-                          </template>
-                          <template v-else>
-                            <v-chip
-                                color="transparent"
-                                dark
-                                :key="industry.name"
-                                text-color="#1c1c1b"
-                                class="chip_no_hover"
-                            >
-                              {{ item.value }}
-                            </v-chip>
-                          </template>
-                        </template>
-                        <template
-                            v-slot:item.data="{ item }"
-                        >
-                          <template v-if="getDataTypeColor(item) != null">
-                            <v-tooltip bottom>
-                              <template v-slot:activator="{ on, attrs }">
-                                <v-chip
-                                    :color="getDataTypeColor(item)[0]"
-                                    dark
-                                    :key="industry.name"
-                                    text-color="#1c1c1b"
-                                    v-bind="attrs"
-                                    v-on="on"
-                                >
-                                  {{ item.data }}
-                                </v-chip>
-                              </template>
-                              <span>{{getDataTypeColor(item)[1]}}</span>
-                            </v-tooltip>
-                          </template>
-                        </template>
-
-
-                      </v-data-table>
-
-                    </div>
                     <div v-else-if="active_indicator[0] == 9">
                       <v-data-table
                           :headers="treatment_efficiency_table.header"
@@ -1235,96 +966,32 @@
                       </v-data-table>
                     </div>
                     <div v-else-if="active_indicator[0] == 12">
-                      <v-chip-group
-                          mandatory
-                          v-model="concentration_chip"
-                      >
-                        <v-chip
-                            color="primary"
-                            outlined
-                            class="ma-2"
-                            pill
-                        >
-                          <v-icon left>
-                            mdi-chart-pie
-                          </v-icon>
-                          Chart
-                        </v-chip>
 
-                        <v-chip
-                            color="primary"
-                            outlined
-                            pill
-                            class="ma-2"
-                        >
-                          <v-icon left>
-                            mdi-table
-                          </v-icon>
-                          Table
-
-                        </v-chip>
-                      </v-chip-group>
-                      <div v-if="concentration_chip === 0">
-                        <div>
-                          <p class="chart_no_data" v-if="utils.get_pollutants([this.industry]).length == 0">
-                            Current industry doesn't have pollutants selected
-                          </p>
-                          <div v-else>
-                            <h3>Toxic units in the effluent chart: </h3>
-                            <PieChart
-                                style="padding-top: 10px"
-                                :chart-data="ecotoxicity_chart.chartData"
-                                :chart-options="ecotoxicity_chart.chartOptions"
-
-
-                            />
-                            <p class="instructions_2">
-                              *Only labels >5% are shown.
-                            </p>
-                          </div>
-
-                        </div>
-                        <div>
-                          <p class="chart_no_data" v-if="utils.get_pollutants([this.industry]).length == 0">
-                            Current industry doesn't have pollutants selected
-                          </p>
-                          <div v-else>
-                            <h3>Concentration of pollutants in the effluent (with respect to EQS) chart:</h3>
-                            <BarChart
-                                style="padding-top: 40px;"
-                                :chart-data="eqs_chart.chartData"
-                                :chart-options="eqs_chart.chartOptions"
-                            />
-                          </div>
-                        </div>
-                      </div>
                       <v-data-table
                           :headers="concentration_table.header"
                           :items="concentration_table.value"
                           disable-pagination
                           :hide-default-footer="true"
                           dense
-                          v-else
-
                       >
                         <template v-slot:item.name="{ item }">
-                        <span v-if="item.info">
-                        {{ item.name }}
-                        <v-btn
-                            icon
-                            @click="selected_pollutant = item.name; $data[item.info] = true"
-                            class="icon_clickable"
-                            x-small
-                        >
-                          <v-icon
-                              color='#1C195B'
-                          >
-                            mdi-information-outline
-                          </v-icon>
-                        </v-btn>
-                      </span>
+                          <span v-if="item.info">
+                            {{ item.name }}
+                            <v-btn
+                                icon
+                                @click="selected_pollutant = item.name; $data[item.info] = true"
+                                class="icon_clickable"
+                                x-small
+                            >
+                              <v-icon
+                                  color='#1C195B'
+                              >
+                                mdi-information-outline
+                              </v-icon>
+                            </v-btn>
+                          </span>
                           <span v-else>{{ item.name }}</span>
-                        </template>
+                          </template>
                         <template
                             v-slot:item.data="{ item }"
                         >
@@ -1637,6 +1304,59 @@
 
                       </v-data-table>
                     </div>
+                    <div v-else-if="active_indicator[0] == 20">
+                      <v-data-table
+                          :headers="nutrient_concentration_prior_discharge_table.header"
+                          :items="nutrient_concentration_prior_discharge_table.value"
+
+                          :item-class="itemRowBold"
+                          disable-pagination
+                          :hide-default-footer="true"
+                          dense
+                      >
+                        <template v-slot:item.name="{ item }">
+                          <span v-if="item.info">
+                            {{ item.name }}
+                            <v-btn
+                            icon
+                            @click="$data[item.info] = true; selected_pollutant = item.name"
+                            class="icon_clickable"
+                            x-small
+                        >
+                          <v-icon
+                              color='#1C195B'
+                          >
+                            mdi-information-outline
+                          </v-icon>
+                        </v-btn>
+                          </span>
+                          <span v-else>{{ item.name }}</span>
+                        </template>
+                        <template
+                                v-slot:item.data="{ item }"
+                            >
+                              <template v-if="getDataTypeColor(item) != null">
+                                <v-tooltip bottom>
+                                  <template v-slot:activator="{ on, attrs }">
+                                    <v-chip
+                                        :color="getDataTypeColor(item)[0]"
+                                        dark
+                                        :key="industry.name"
+                                        text-color="#1c1c1b"
+                                        v-bind="attrs"
+                                        v-on="on"
+                                    >
+                                      {{ item.data }}
+                                    </v-chip>
+                                  </template>
+                                  <span>{{getDataTypeColor(item)[1]}}</span>
+                                </v-tooltip>
+                              </template>
+                            </template>
+
+                      </v-data-table>
+                    </div>
+
                     <div v-else-if="active_indicator[0] == 21">
                       <v-data-table
                           :headers="biogas_valorised_table.header"
@@ -2165,13 +1885,23 @@
             amount of water available and multiplied by 100. It indicates the percentage of the available water withdrawn
             by the industry’s consumption. This metric may have values ranging from 0, to a value greater than 100,
             indicating that the demand for water is higher than the available.
-            <div v-katex:display="'100 \\cdot \\frac{W_c}{W_a}'"></div>
+            <div v-katex:display="'W_s = 100 \\cdot \\frac{W_c}{W_a}'"></div>
 
-            <b>Where:</b>
+
+            <span v-katex:display="'\\begin{cases}\n'+
+                'W_c=W_w + W_e - W_d &\\text{if discharged water has concentrations below the EQS}\\\\\n'+
+                'W_c= W_w +W_e &\\text{otherwise}\\\\\n'+
+                '\\end{cases}'"></span>
+
+
+              <b>Where:</b>
             <br>
             <ul>
-              <li><span v-katex="'W_c'"></span>: consumptive water use.</li>
-
+              <li><span v-katex="'W_s'"></span>: Consumption available</li>
+              <li><span v-katex="'W_w'"></span>: Amount of water withdrawn</li>
+              <li><span v-katex="'W_e'"></span>: Amount of water than comes from external sources</li>
+              <li><span v-katex="'W_{d}'"></span>: Water discharged</li>
+              <li><span v-katex="'W_c'"></span>: Water consumptive use. Until Science based targets are set, the tool assumes that the discharge should be equal or better than the EQS to be considered “non-consumptive”.</li>
               <li><span v-katex="'W_a'"></span>: amount of water available on the river <b>(streamflow global
                 indicator)</b></li>
             </ul>
@@ -2198,15 +1928,28 @@
           <div class="dialog_detail" style="background-color: white">
             <h3>Specific water consumption </h3>
             <br>
-            Specific water consumption is a metric that indicates what is the amount of water from the water body needed
+            Specific water consumption is a metric that indicates what is the amount of water consumed needed
             to produce a tone of product manufactured in the industry. Higher values indicate higher water demand.
-            <div v-katex:display="'\\frac{T_{ppi}}{W_c}'"></div>
+            <div v-katex:display="'SWC = \\frac{W_c}{T_{ppi}}'"></div>
+
+
+            <span v-katex:display="'\\begin{cases}\n'+
+                'W_c=W_w + W_e - W_d &\\text{if discharged water has concentrations below the EQS}\\\\\n'+
+                'W_c= W_w + W_e &\\text{otherwise}\\\\\n'+
+                '\\end{cases}'"></span>
+
+
 
             <b>Where:</b>
             <br>
             <ul>
+              <li><span v-katex="'SWC'"></span>: Specific water consumption</li>
               <li><span v-katex="'T_{ppi}'"></span>: tons of product produced by the industry</li>
-              <li><span v-katex="'W_c'"></span>: water consumptive use (both superficial and groundwater)</li>
+              <li><span v-katex="'W_{w}'"></span>: Water withdrawn (both superficial and groundwater)</li>
+              <li><span v-katex="'W_{d}'"></span>: Water discharged</li>
+              <li><span v-katex="'W_e'"></span>: Amount of water than comes from external sources</li>
+              <li><span v-katex="'W_c'"></span>: Water consumptive use. Until Science based targets are set, the tool assumes that the discharge should be equal or better than the EQS to be considered “non-consumptive”.
+              </li>
             </ul>
           </div>
 
@@ -2220,6 +1963,22 @@
             <h3>Net consumptive use </h3>
             <br>
             Amount of water withdrawn by the industry minus the amount of water discharged into the same watershed that meets the EQS
+            <span v-katex:display="'\\begin{cases}\n'+
+                'W_c=W_w + W_e - W_d &\\text{if discharged water has concentrations below the EQS}\\\\\n'+
+                'W_c= W_w + W_e &\\text{otherwise}\\\\\n'+
+                '\\end{cases}'"></span>
+
+            <b>Where:</b>
+            <br>
+            <ul>
+              <li><span v-katex="'W_w'"></span>: Amount of water withdrawn</li>
+              <li><span v-katex="'W_d'"></span>: Water discharged</li>
+              <li><span v-katex="'W_e'"></span>: Amount of water than comes from external sources</li>
+              <li><span v-katex="'W_c'"></span>: Water consumptive use. Until Science based targets are set, the tool assumes that the discharge should be equal or better than the EQS to be considered “non-consumptive”.</li>
+            </ul>
+
+
+
           </div>
 
         </v-dialog>
@@ -2229,13 +1988,20 @@
         >
           <div class="dialog_detail" style="background-color: white">
             <h3>Percentage of water withdrawn for consumptive use </h3>
-            <div v-katex:display="'\\frac{W_c}{W_w} \\cdot 100'"></div>
+            <div v-katex:display="'W_{frac} = \\frac{W_c}{W_w} \\cdot 100'"></div>
+            <span v-katex:display="'\\begin{cases}\n'+
+                'W_c=W_w + W_e - W_d &\\text{if discharged water has concentrations below the EQS}\\\\\n'+
+                'W_c= W_w + W_e &\\text{otherwise}\\\\\n'+
+                '\\end{cases}'"></span>
 
             <b>Where:</b>
             <br>
             <ul>
+              <li><span v-katex="'W_{frac}'"></span>: Percentage of water withdrawn for consumptive use</li>
               <li><span v-katex="'W_w'"></span>: Amount of water withdrawn</li>
-              <li><span v-katex="'W_c'"></span>: Consumptive water use</li>
+              <li><span v-katex="'W_d'"></span>: Water discharged</li>
+              <li><span v-katex="'W_e'"></span>: Amount of water than comes from external sources</li>
+              <li><span v-katex="'W_c'"></span>: Water consumptive use. Until Science based targets are set, the tool assumes that the discharge should be equal or better than the EQS to be considered “non-consumptive”.</li>
             </ul>
 
           </div>
@@ -2602,8 +2368,7 @@
                 <span v-katex:display="'\\begin{cases}\n'+
                 'CH_4=0 &\\text{if emissions are treated or covered}\\\\\n'+
                 'CH_4= sludgemass \\cdot TVS \\cdot TVStoOC \\cdot upEf \\cdot OCtoCH_4 \\cdot ctCH_4eq &\\text{otherwise}\\\\\n'+
-                '\\end{cases}'">
-              </span>
+                '\\end{cases}'"></span>
                 <span v-katex:display="'\\begin{cases}\n'+
                 'N_2O=0 &\\text{if } ratioCN>30\\\\\n'+
                 'N_2O=0 &\\text{if solid content of compost}>50 \\\\\n'+
@@ -3271,45 +3036,6 @@
           </div>
 
         </v-dialog>
-        <v-dialog
-            v-model="info_effluent_load_cod"
-            width="60%"
-        >
-          <div class="dialog_detail" style="background-color: white">
-            <h3> COD effluent load </h3>
-            <br>
-            Concentration of COD discharged by the industry.
-            <br>
-            Reducing COD will contribute to reducing your GHG emissions associated to "water discharged"
-          </div>
-
-        </v-dialog>
-        <v-dialog
-            v-model="info_effluent_load_tn"
-            width="60%"
-        >
-          <div class="dialog_detail" style="background-color: white">
-            <h3> TN effluent load </h3>
-            <br>
-            Concentration of TN discharged by the industry.
-            <br>
-            Reducing TN will contribute to reducing your GHG emissions associated to "water discharged"
-          </div>
-
-        </v-dialog>
-        <v-dialog
-            v-model="info_effluent_load_tp"
-            width="60%"
-        >
-          <div class="dialog_detail" style="background-color: white">
-            <h3> TP effluent load </h3>
-            <br>
-            Concentration of TP discharged by the industry.
-            <br>
-            Reducing TP will contribute to reducing your GHG emissions associated to "water discharged"
-          </div>
-
-        </v-dialog>
 
         <v-dialog
             v-model="co2_ghg_ratio_info"
@@ -3384,6 +3110,21 @@
 
           </div>
         </v-dialog>
+        <v-dialog
+            v-model="info_nutrient_concentration_prior_discharge"
+            width="60%"
+        >
+          <div class="dialog_detail" style="background-color: white">
+            <h3> {{ selected_pollutant }} effluent load </h3>
+            <br>
+            Concentration of {{ selected_pollutant }} discharged by the industry.
+            <br>
+            Reducing {{ selected_pollutant }} will contribute to reducing your GHG emissions associated to "water discharged"
+          </div>
+
+        </v-dialog>
+
+
 
 
 
@@ -3455,13 +3196,6 @@ export default {
       treatment_efficiency_table: {header: [], value: []},
       treatment_efficiency_influent_table: {header: [], value: []},
 
-      ecotoxicity_table: {header: [], value: []},
-      ecotoxicity_chart: {chartData: {}, chartOptions: {}},
-      ecotoxicity_chip: 0,
-
-      eqs_table: {header: [], value: []},
-      eqs_chart: {chartData: {}, chartOptions: {}},
-      eqs_chip: 0,
 
 
       delta_ecotox_table: {header: [], value: []},
@@ -3487,9 +3221,8 @@ export default {
       ghg_sludge_management_chip: 0,
 
       concentration_table: {header: [], value: []},
-      concentration_ecotox_chart: {chartData: {}, chartOptions: {}},
-      concentration_pollutant_chart: {chartData: {}, chartOptions: {}},
-      concentration_chip: 0,
+
+      nutrient_concentration_prior_discharge_table: {header: [], value: []},
 
       emissions_table: {header: [], value: []},
       emissions_chart: {chartData: {}, chartOptions: {}},
@@ -3605,6 +3338,8 @@ export default {
       info_effluent_load_tp: false,
 
       info_pollutant_concentration: false,
+      info_nutrient_concentration_prior_discharge: false,
+
       co2_ghg_ratio_info: false,
       n2o_ghg_ratio_info: false,
       ch4_ghg_ratio_info: false,
@@ -3659,11 +3394,9 @@ export default {
       _this.freshwater_lever_for_action = await _this.generate_freshwater_lever_for_action_table()
 
       _this.eutrophication_table = _this.generate_eutrophication_table()
-      _this.ecotoxicity_table = _this.generate_ecotoxicity_table()
       _this.treatment_efficiency_table = _this.generate_treatment_efficiency_table()
       _this.treatment_efficiency_influent_table = _this.generate_treatment_efficiency_influent_table()
 
-      _this.eqs_table = _this.generate_eqs_table()
       _this.delta_eqs_table = await _this.generate_delta_eqs_table()
       _this.delta_ecotox_table = await _this.generate_delta_ecotox_table()
 
@@ -3674,6 +3407,7 @@ export default {
       _this.ghg_ratio_table = _this.generate_ghg_ratio_table()
       _this.ghg_sludge_management_table = _this.generate_sludge_management_table()
       _this.concentration_table = await _this.generate_concentration_table()
+      _this.nutrient_concentration_prior_discharge_table = _this.generate_nutrient_concentration_prior_discharge_table()
 
     },
 
@@ -3912,13 +3646,7 @@ export default {
         let delta_eqs_values = this.delta_eqs_table.value.map(x => x["value"])
         delta_eqs_impact = this.risk_categories["delta_eqs"](delta_eqs_values.sum() / delta_eqs_values.length)
       }
-      let ecotox_impact = null
-      if (this.ecotoxicity_table.value[0] != undefined) ecotox_impact = this.risk_categories["ecotoxicity"](this.ecotoxicity_table.value[0][current_industry_name])
-      let eqs_impact = null
-      if (this.eqs_table.value.length > 0) {
-        let eqs_values = this.eqs_table.value.map(x => x["value"])
-        eqs_impact = this.risk_categories["eqs"](eqs_values.sum() / eqs_values.length)
-      }
+
       /*
       let pollution_load_to_environment_risk = [null, null]
       pollution_load_to_environment_risk[1] = this.return_avg_risk([eutrophication_impact, delta_eqs_impact, delta_ecotox_impact])
@@ -3944,7 +3672,7 @@ export default {
 
       }
 
-      let id_risk = [1, 2, 3, 4, 5, 6, 7, 13, 14, 16, 17]
+      let id_risk = [1, 2, 3, 4, 5, 13, 14, 16, 17]
       if (id_risk.includes(id.id)) {
         if (id.id < 3) {
           return return_color_class(pollution_impact)
@@ -3954,10 +3682,6 @@ export default {
           return return_color_class(delta_eqs_impact)
         } else if (id.id == 5) {
           return return_color_class(eutrophication_impact)
-        } else if (id.id == 6) {
-          return return_color_class(ecotox_impact)
-        } else if (id.id == 7) {
-          return return_color_class(eqs_impact)
         } else if (id.id <= 14) {
           return return_color_class(freshwater_impact)
         } else {
@@ -4522,8 +4246,8 @@ export default {
           header: [{text: "", value: "name", sortable: false},
             {text: "Concentration of the water discharged (g/m3)", value: 'concentration'},
             {text: "Increase of the concentration in the receiving water body (g/m3)", value: 'delta'},
-            {text: "Toxic units in the effluent (TU/Day)", value: 'toxicUnits'},
-            {text: "concentration of the pollutants in the effluent (with respect to EQS) (%)", value: 'pollConcentration'},
+            {text: "Toxic units in the effluent (TU/Day)", value: 'tu'},
+            {text: "Concentration of the pollutants in the effluent (with respect to EQS) (%)", value: 'eqs'},
             {text: "Data Type", value: "data", sortable: false}],
           value: []
         }
@@ -4531,22 +4255,16 @@ export default {
         //let key = 'concentration'
         let industries = [this.industry]
 
-        //pollutants_table.header.push({
-          //text: "Concentration of the water discharged (g/m3)", value: 'concentration'},{
-          //text: "Increase of the concentration in the receiving water body (g/m3)", value: 'delta',})
 
-
-        let tu = metrics.pollutant_concentration(industries)
+        let concentration = metrics.pollutant_concentration(industries)
         let delta = await metrics.pollutant_delta(industries, _this.global_layers)
-        let toxicUts = metrics.ecotoxicity_potential_tu(industries)
-        let concentration = metrics.environmental_quality_standards(industries)
+        let tu = metrics.ecotoxicity_potential_tu(industries)
+        let eqs = metrics.environmental_quality_standards(industries)
 
-        let labels_dataset= []
-        let values_dataset= []
+        let labels_dataset = []
+        let values_tu_dataset = []
+        let values_eqs_dataset = []
 
-        //let dichloroethane = {value: _this.table_title.pollutants.diclo,  info: "info_pollutant_concentration"}
-        //dichloroethane[key] = tu.diclo
-        //dichloroethane['delta'] = delta.diclo
         for(let pollutant of this.industry.pollutants_selected){
           let DataType = industry_impact_legend_category.pollutant_concentration(industries[0], pollutant)
           let pollutant_obj = {
@@ -4554,110 +4272,59 @@ export default {
             info: "info_pollutant_concentration",
             data: this.get_string_impact_legend(DataType)
           }
-          pollutant_obj['concentration'] = tu[pollutant]
+          pollutant_obj['concentration'] = concentration[pollutant]
           pollutant_obj['delta'] = delta[pollutant]
-          pollutant_obj['toxicUnits'] = toxicUts[pollutant]
-          pollutant_obj['pollConcentration'] = concentration[pollutant]
+          pollutant_obj['tu'] = tu[pollutant]
+          pollutant_obj['eqs'] = eqs[pollutant]
 
           pollutants_table.value.push(pollutant_obj)
-          labels_dataset.push(pollutant)
-          values_dataset.push(tu[pollutant])
-        }
 
-        _this.concentration_ecotox_chart = {
-          chartData: {
-            labels: labels_dataset,
-            datasets: [
-              {
-                backgroundColor: labels_dataset.map(pollutant => this.chooseColor(pollutant)),
-                data: values_dataset
-              }
-            ]
-          },
-          chartOptions: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              tooltip: {
-                callbacks: {
-                  label: function(context) {
-                    let datasets = context.dataset;
-                    let sum = datasets.data.map(x => parseFloat(x)).reduce((a, b) => a + b, 0);
-                    let percentage = ((context.raw / sum) * 100).toFixed(2);
-
-                    return context.label + ": "+context.raw + " TU/day" + " ("+percentage+"%)"
-                  }
-
-                }
-
-              },
-              datalabels: {
-                formatter: function (value, ctx) {
-                  let datasets = ctx.chart.data.datasets;
-                  if (datasets.length > 0) {
-                    let sum = datasets[0].data.map(x => parseFloat(x)).reduce((a, b) => a + b, 0);
-                    let percentage = ((value / sum) * 100).toFixed(2);
-                    if(percentage > 5) {
-
-                      return percentage + "%"
-                    }else return ''
-                  }
-
-                },
-                color: 'white'
-              },
-
-            },
+          if(!["COD", "TN", "TP"].includes(pollutant)){
+            labels_dataset.push(pollutant)
+            values_tu_dataset.push(tu[pollutant])
+            values_eqs_dataset.push(eqs[pollutant])
           }
-
-        }
-        _this.concentration_pollutant_chart = {
-          chartData: {
-            labels: labels_dataset,
-            datasets: [
-              {
-                data: values_dataset,
-                backgroundColor: labels_dataset.map(pollutant => this.chooseColor(pollutant)),
-              },
-
-            ]
-          },
-          chartOptions: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: {
-                display: false
-              },
-              tooltip: {
-                callbacks: {
-                  label: function(context) {
-                    return context.label + ": "+context.raw + "%"
-                  },
-                }
-
-              },
-            },
-            scales: {
-              y: {
-                ticks: {
-                  beginAtZero:true,
-                  callback: function(value, index, values) {
-                    return value + '%';
-                  }
-                },
-              }
-            }
-          },
-
         }
 
-        console.log(pollutants_table)
         return pollutants_table
       } else return {header: [], emissions: []}
 
 
     },
+
+    //Effluent concentration prior to discharge
+    generate_nutrient_concentration_prior_discharge_table() {
+      let _this = this
+      if (_this.industry !== null) {
+
+        let pollutants_table = {
+          header: [{text: "", value: "name", sortable: false},
+            {text: "Concentration of the water discharged (g/m3)", value: 'concentration'},
+            {text: "Data Type", value: "data", sortable: false}],
+          value: []
+        }
+
+        let industries = [this.industry]
+        let concentration = metrics.pollutant_concentration(industries)
+
+
+        for(let pollutant of ['COD', 'TN']){
+          let DataType = industry_impact_legend_category.pollutant_concentration(industries[0], pollutant)
+          let pollutant_obj = {
+            name: pollutant,
+            info: "info_nutrient_concentration_prior_discharge",
+            data: this.get_string_impact_legend(DataType)
+          }
+          pollutant_obj['concentration'] = concentration[pollutant]
+          pollutants_table.value.push(pollutant_obj)
+        }
+
+
+        return pollutants_table
+      } else return {header: [], emissions: []}
+
+    },
+
 
     //Biogas valorisation table
     generate_biogas_valorised_table() {
@@ -4857,111 +4524,6 @@ export default {
 
     },
 
-    //"Toxic units in the effluent" table
-    generate_ecotoxicity_table() {
-
-      let _this = this
-
-      if (_this.industry !== null) {
-
-        let pollutants_table = {
-          header: [{text: "", value: "name", sortable: false},
-            {text: this.industry.name, value: "value"},
-            {text: "Unit", value: "unit", sortable: false},
-            {text: "Data Type", value: "data", sortable: false}],
-          value: []
-        }
-
-
-        //let dichloroethane = {value: _this.table_title.pollutants.diclo, unit: "TU/day", info: "info_tu_diclo"}
-
-        //let key = this.industry.name
-        let industries = [this.industry]
-        let tu = metrics.ecotoxicity_potential_tu(industries)
-        let total = {name: _this.table_title.pollutants.total, value: tu.total,  unit: "TU/day"}
-        //total[this.industry.name] = tu.total
-        pollutants_table.value.push(total)
-
-
-        //pollutants_table.header.push({
-          //text: key, value: key,
-        //})
-        //pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
-
-
-        let labels_dataset = []
-        let values_dataset = []
-
-
-        for(let pollutant of utils.remove_nutrients(this.industry.pollutants_selected)){
-          let DataType = industry_impact_legend_category.ecotoxicity_potential_tu(industries[0], pollutant)
-          let pollutant_obj = {
-            name: pollutant,
-            unit: "TU/day",
-            info: "info_tu",
-            value: tu[pollutant],
-            data: this.get_string_impact_legend(DataType)
-          }
-          //pollutant_obj[key] = tu[pollutant]
-          pollutants_table.value.push(pollutant_obj)
-
-          labels_dataset.push(pollutant)
-          values_dataset.push(tu[pollutant])
-        }
-
-        _this.ecotoxicity_chart = {
-          chartData: {
-            labels: labels_dataset,
-            datasets: [
-              {
-                backgroundColor: labels_dataset.map(pollutant => this.chooseColor(pollutant)),
-                data: values_dataset
-              }
-            ]
-          },
-          chartOptions: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              tooltip: {
-                callbacks: {
-                  label: function(context) {
-                    let datasets = context.dataset;
-                    let sum = datasets.data.map(x => parseFloat(x)).reduce((a, b) => a + b, 0);
-                    let percentage = ((context.raw / sum) * 100).toFixed(2);
-
-                    return context.label + ": "+context.raw + " TU/day" + " ("+percentage+"%)"
-                  }
-
-                }
-
-              },
-              datalabels: {
-                formatter: function (value, ctx) {
-                  let datasets = ctx.chart.data.datasets;
-                  if (datasets.length > 0) {
-                    let sum = datasets[0].data.map(x => parseFloat(x)).reduce((a, b) => a + b, 0);
-                    let percentage = ((value / sum) * 100).toFixed(2);
-                    if(percentage > 5) {
-
-                      return percentage + "%"
-                    }else return ''
-                  }
-
-                },
-                color: 'white'
-              },
-
-            },
-          }
-        }
-
-
-        return pollutants_table
-      } else return {header: [], emissions: []}
-
-    },
-
     //"Increase of the concentration of the pollutants in the receiving water body after discharge (with respect to EQS)" table
     async generate_delta_eqs_table() {
 
@@ -5140,102 +4702,6 @@ export default {
             },
           }
         }
-
-        return pollutants_table
-      } else return {header: [], emissions: []}
-
-    },
-
-    //"Concentration of the pollutants in the effluent (with respect to EQS)"
-    generate_eqs_table() {
-
-      let _this = this
-
-
-      if (_this.industry !== null) {
-
-        let pollutants_table = {
-          header: [{text: "", value: "name", sortable: false},
-            {text: this.industry.name, value: "value"},
-            {text: "Unit", value: "unit", sortable: false},
-            {text: "Data type", value: "data", sortable: false}],
-          value: []
-        }
-
-        //let key = this.industry.name
-        let industries = [this.industry]
-
-        //pollutants_table.header.push({
-          //text: key, value: key,
-        //})
-
-        let tu = metrics.environmental_quality_standards(industries)
-
-
-        let labels_dataset = []
-        let values_dataset = []
-        for(let pollutant of utils.remove_nutrients(this.industry.pollutants_selected)){
-          let DataType = industry_impact_legend_category.pollutant_concentration(industries[0], pollutant)
-          let pollutant_obj = {
-            name: pollutant,
-            unit: "%",
-            info: "info_eqs",
-            value:  tu[pollutant],
-            data: this.get_string_impact_legend(DataType)
-          }
-          //pollutant_obj[key] = tu[pollutant]
-          pollutants_table.value.push(pollutant_obj)
-
-          labels_dataset.push(pollutant)
-          values_dataset.push(tu[pollutant])
-        }
-
-        //pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
-
-        this.eqs_chart = {
-          chartData: {
-            labels: labels_dataset,
-            datasets: [
-              {
-                data: values_dataset,
-                backgroundColor: labels_dataset.map(pollutant => this.chooseColor(pollutant))
-              },
-
-            ]
-          },
-          chartOptions: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: {
-                display: false
-              },
-              tooltip: {
-                callbacks: {
-                  label: function(context) {
-                    return context.label + ": "+context.raw + "%"
-                  }
-
-                }
-
-              },
-
-            },
-            scales: {
-              y: {
-                ticks: {
-                  beginAtZero:true,
-                  callback: function(value, index, values) {
-                    return value + '%';
-                  }
-                },
-              }
-            }
-
-          }
-
-        }
-
 
         return pollutants_table
       } else return {header: [], emissions: []}
@@ -5767,7 +5233,6 @@ export default {
         id = _this.add_identifier(category, id)  //id has the new id to add
       })
 
-      console.log(this.layers)
       return this.layers
     },
 
@@ -5785,10 +5250,6 @@ export default {
                 {id: 3, name: this.table_title.simple_table.delta_tu, info: "Toxic units in the receiving water body indicates if the concentration after the effluent discharge on the water body exceed the EC50, supposing the receiving water has a concentration of 0 before discharge."},
                 {id: 4, name: this.table_title.simple_table.delta_eqs, info: "Increase of the concentration of the pollutants in the receiving water body after discharge (with respect to EQS), supposing the receiving water has a concentration of 0 before discharge."},
                 {id: 5, name: this.table_title.simple_table.eutrophication, info: "Eutrophication potential (EP) is defined as the potential to cause over-fertilization of water and soil, which can result in increased growth of biomass. It will always have positive values; higher values indicate higher impact. It converts the pollutants to PO4 equivalent to calculate the total Eutrophication potential. "},
-                //{id: 6, name: this.table_title.simple_table.tu, info: "Toxic units in the effluent aims to calculate haw toxic is industry effluent for the ecosystem. To calculate Toxic units, we have used the PP concentrations values from which in 24h cause the deaths or lack of movement of 50% of Daphnia magna individuals. These values (EC50) have been extracted from different studies compiled into two different databases, the ECOTOX Knowledgebase from the United States Environmental Protection Agency (ECOTOX | Home, n.d.) and from the NORMAN Ecotoxicology Database. (NORMAN Ecotoxicology Database, n.d.)\n" +
-                //      "This metric has no impact categories because it calculates with respect to the industry effluent and not with respect to the water body.\n"},
-                //{id: 7, name: this.table_title.simple_table.eqs, info: "The Environmental Quality Standards (EQS) are the limits approved by the EU’s Water Framework Directive. The directive sets environmental quality standards for priority pollutants (PP) and eight other pollutants. These substances include the metals cadmium, lead, mercury and nickel, and their compounds; benzene; polyaromatic hydrocarbons (PAH); and several pesticides. Several of these priority substances are classed as hazardous. Each PP has a maximum allowable concentration (MAC) for inland surface waters. The metric of impact indicates if the concentration of the pollutant in the industry effluent is higher than the MAC (> 100%) or lower (< 100%). (Priority Substances - Water - Environment - European Commission, n.d.)\n" +
-                //      "This metric has no impact categories because it calculates with respect to the industry effluent and not with respect to the water body.  \n"},
               ]
             },
             {
@@ -5821,6 +5282,7 @@ export default {
               name: "Levers for action",
               children: [
                 {id: 19, name: "Energy use", info: "Energy used by the industry to treat a m3 of water"},
+                {id: 20, name: "Effluent concentration prior to discharge", info: "TN and COD concentration of the effluent, which are triggering N2O and methane emissions"},
                 {id: 21, name: "Biogenic emissions", info: "Biogenic emissions sources are emissions that come from natural sources"},
                 {id: 22, name: "GHG emissions by source", info: "Amount of CO2eq by source emitted to the atmosphere during wastewater treatment process"},
                 {id: 23, name: "Sludge management", info: "GHG emissions from sludge management operations (storing, composting, incineration, land application, landfilling, stockpiling and truck transport)"},

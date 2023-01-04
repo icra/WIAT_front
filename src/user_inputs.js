@@ -231,7 +231,7 @@ export let user_inputs = {
 
     "wwt_treatment_type" :{question:"Type of wastewater treatment", value: 0}, //Option | type of treatment (see Tables)
 
-    "wwt_vol_trea": {question: "Volume of water treated in the WWTP every day", value: 0, unit: "m3/day"},
+    "wwt_vol_trea": {question: "Volume of water treated in the WWTP every day", value: 0, unit: "m3/day", description_tooltip: "The quantity entered here is the portion of the Industry Wastewater Generation that is treated in the WWTP"}, //m3 | volume of water treated
 
     "wwt_vol_disc" :{question:"Volume of water discharged to water body every day", value: 0, unit: "m3/day"},
     "dd_vol_disc" :{question:"Volume of water discharged to water body every day (direct discharge of untreated water)", value: 0, unit: "m3/day"},
@@ -288,8 +288,9 @@ export let user_inputs = {
     "wwt_vol_treated_external": {question: "Volume of water from the WWTP also treated in an off-site WWTP every day", value: 0, unit: "m3/day"},
 
     //INDUSTRY INPUTS
-    "volume_withdrawn": {question: "Industry withdrawal water quantity (surface water only)", value: 0, unit: "m3/day"},
+    "volume_withdrawn": {question: "Industry withdrawal water quantity (surface water only)", value: 0, unit: "m3/day", description_tooltip:"The quantity entered here is the quantity withdrawn from the river (raw water intake)"},
     "volume_withdrawn_groundwater": {question: "Industry withdrawal water quantity (groundwater only)", value: 0, unit: "m3/day"},
+    "volume_external_sources": {question: "All other external sources of water", value: 0, unit: "m3/day", description_tooltip: "The quantity entered here is the quantity of water withdrawn from other sources (e.g. recycled water from a third party, drinking water purchased from the municipality, etc.)"},
 
     "has_onsite_wwtp": {question: "Has the industry an on-site wastewater pre-treatment or treatment plant?", value: false,},
     "has_direct_discharge": {question: "Does the industry directly discharge wastewater effluent (without treatment) into the water body?", value: false, description_tooltip: "Untreated water"},
@@ -323,7 +324,7 @@ export let user_inputs = {
 }
 
 //Inputs related to industry step
-export let industry_inputs = ["volume_withdrawn", "volume_withdrawn_groundwater", "has_onsite_wwtp", "has_direct_discharge", "has_offsite_wwtp", "industry_type", "product_produced", "pollutants_list", "ind_pollutants_effl", "ind_pollutants_infl"]
+export let industry_inputs = ["volume_withdrawn", "volume_withdrawn_groundwater", "volume_external_sources", "has_onsite_wwtp", "has_direct_discharge", "has_offsite_wwtp", "industry_type", "product_produced", "pollutants_list", "ind_pollutants_effl", "ind_pollutants_infl"]
 
 //Inputs related to onsite WWTP step (without external WWTP)
 export let onsite_wwtp_no_offsite = ["wwt_treatment_type", "wwt_vol_trea", "wwt_vol_disc", "wwt_vol_reused", "discharge_same_location_as_withdrawal", "wwt_pollutants_effl", "wwt_nrg_cons", "wwt_conv_kwh", "wwt_mass_slu", "wwt_cod_slud", "wwt_ch4_efac_tre", "wwt_n2o_efac_tre", "wwt_ch4_efac_dis", "wwt_n2o_efac_dis", "wwt_fuel_typ", "wwt_vol_fuel",

@@ -18,6 +18,20 @@
                 <span>
                   {{user_inputs[industry_input].question}}
                 </span>
+                <v-tooltip bottom v-if="user_inputs[industry_input].hasOwnProperty('description_tooltip')">
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-icon
+                        v-bind="attrs"
+                        v-on="on"
+                        color="primary"
+                        style="margin-left: 2px; margin-right: 2px; font-size: 1.3rem;"
+                    >
+                      mdi-information-outline
+                    </v-icon>
+                  </template>
+                  <span>{{ user_inputs[industry_input]['description_tooltip'] }}</span>
+                </v-tooltip>
+
                 <v-tooltip bottom v-if="required.includes(industry_input)">
                   <template v-slot:activator="{ on, attrs }">
                     <span v-bind="attrs"
@@ -163,6 +177,19 @@
                 <span>
                   Concentration of {{pollutant}} in the water used by the industry (and before being treated in a WWTP)
                 </span>
+                <v-tooltip bottom v-if="user_inputs[industry_input].hasOwnProperty('description_tooltip')">
+                  <template v-slot:activator="{ on, attrs }">
+                    <v-icon
+                        v-bind="attrs"
+                        v-on="on"
+                        color="primary"
+                        style="margin-left: 2px; margin-right: 2px; font-size: 1.3rem;"
+                    >
+                      mdi-information-outline
+                    </v-icon>
+                  </template>
+                  <span>{{ user_inputs[industry_input]['description_tooltip'] }}</span>
+                </v-tooltip>
               </div>
               <!-- button estimation -->
               <v-btn v-if="button_estimation.includes(industry_input) && !isNaN(button_estimations(industry_input, pollutant)) && button_estimations(industry_input, pollutant) != null"
@@ -232,6 +259,20 @@
                       <span>
                         Industry withdrawal water {{pollutant}} concentration (surface water only)
                       </span>
+                      <v-tooltip bottom v-if="user_inputs[industry_input].hasOwnProperty('description_tooltip')">
+                        <template v-slot:activator="{ on, attrs }">
+                          <v-icon
+                              v-bind="attrs"
+                              v-on="on"
+                              color="primary"
+                              style="margin-left: 2px; margin-right: 2px; font-size: 1.3rem;"
+                          >
+                            mdi-information-outline
+                          </v-icon>
+                        </template>
+                        <span>{{ user_inputs[industry_input]['description_tooltip'] }}</span>
+                      </v-tooltip>
+
                       <v-btn v-if="button_estimation.includes('ind_pollutants_infl') && pollutant == 'COD' && cod_influent_quality != null"
                              tile
                              x-small
