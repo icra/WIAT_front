@@ -1649,15 +1649,15 @@
                         :hide-default-footer="true"
                         dense
                     >
-                      <!--<template
+                      <template
                           v-for="value in ['baseline', 'future']"
                           v-slot:[`item.${value}`]="{ item }"
                       >
-                        <template v-if="getGISLayerColor(item, value, this.selected_layer) != null">
+                        <template v-if="getGISLayerColor(item, value, item.indicator) != null">
                           <v-tooltip bottom>
-                            <template v-slot:activator="{ on, attrs }">
+                            <template v-slot:activator="{ on, attrs}">
                               <v-chip
-                                  :color="getGISLayerColor(item, value)[0]"
+                                  :color="getGISLayerColor(item, value, item.indicator)[0]"
                                   dark
                                   :key="value"
                                   v-bind="attrs"
@@ -1667,7 +1667,7 @@
                                 {{ item[value] }}
                               </v-chip>
                             </template>
-                            <span>{{ getGISLayerColor(item, value)[1] }}</span>
+                            <span>{{ getGISLayerColor(item, value, item.indicator)[1] }}</span>
                           </v-tooltip>
                         </template>
                         <template v-else>
@@ -1681,86 +1681,7 @@
                             {{ item[value] }}
                           </v-chip>
                         </template>
-                      </template> -->
-
-
-                    <!--
-                      <template v-slot:item.name="{ item }">
-                          <span v-if="item.info">
-                          {{ item.name }}
-                          <v-btn
-                              icon
-
-                              @click="selected_pollutant = item.name; $data[item.info] = true"
-                              class="icon_clickable"
-                              x-small
-                          >
-                            <v-icon
-                                color='#1C195B'
-                            >
-                              mdi-information-outline
-                            </v-icon>
-                          </v-btn>
-
-
-                        </span>
-                        <span v-else>{{ item.name }}</span>
                       </template>
-
-                      <template
-                          v-slot:item.value="{ item }"
-                      >
-                        <template v-if="getDeltaEcotoxColor(item) != null">
-                          <v-tooltip bottom>
-                            <template v-slot:activator="{ on, attrs }">
-                              <v-chip
-                                  :color="getDeltaEcotoxColor(item)[0]"
-                                  dark
-                                  :key="industry.name"
-                                  v-bind="attrs"
-                                  v-on="on"
-                                  text-color="#1c1c1b"
-                              >
-                                {{ item.value }}
-                              </v-chip>
-                            </template>
-                            <span>{{ getDeltaEcotoxColor(item)[1] }}</span>
-                          </v-tooltip>
-                        </template>
-                        <template v-else>
-                          <v-chip
-                              color="transparent"
-                              dark
-                              :key="industry.name"
-                              text-color="#1c1c1b"
-                              class="chip_no_hover"
-                          >
-                            {{ item[industry.name] }}
-                          </v-chip>
-                        </template>
-
-                      </template>
-                      <template
-                          v-slot:item.data="{ item }"
-                      >
-                        <template v-if="getDataTypeColor(item) != null">
-                          <v-tooltip bottom>
-                            <template v-slot:activator="{ on, attrs }">
-                              <v-chip
-                                  :color="getDataTypeColor(item)[0]"
-                                  dark
-                                  :key="industry.name"
-                                  text-color="#1c1c1b"
-                                  v-bind="attrs"
-                                  v-on="on"
-                              >
-                                {{ item.data }}
-                              </v-chip>
-                            </template>
-                            <span>{{getDataTypeColor(item)[1]}}</span>
-                          </v-tooltip>
-                        </template>
-                      </template>-->
 
                     </v-data-table>
 
@@ -3431,9 +3352,12 @@ export default {
 
     //Get color of item based on value
     getGISLayerColor(item, value, layer_name = null){
-      let layer = this.selected_layer.name
-      if(layer_name == null) layer = this.selected_layer.name
-      else layer = layer_name
+      let layer = layer_name
+
+      if(layer_name == null) {
+        if (this.selected_layer == null) return null
+        layer = this.selected_layer.name
+      }
 
       let equals = function(name1, name2){
         return name1 == name2 || name1 == name2 + " (Value In Year to 2030 Business as usual)"
@@ -3499,7 +3423,7 @@ export default {
             {text: "Country", value: "country"},
             {text: "Latitude", value: "lat"},
             {text: "Longitude", value: "lng"},
-            {text: "Overall water risk.", value: "overall_water_risk"},
+            {text: "Overall water risk", value: "overall_water_risk"},
             {text: nodeLayer[0].name+ " (Baseline)", value: "baseline"},
           ]
 
