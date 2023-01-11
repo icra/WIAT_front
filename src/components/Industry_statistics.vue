@@ -1900,7 +1900,7 @@
               <li><span v-katex="'W_s'"></span>: Consumption available</li>
               <li><span v-katex="'W_w'"></span>: Amount of water withdrawn</li>
               <li><span v-katex="'W_e'"></span>: Amount of water than comes from external sources</li>
-              <li><span v-katex="'W_{d}'"></span>: Water discharged</li>
+              <li><span v-katex="'W_{d}'"></span>: Water discharged at the same watershed where the water is withdrawn</li>
               <li><span v-katex="'W_c'"></span>: Water consumptive use. Until Science based targets are set, the tool assumes that the discharge should be equal or better than the EQS to be considered “non-consumptive”.</li>
               <li><span v-katex="'W_a'"></span>: amount of water available on the river <b>(streamflow global
                 indicator)</b></li>
@@ -1946,7 +1946,7 @@
               <li><span v-katex="'SWC'"></span>: Specific water consumption</li>
               <li><span v-katex="'T_{ppi}'"></span>: tons of product produced by the industry</li>
               <li><span v-katex="'W_{w}'"></span>: Water withdrawn (both superficial and groundwater)</li>
-              <li><span v-katex="'W_{d}'"></span>: Water discharged</li>
+              <li><span v-katex="'W_{d}'"></span>: Water discharged at the same watershed where the water is withdrawn</li>
               <li><span v-katex="'W_e'"></span>: Amount of water than comes from external sources</li>
               <li><span v-katex="'W_c'"></span>: Water consumptive use. Until Science based targets are set, the tool assumes that the discharge should be equal or better than the EQS to be considered “non-consumptive”.
               </li>
@@ -1972,7 +1972,7 @@
             <br>
             <ul>
               <li><span v-katex="'W_w'"></span>: Amount of water withdrawn</li>
-              <li><span v-katex="'W_d'"></span>: Water discharged</li>
+              <li><span v-katex="'W_d'"></span>: Water discharged at the same watershed where the water is withdrawn</li>
               <li><span v-katex="'W_e'"></span>: Amount of water than comes from external sources</li>
               <li><span v-katex="'W_c'"></span>: Water consumptive use. Until Science based targets are set, the tool assumes that the discharge should be equal or better than the EQS to be considered “non-consumptive”.</li>
             </ul>
@@ -1999,7 +1999,7 @@
             <ul>
               <li><span v-katex="'W_{frac}'"></span>: Percentage of water withdrawn for consumptive use</li>
               <li><span v-katex="'W_w'"></span>: Amount of water withdrawn</li>
-              <li><span v-katex="'W_d'"></span>: Water discharged</li>
+              <li><span v-katex="'W_d'"></span>: Water discharged at the same watershed where the water is withdrawn</li>
               <li><span v-katex="'W_e'"></span>: Amount of water than comes from external sources</li>
               <li><span v-katex="'W_c'"></span>: Water consumptive use. Until Science based targets are set, the tool assumes that the discharge should be equal or better than the EQS to be considered “non-consumptive”.</li>
             </ul>
