@@ -231,99 +231,102 @@
 
     </v-container>
     <!-- Advanced inputs -->
-    <v-expansion-panels style="padding-top: 20px">
-      <v-expansion-panel>
-        <v-expansion-panel-header color="#1c195b">
-          <h3 style="color: white">SHOW ADVANCED INPUTS</h3>
-          <template v-slot:actions>
-            <v-icon color="white">
-              $expand
-            </v-icon>
-          </template>
-        </v-expansion-panel-header>
-        <v-expansion-panel-content style="padding: 30px">
-          <v-container
-              v-for = "industry_input in array_difference(industry_inputs, basic_inputs)"
-              :key="industry_input"
-          >
-            <v-row
-                align="center"
-                v-for = "pollutant in model_selected_pollutants"
-                :key="pollutant"
+    <v-container>
+      <v-expansion-panels style="padding-top: 20px">
+        <v-expansion-panel>
+          <v-expansion-panel-header color="#1c195b">
+            <h3 style="color: white">SHOW ADVANCED INPUTS</h3>
+            <template v-slot:actions>
+              <v-icon color="white">
+                $expand
+              </v-icon>
+            </template>
+          </v-expansion-panel-header>
+          <v-expansion-panel-content style="padding: 30px">
+            <v-container
+                v-for = "industry_input in array_difference(industry_inputs, basic_inputs)"
+                :key="industry_input"
             >
-              <!-- Input description -->
-              <v-col cols="7" >
-                <div style="width: 100%;">
-                  <div style="height: 100%; display: flex; justify-content: space-between; width: 90%">
-                    <div>
+              <v-row
+                  align="center"
+                  v-for = "pollutant in model_selected_pollutants"
+                  :key="pollutant"
+              >
+                <!-- Input description -->
+                <v-col cols="7" >
+                  <div style="width: 100%;">
+                    <div style="height: 100%; display: flex; justify-content: space-between; width: 90%">
+                      <div>
                       <span>
                         Industry withdrawal water {{pollutant}} concentration (surface water only)
                       </span>
-                      <v-tooltip bottom v-if="user_inputs[industry_input].hasOwnProperty('description_tooltip')">
-                        <template v-slot:activator="{ on, attrs }">
-                          <v-icon
-                              v-bind="attrs"
-                              v-on="on"
-                              color="primary"
-                              style="margin-left: 2px; margin-right: 2px; font-size: 1.3rem;"
-                          >
-                            mdi-information-outline
-                          </v-icon>
-                        </template>
-                        <span>{{ user_inputs[industry_input]['description_tooltip'] }}</span>
-                      </v-tooltip>
+                        <v-tooltip bottom v-if="user_inputs[industry_input].hasOwnProperty('description_tooltip')">
+                          <template v-slot:activator="{ on, attrs }">
+                            <v-icon
+                                v-bind="attrs"
+                                v-on="on"
+                                color="primary"
+                                style="margin-left: 2px; margin-right: 2px; font-size: 1.3rem;"
+                            >
+                              mdi-information-outline
+                            </v-icon>
+                          </template>
+                          <span>{{ user_inputs[industry_input]['description_tooltip'] }}</span>
+                        </v-tooltip>
 
-                      <v-btn v-if="button_estimation.includes('ind_pollutants_infl') && pollutant == 'COD' && cod_influent_quality != null"
-                             tile
-                             x-small
-                             color="#b62373"
-                             @click="industry_model['ind_pollutants_infl'][pollutant] = cod_influent_quality"
-                      >
-                        Estimation:  {{cod_influent_quality}}<!-- Button estimation -->
-                      </v-btn>
-                      <v-btn v-else-if="button_estimation.includes('ind_pollutants_infl') && pollutant == 'TN' && tn_influent_quality != null"
-                             tile
-                             x-small
-                             color="#b62373"
-                             @click="industry_model['ind_pollutants_infl'][pollutant] = tn_influent_quality"
-                      >
-                        Estimation:  {{tn_influent_quality}}<!-- Button estimation -->
-                      </v-btn>
+                        <v-btn v-if="button_estimation.includes('ind_pollutants_infl') && pollutant == 'COD' && cod_influent_quality != null"
+                               tile
+                               x-small
+                               color="#b62373"
+                               @click="industry_model['ind_pollutants_infl'][pollutant] = cod_influent_quality"
+                        >
+                          Estimation:  {{cod_influent_quality}}<!-- Button estimation -->
+                        </v-btn>
+                        <v-btn v-else-if="button_estimation.includes('ind_pollutants_infl') && pollutant == 'TN' && tn_influent_quality != null"
+                               tile
+                               x-small
+                               color="#b62373"
+                               @click="industry_model['ind_pollutants_infl'][pollutant] = tn_influent_quality"
+                        >
+                          Estimation:  {{tn_influent_quality}}<!-- Button estimation -->
+                        </v-btn>
 
+                      </div>
                     </div>
                   </div>
-                </div>
 
-              </v-col>
-              <!-- Response -->
-              <v-col cols="3">
-                <div>
+                </v-col>
+                <!-- Response -->
+                <v-col cols="3">
                   <div>
-                    <v-text-field
-                        v-model="industry_model['ind_pollutants_infl'][pollutant]"
-                        :suffix=user_inputs[industry_input].unit
-                        type="number"
-                    ></v-text-field>
+                    <div>
+                      <v-text-field
+                          v-model="industry_model['ind_pollutants_infl'][pollutant]"
+                          :suffix=user_inputs[industry_input].unit
+                          type="number"
+                      ></v-text-field>
+                    </div>
                   </div>
-                </div>
-              </v-col>
-              <!-- Data origin -->
-              <v-col cols="2">
-                <v-select
-                    label="Level of certainty"
-                    :items = level_of_certainty
-                    v-model="industry_model.level_of_certainty[industry_input][pollutant]"
-                    item-text="text"
-                    item-value="key"
-                ></v-select>
+                </v-col>
+                <!-- Data origin -->
+                <v-col cols="2">
+                  <v-select
+                      label="Level of certainty"
+                      :items = level_of_certainty
+                      v-model="industry_model.level_of_certainty[industry_input][pollutant]"
+                      item-text="text"
+                      item-value="key"
+                  ></v-select>
 
-              </v-col>
+                </v-col>
 
-            </v-row>
-          </v-container>
-        </v-expansion-panel-content>
-      </v-expansion-panel>
-    </v-expansion-panels>
+              </v-row>
+            </v-container>
+          </v-expansion-panel-content>
+        </v-expansion-panel>
+      </v-expansion-panels>
+
+    </v-container>
 
   </div>
 

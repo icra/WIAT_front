@@ -1238,6 +1238,8 @@ export default {
         assessment.add_industry(industry)
         this.snackbars.new_industry.v_model = true
         this.$refs.reference.industry_created()
+        this.secondMenu = false
+        this.open_edit_industry_tab(assessment, assessment.industries.length)
       }else {
         this.snackbars.create_industry_not_in_map.v_model = true
       }

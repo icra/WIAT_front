@@ -3,9 +3,11 @@
     <div v-if="(industry.has_onsite_wwtp == 1 && stepper_model == 2) || (industry.has_offsite_wwtp == 1 && stepper_model == 4)">
 
       <!-- Basic inputs -->
-      <v-row
-          align="center"
+      <v-container
           v-for = "input in array_intersection(wwtp_inputs, basic_inputs)"
+          :key="input"
+      >
+        <v-row
           :key="input"
         >
           <v-col cols="7" >
@@ -108,11 +110,14 @@
 
 
         </v-row>
+      </v-container>
 
       <!-- Advanced inputs -->
-      <v-expansion-panels style="padding-top: 20px">
+      <v-container>
+        <v-expansion-panels style="padding-top: 20px">
           <v-expansion-panel>
-            <v-expansion-panel-header color="#1c195b">
+
+            <v-expansion-panel-header color="#1c195b" >
               <h3 style="color: white">SHOW ADVANCED INPUTS</h3>
               <template v-slot:actions>
                 <v-icon color="white">
@@ -120,88 +125,93 @@
                 </v-icon>
               </template>
             </v-expansion-panel-header>
+
             <v-expansion-panel-content style="padding: 30px">
               <v-expansion-panels style="padding-top: 20px">
 
                 <!-- Effluent pollution -->
-                <v-expansion-panel>
-                  <v-expansion-panel-header >
-                    <h3>Effluent pollution</h3>
-                  </v-expansion-panel-header>
-                  <v-expansion-panel-content style="padding: 30px">
-                    <v-row
-                        align="center"
-                        v-for = "pollutant in model_selected_pollutants"
-                        :key="pollutant"
+                <v-container>
+                  <v-expansion-panel>
+                    <v-expansion-panel-header >
+                      <h3>Effluent pollution</h3>
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content style="padding: 30px">
+                      <v-row
+                          align="center"
+                          v-for = "pollutant in model_selected_pollutants"
+                          :key="pollutant"
 
-                    >
-                      <v-col cols="7" >
-                        <div style="width: 100%;">
-                          <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                      >
+                        <v-col cols="7" >
+                          <div style="width: 100%;">
+                            <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                             <span>
                               Concentration of {{pollutant}} in the WWTP effluent
                             </span>
-                            <v-tooltip bottom v-if="user_inputs['wwt_pollutants_effl'].hasOwnProperty('description_tooltip')">
-                              <template v-slot:activator="{ on, attrs }">
-                                <v-icon
-                                    v-bind="attrs"
-                                    v-on="on"
-                                    color="primary"
-                                    style="margin-left: 2px; margin-right: 2px; font-size: 1.3rem;"
-                                >
-                                  mdi-information-outline
-                                </v-icon>
-                              </template>
-                              <span>{{ user_inputs['wwt_pollutants_effl']['description_tooltip'] }}</span>
-                            </v-tooltip>
+                              <v-tooltip bottom v-if="user_inputs['wwt_pollutants_effl'].hasOwnProperty('description_tooltip')">
+                                <template v-slot:activator="{ on, attrs }">
+                                  <v-icon
+                                      v-bind="attrs"
+                                      v-on="on"
+                                      color="primary"
+                                      style="margin-left: 2px; margin-right: 2px; font-size: 1.3rem;"
+                                  >
+                                    mdi-information-outline
+                                  </v-icon>
+                                </template>
+                                <span>{{ user_inputs['wwt_pollutants_effl']['description_tooltip'] }}</span>
+                              </v-tooltip>
 
-                            <v-btn v-if="button_estimation.includes('wwt_pollutants_effl') && !isNaN(button_estimations('wwt_pollutants_effl', pollutant)) && button_estimations('wwt_pollutants_effl', pollutant) != null"
-                                   tile
-                                   x-small
-                                   color="#b62373"
-                                   @click="wwtp_model['wwt_pollutants_effl'][pollutant] = button_estimations('wwt_pollutants_effl', pollutant)"
-                            >
-                              Estimation:  {{button_estimations('wwt_pollutants_effl', pollutant)}}<!-- Estimation button -->
-                            </v-btn>
+                              <v-btn v-if="button_estimation.includes('wwt_pollutants_effl') && !isNaN(button_estimations('wwt_pollutants_effl', pollutant)) && button_estimations('wwt_pollutants_effl', pollutant) != null"
+                                     tile
+                                     x-small
+                                     color="#b62373"
+                                     @click="wwtp_model['wwt_pollutants_effl'][pollutant] = button_estimations('wwt_pollutants_effl', pollutant)"
+                              >
+                                Estimation:  {{button_estimations('wwt_pollutants_effl', pollutant)}}<!-- Estimation button -->
+                              </v-btn>
+                            </div>
                           </div>
-                        </div>
-                      </v-col>
-                      <v-col cols="3">
-                        <v-text-field
-                            v-model="wwtp_model['wwt_pollutants_effl'][pollutant]"
-                            :suffix="user_inputs['wwt_pollutants_effl'].unit"
-                            type="number"
-                        ></v-text-field>
-                      </v-col>
-                      <v-col cols="2" v-if="!keys_without_level_of_certainty.has('wwt_pollutants_effl')">
-                        <v-select
-                            label="Level of certainty"
-                            :items = level_of_certainty
-                            item-text="text"
-                            item-value="key"
-                            v-model="wwtp_model.level_of_certainty['wwt_pollutants_effl'][pollutant]"
+                        </v-col>
+                        <v-col cols="3">
+                          <v-text-field
+                              v-model="wwtp_model['wwt_pollutants_effl'][pollutant]"
+                              :suffix="user_inputs['wwt_pollutants_effl'].unit"
+                              type="number"
+                          ></v-text-field>
+                        </v-col>
+                        <v-col cols="2" v-if="!keys_without_level_of_certainty.has('wwt_pollutants_effl')">
+                          <v-select
+                              label="Level of certainty"
+                              :items = level_of_certainty
+                              item-text="text"
+                              item-value="key"
+                              v-model="wwtp_model.level_of_certainty['wwt_pollutants_effl'][pollutant]"
 
-                        ></v-select>
+                          ></v-select>
 
-                      </v-col>
+                        </v-col>
 
-                    </v-row>
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
+                      </v-row>
+                    </v-expansion-panel-content>
+                  </v-expansion-panel>
+                </v-container>
+
                 <!-- Fuel engines-->
-                <v-expansion-panel>
-                  <v-expansion-panel-header >
-                    <h3>Fuel engines</h3>
-                  </v-expansion-panel-header>
-                  <v-expansion-panel-content style="padding: 30px">
-                    <v-row
-                        align="center"
-                        v-for = "input in advanced_fuel_engines"
-                        :key="input"
-                    >
-                      <v-col cols="7" >
-                        <div style="width: 100%;">
-                          <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                <v-container>
+                  <v-expansion-panel>
+                    <v-expansion-panel-header >
+                      <h3>Fuel engines</h3>
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content style="padding: 30px">
+                      <v-row
+                          align="center"
+                          v-for = "input in advanced_fuel_engines"
+                          :key="input"
+                      >
+                        <v-col cols="7" >
+                          <div style="width: 100%;">
+                            <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                             <span>
                               {{user_inputs[input].question}}
                               <v-tooltip bottom v-if="user_inputs[input].hasOwnProperty('description_tooltip')">
@@ -218,83 +228,85 @@
                                 <span>{{ user_inputs[input]['description_tooltip'] }}</span>
                               </v-tooltip>
                             </span>
-                            <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
-                                   tile
-                                   color="#b62373"
-                                   x-small
-                                   @click="wwtp_model[input] = button_estimations(input)"
-                            >
-                              Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Estimation button -->
-                            </v-btn>
-                          </div>
-                          <div v-if="select_estimation.includes(input)" style="width: 100%">
-                            <select v-model = "wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
-                              <option
-                                  v-for="item in select_estimations(input)"
-                                  :value="item.value"
+                              <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
+                                     tile
+                                     color="#b62373"
+                                     x-small
+                                     @click="wwtp_model[input] = button_estimations(input)"
                               >
-                                <!--Toggle menu with estimation-->
-                                {{item.name}} ({{item.value.toFixed(3)}})
-                              </option>
-                              <option :value="wwtp_model[input]">Custom value</option>
-                            </select>
-                          </div>
+                                Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Estimation button -->
+                              </v-btn>
+                            </div>
+                            <div v-if="select_estimation.includes(input)" style="width: 100%">
+                              <select v-model = "wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                                <option
+                                    v-for="item in select_estimations(input)"
+                                    :value="item.value"
+                                >
+                                  <!--Toggle menu with estimation-->
+                                  {{item.name}} ({{item.value.toFixed(3)}})
+                                </option>
+                                <option :value="wwtp_model[input]">Custom value</option>
+                              </select>
+                            </div>
 
-                        </div>
-                      </v-col>
-                      <v-col :cols="keys_without_level_of_certainty.has(input) ? 5 : 3">
-                        <div>
+                          </div>
+                        </v-col>
+                        <v-col :cols="keys_without_level_of_certainty.has(input) ? 5 : 3">
                           <div>
-                            <v-select
-                                v-if="type_option[input]"
-                                v-model="wwtp_model[input]"
-                                item-text="text"
-                                item-value="value"
-                                :items="type_option[input].items"
-                                label="Select"
-                            >
-                            </v-select>
-                            <v-text-field
-                                v-else
-                                v-model="wwtp_model[input]"
-                                :suffix=user_inputs[input].unit
-                                type="number"
-                            ></v-text-field>
+                            <div>
+                              <v-select
+                                  v-if="type_option[input]"
+                                  v-model="wwtp_model[input]"
+                                  item-text="text"
+                                  item-value="value"
+                                  :items="type_option[input].items"
+                                  label="Select"
+                              >
+                              </v-select>
+                              <v-text-field
+                                  v-else
+                                  v-model="wwtp_model[input]"
+                                  :suffix=user_inputs[input].unit
+                                  type="number"
+                              ></v-text-field>
 
+                            </div>
                           </div>
-                        </div>
 
-                      </v-col>
-                      <v-col cols="2" v-if="!keys_without_level_of_certainty.has(input)">
-                        <v-select
-                            label="Level of certainty"
-                            :items = level_of_certainty
-                            item-text="text"
-                            item-value="key"
-                            v-model="wwtp_model.level_of_certainty[input]"
+                        </v-col>
+                        <v-col cols="2" v-if="!keys_without_level_of_certainty.has(input)">
+                          <v-select
+                              label="Level of certainty"
+                              :items = level_of_certainty
+                              item-text="text"
+                              item-value="key"
+                              v-model="wwtp_model.level_of_certainty[input]"
 
-                        ></v-select>
+                          ></v-select>
 
-                      </v-col>
+                        </v-col>
 
-                    </v-row>
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
+                      </v-row>
+                    </v-expansion-panel-content>
+                  </v-expansion-panel>
+                </v-container>
                 <!-- Biogas produced from anaerobic digestion -->
-                <v-expansion-panel>
-                  <v-expansion-panel-header >
-                    <h3>Biogas produced from anaerobic digestion</h3>
-                  </v-expansion-panel-header>
-                  <v-expansion-panel-content style="padding: 30px">
-                    <v-row
-                        align="center"
-                        v-for = "input in advanced_biogas_from_anaerobic"
-                        :key="input"
+                <v-container>
+                  <v-expansion-panel>
+                    <v-expansion-panel-header >
+                      <h3>Biogas produced from anaerobic digestion</h3>
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content style="padding: 30px">
+                      <v-row
+                          align="center"
+                          v-for = "input in advanced_biogas_from_anaerobic"
+                          :key="input"
 
-                    >
-                      <v-col cols="7" >
-                        <div style="width: 100%;">
-                          <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                      >
+                        <v-col cols="7" >
+                          <div style="width: 100%;">
+                            <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                             <span>
                               {{user_inputs[input].question}}
                               <v-tooltip bottom v-if="user_inputs[input].hasOwnProperty('description_tooltip')">
@@ -312,84 +324,86 @@
                               </v-tooltip>
 
                             </span>
-                            <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
-                                   tile
-                                   color="#b62373"
-                                   x-small
-                                   @click="wwtp_model[input] = button_estimations(input)"
-                            >
-                              Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Estimation button -->
-                            </v-btn>
-                          </div>
-                          <div v-if="select_estimation.includes(input)" style="width: 100%">
-                            <select v-model = "wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
-                              <option
-                                  v-for="item in select_estimations(input)"
-                                  :value="item.value"
+                              <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
+                                     tile
+                                     color="#b62373"
+                                     x-small
+                                     @click="wwtp_model[input] = button_estimations(input)"
                               >
-                                <!--Toggle menu with estimation-->
-                                {{item.name}} ({{item.value.toFixed(3)}})
-                              </option>
-                              <option :value="wwtp_model[input]">Custom value</option>
-                            </select>
-                          </div>
+                                Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Estimation button -->
+                              </v-btn>
+                            </div>
+                            <div v-if="select_estimation.includes(input)" style="width: 100%">
+                              <select v-model = "wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                                <option
+                                    v-for="item in select_estimations(input)"
+                                    :value="item.value"
+                                >
+                                  <!--Toggle menu with estimation-->
+                                  {{item.name}} ({{item.value.toFixed(3)}})
+                                </option>
+                                <option :value="wwtp_model[input]">Custom value</option>
+                              </select>
+                            </div>
 
-                        </div>
-                      </v-col>
-                      <v-col :cols="keys_without_level_of_certainty.has(input) ? 5 : 3">
-                        <div>
+                          </div>
+                        </v-col>
+                        <v-col :cols="keys_without_level_of_certainty.has(input) ? 5 : 3">
                           <div>
-                            <v-select
-                                v-if="type_option[input]"
-                                v-model="wwtp_model[input]"
-                                item-text="text"
-                                item-value="value"
-                                :items="type_option[input].items"
-                                label="Select"
-                            >
-                            </v-select>
-                            <v-text-field
-                                v-else
-                                v-model="wwtp_model[input]"
-                                :suffix=user_inputs[input].unit
-                                type="number"
-                            ></v-text-field>
+                            <div>
+                              <v-select
+                                  v-if="type_option[input]"
+                                  v-model="wwtp_model[input]"
+                                  item-text="text"
+                                  item-value="value"
+                                  :items="type_option[input].items"
+                                  label="Select"
+                              >
+                              </v-select>
+                              <v-text-field
+                                  v-else
+                                  v-model="wwtp_model[input]"
+                                  :suffix=user_inputs[input].unit
+                                  type="number"
+                              ></v-text-field>
 
+                            </div>
                           </div>
-                        </div>
 
-                      </v-col>
-                      <v-col cols="2" v-if="!keys_without_level_of_certainty.has(input)">
-                        <v-select
-                            label="Level of certainty"
-                            :items = level_of_certainty
-                            item-text="text"
-                            item-value="key"
-                            v-model="wwtp_model.level_of_certainty[input]"
+                        </v-col>
+                        <v-col cols="2" v-if="!keys_without_level_of_certainty.has(input)">
+                          <v-select
+                              label="Level of certainty"
+                              :items = level_of_certainty
+                              item-text="text"
+                              item-value="key"
+                              v-model="wwtp_model.level_of_certainty[input]"
 
-                        ></v-select>
+                          ></v-select>
 
-                      </v-col>
+                        </v-col>
 
 
-                    </v-row>
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
+                      </v-row>
+                    </v-expansion-panel-content>
+                  </v-expansion-panel>
+                </v-container>
                 <!-- Fuel used in water reuse trucks -->
-                <v-expansion-panel>
-                  <v-expansion-panel-header >
-                    <h3>Fuel used in water reuse trucks</h3>
-                  </v-expansion-panel-header>
-                  <v-expansion-panel-content style="padding: 30px">
-                    <v-row
-                        align="center"
-                        v-for = "input in advanced_water_reuse_trucks"
-                        :key="input"
+                <v-container>
+                  <v-expansion-panel>
+                    <v-expansion-panel-header >
+                      <h3>Fuel used in water reuse trucks</h3>
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content style="padding: 30px">
+                      <v-row
+                          align="center"
+                          v-for = "input in advanced_water_reuse_trucks"
+                          :key="input"
 
-                    >
-                      <v-col cols="7" >
-                        <div style="width: 100%;">
-                          <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                      >
+                        <v-col cols="7" >
+                          <div style="width: 100%;">
+                            <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                             <span>
                               {{user_inputs[input].question}}
                               <v-tooltip bottom v-if="user_inputs[input].hasOwnProperty('description_tooltip')">
@@ -407,84 +421,86 @@
                               </v-tooltip>
 
                             </span>
-                            <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
-                                   tile
-                                   color="#b62373"
-                                   x-small
-                                   @click="wwtp_model[input] = button_estimations(input)"
-                            >
-                              Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Estimation button -->
-                            </v-btn>
-                          </div>
-                          <div v-if="select_estimation.includes(input)" style="width: 100%">
-                            <select v-model = "wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
-                              <option
-                                  v-for="item in select_estimations(input)"
-                                  :value="item.value"
+                              <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
+                                     tile
+                                     color="#b62373"
+                                     x-small
+                                     @click="wwtp_model[input] = button_estimations(input)"
                               >
-                                <!--Toggle menu with estimation-->
-                                {{item.name}} ({{item.value.toFixed(3)}})
-                              </option>
-                              <option :value="wwtp_model[input]">Custom value</option>
-                            </select>
-                          </div>
+                                Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Estimation button -->
+                              </v-btn>
+                            </div>
+                            <div v-if="select_estimation.includes(input)" style="width: 100%">
+                              <select v-model = "wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                                <option
+                                    v-for="item in select_estimations(input)"
+                                    :value="item.value"
+                                >
+                                  <!--Toggle menu with estimation-->
+                                  {{item.name}} ({{item.value.toFixed(3)}})
+                                </option>
+                                <option :value="wwtp_model[input]">Custom value</option>
+                              </select>
+                            </div>
 
-                        </div>
-                      </v-col>
-                      <v-col :cols="keys_without_level_of_certainty.has(input) ? 5 : 3">
-                        <div>
+                          </div>
+                        </v-col>
+                        <v-col :cols="keys_without_level_of_certainty.has(input) ? 5 : 3">
                           <div>
-                            <v-select
-                                v-if="type_option[input]"
-                                v-model="wwtp_model[input]"
-                                item-text="text"
-                                item-value="value"
-                                :items="type_option[input].items"
-                                label="Select"
-                            >
-                            </v-select>
-                            <v-text-field
-                                v-else
-                                v-model="wwtp_model[input]"
-                                :suffix=user_inputs[input].unit
-                                type="number"
-                            ></v-text-field>
+                            <div>
+                              <v-select
+                                  v-if="type_option[input]"
+                                  v-model="wwtp_model[input]"
+                                  item-text="text"
+                                  item-value="value"
+                                  :items="type_option[input].items"
+                                  label="Select"
+                              >
+                              </v-select>
+                              <v-text-field
+                                  v-else
+                                  v-model="wwtp_model[input]"
+                                  :suffix=user_inputs[input].unit
+                                  type="number"
+                              ></v-text-field>
 
+                            </div>
                           </div>
-                        </div>
 
-                      </v-col>
-                      <v-col cols="2" v-if="!keys_without_level_of_certainty.has(input)">
-                        <v-select
-                            label="Level of certainty"
-                            :items = level_of_certainty
-                            item-text="text"
-                            item-value="key"
-                            v-model="wwtp_model.level_of_certainty[input]"
+                        </v-col>
+                        <v-col cols="2" v-if="!keys_without_level_of_certainty.has(input)">
+                          <v-select
+                              label="Level of certainty"
+                              :items = level_of_certainty
+                              item-text="text"
+                              item-value="key"
+                              v-model="wwtp_model.level_of_certainty[input]"
 
-                        ></v-select>
+                          ></v-select>
 
-                      </v-col>
+                        </v-col>
 
 
-                    </v-row>
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
+                      </v-row>
+                    </v-expansion-panel-content>
+                  </v-expansion-panel>
+                </v-container>
                 <!-- Sludge storage in WWTP -->
-                <v-expansion-panel>
-                  <v-expansion-panel-header >
-                    <h3>Sludge storage in WWTP</h3>
-                  </v-expansion-panel-header>
-                  <v-expansion-panel-content style="padding: 30px">
-                    <v-row
-                        align="center"
-                        v-for = "input in advanced_sludge_storage"
-                        :key="input"
+                <v-container>
+                  <v-expansion-panel>
+                    <v-expansion-panel-header >
+                      <h3>Sludge storage in WWTP</h3>
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content style="padding: 30px">
+                      <v-row
+                          align="center"
+                          v-for = "input in advanced_sludge_storage"
+                          :key="input"
 
-                    >
-                      <v-col cols="7" >
-                        <div style="width: 100%;">
-                          <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                      >
+                        <v-col cols="7" >
+                          <div style="width: 100%;">
+                            <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                             <span>
                               {{user_inputs[input].question}}
                               <v-tooltip bottom v-if="user_inputs[input].hasOwnProperty('description_tooltip')">
@@ -502,84 +518,86 @@
                               </v-tooltip>
 
                             </span>
-                            <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
-                                   tile
-                                   color="#b62373"
-                                   x-small
-                                   @click="wwtp_model[input] = button_estimations(input)"
-                            >
-                              Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Estimation button -->
-                            </v-btn>
-                          </div>
-                          <div v-if="select_estimation.includes(input)" style="width: 100%">
-                            <select v-model = "wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
-                              <option
-                                  v-for="item in select_estimations(input)"
-                                  :value="item.value"
+                              <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
+                                     tile
+                                     color="#b62373"
+                                     x-small
+                                     @click="wwtp_model[input] = button_estimations(input)"
                               >
-                                <!--Toggle menu with estimation-->
-                                {{item.name}} ({{item.value.toFixed(3)}})
-                              </option>
-                              <option :value="wwtp_model[input]">Custom value</option>
-                            </select>
-                          </div>
+                                Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Estimation button -->
+                              </v-btn>
+                            </div>
+                            <div v-if="select_estimation.includes(input)" style="width: 100%">
+                              <select v-model = "wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                                <option
+                                    v-for="item in select_estimations(input)"
+                                    :value="item.value"
+                                >
+                                  <!--Toggle menu with estimation-->
+                                  {{item.name}} ({{item.value.toFixed(3)}})
+                                </option>
+                                <option :value="wwtp_model[input]">Custom value</option>
+                              </select>
+                            </div>
 
-                        </div>
-                      </v-col>
-                      <v-col :cols="keys_without_level_of_certainty.has(input) ? 5 : 3">
-                        <div>
+                          </div>
+                        </v-col>
+                        <v-col :cols="keys_without_level_of_certainty.has(input) ? 5 : 3">
                           <div>
-                            <v-select
-                                v-if="type_option[input]"
-                                v-model="wwtp_model[input]"
-                                item-text="text"
-                                item-value="value"
-                                :items="type_option[input].items"
-                                label="Select"
-                            >
-                            </v-select>
-                            <v-text-field
-                                v-else
-                                v-model="wwtp_model[input]"
-                                :suffix=user_inputs[input].unit
-                                type="number"
-                            ></v-text-field>
+                            <div>
+                              <v-select
+                                  v-if="type_option[input]"
+                                  v-model="wwtp_model[input]"
+                                  item-text="text"
+                                  item-value="value"
+                                  :items="type_option[input].items"
+                                  label="Select"
+                              >
+                              </v-select>
+                              <v-text-field
+                                  v-else
+                                  v-model="wwtp_model[input]"
+                                  :suffix=user_inputs[input].unit
+                                  type="number"
+                              ></v-text-field>
 
+                            </div>
                           </div>
-                        </div>
 
-                      </v-col>
-                      <v-col cols="2" v-if="!keys_without_level_of_certainty.has(input)">
-                        <v-select
-                            label="Level of certainty"
-                            :items = level_of_certainty
-                            item-text="text"
-                            item-value="key"
-                            v-model="wwtp_model.level_of_certainty[input]"
+                        </v-col>
+                        <v-col cols="2" v-if="!keys_without_level_of_certainty.has(input)">
+                          <v-select
+                              label="Level of certainty"
+                              :items = level_of_certainty
+                              item-text="text"
+                              item-value="key"
+                              v-model="wwtp_model.level_of_certainty[input]"
 
-                        ></v-select>
+                          ></v-select>
 
-                      </v-col>
+                        </v-col>
 
 
-                    </v-row>
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
+                      </v-row>
+                    </v-expansion-panel-content>
+                  </v-expansion-panel>
+                </v-container>
                 <!-- Sludge composting in WWTP -->
-                <v-expansion-panel>
-                  <v-expansion-panel-header >
-                    <h3>Sludge composting in WWTP</h3>
-                  </v-expansion-panel-header>
-                  <v-expansion-panel-content style="padding: 30px">
-                    <v-row
-                        align="center"
-                        v-for = "input in advanced_sludge_composting"
-                        :key="input"
+                <v-container>
+                  <v-expansion-panel>
+                    <v-expansion-panel-header >
+                      <h3>Sludge composting in WWTP</h3>
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content style="padding: 30px">
+                      <v-row
+                          align="center"
+                          v-for = "input in advanced_sludge_composting"
+                          :key="input"
 
-                    >
-                      <v-col cols="7" >
-                        <div style="width: 100%;">
-                          <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                      >
+                        <v-col cols="7" >
+                          <div style="width: 100%;">
+                            <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                             <span>
                               {{user_inputs[input].question}}
                               <v-tooltip bottom v-if="user_inputs[input].hasOwnProperty('description_tooltip')">
@@ -597,84 +615,86 @@
                               </v-tooltip>
 
                             </span>
-                            <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
-                                   tile
-                                   color="#b62373"
-                                   x-small
-                                   @click="wwtp_model[input] = button_estimations(input)"
-                            >
-                              Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Estimation button -->
-                            </v-btn>
-                          </div>
-                          <div v-if="select_estimation.includes(input)" style="width: 100%">
-                            <select v-model = "wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
-                              <option
-                                  v-for="item in select_estimations(input)"
-                                  :value="item.value"
+                              <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
+                                     tile
+                                     color="#b62373"
+                                     x-small
+                                     @click="wwtp_model[input] = button_estimations(input)"
                               >
-                                <!--Toggle menu with estimation-->
-                                {{item.name}} ({{item.value.toFixed(3)}})
-                              </option>
-                              <option :value="wwtp_model[input]">Custom value</option>
-                            </select>
-                          </div>
+                                Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Estimation button -->
+                              </v-btn>
+                            </div>
+                            <div v-if="select_estimation.includes(input)" style="width: 100%">
+                              <select v-model = "wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                                <option
+                                    v-for="item in select_estimations(input)"
+                                    :value="item.value"
+                                >
+                                  <!--Toggle menu with estimation-->
+                                  {{item.name}} ({{item.value.toFixed(3)}})
+                                </option>
+                                <option :value="wwtp_model[input]">Custom value</option>
+                              </select>
+                            </div>
 
-                        </div>
-                      </v-col>
-                      <v-col :cols="keys_without_level_of_certainty.has(input) ? 5 : 3">
-                        <div>
+                          </div>
+                        </v-col>
+                        <v-col :cols="keys_without_level_of_certainty.has(input) ? 5 : 3">
                           <div>
-                            <v-select
-                                v-if="type_option[input]"
-                                v-model="wwtp_model[input]"
-                                item-text="text"
-                                item-value="value"
-                                :items="type_option[input].items"
-                                label="Select"
-                            >
-                            </v-select>
-                            <v-text-field
-                                v-else
-                                v-model="wwtp_model[input]"
-                                :suffix=user_inputs[input].unit
-                                type="number"
-                            ></v-text-field>
+                            <div>
+                              <v-select
+                                  v-if="type_option[input]"
+                                  v-model="wwtp_model[input]"
+                                  item-text="text"
+                                  item-value="value"
+                                  :items="type_option[input].items"
+                                  label="Select"
+                              >
+                              </v-select>
+                              <v-text-field
+                                  v-else
+                                  v-model="wwtp_model[input]"
+                                  :suffix=user_inputs[input].unit
+                                  type="number"
+                              ></v-text-field>
 
+                            </div>
                           </div>
-                        </div>
 
-                      </v-col>
-                      <v-col cols="2" v-if="!keys_without_level_of_certainty.has(input)">
-                        <v-select
-                            label="Level of certainty"
-                            :items = level_of_certainty
-                            item-text="text"
-                            item-value="key"
-                            v-model="wwtp_model.level_of_certainty[input]"
+                        </v-col>
+                        <v-col cols="2" v-if="!keys_without_level_of_certainty.has(input)">
+                          <v-select
+                              label="Level of certainty"
+                              :items = level_of_certainty
+                              item-text="text"
+                              item-value="key"
+                              v-model="wwtp_model.level_of_certainty[input]"
 
-                        ></v-select>
+                          ></v-select>
 
-                      </v-col>
+                        </v-col>
 
 
-                    </v-row>
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
+                      </v-row>
+                    </v-expansion-panel-content>
+                  </v-expansion-panel>
+                </v-container>
                 <!-- Sludge incineration -->
-                <v-expansion-panel>
-                  <v-expansion-panel-header >
-                    <h3>Sludge incineration</h3>
-                  </v-expansion-panel-header>
-                  <v-expansion-panel-content style="padding: 30px">
-                    <v-row
-                        align="center"
-                        v-for = "input in advanced_sludge_incineration"
-                        :key="input"
+                <v-container>
+                  <v-expansion-panel>
+                    <v-expansion-panel-header >
+                      <h3>Sludge incineration</h3>
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content style="padding: 30px">
+                      <v-row
+                          align="center"
+                          v-for = "input in advanced_sludge_incineration"
+                          :key="input"
 
-                    >
-                      <v-col cols="7" >
-                        <div style="width: 100%;">
-                          <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                      >
+                        <v-col cols="7" >
+                          <div style="width: 100%;">
+                            <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                             <span>
                               {{user_inputs[input].question}}
                               <v-tooltip bottom v-if="user_inputs[input].hasOwnProperty('description_tooltip')">
@@ -692,84 +712,86 @@
                               </v-tooltip>
 
                             </span>
-                            <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
-                                   tile
-                                   color="#b62373"
-                                   x-small
-                                   @click="wwtp_model[input] = button_estimations(input)"
-                            >
-                              Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Estimation button -->
-                            </v-btn>
-                          </div>
-                          <div v-if="select_estimation.includes(input)" style="width: 100%">
-                            <select v-model = "wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
-                              <option
-                                  v-for="item in select_estimations(input)"
-                                  :value="item.value"
+                              <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
+                                     tile
+                                     color="#b62373"
+                                     x-small
+                                     @click="wwtp_model[input] = button_estimations(input)"
                               >
-                                <!--Toggle menu with estimation-->
-                                {{item.name}} ({{item.value.toFixed(3)}})
-                              </option>
-                              <option :value="wwtp_model[input]">Custom value</option>
-                            </select>
-                          </div>
+                                Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Estimation button -->
+                              </v-btn>
+                            </div>
+                            <div v-if="select_estimation.includes(input)" style="width: 100%">
+                              <select v-model = "wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                                <option
+                                    v-for="item in select_estimations(input)"
+                                    :value="item.value"
+                                >
+                                  <!--Toggle menu with estimation-->
+                                  {{item.name}} ({{item.value.toFixed(3)}})
+                                </option>
+                                <option :value="wwtp_model[input]">Custom value</option>
+                              </select>
+                            </div>
 
-                        </div>
-                      </v-col>
-                      <v-col :cols="keys_without_level_of_certainty.has(input) ? 5 : 3">
-                        <div>
+                          </div>
+                        </v-col>
+                        <v-col :cols="keys_without_level_of_certainty.has(input) ? 5 : 3">
                           <div>
-                            <v-select
-                                v-if="type_option[input]"
-                                v-model="wwtp_model[input]"
-                                item-text="text"
-                                item-value="value"
-                                :items="type_option[input].items"
-                                label="Select"
-                            >
-                            </v-select>
-                            <v-text-field
-                                v-else
-                                v-model="wwtp_model[input]"
-                                :suffix=user_inputs[input].unit
-                                type="number"
-                            ></v-text-field>
+                            <div>
+                              <v-select
+                                  v-if="type_option[input]"
+                                  v-model="wwtp_model[input]"
+                                  item-text="text"
+                                  item-value="value"
+                                  :items="type_option[input].items"
+                                  label="Select"
+                              >
+                              </v-select>
+                              <v-text-field
+                                  v-else
+                                  v-model="wwtp_model[input]"
+                                  :suffix=user_inputs[input].unit
+                                  type="number"
+                              ></v-text-field>
 
+                            </div>
                           </div>
-                        </div>
 
-                      </v-col>
-                      <v-col cols="2" v-if="!keys_without_level_of_certainty.has(input)">
-                        <v-select
-                            label="Level of certainty"
-                            :items = level_of_certainty
-                            item-text="text"
-                            item-value="key"
-                            v-model="wwtp_model.level_of_certainty[input]"
+                        </v-col>
+                        <v-col cols="2" v-if="!keys_without_level_of_certainty.has(input)">
+                          <v-select
+                              label="Level of certainty"
+                              :items = level_of_certainty
+                              item-text="text"
+                              item-value="key"
+                              v-model="wwtp_model.level_of_certainty[input]"
 
-                        ></v-select>
+                          ></v-select>
 
-                      </v-col>
+                        </v-col>
 
 
-                    </v-row>
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
+                      </v-row>
+                    </v-expansion-panel-content>
+                  </v-expansion-panel>
+                </v-container>
                 <!-- Sludge sent to dry application -->
-                <v-expansion-panel>
-                  <v-expansion-panel-header >
-                    <h3>Sludge sent to dry application</h3>
-                  </v-expansion-panel-header>
-                  <v-expansion-panel-content style="padding: 30px">
-                    <v-row
-                        align="center"
-                        v-for = "input in advanced_application"
-                        :key="input"
+                <v-container>
+                  <v-expansion-panel>
+                    <v-expansion-panel-header >
+                      <h3>Sludge sent to dry application</h3>
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content style="padding: 30px">
+                      <v-row
+                          align="center"
+                          v-for = "input in advanced_application"
+                          :key="input"
 
-                    >
-                      <v-col cols="7" >
-                        <div style="width: 100%;">
-                          <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                      >
+                        <v-col cols="7" >
+                          <div style="width: 100%;">
+                            <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                             <span>
                               {{user_inputs[input].question}}
                               <v-tooltip bottom v-if="user_inputs[input].hasOwnProperty('description_tooltip')">
@@ -787,84 +809,86 @@
                               </v-tooltip>
 
                             </span>
-                            <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
-                                   tile
-                                   color="#b62373"
-                                   x-small
-                                   @click="wwtp_model[input] = button_estimations(input)"
-                            >
-                              Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Estimation button -->
-                            </v-btn>
-                          </div>
-                          <div v-if="select_estimation.includes(input)" style="width: 100%">
-                            <select v-model = "wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
-                              <option
-                                  v-for="item in select_estimations(input)"
-                                  :value="item.value"
+                              <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
+                                     tile
+                                     color="#b62373"
+                                     x-small
+                                     @click="wwtp_model[input] = button_estimations(input)"
                               >
-                                <!--Toggle menu with estimation-->
-                                {{item.name}} ({{item.value.toFixed(3)}})
-                              </option>
-                              <option :value="wwtp_model[input]">Custom value</option>
-                            </select>
-                          </div>
+                                Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Estimation button -->
+                              </v-btn>
+                            </div>
+                            <div v-if="select_estimation.includes(input)" style="width: 100%">
+                              <select v-model = "wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                                <option
+                                    v-for="item in select_estimations(input)"
+                                    :value="item.value"
+                                >
+                                  <!--Toggle menu with estimation-->
+                                  {{item.name}} ({{item.value.toFixed(3)}})
+                                </option>
+                                <option :value="wwtp_model[input]">Custom value</option>
+                              </select>
+                            </div>
 
-                        </div>
-                      </v-col>
-                      <v-col :cols="keys_without_level_of_certainty.has(input) ? 5 : 3">
-                        <div>
+                          </div>
+                        </v-col>
+                        <v-col :cols="keys_without_level_of_certainty.has(input) ? 5 : 3">
                           <div>
-                            <v-select
-                                v-if="type_option[input]"
-                                v-model="wwtp_model[input]"
-                                item-text="text"
-                                item-value="value"
-                                :items="type_option[input].items"
-                                label="Select"
-                            >
-                            </v-select>
-                            <v-text-field
-                                v-else
-                                v-model="wwtp_model[input]"
-                                :suffix=user_inputs[input].unit
-                                type="number"
-                            ></v-text-field>
+                            <div>
+                              <v-select
+                                  v-if="type_option[input]"
+                                  v-model="wwtp_model[input]"
+                                  item-text="text"
+                                  item-value="value"
+                                  :items="type_option[input].items"
+                                  label="Select"
+                              >
+                              </v-select>
+                              <v-text-field
+                                  v-else
+                                  v-model="wwtp_model[input]"
+                                  :suffix=user_inputs[input].unit
+                                  type="number"
+                              ></v-text-field>
 
+                            </div>
                           </div>
-                        </div>
 
-                      </v-col>
-                      <v-col cols="2" v-if="!keys_without_level_of_certainty.has(input)">
-                        <v-select
-                            label="Level of certainty"
-                            :items = level_of_certainty
-                            item-text="text"
-                            item-value="key"
-                            v-model="wwtp_model.level_of_certainty[input]"
+                        </v-col>
+                        <v-col cols="2" v-if="!keys_without_level_of_certainty.has(input)">
+                          <v-select
+                              label="Level of certainty"
+                              :items = level_of_certainty
+                              item-text="text"
+                              item-value="key"
+                              v-model="wwtp_model.level_of_certainty[input]"
 
-                        ></v-select>
+                          ></v-select>
 
-                      </v-col>
+                        </v-col>
 
 
-                    </v-row>
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
+                      </v-row>
+                    </v-expansion-panel-content>
+                  </v-expansion-panel>
+                </v-container>
                 <!-- Sludge landfilling -->
-                <v-expansion-panel>
-                  <v-expansion-panel-header >
-                    <h3>Sludge landfilling</h3>
-                  </v-expansion-panel-header>
-                  <v-expansion-panel-content style="padding: 30px">
-                    <v-row
-                        align="center"
-                        v-for = "input in advanced_landfilling"
-                        :key="input"
+                <v-container>
+                  <v-expansion-panel>
+                    <v-expansion-panel-header >
+                      <h3>Sludge landfilling</h3>
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content style="padding: 30px">
+                      <v-row
+                          align="center"
+                          v-for = "input in advanced_landfilling"
+                          :key="input"
 
-                    >
-                      <v-col cols="7" >
-                        <div style="width: 100%;">
-                          <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                      >
+                        <v-col cols="7" >
+                          <div style="width: 100%;">
+                            <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                             <span>
                               {{user_inputs[input].question}}
                               <v-tooltip bottom v-if="user_inputs[input].hasOwnProperty('description_tooltip')">
@@ -882,263 +906,270 @@
                               </v-tooltip>
 
                             </span>
-                            <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
-                                   tile
-                                   color="#b62373"
-                                   x-small
-                                   @click="wwtp_model[input] = button_estimations(input)"
-                            >
-                              Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Estimation button -->
-                            </v-btn>
-                          </div>
-                          <div v-if="select_estimation.includes(input)" style="width: 100%">
-                            <select v-model = "wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
-                              <option
-                                  v-for="item in select_estimations(input)"
-                                  :value="item.value"
+                              <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
+                                     tile
+                                     color="#b62373"
+                                     x-small
+                                     @click="wwtp_model[input] = button_estimations(input)"
                               >
-                                <!--Toggle menu with estimation-->
-                                {{item.name}} ({{item.value.toFixed(3)}})
-                              </option>
-                              <option :value="wwtp_model[input]">Custom value</option>
-                            </select>
-                          </div>
+                                Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Estimation button -->
+                              </v-btn>
+                            </div>
+                            <div v-if="select_estimation.includes(input)" style="width: 100%">
+                              <select v-model = "wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                                <option
+                                    v-for="item in select_estimations(input)"
+                                    :value="item.value"
+                                >
+                                  <!--Toggle menu with estimation-->
+                                  {{item.name}} ({{item.value.toFixed(3)}})
+                                </option>
+                                <option :value="wwtp_model[input]">Custom value</option>
+                              </select>
+                            </div>
 
-                        </div>
-                      </v-col>
-                      <v-col :cols="keys_without_level_of_certainty.has(input) ? 5 : 3">
-                        <div>
+                          </div>
+                        </v-col>
+                        <v-col :cols="keys_without_level_of_certainty.has(input) ? 5 : 3">
                           <div>
-                            <v-select
-                                v-if="type_option[input]"
-                                v-model="wwtp_model[input]"
-                                item-text="text"
-                                item-value="value"
-                                :items="type_option[input].items"
-                                label="Select"
-                            >
-                            </v-select>
-                            <v-text-field
-                                v-else
-                                v-model="wwtp_model[input]"
-                                :suffix=user_inputs[input].unit
-                                type="number"
-                            ></v-text-field>
+                            <div>
+                              <v-select
+                                  v-if="type_option[input]"
+                                  v-model="wwtp_model[input]"
+                                  item-text="text"
+                                  item-value="value"
+                                  :items="type_option[input].items"
+                                  label="Select"
+                              >
+                              </v-select>
+                              <v-text-field
+                                  v-else
+                                  v-model="wwtp_model[input]"
+                                  :suffix=user_inputs[input].unit
+                                  type="number"
+                              ></v-text-field>
 
+                            </div>
                           </div>
-                        </div>
 
-                      </v-col>
-                      <v-col cols="2" v-if="!keys_without_level_of_certainty.has(input)">
-                        <v-select
-                            label="Level of certainty"
-                            :items = level_of_certainty
-                            item-text="text"
-                            item-value="key"
-                            v-model="wwtp_model.level_of_certainty[input]"
+                        </v-col>
+                        <v-col cols="2" v-if="!keys_without_level_of_certainty.has(input)">
+                          <v-select
+                              label="Level of certainty"
+                              :items = level_of_certainty
+                              item-text="text"
+                              item-value="key"
+                              v-model="wwtp_model.level_of_certainty[input]"
 
-                        ></v-select>
+                          ></v-select>
 
-                      </v-col>
+                        </v-col>
 
 
-                    </v-row>
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
+                      </v-row>
+                    </v-expansion-panel-content>
+                  </v-expansion-panel>
+                </v-container>
                 <!-- Sludge stockpiling -->
-                <v-expansion-panel>
-                  <v-expansion-panel-header >
-                    <h3>Sludge stockpiling</h3>
-                  </v-expansion-panel-header>
-                  <v-expansion-panel-content style="padding: 30px">
-                    <v-row
-                        align="center"
-                        v-for = "input in advanced_stockpiling"
-                        :key="input"
-                    >
-                      <v-col cols="7" >
-                        <div style="width: 100%;">
-                          <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                <v-container>
+                  <v-expansion-panel>
+                    <v-expansion-panel-header >
+                      <h3>Sludge stockpiling</h3>
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content style="padding: 30px">
+                      <v-row
+                          align="center"
+                          v-for = "input in advanced_stockpiling"
+                          :key="input"
+                      >
+                        <v-col cols="7" >
+                          <div style="width: 100%;">
+                            <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                             <span>
                               {{user_inputs[input].question}}
                             </span>
-                            <v-tooltip bottom v-if="user_inputs[input].hasOwnProperty('description_tooltip')">
-                              <template v-slot:activator="{ on, attrs }">
-                                <v-icon
-                                    v-bind="attrs"
-                                    v-on="on"
-                                    color="primary"
-                                    style="margin-left: 2px; margin-right: 2px; font-size: 1.3rem;"
-                                >
-                                  mdi-information-outline
-                                </v-icon>
-                              </template>
-                              <span>{{ user_inputs[input]['description_tooltip'] }}</span>
-                            </v-tooltip>
+                              <v-tooltip bottom v-if="user_inputs[input].hasOwnProperty('description_tooltip')">
+                                <template v-slot:activator="{ on, attrs }">
+                                  <v-icon
+                                      v-bind="attrs"
+                                      v-on="on"
+                                      color="primary"
+                                      style="margin-left: 2px; margin-right: 2px; font-size: 1.3rem;"
+                                  >
+                                    mdi-information-outline
+                                  </v-icon>
+                                </template>
+                                <span>{{ user_inputs[input]['description_tooltip'] }}</span>
+                              </v-tooltip>
 
-                            <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
-                                   tile
-                                   color="#b62373"
-                                   x-small
-                                   @click="wwtp_model[input] = button_estimations(input)"
-                            >
-                              Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Estimation button -->
-                            </v-btn>
-                          </div>
-                          <div v-if="select_estimation.includes(input)" style="width: 100%">
-                            <select v-model = "wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
-                              <option
-                                  v-for="item in select_estimations(input)"
-                                  :value="item.value"
+                              <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
+                                     tile
+                                     color="#b62373"
+                                     x-small
+                                     @click="wwtp_model[input] = button_estimations(input)"
                               >
-                                <!--Toggle menu with estimation-->
-                                {{item.name}} ({{item.value.toFixed(3)}})
-                              </option>
-                              <option :value="wwtp_model[input]">Custom value</option>
-                            </select>
-                          </div>
+                                Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Estimation button -->
+                              </v-btn>
+                            </div>
+                            <div v-if="select_estimation.includes(input)" style="width: 100%">
+                              <select v-model = "wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                                <option
+                                    v-for="item in select_estimations(input)"
+                                    :value="item.value"
+                                >
+                                  <!--Toggle menu with estimation-->
+                                  {{item.name}} ({{item.value.toFixed(3)}})
+                                </option>
+                                <option :value="wwtp_model[input]">Custom value</option>
+                              </select>
+                            </div>
 
-                        </div>
-                      </v-col>
-                      <v-col :cols="keys_without_level_of_certainty.has(input) ? 5 : 3">
-                        <div>
+                          </div>
+                        </v-col>
+                        <v-col :cols="keys_without_level_of_certainty.has(input) ? 5 : 3">
                           <div>
-                            <v-select
-                                v-if="type_option[input]"
-                                v-model="wwtp_model[input]"
-                                item-text="text"
-                                item-value="value"
-                                :items="type_option[input].items"
-                                label="Select"
-                            >
-                            </v-select>
-                            <v-text-field
-                                v-else
-                                v-model="wwtp_model[input]"
-                                :suffix=user_inputs[input].unit
-                                type="number"
-                            ></v-text-field>
+                            <div>
+                              <v-select
+                                  v-if="type_option[input]"
+                                  v-model="wwtp_model[input]"
+                                  item-text="text"
+                                  item-value="value"
+                                  :items="type_option[input].items"
+                                  label="Select"
+                              >
+                              </v-select>
+                              <v-text-field
+                                  v-else
+                                  v-model="wwtp_model[input]"
+                                  :suffix=user_inputs[input].unit
+                                  type="number"
+                              ></v-text-field>
 
+                            </div>
                           </div>
-                        </div>
 
-                      </v-col>
-                      <v-col cols="2" v-if="!keys_without_level_of_certainty.has(input)">
-                        <v-select
-                            label="Level of certainty"
-                            :items = level_of_certainty
-                            item-text="text"
-                            item-value="key"
-                            v-model="wwtp_model.level_of_certainty[input]"
+                        </v-col>
+                        <v-col cols="2" v-if="!keys_without_level_of_certainty.has(input)">
+                          <v-select
+                              label="Level of certainty"
+                              :items = level_of_certainty
+                              item-text="text"
+                              item-value="key"
+                              v-model="wwtp_model.level_of_certainty[input]"
 
-                        ></v-select>
+                          ></v-select>
 
-                      </v-col>
+                        </v-col>
 
 
-                    </v-row>
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
+                      </v-row>
+                    </v-expansion-panel-content>
+                  </v-expansion-panel>
+                </v-container>
                 <!-- Sludge truck transportation to disposal site -->
-                <v-expansion-panel>
-                  <v-expansion-panel-header >
-                    <h3>Sludge truck transportation to disposal site</h3>
-                  </v-expansion-panel-header>
-                  <v-expansion-panel-content style="padding: 30px">
-                    <v-row
-                        align="center"
-                        v-for = "input in advanced_truck_transportation"
-                        :key="input"
+                <v-container>
+                  <v-expansion-panel>
+                    <v-expansion-panel-header >
+                      <h3>Sludge truck transportation to disposal site</h3>
+                    </v-expansion-panel-header>
+                    <v-expansion-panel-content style="padding: 30px">
+                      <v-row
+                          align="center"
+                          v-for = "input in advanced_truck_transportation"
+                          :key="input"
 
-                    >
-                      <v-col cols="7" >
-                        <div style="width: 100%;">
-                          <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
+                      >
+                        <v-col cols="7" >
+                          <div style="width: 100%;">
+                            <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
                             <span>
                               {{user_inputs[input].question}}
                             </span>
-                            <v-tooltip bottom v-if="user_inputs[input].hasOwnProperty('description_tooltip')">
-                              <template v-slot:activator="{ on, attrs }">
-                                <v-icon
-                                    v-bind="attrs"
-                                    v-on="on"
-                                    color="primary"
-                                    style="margin-left: 2px; margin-right: 2px; font-size: 1.3rem;"
-                                >
-                                  mdi-information-outline
-                                </v-icon>
-                              </template>
-                              <span>{{ user_inputs[input]['description_tooltip'] }}</span>
-                            </v-tooltip>
+                              <v-tooltip bottom v-if="user_inputs[input].hasOwnProperty('description_tooltip')">
+                                <template v-slot:activator="{ on, attrs }">
+                                  <v-icon
+                                      v-bind="attrs"
+                                      v-on="on"
+                                      color="primary"
+                                      style="margin-left: 2px; margin-right: 2px; font-size: 1.3rem;"
+                                  >
+                                    mdi-information-outline
+                                  </v-icon>
+                                </template>
+                                <span>{{ user_inputs[input]['description_tooltip'] }}</span>
+                              </v-tooltip>
 
-                            <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
-                                   tile
-                                   color="#b62373"
-                                   x-small
-                                   @click="wwtp_model[input] = button_estimations(input)"
-                            >
-                              Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Estimation button -->
-                            </v-btn>
-                          </div>
-                          <div v-if="select_estimation.includes(input)" style="width: 100%">
-                            <select v-model = "wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
-                              <option
-                                  v-for="item in select_estimations(input)"
-                                  :value="item.value"
+                              <v-btn v-if="button_estimation.includes(input) && !isNaN(button_estimations(input)) && button_estimations(input) != null"
+                                     tile
+                                     color="#b62373"
+                                     x-small
+                                     @click="wwtp_model[input] = button_estimations(input)"
                               >
-                                <!--Toggle menu with estimation-->
-                                {{item.name}} ({{item.value.toFixed(3)}})
-                              </option>
-                              <option :value="wwtp_model[input]">Custom value</option>
-                            </select>
-                          </div>
+                                Estimation:  {{button_estimations(input).toExponential(3)}}<!-- Estimation button -->
+                              </v-btn>
+                            </div>
+                            <div v-if="select_estimation.includes(input)" style="width: 100%">
+                              <select v-model = "wwtp_model[input]" style="max-width:90%;background-color: #d9d9d5; width: 90%; -webkit-appearance: menulist"  >
+                                <option
+                                    v-for="item in select_estimations(input)"
+                                    :value="item.value"
+                                >
+                                  <!--Toggle menu with estimation-->
+                                  {{item.name}} ({{item.value.toFixed(3)}})
+                                </option>
+                                <option :value="wwtp_model[input]">Custom value</option>
+                              </select>
+                            </div>
 
-                        </div>
-                      </v-col>
-                      <v-col :cols="keys_without_level_of_certainty.has(input) ? 5 : 3">
-                        <div>
+                          </div>
+                        </v-col>
+                        <v-col :cols="keys_without_level_of_certainty.has(input) ? 5 : 3">
                           <div>
-                            <v-select
-                                v-if="type_option[input]"
-                                v-model="wwtp_model[input]"
-                                item-text="text"
-                                item-value="value"
-                                :items="type_option[input].items"
-                                label="Select"
-                            >
-                            </v-select>
-                            <v-text-field
-                                v-else
-                                v-model="wwtp_model[input]"
-                                :suffix=user_inputs[input].unit
-                                type="number"
-                            ></v-text-field>
+                            <div>
+                              <v-select
+                                  v-if="type_option[input]"
+                                  v-model="wwtp_model[input]"
+                                  item-text="text"
+                                  item-value="value"
+                                  :items="type_option[input].items"
+                                  label="Select"
+                              >
+                              </v-select>
+                              <v-text-field
+                                  v-else
+                                  v-model="wwtp_model[input]"
+                                  :suffix=user_inputs[input].unit
+                                  type="number"
+                              ></v-text-field>
 
+                            </div>
                           </div>
-                        </div>
 
-                      </v-col>
-                      <v-col cols="2" v-if="!keys_without_level_of_certainty.has(input)">
-                        <v-select
-                            label="Level of certainty"
-                            :items = level_of_certainty
-                            item-text="text"
-                            item-value="key"
-                            v-model="wwtp_model.level_of_certainty[input]"
+                        </v-col>
+                        <v-col cols="2" v-if="!keys_without_level_of_certainty.has(input)">
+                          <v-select
+                              label="Level of certainty"
+                              :items = level_of_certainty
+                              item-text="text"
+                              item-value="key"
+                              v-model="wwtp_model.level_of_certainty[input]"
 
-                        ></v-select>
+                          ></v-select>
 
-                      </v-col>
+                        </v-col>
 
 
-                    </v-row>
-                  </v-expansion-panel-content>
-                </v-expansion-panel>
+                      </v-row>
+                    </v-expansion-panel-content>
+                  </v-expansion-panel>
+                </v-container>
 
               </v-expansion-panels>
             </v-expansion-panel-content>
           </v-expansion-panel>
         </v-expansion-panels>
+
+      </v-container>
 
 
     </div>

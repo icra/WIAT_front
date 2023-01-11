@@ -110,27 +110,34 @@
 
           />
           <br>
-          <v-tooltip bottom :disabled="!tab_1_disabled">
-            <template v-slot:activator="{ on }">
-              <div v-on="on" class="d-inline-block">
-                <v-btn
-                    @click="tab_1_continue"
-                    :disabled="tab_1_disabled"
-                    tile
-                    color="#b62373"
 
-                >
-                  SAVE AND CONTINUE
-                </v-btn>
-              </div>
-            </template>
-            <span>Please, fill in the required items before continue.</span>
-          </v-tooltip>
+          <v-container>
+            <v-tooltip bottom :disabled="!tab_1_disabled">
+              <template v-slot:activator="{ on }">
+
+                <div v-on="on" class="d-inline-block">
+                  <v-btn
+                      @click="tab_1_continue"
+                      :disabled="tab_1_disabled"
+                      tile
+                      color="#b62373"
+
+                  >
+                    SAVE AND CONTINUE
+                  </v-btn>
+
+                </div>
+              </template>
+              <span>Please, fill in the required items before continue.</span>
+            </v-tooltip>
+
+          </v-container>
 
 
         </v-stepper-content>  <!-- Industry -->
 
         <v-stepper-content step="2" >
+
           <Wwtp_questionnaire
               :industry = industry
               :stepper_model = 2
@@ -161,23 +168,25 @@
 
           ></Wwtp_questionnaire>
 
-          <br>
-          <v-tooltip bottom :disabled="!tab_2_disabled">
-            <template v-slot:activator="{ on }">
-              <div v-on="on" class="d-inline-block">
-                <v-btn
-                    @click="tab_2_continue"
-                    :disabled="tab_2_disabled"
-                    tile
-                    color="#b62373"
+          <v-container>
+            <v-tooltip bottom :disabled="!tab_2_disabled">
+              <template v-slot:activator="{ on }">
+                <div v-on="on" class="d-inline-block">
+                  <v-btn
+                      @click="tab_2_continue"
+                      :disabled="tab_2_disabled"
+                      tile
+                      color="#b62373"
 
-                >
-                  SAVE AND CONTINUE
-                </v-btn>
-              </div>
-            </template>
-            <span>Please, fill in the required items before continue.</span>
-          </v-tooltip>
+                  >
+                    SAVE AND CONTINUE
+                  </v-btn>
+                </div>
+              </template>
+              <span>Please, fill in the required items before continue.</span>
+            </v-tooltip>
+
+          </v-container>
 
         </v-stepper-content> <!-- Onsite WWTP -->
 
@@ -198,23 +207,24 @@
 
           />
 
+          <v-container>
+            <v-tooltip bottom :disabled="!tab_3_disabled">
+              <template v-slot:activator="{ on }">
+                <div v-on="on" class="d-inline-block">
+                  <v-btn
+                      @click="tab_3_continue"
+                      :disabled="tab_3_disabled"
+                      tile
+                      color="#b62373"
 
-          <v-tooltip bottom :disabled="!tab_3_disabled">
-            <template v-slot:activator="{ on }">
-              <div v-on="on" class="d-inline-block">
-                <v-btn
-                    @click="tab_3_continue"
-                    :disabled="tab_3_disabled"
-                    tile
-                    color="#b62373"
-
-                >
-                  SAVE AND CONTINUE
-                </v-btn>
-              </div>
-            </template>
-            <span>Please, fill in the required items before continue.</span>
-          </v-tooltip>
+                  >
+                    SAVE AND CONTINUE
+                  </v-btn>
+                </div>
+              </template>
+              <span>Please, fill in the required items before continue.</span>
+            </v-tooltip>
+          </v-container>
 
         </v-stepper-content>  <!-- Direct discharge -->
 
@@ -250,23 +260,25 @@
 
           ></Wwtp_questionnaire>
 
+          <v-container>
+            <v-tooltip bottom :disabled="!tab_4_disabled">
+              <template v-slot:activator="{ on }">
+                <div v-on="on" class="d-inline-block">
+                  <v-btn
+                      @click="tab_4_continue"
+                      :disabled="tab_4_disabled"
+                      tile
+                      color="#b62373"
 
-          <v-tooltip bottom :disabled="!tab_4_disabled">
-            <template v-slot:activator="{ on }">
-              <div v-on="on" class="d-inline-block">
-                <v-btn
-                    @click="tab_4_continue"
-                    :disabled="tab_4_disabled"
-                    tile
-                    color="#b62373"
+                  >
+                    SAVE AND CONTINUE
+                  </v-btn>
+                </div>
+              </template>
+              <span>Please, fill in the required items before continue.</span>
+            </v-tooltip>
 
-                >
-                  SAVE AND CONTINUE
-                </v-btn>
-              </div>
-            </template>
-            <span>Please, fill in the required items before continue.</span>
-          </v-tooltip>
+          </v-container>
 
         </v-stepper-content>
 
@@ -919,5 +931,17 @@ export default {
 
 .icon_clickable {
   transition: all .2s ease-in-out;
+}
+
+.margin_button{
+  width: 100%;
+  height: 90%;
+  margin: auto
+}
+
+@media (min-width: 1600px) {
+  .margin_button{
+    width: 80%;
+  }
 }
 </style>
