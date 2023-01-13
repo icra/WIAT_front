@@ -276,6 +276,12 @@ export class Industry{
         return concentration*this.volume_of_surface_water_withdrawn()
     }
 
+    infl_pollutant_concentration(pollutant){
+        if (this.ind_pollutants_infl.hasOwnProperty(pollutant)) return this.ind_pollutants_infl[pollutant]
+        else return 0
+    }
+
+
     //Adds load of pollutant from onsite WWTP (before being treated), offsite WWTP (before being treated) and directly discharged water
     generated_pollutant_load(pollutant){
         let load = 0

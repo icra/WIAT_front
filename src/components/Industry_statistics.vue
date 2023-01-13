@@ -73,7 +73,7 @@
                     </template>
                     <span v-html="item.layer.info"></span>
                   </v-tooltip>
-                  <span v-if="item.name == 'Change of state of nature'" class="state_of_nature"></span>
+                  <span v-if="item.name == 'Change in the state of Nature'" class="state_of_nature"></span>
 
                 </template>
 
@@ -110,7 +110,7 @@
                   </v-tooltip>
                 </template>
                 <template v-slot:label="{ item }">
-                  <span v-if="item.name == 'Change of state of nature'" class="state_of_nature">
+                  <span v-if="item.name == 'Change in the state of Nature'" class="state_of_nature">
                     {{ item.name }}
                   </span>
                   <span v-else>
@@ -1742,7 +1742,7 @@
               <li><span v-katex="'W_a'"></span>: Amount of superficial water available <b>(streamflow global
                 indicator)</b></li>
               <li><span v-katex="'W_w'"></span>: Amount of water withdrawn from the river</li>
-              <li><span v-katex="'W_{effl}'"></span>: Amount of water discharged into the river by industry</li>
+              <li><span v-katex="'W_{effl}'"></span>: Amount of water discharged into the same watershed from which it was withdrawn</li>
 
             </ul>
           </div>
@@ -1836,7 +1836,7 @@
           <div class="dialog_detail" style="background-color: white">
             <h3>Groundwater withdrawals (only in areas with GW decline) </h3>
             <br>
-            Amount of groundwater withdrawals that take place in areas where the water table declines more than 40 centimeters per year on average.
+            Amount of groundwater withdrawals that take place in areas where the water table declines.
 
           </div>
 
@@ -1908,7 +1908,7 @@
             width="60%"
         >
           <div class="dialog_detail" style="background-color: white">
-            <h3>Percentage of water withdrawn for consumptive use </h3>
+            <h3>Percentage of consumptive use over water withdrawn </h3>
             <div v-katex:display="'W_{frac} = \\frac{W_c}{W_w} \\cdot 100'"></div>
             <span v-katex:display="'\\begin{cases}\n'+
                 'W_c=W_w + W_e - W_d &\\text{if discharged water has concentrations below the EQS}\\\\\n'+
@@ -1918,8 +1918,8 @@
             <b>Where:</b>
             <br>
             <ul>
-              <li><span v-katex="'W_{frac}'"></span>: Percentage of water withdrawn for consumptive use</li>
-              <li><span v-katex="'W_w'"></span>: Amount of water withdrawn</li>
+              <li><span v-katex="'W_{frac}'"></span>: Percentage of consumptive use over water withdrawn</li>
+              <li><span v-katex="'W_w'"></span>: Amount of water withdrawn. It sums all water sources</li>
               <li><span v-katex="'W_d'"></span>: Water discharged at the same watershed where the water is withdrawn</li>
               <li><span v-katex="'W_e'"></span>: Amount of water than comes from external sources</li>
               <li><span v-katex="'W_c'"></span>: Water consumptive use. Until Science based targets are set, the tool assumes that the discharge should be equal or better than the EQS to be considered “non-consumptive”.</li>
@@ -2835,8 +2835,8 @@
             <br>
             <ul>
               <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water</li>
-              <li><span v-katex="this.selected_pollutant+'_{effl}'"></span>: load of {{ selected_pollutant }} in the effluent</li>
-              <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body</li>
+              <li><span v-katex="this.selected_pollutant+'_{effl}'"></span>: load of {{ selected_pollutant }} of water discharged to the same water body from which it was withdrawn</li>
+              <li><span v-katex="'W_{effl}'"></span>: Amount of water discharged into the same watershed from which it was withdrawn</li>
               <li><span v-katex="'EC50_{'+this.selected_pollutant+'}: '+this.conversion_factors[this.selected_pollutant]['tu']+' \\mu g/L'"></span></li>
               <li><span v-katex="'W_{a}'"></span>: amount of water available in the river <b>(streamflow global
                 indicator)</b></li>
@@ -2892,8 +2892,8 @@
             <br>
             <ul>
               <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water</li>
-              <li><span v-katex="this.selected_pollutant+'_{effl}'"></span>: load of {{ selected_pollutant }} in the effluent</li>
-              <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body</li>
+              <li><span v-katex="this.selected_pollutant+'_{effl}'"></span>: load of {{ selected_pollutant }} discharged to the same water body from which it was withdrawn</li>
+              <li><span v-katex="'W_{effl}'"></span>: Amount of water discharged into the same watershed from which it was withdrawn</li>
               <li><span v-katex="'EQS_{'+this.selected_pollutant+'}: '+this.conversion_factors[this.selected_pollutant]['eqs']+' mg/L'"></span></li>
               <li><span v-katex="'W_{a}'"></span>: amount of water available in the river <b>(streamflow global
                 indicator)</b></li>
@@ -3014,8 +3014,8 @@
             <ul>
               <li><span v-katex="'C'"></span>: Concentration of pollutants in the water after treatment in the WWTP (g/m3)</li>
               <li><span v-katex="'\\Delta'"></span>: Increase of the concentration in the receiving water body after discharge (g/m3)</li>
-              <li><span v-katex="'TU'"></span>: Toxic Units in the effluent aims to calculete how toxic is industry effluent for ecosystem</li>
-              <li><span v-katex="'EQS'"></span>: Enviromental Quality Standards are the limits aprproved by the EU's Water Framework Directive</li>
+              <li><span v-katex="'TU'"></span>: Toxic Units in the industry effluent aims to calculate how toxic is industry effluent for ecosystem</li>
+              <li><span v-katex="'EQS'"></span>: Enviromental Quality Standards are the limits approved by the EU's Water Framework Directive</li>
 
               <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water</li>
               <li><span v-katex="this.selected_pollutant+'_{effl}'"></span>: load of pollutant in the effluent</li>
@@ -4181,7 +4181,7 @@ export default {
 
 
         let concentration = metrics.pollutant_concentration(industries)
-        let delta = await metrics.pollutant_delta(industries, _this.global_layers)
+        let delta = await metrics.pollutant_delta(industries, _this.global_layers, true)
         let tu = metrics.ecotoxicity_potential_tu(industries)
         let eqs = metrics.environmental_quality_standards(industries)
 
@@ -4471,7 +4471,7 @@ export default {
         //pollutants_table.header.push({text: "Unit", value: "unit", sortable: false,})
 
         //let dichloroethane = {value: _this.table_title.pollutants.diclo, unit: "%", info: "info_delta_eqs_diclo"}
-        let tu = await metrics.delta_eqs(industries, _this.global_layers)
+        let tu = await metrics.delta_eqs(industries, _this.global_layers, true)
 
         let labels_dataset = []
         let values_dataset = []
@@ -4556,7 +4556,7 @@ export default {
           value: []
         }
 
-        let tu = await metrics.delta_tu(industries, _this.global_layers)
+        let tu = await metrics.delta_tu(industries, _this.global_layers, true)
         let total = {name: _this.table_title.pollutants.total, unit: "TU/day", value: tu.total}
         pollutants_table.value.push(total)
 
@@ -4654,7 +4654,7 @@ export default {
 
         let industry_row = {value: key}
 
-        let dilution_factor_value = await metrics.dilution_factor(this.global_layers, industries)
+        let dilution_factor_value = await metrics.dilution_factor(this.global_layers, industries, true)
         let dilution_factor_risk = this.risk_categories["dilution_factor"](dilution_factor_value)
 
         let available_factor = await metrics.available_ratio(this.global_layers, industries)
@@ -4669,7 +4669,7 @@ export default {
         let ecotox_effluent_factor = metrics.ecotoxicity_potential_tu(industries).total
         let ecotox_effluent_risk = this.risk_categories["ecotoxicity"](ecotox_effluent_factor)
 
-        let delta_ecotox_factor = (await metrics.delta_tu(industries, this.global_layers)).total
+        let delta_ecotox_factor = (await metrics.delta_tu(industries, this.global_layers, true)).total
         let delta_ecotox_risk = this.risk_categories["delta_ecotoxicity"](delta_ecotox_factor)
 
         let eqs_factor = metrics.eqs_avg(industries)
@@ -4710,7 +4710,7 @@ export default {
 
         let industries = [this.industry]
 
-        let dilution_factor_value = await metrics.dilution_factor(this.global_layers, industries)
+        let dilution_factor_value = await metrics.dilution_factor(this.global_layers, industries, true)
 
         let available_ratio_value = await metrics.available_ratio(this.global_layers, industries)
 
@@ -5169,7 +5169,7 @@ export default {
           children: [
             {
               id: 2,
-              name: 'Change of state of nature',
+              name: 'Change in the state of Nature',
               children: [
                 {id: 3, name: this.table_title.simple_table.delta_tu, info: "Toxic units in the receiving water body indicates if the concentration after the effluent discharge on the water body exceed the EC50, supposing the receiving water has a concentration of 0 before discharge."},
                 {id: 4, name: this.table_title.simple_table.delta_eqs, info: "Increase of the concentration of the pollutants in the receiving water body after discharge (with respect to EQS), supposing the receiving water has a concentration of 0 before discharge."},
@@ -5192,7 +5192,7 @@ export default {
           id: 13,
           name: "Water availability",
           children: [
-            {id: 14, name: "Change of state of nature",},
+            {id: 14, name: "Change in the state of Nature",},
             {id: 15, name: "Levers for action",}
           ]
         },
@@ -5200,7 +5200,7 @@ export default {
           id: 16,
           name: "GHG emissions from wastewater treatment",
           children: [
-            {id: 17, name: "Change of state of nature",},
+            {id: 17, name: "Change in the state of Nature",},
             {
               id: 18,
               name: "Levers for action",

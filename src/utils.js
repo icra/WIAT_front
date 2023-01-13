@@ -266,6 +266,18 @@ function calculate_influent_load(industries, pollutant){
     return load
 }
 
+//Load of pollutant from the water before being withdrawn by industries (g/day)
+async function calculate_load_water_body(industries, pollutant, global_layers){
+    let loads = []
+    for (let industry of industries){
+        let streamflow_value = await streamflow([industry], global_layers)
+        let concentration = industry.infl_pollutant_concentration(pollutant)
+        loads.push(streamflow_value*concentration)
+    }
+
+    return loads.sum()
+}
+
 //Concentration of pollutant_effl discharged by industries (g/m3)
 function effl_concentration(industries, pollutant_effl){
     let load = calculate_effluent_load(industries, pollutant_effl)
@@ -379,13 +391,19 @@ function calculate_product_produced(industries){
 //if only_same_watershed is true, only discharges from the same watershed where water is withdrawn are considered
 async function effl_delta(industries, effl, global_layers, only_same_watershed = false){
 
-    let load = calculate_effluent_load(industries, effl, only_same_watershed)
+    let load_effluent = calculate_effluent_load(industries, effl, only_same_watershed)
+    //let load_river = await calculate_load_water_body(industries, effl, global_layers)
+    //let load_influent_industry = calculate_influent_load(industries, effl)
+    let load_river = 0
+    let load_influent_industry = 0
+
 
     let water_discharged = calculate_water_discharged(industries, only_same_watershed)
     let streamflow_value = await streamflow(industries, global_layers) //streamflow (m3/day)
     let water_withdrawn = calculate_surface_water_withdrawn(industries)
 
-    let delta = load / (streamflow_value + water_discharged - water_withdrawn)
+
+    let delta = (load_river-load_influent_industry+load_effluent) / (streamflow_value + water_discharged - water_withdrawn)
 
     if(isNaN(delta)) return "-"
     return delta.toExponential(3) //g/m3
@@ -531,9 +549,9 @@ async function has_water_stress(industries, global_layers){
 }
 
 //Says if industries have groundwater table decline (avg industries groundwater table decline > 40 mm/year )
-async function has_groundwater_table_decline(industries, global_layers){
+async function has_groundwater_table_decline(industries, global_layers, threshold = 40){
     let gw_decline = await groundwater_table_decline(industries, global_layers)
-    return gw_decline >= 40
+    return gw_decline >= threshold
 }
 
 //Amount of pollutant removed by applying WWTP's treatment (g/day)
@@ -667,9 +685,9 @@ let metrics = {
     },
 
     //Dilution factor (dimensionless)
-    async dilution_factor(global_layers, industries){
+    async dilution_factor(global_layers, industries, only_same_watershed=true){
 
-        let water_discharged = calculate_water_discharged(industries)    // m3/day
+        let water_discharged = calculate_water_discharged(industries, only_same_watershed)    // m3/day
 
         if(water_discharged == 0) return "-"
 
@@ -1211,12 +1229,12 @@ let metrics = {
 
         return toxic_units
     },
-    async delta_tu(industries, global_layers){ //increase of tu in the receiving water body due to discharging the water(tu/day)
+    async delta_tu(industries, global_layers, only_same_watershed= false){ //increase of tu in the receiving water body due to discharging the water(tu/day)
 
         let toxic_units = {}
         for(let pollutant of utils.get_pollutants(industries)){
             let tu_factor = conversion_factors[pollutant]['tu']
-            let pollutant_delta = await effl_delta(industries, pollutant, global_layers)
+            let pollutant_delta = await effl_delta(industries, pollutant, global_layers, only_same_watershed)
             let delta_tu = 1000*pollutant_delta/tu_factor
             if(Number.isFinite(delta_tu)) toxic_units[pollutant] = delta_tu.toExponential(2)
             else toxic_units[pollutant] = "-"
@@ -1228,7 +1246,7 @@ let metrics = {
 
         return toxic_units
     },
-    async delta_eqs(industries, global_layers, same_watershed){ //Increase in the concentration of the receiving water body (compared to EQS) due to  discharging the water(%)
+    async delta_eqs(industries, global_layers, same_watershed = false){ //Increase in the concentration of the receiving water body (compared to EQS) due to  discharging the water(%)
 
         let toxic_units = {}
         for(let pollutant of utils.get_pollutants(industries)){
@@ -1246,7 +1264,7 @@ let metrics = {
 
 
     async delta_eqs_avg(industries, global_layers){
-        let eqs = await this.delta_eqs(industries, global_layers)
+        let eqs = await this.delta_eqs(industries, global_layers, true)
 
         if (Object.values(eqs).filter(x => x != "-").length == 0) return  '-'
 
@@ -1349,7 +1367,7 @@ let metrics = {
     async groundwater_withdrawals_in_high_groundwater_decline(industries, global_layers){
         let total_gw_decline = 0
         for (let industry of industries){
-            let has_gw_decline = await has_groundwater_table_decline([industry], global_layers)
+            let has_gw_decline = await has_groundwater_table_decline([industry], global_layers, 0)
             let groundwater = industry.volume_of_groundwater_water_withdrawn()
             if (has_gw_decline) total_gw_decline += groundwater
         }
