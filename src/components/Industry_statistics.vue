@@ -1015,7 +1015,58 @@
                         </template>
                       </v-data-table>
                     </div>
-                    <div v-else-if="active_indicator[0] == 14">
+                    <div v-else-if="active_indicator[0] == 13">
+
+                      <v-data-table
+                          :headers="concentration_table_receiving_body.header"
+                          :items="concentration_table_receiving_body.value"
+                          disable-pagination
+                          :hide-default-footer="true"
+                          dense
+                      >
+                        <template v-slot:item.name="{ item }">
+                          <span v-if="item.info">
+                            {{ item.name }}
+                            <v-btn
+                                icon
+                                @click="selected_pollutant = item.name; $data[item.info] = true"
+                                class="icon_clickable"
+                                x-small
+                            >
+                              <v-icon
+                                  color='#1C195B'
+                              >
+                                mdi-information-outline
+                              </v-icon>
+                            </v-btn>
+                          </span>
+                          <span v-else>{{ item.name }}</span>
+                        </template>
+                        <template
+                            v-slot:item.data="{ item }"
+                        >
+                          <template v-if="getDataTypeColor(item) != null">
+                            <v-tooltip bottom>
+                              <template v-slot:activator="{ on, attrs }">
+                                <v-chip
+                                    :color="getDataTypeColor(item)[0]"
+                                    dark
+                                    :key="industry.name"
+                                    text-color="#1c1c1b"
+                                    v-bind="attrs"
+                                    v-on="on"
+                                >
+                                  {{ item.data }}
+                                </v-chip>
+                              </template>
+                              <span>{{getDataTypeColor(item)[1]}}</span>
+                            </v-tooltip>
+                          </template>
+                        </template>
+                      </v-data-table>
+                    </div>
+
+                    <div v-else-if="active_indicator[0] == 15">
                       <v-data-table
                           :headers="water_quantity.header"
                           :items="water_quantity.value"
@@ -1101,7 +1152,7 @@
 
                       </v-data-table>
                   </div>
-                    <div v-else-if="active_indicator[0] == 15">
+                    <div v-else-if="active_indicator[0] == 16">
                       <v-data-table
                           :headers="freshwater_lever_for_action.header"
                           :items="freshwater_lever_for_action.value"
@@ -1154,7 +1205,7 @@
                       </v-data-table>
 
                     </div>
-                    <div v-else-if="active_indicator[0] == 17">
+                    <div v-else-if="active_indicator[0] == 18">
 
                       <v-chip-group
                           mandatory
@@ -1249,7 +1300,7 @@
                       </div>
 
                     </div>
-                    <div v-else-if="active_indicator[0] == 19">
+                    <div v-else-if="active_indicator[0] == 20">
                       <v-data-table
                           :headers="energy_use_table.header"
                           :items="energy_use_table.value"
@@ -1304,7 +1355,7 @@
 
                       </v-data-table>
                     </div>
-                    <div v-else-if="active_indicator[0] == 20">
+                    <div v-else-if="active_indicator[0] == 21">
                       <v-data-table
                           :headers="nutrient_concentration_prior_discharge_table.header"
                           :items="nutrient_concentration_prior_discharge_table.value"
@@ -1357,7 +1408,7 @@
                       </v-data-table>
                     </div>
 
-                    <div v-else-if="active_indicator[0] == 21">
+                    <div v-else-if="active_indicator[0] == 22">
                       <v-data-table
                           :headers="biogas_valorised_table.header"
                           :items="biogas_valorised_table.value"
@@ -1412,7 +1463,7 @@
 
                       </v-data-table>
                     </div>
-                    <div v-else-if="active_indicator[0] == 22">
+                    <div v-else-if="active_indicator[0] == 23">
 
                       <v-chip-group
                           mandatory
@@ -1542,7 +1593,7 @@
                       </div>
 
                     </div>
-                    <div v-else-if="active_indicator[0] == 23">
+                    <div v-else-if="active_indicator[0] == 24">
                       <v-chip-group
                           mandatory
                           v-model="ghg_sludge_management_chip"
@@ -1634,7 +1685,7 @@
 
                     </div>
                   </div>
-                  <div v-if = "active_indicator <= 15">
+                  <div v-if = "active_indicator <= 16">
                     <v-divider
                         style="margin-top: 5%; border-width: 1px; background-color: black"
                     ></v-divider>
@@ -3000,11 +3051,10 @@
             width="60%"
         >
           <div class="dialog_detail" style="background-color: white">
-            <h3> Pollutant concentration </h3>
+            <h3> Pollutant concentration in the industry effluent</h3>
             <br>
 
             <div v-katex:display="'C = \\frac{\\sum_{i \\in DP} '+this.selected_pollutant+'_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} '"></div>
-            <div v-katex:display="' \\Delta = \\frac{C}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}}'"></div>
             <div v-katex:display="'TU = \\frac{\\sum_{i \\in DP} '+this.selected_pollutant+'_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EC50_{'+this.selected_pollutant+'} \\cdot 10^{-3}}'"></div>
             <div v-katex:display="'EQS = \\frac{\\sum_{i \\in DP} '+this.selected_pollutant+'_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EQS_{'+this.selected_pollutant+'}} \\cdot 100'"></div>
 
@@ -3013,6 +3063,43 @@
             <br>
             <ul>
               <li><span v-katex="'C'"></span>: Concentration of pollutants in the water after treatment in the WWTP (g/m3)</li>
+              <li><span v-katex="'TU'"></span>: Toxic Units in the industry effluent aims to calculate how toxic is industry effluent for ecosystem</li>
+              <li><span v-katex="'EQS'"></span>: Enviromental Quality Standards are the limits approved by the EU's Water Framework Directive</li>
+
+              <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water</li>
+              <li><span v-katex="this.selected_pollutant+'_{effl}'"></span>: load of pollutant in the industry effluent</li>
+              <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body</li>
+
+              <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river</li>
+              <li><span v-katex="'EC50_{'+this.selected_pollutant+'}: '+this.conversion_factors[this.selected_pollutant]['eqs']+' \\mu g/L'"></span></li>
+              <li><span v-katex="'EQS_{'+this.selected_pollutant+'}: '+this.conversion_factors[this.selected_pollutant]['eqs']+' mg/L'"></span></li>
+
+            </ul>
+            <br>
+
+          </div>
+        </v-dialog>
+        <v-dialog
+            v-model="info_pollutant_concentration_receiving_water_body"
+            width="60%"
+        >
+          <div class="dialog_detail" style="background-color: white">
+            <h3> Pollutant concentration </h3>
+            <br>
+
+            <div v-katex:display="'C_{effl} = \\frac{\\sum_{i \\in DP} '+this.selected_pollutant+'_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} '"></div>
+            <div v-katex:display="'C = \\frac{C_{WB} \\cdot W_a - C_{WB} \\cdot W_w + C_{effl} \\cdot W_{effl}}{W_a - W_w + W_{effl}} '"></div>
+
+            <div v-katex:display="' \\Delta = \\frac{C_{effl}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}}'"></div>
+            <div v-katex:display="'TU = \\frac{C}{EC50_{'+this.selected_pollutant+'} \\cdot 10^{-3}}'"></div>
+            <div v-katex:display="'EQS = \\frac{C}{EQS_{'+this.selected_pollutant+'}} \\cdot 100'"></div>
+
+
+            <b>Where:</b>
+            <br>
+            <ul>
+              <li><span v-katex="'C'"></span>: Concentration of {{ this.selected_pollutant }} in the receiving water body after discharging water (g/m3)</li>
+              <li><span v-katex="'C_{effl}'"></span>: Concentration of {{ this.selected_pollutant }} in the industry effluent after treatment in the WWTP (g/m3)</li>
               <li><span v-katex="'\\Delta'"></span>: Increase of the concentration in the receiving water body after discharge (g/m3)</li>
               <li><span v-katex="'TU'"></span>: Toxic Units in the industry effluent aims to calculate how toxic is industry effluent for ecosystem</li>
               <li><span v-katex="'EQS'"></span>: Enviromental Quality Standards are the limits approved by the EU's Water Framework Directive</li>
@@ -3031,6 +3118,7 @@
 
           </div>
         </v-dialog>
+
         <v-dialog
             v-model="info_nutrient_concentration_prior_discharge"
             width="60%"
@@ -3142,6 +3230,7 @@ export default {
       ghg_sludge_management_chip: 0,
 
       concentration_table: {header: [], value: []},
+      concentration_table_receiving_body: {header: [], value: []},
 
       nutrient_concentration_prior_discharge_table: {header: [], value: []},
 
@@ -3259,6 +3348,8 @@ export default {
       info_effluent_load_tp: false,
 
       info_pollutant_concentration: false,
+      info_pollutant_concentration_receiving_water_body: false,
+
       info_nutrient_concentration_prior_discharge: false,
 
       co2_ghg_ratio_info: false,
@@ -3328,6 +3419,9 @@ export default {
       _this.ghg_ratio_table = _this.generate_ghg_ratio_table()
       _this.ghg_sludge_management_table = _this.generate_sludge_management_table()
       _this.concentration_table = await _this.generate_concentration_table()
+      _this.concentration_table_receiving_body = await _this.generate_concentration_receiving_water_body_table()
+
+
       _this.nutrient_concentration_prior_discharge_table = _this.generate_nutrient_concentration_prior_discharge_table()
 
     },
@@ -3388,6 +3482,10 @@ export default {
         return this.risk_categories.no_sanitation(item[value])
       } else if (equals(layer, "Unimproved/No Drinking Water")){
         return this.risk_categories.no_drinking(item[value])
+      } else if (equals(layer, "BOD")){
+        return this.risk_categories.bod(item[value])
+      } else if (equals(layer, "Nitrates")){
+        return this.risk_categories.nitrates(item[value])
       }
     },
 
@@ -3596,7 +3694,7 @@ export default {
 
       }
 
-      let id_risk = [1, 2, 3, 4, 5, 13, 14, 16, 17]
+      let id_risk = [1, 2, 3, 4, 5, 14, 15, 17, 18]
       if (id_risk.includes(id.id)) {
         if (id.id < 3) {
           return return_color_class(pollution_impact)
@@ -3606,7 +3704,7 @@ export default {
           return return_color_class(delta_eqs_impact)
         } else if (id.id == 5) {
           return return_color_class(eutrophication_impact)
-        } else if (id.id <= 14) {
+        } else if (id.id <= 15) {
           return return_color_class(freshwater_impact)
         } else {
           return return_color_class(ghg_impact)
@@ -4159,7 +4257,7 @@ export default {
 
     },
 
-    //Concentration of pollutants table
+    //Concentration of pollutants in the industry effluent
     async generate_concentration_table() {
       let _this = this
 
@@ -4169,9 +4267,8 @@ export default {
         let pollutants_table = {
           header: [{text: "", value: "name", sortable: false},
             {text: "Concentration of the water discharged (g/m3)", value: 'concentration'},
-            {text: "Increase of the concentration in the receiving water body (g/m3)", value: 'delta'},
-            {text: "Toxic units in the effluent (TU/Day)", value: 'tu'},
-            {text: "Concentration of the pollutants in the effluent (with respect to EQS) (%)", value: 'eqs'},
+            {text: "Toxic units in the industry effluent (TU/Day)", value: 'tu'},
+            {text: "Concentration of the pollutants in the industry effluent (with respect to EQS) (%)", value: 'eqs'},
             {text: "Data Type", value: "data", sortable: false}],
           value: []
         }
@@ -4181,13 +4278,8 @@ export default {
 
 
         let concentration = metrics.pollutant_concentration(industries)
-        let delta = await metrics.pollutant_delta(industries, _this.global_layers, true)
         let tu = metrics.ecotoxicity_potential_tu(industries)
         let eqs = metrics.environmental_quality_standards(industries)
-
-        let labels_dataset = []
-        let values_tu_dataset = []
-        let values_eqs_dataset = []
 
         for(let pollutant of this.industry.pollutants_selected){
           let DataType = industry_impact_legend_category.pollutant_concentration(industries[0], pollutant)
@@ -4197,17 +4289,11 @@ export default {
             data: this.get_string_impact_legend(DataType)
           }
           pollutant_obj['concentration'] = concentration[pollutant]
-          pollutant_obj['delta'] = delta[pollutant]
           pollutant_obj['tu'] = tu[pollutant]
           pollutant_obj['eqs'] = eqs[pollutant]
 
           pollutants_table.value.push(pollutant_obj)
 
-          if(!["COD", "TN", "TP"].includes(pollutant)){
-            labels_dataset.push(pollutant)
-            values_tu_dataset.push(tu[pollutant])
-            values_eqs_dataset.push(eqs[pollutant])
-          }
         }
 
         return pollutants_table
@@ -4215,6 +4301,56 @@ export default {
 
 
     },
+
+    //Concentration of pollutants in the receiving water body
+    async generate_concentration_receiving_water_body_table() {
+      let _this = this
+
+
+      if (_this.industry !== null) {
+
+        let pollutants_table = {
+          header: [{text: "", value: "name", sortable: false},
+            {text: "Concentration(g/m3)", value: 'concentration'},
+            {text: "Increase of the concentration (g/m3)", value: 'delta'},
+            {text: "Toxic units (TU/Day)", value: 'tu'},
+            {text: "Concentration of the pollutants with respect to EQS (%)", value: 'eqs'},
+            {text: "Data Type", value: "data", sortable: false}],
+          value: []
+        }
+
+        //let key = 'concentration'
+        let industries = [this.industry]
+
+
+        let concentration = await metrics.final_water_body_concentration(industries, _this.global_layers)
+        let delta = await metrics.pollutant_delta(industries, _this.global_layers, true)
+        let tu = await metrics.tu_receiving_water_body(industries, _this.global_layers, true)
+        let eqs = await metrics.eqs_receiving_water_body(industries, _this.global_layers, true)
+
+
+        for(let pollutant of this.industry.pollutants_selected){
+          let DataType = industry_impact_legend_category.final_water_body_concentration(industries[0], pollutant)
+          let pollutant_obj = {
+            name: pollutant,
+            info: "info_pollutant_concentration_receiving_water_body",
+            data: this.get_string_impact_legend(DataType)
+          }
+          pollutant_obj['concentration'] = concentration[pollutant]
+          pollutant_obj['delta'] = delta[pollutant]
+          pollutant_obj['tu'] = tu[pollutant]
+          pollutant_obj['eqs'] = eqs[pollutant]
+
+          pollutants_table.value.push(pollutant_obj)
+
+        }
+
+        return pollutants_table
+      } else return {header: [], emissions: []}
+
+
+    },
+
 
     //Effluent concentration prior to discharge
     generate_nutrient_concentration_prior_discharge_table() {
@@ -5071,7 +5207,7 @@ export default {
     },
 
     async generate_context_for_impact_table(new_value, old_value){
-      if(!(((new_value >= 1 && new_value <= 12) && (old_value >= 1 && old_value <=12)) || ((new_value >= 13 && new_value <= 15) && (old_value >= 13 && old_value <= 15)))) {
+      if(!(((new_value >= 1 && new_value <= 13) && (old_value >= 1 && old_value <=13)) || ((new_value >= 14 && new_value <= 16) && (old_value >= 14 && old_value <= 16)))) {
         let _this = this
         let table = {
           header: [
@@ -5084,9 +5220,9 @@ export default {
         }
 
         let indicators = []
-        if (_this.active_indicator >= 1 && _this.active_indicator <= 12) {
+        if (_this.active_indicator >= 1 && _this.active_indicator <= 13) {
           indicators = ["Coastal Eutrophication Potential", "Surface Water Pharmaceutical Pollution", "Coastal Pharmaceutical Pollution", "Unimproved/No Drinking Water", "Unimproved/No Sanitation", "BOD", "Nitrates", "Streamflow"]
-        } else if (_this.active_indicator >= 13 && _this.active_indicator <= 15) {
+        } else if (_this.active_indicator >= 14 && _this.active_indicator <= 16) {
           indicators = ["Seasonal variability", "Interannual variability", "Water stress", "Water depletion", "Aridity index", "Groundwater table decline", "Drought risk", "Streamflow"]
         }
 
@@ -5182,34 +5318,36 @@ export default {
               children: [
                 {id: 9, name: this.table_title.simple_table.avg_treatment_efficiency, info: "This metric indicates what is the percentage of pollutant load that the WWTP eliminates from the industry water."},
                 {id: 10, name: this.table_title.simple_table.avg_influent_efficiency, info: "This metric indicates whether there is an improvement in water quality due to its use by the industry. If the quality of the water after treatment is better than the industry withdrawal water quality (surface water only), then the value of this metric is greater than 100. This is only calculated for COD, TN and TP when the “advanced inputs” provide a value under “Industry withdrawal water quality (surface water only)”"},
-                {id: 11, name: this.table_title.simple_table.treated, info: "This metric indicates the ratio between the water remaining after the industry consumption and the water that is treated in the WWTP. "},
-                {id: 12, name: 'Concentration of pollutants', info: "Concentration of pollutants in the water after treatment in the WWTP, and increase of the concentration in the receiving water body after discharge."},
+                {id: 11, name: this.table_title.simple_table.treated, info: "This metric indicates the ratio between the water remaining after the industry consumption and the water that is treated in the WWTP"},
+                {id: 12, name: 'Concentration of pollutants in the industry effluent', info: "Statistics related to the concentration of pollutants in the water after treatment in the WWTP"},
+                {id: 13, name: 'Concentration of pollutants in the receiving water body', info: "Statistics related to the concentration of the receiving water body after industry discharge"},
+
               ]
             },
           ],
         },
         {
-          id: 13,
+          id: 14,
           name: "Water availability",
           children: [
-            {id: 14, name: "Change in the state of Nature",},
-            {id: 15, name: "Levers for action",}
+            {id: 15, name: "Change in the state of Nature",},
+            {id: 16, name: "Levers for action",}
           ]
         },
         {
-          id: 16,
+          id: 17,
           name: "GHG emissions from wastewater treatment",
           children: [
-            {id: 17, name: "Change in the state of Nature",},
+            {id: 18, name: "Change in the state of Nature",},
             {
-              id: 18,
+              id: 19,
               name: "Levers for action",
               children: [
-                {id: 19, name: "Energy use", info: "Energy used by the industry to treat a m3 of water"},
-                {id: 20, name: "Effluent concentration prior to discharge", info: "TN and COD concentration of the effluent, which are triggering N2O and methane emissions"},
-                {id: 21, name: "Biogenic emissions", info: "Biogenic emissions sources are emissions that come from natural sources"},
-                {id: 22, name: "GHG emissions by source", info: "Amount of CO2eq by source emitted to the atmosphere during wastewater treatment process"},
-                {id: 23, name: "Sludge management", info: "GHG emissions from sludge management operations (storing, composting, incineration, land application, landfilling, stockpiling and truck transport)"},
+                {id: 20, name: "Energy use", info: "Energy used by the industry to treat a m3 of water"},
+                {id: 21, name: "Effluent concentration prior to discharge", info: "TN and COD concentration of the effluent, which are triggering N2O and methane emissions"},
+                {id: 22, name: "Biogenic emissions", info: "Biogenic emissions sources are emissions that come from natural sources"},
+                {id: 23, name: "GHG emissions by source", info: "Amount of CO2eq by source emitted to the atmosphere during wastewater treatment process"},
+                {id: 24, name: "Sludge management", info: "GHG emissions from sludge management operations (storing, composting, incineration, land application, landfilling, stockpiling and truck transport)"},
               ]
             },
           ]

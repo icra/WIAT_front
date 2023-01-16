@@ -283,6 +283,21 @@ let risk_category = {
         else if(value > 5) return red
         return null
     },
+    bod: function(value){
+        if(value < 1.4) return layers.l
+        else if (value < 1.7) return layers.lm
+        else if (value < 2.5) return layers.mh
+        else if (value >= 2.5) return layers.h
+        return null
+    },
+    nitrates: function(value){
+        if(value < 0.2) return layers.l
+        else if (value < 0.35) return layers.lm
+        else if (value < 0.65) return layers.mh
+        else if (value < 1) return layers.h
+        else if (value >= 1) return layers.eh
+        return null
+    },
 
     legend_impact_pdf: function(dd){
         dd.content.push({

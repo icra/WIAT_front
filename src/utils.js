@@ -409,6 +409,24 @@ async function effl_delta(industries, effl, global_layers, only_same_watershed =
     return delta.toExponential(3) //g/m3
 }
 
+//Final concentration of the receiving water body after withdrawing, using, filtering and discharging water
+async function concentration_receiving_water_body(industries, effl, global_layers, only_same_watershed = false){
+
+    let load_effluent = calculate_effluent_load(industries, effl, only_same_watershed)
+    let load_river = await calculate_load_water_body(industries, effl, global_layers)
+    let load_influent_industry = calculate_influent_load(industries, effl)
+
+    let water_discharged = calculate_water_discharged(industries, only_same_watershed)
+    let streamflow_value = await streamflow(industries, global_layers) //streamflow (m3/day)
+    let water_withdrawn = calculate_surface_water_withdrawn(industries)
+
+
+    let delta = (load_river-load_influent_industry+load_effluent) / (streamflow_value + water_discharged - water_withdrawn)
+
+    if(isNaN(delta)) return "-"
+    return delta.toExponential(3) //g/m3
+}
+
 //Added streamflow of industries
 async function streamflow(industries, global_layers){
 
@@ -766,16 +784,26 @@ let metrics = {
         }
         return concentration
 
-
     },
     // For each pollutant, says the increase of the concentration in the receiving water body due to discharge (g/m3)
     async pollutant_delta(industries, global_layers){
 
         let delta = {}
         for(let pollutant of utils.get_pollutants(industries, false)){
-            delta[pollutant] = await effl_delta(industries, pollutant, global_layers)
+            delta[pollutant] = await effl_delta(industries, pollutant, global_layers, true)
         }
         return delta
+    },
+
+    // For each pollutant, says the concentration of the water in the receiver water body after discharging water (g/m3)
+    async final_water_body_concentration(industries, global_layers){
+
+        let concentration = {}
+        for(let pollutant of utils.get_pollutants(industries, false)){
+            let pollutant_concentration = await concentration_receiving_water_body(industries, pollutant, global_layers, true)
+            concentration[pollutant] = pollutant_concentration
+        }
+        return concentration
 
     },
 
@@ -1246,6 +1274,24 @@ let metrics = {
 
         return toxic_units
     },
+    //tu in the receiving water body due to discharging the water(tu/day)
+    async tu_receiving_water_body(industries, global_layers, only_same_watershed= false){
+
+        let toxic_units = {}
+        for(let pollutant of utils.get_pollutants(industries)){
+            let tu_factor = conversion_factors[pollutant]['tu']
+            let pollutant_concentration = await concentration_receiving_water_body(industries, pollutant, global_layers, only_same_watershed)
+            let tu_receiving_water_body = 1000*pollutant_concentration/tu_factor
+            if(Number.isFinite(tu_receiving_water_body)) toxic_units[pollutant] = tu_receiving_water_body.toExponential(2)
+            else toxic_units[pollutant] = "-"
+
+        }
+
+        if (Object.values(toxic_units).filter(x => x != "-").length == 0) toxic_units["total"] = '-'
+        else toxic_units["total"] = Object.values(toxic_units).sum().toExponential(2)
+
+        return toxic_units
+    },
     async delta_eqs(industries, global_layers, same_watershed = false){ //Increase in the concentration of the receiving water body (compared to EQS) due to  discharging the water(%)
 
         let toxic_units = {}
@@ -1256,6 +1302,23 @@ let metrics = {
 
             if(pollutant_delta == 0) toxic_units[pollutant] = (0).toFixed(3)
             else if(Number.isFinite(delta_eqs)) toxic_units[pollutant] = delta_eqs.toFixed(3)
+            else toxic_units[pollutant] = "-"
+        }
+
+        return toxic_units
+    },
+
+    //Increase in the concentration of the receiving water body (compared to EQS) due to  discharging the water(%)
+    async eqs_receiving_water_body(industries, global_layers, same_watershed = false){
+
+        let toxic_units = {}
+        for(let pollutant of utils.get_pollutants(industries)){
+            let eqs_factor = conversion_factors[pollutant]['eqs']
+            let pollutant_concentration = await concentration_receiving_water_body(industries, pollutant, global_layers, same_watershed)
+            let eqs = 100*pollutant_concentration/eqs_factor
+
+            if(eqs == 0) toxic_units[pollutant] = (0).toFixed(3)
+            else if(Number.isFinite(eqs)) toxic_units[pollutant] = eqs.toFixed(3)
             else toxic_units[pollutant] = "-"
         }
 

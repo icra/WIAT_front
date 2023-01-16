@@ -226,6 +226,16 @@ let inputs_required = {
     effl_delta(){
         return merge_dicts([this.calculate_effluent_load(), this.calculate_water_discharged(), this.calculate_surface_water_withdrawn()])
     },
+
+    final_water_body_concentration(){
+        let industry = ['volume_withdrawn', 'ind_pollutants_infl']
+        let onsite_wwtp = ['wwt_pollutants_effl', 'wwt_vol_disc']
+        let offsite_wwtp = ['wwt_pollutants_effl', 'wwt_vol_disc']
+        let direct_discharge = ['wwt_pollutants_effl', 'dd_vol_disc']
+
+        return {industry, onsite_wwtp, offsite_wwtp, direct_discharge}
+
+    },
     effl_concentration() {
         return merge_dicts([this.calculate_effluent_load(), this.calculate_water_discharged()])
     },
@@ -502,8 +512,8 @@ let industry_impact_legend_category = {
         let inputs = inputs_required.effl_concentration()
         return category_of_inputs(industry, inputs, pollutant)
     },
-    pollutant_delta(industry, pollutant){
-        let inputs = inputs_required.effl_delta()
+    final_water_body_concentration(industry, pollutant){
+        let inputs = inputs_required.final_water_body_concentration()
         return category_of_inputs(industry, inputs, pollutant)
     },
     dilution_factor(industry){
