@@ -428,7 +428,7 @@
                                 text-color="#1c1c1b"
                                 class="chip_no_hover"
                             >
-                              {{ item[industry.name] }}
+                              {{ item.data }}
                             </v-chip>
                           </template>
 
@@ -577,7 +577,7 @@
                                 text-color="#1c1c1b"
                                 class="chip_no_hover"
                             >
-                              {{ item[industry.name] }}
+                              {{ item.data }}
                             </v-chip>
                           </template>
                         </template>
@@ -696,7 +696,7 @@
                                 text-color="#1c1c1b"
                                 class="chip_no_hover"
                             >
-                              {{ item[industry.name] }}
+                              {{ item.value }}
                             </v-chip>
                           </template>
                         </template>
@@ -1851,9 +1851,9 @@
             width="60%"
         >
           <div class="dialog_detail" style="background-color: white">
-            <h3>Consumption available (level of water stress)</h3>
+            <h3>Consumption available ratio (level of water stress)</h3>
             <br>
-            This metric is calculated from the relationship between the volume of consumptive use and the
+            This metric is calculated from the relationship between the volume of consumptive use in the same watershed and the
             amount of water available and multiplied by 100. It indicates the percentage of the available water withdrawn
             by the industry’s consumption. This metric may have values ranging from 0, to a value greater than 100,
             indicating that the demand for water is higher than the available.
@@ -1871,7 +1871,7 @@
             <ul>
               <li><span v-katex="'W_s'"></span>: Consumption available</li>
               <li><span v-katex="'W_w'"></span>: Amount of water withdrawn</li>
-              <li><span v-katex="'W_e'"></span>: Amount of water than comes from external sources</li>
+              <li><span v-katex="'W_e'"></span>: Amount of water that comes from external sources located in the same watershed where water was withdrawn</li>
               <li><span v-katex="'W_{d}'"></span>: Water discharged at the same watershed where the water is withdrawn</li>
               <li><span v-katex="'W_c'"></span>: Water consumptive use. Until Science based targets are set, the tool assumes that the discharge should be equal or better than the EQS to be considered “non-consumptive”.</li>
               <li><span v-katex="'W_a'"></span>: amount of water available on the river <b>(streamflow global
@@ -1894,6 +1894,20 @@
         </v-dialog>
 
         <v-dialog
+            v-model="info_consumptive_use_different_watersheds"
+            width="60%"
+        >
+          <div class="dialog_detail" style="background-color: white">
+            <h3>Consumptive use from different watersheds</h3>
+            <br>
+            Amount of water that comes from external sources (e.g. purshased) located in different watersheds where water was withdrawn
+
+          </div>
+
+        </v-dialog>
+
+
+        <v-dialog
             v-model="info_specific_consumption"
             width="60%"
         >
@@ -1901,8 +1915,8 @@
             <h3>Specific water consumption </h3>
             <br>
             Specific water consumption is a metric that indicates what is the amount of water consumed needed
-            to produce a tone of product manufactured in the industry. Higher values indicate higher water demand.
-            <div v-katex:display="'SWC = \\frac{W_c}{T_{ppi}}'"></div>
+            to produce one unit of the user's specified product (by default, tonnes). Higher values indicate higher water demand.
+            <div v-katex:display="'SWC = \\frac{W_c}{A}'"></div>
 
 
             <span v-katex:display="'\\begin{cases}\n'+
@@ -1916,7 +1930,7 @@
             <br>
             <ul>
               <li><span v-katex="'SWC'"></span>: Specific water consumption</li>
-              <li><span v-katex="'T_{ppi}'"></span>: tons of product produced by the industry</li>
+              <li><span v-katex="'A'"></span>: amount of {{industry.product_produced_unit}}</li>
               <li><span v-katex="'W_{w}'"></span>: Water withdrawn (both superficial and groundwater)</li>
               <li><span v-katex="'W_{d}'"></span>: Water discharged at the same watershed where the water is withdrawn</li>
               <li><span v-katex="'W_e'"></span>: Amount of water than comes from external sources</li>
@@ -2829,8 +2843,8 @@
             <br>
             <ul>
               <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water</li>
-              <li><span v-katex="this.selected_pollutant+'_{effl}'"></span>: load of {{ selected_pollutant }} in the effluent</li>
-              <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body</li>
+              <li><span v-katex="this.selected_pollutant+'_{effl}'"></span>: load of {{ selected_pollutant }} in the industry effluent (except ocean discharges)</li>
+              <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body (except ocean discharges)</li>
               <li><span v-katex="'EQ_{'+this.selected_pollutant+'}'"></span>: conversion of {{ selected_pollutant }} to PO4 equivalent (<b> {{this.conversion_factors[this.selected_pollutant]['eutrophication']}}gPO4eq/g{{selected_pollutant}} </b>)</li>
 
             </ul>
@@ -3098,15 +3112,15 @@
             <b>Where:</b>
             <br>
             <ul>
-              <li><span v-katex="'C'"></span>: Concentration of {{ this.selected_pollutant }} in the receiving water body after discharging water (g/m3)</li>
-              <li><span v-katex="'C_{effl}'"></span>: Concentration of {{ this.selected_pollutant }} in the industry effluent after treatment in the WWTP (g/m3)</li>
-              <li><span v-katex="'\\Delta'"></span>: Increase of the concentration in the receiving water body after discharge (g/m3)</li>
-              <li><span v-katex="'TU'"></span>: Toxic Units in the industry effluent aims to calculate how toxic is industry effluent for ecosystem</li>
+              <li><span v-katex="'C'"></span>: Concentration of {{ this.selected_pollutant }} in the same water body where water was withdrawn after discharging water (g/m3)</li>
+              <li><span v-katex="'C_{effl}'"></span>: Concentration of {{ this.selected_pollutant }} in the industry effluent after treatment in the WWTP (only the part that is being discharged in the same water body where water was withdrawn) (g/m3)</li>
+              <li><span v-katex="'\\Delta'"></span>: Increase of the concentration in the water body where water was withdrawn after industry discharge (g/m3)</li>
+              <li><span v-katex="'TU'"></span>: Toxic Units in the industry effluent aims to calculate how toxic is industry effluent for ecosystem </li>
               <li><span v-katex="'EQS'"></span>: Enviromental Quality Standards are the limits approved by the EU's Water Framework Directive</li>
 
               <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water</li>
               <li><span v-katex="this.selected_pollutant+'_{effl}'"></span>: load of pollutant in the effluent</li>
-              <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body</li>
+              <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the same water body where water was withdrawn</li>
               <li><span v-katex="'W_{a}'"></span>: amount of water available in the river <b>(streamflow global
                 indicator)</b></li>
               <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river</li>
@@ -3323,6 +3337,7 @@ export default {
       info_treated_factor: false,
       info_water_stress: false,
       info_groundwater_decline: false,
+      info_consumptive_use_different_watersheds: false,
       info_specific_consumption: false,
       info_consumptive_use: false,
       info_consumptive_use_percentage: false,
@@ -4871,10 +4886,18 @@ export default {
         }
         let gw_decline = {
           name: "Groundwater withdrawals (only in areas with GW decline)",
-          unit: "M3/year",
+          unit: "m3/day",
           info: "info_groundwater_decline",
           value: await metrics.groundwater_withdrawals_in_high_groundwater_decline(industries, this.global_layers),
           data: this.get_string_impact_legend(industry_impact_legend_category.groundwater_withdrawals_in_high_groundwater_decline(industries[0]))
+        }
+
+        let consumption_available_different_watersheds = {
+          name: "Consumptive use from different watersheds",
+          unit: "m3/day",
+          info: "info_consumptive_use_different_watersheds",
+          value: metrics.external_sources_from_other_watersheds(industries),
+          data: this.get_string_impact_legend(industry_impact_legend_category.external_sources_from_other_watersheds(industries[0]))
         }
 
 
@@ -4952,6 +4975,7 @@ export default {
         //pollutants_table.value.push(recycled_factor)
         //pollutants_table.value.push(treated_factor)
         pollutants_table.value.push(available_ratio)
+        pollutants_table.value.push(consumption_available_different_watersheds)
         //pollutants_table.value.push(efficiency_factor)
         //pollutants_table.value.push(water_quality_standards)
         pollutants_table.value.push(gw_decline)
@@ -4988,17 +5012,17 @@ export default {
         }
         let efficiency_factor = {
           name: _this.table_title.availability_quantity.specific_water_consumption,
-          unit: "m3/tonnes",
+          unit: "m3/"+industries[0].product_produced_unit,
           info: "info_specific_consumption",
           value: await metrics.efficiency_factor(industries, this.global_layers),
           data: this.get_string_impact_legend(industry_impact_legend_category.efficiency_factor(industries[0]))
         }
         let net_consumptive_use = {
           name: "Net consumptive use",
-          unit: "m3/year",
+          unit: "m3/day",
           info: "info_consumptive_use",
           value: await metrics.net_consumptive_use(industries, this.global_layers),
-          data: this.get_string_impact_legend(industry_impact_legend_category.net_consumptive_use(industries[0]))
+          data: this.get_string_impact_legend(industry_impact_legend_category.net_consumptive_use_all_watersheds(industries[0]))
         }
         let net_consumptive_use_percentatge = {
           name: "Percentage of water withdrawn for consumptive use",

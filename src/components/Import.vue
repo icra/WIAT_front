@@ -276,8 +276,7 @@ export default {
         "wwt_cod_infl_ind", "wwt_tn_infl_ind", "wwt_tp_infl_ind", "wwt_diclo_infl_ind", "wwt_cadmium_infl_ind", "wwt_hexaclorobenzene_infl_ind", "wwt_mercury_infl_ind", "wwt_plomo_infl_ind", "wwt_niquel_infl_ind", "wwt_chloro_infl_ind", "wwt_hexaclorobutadie_infl_ind", "wwt_nonilfenols_infl_ind", "wwt_tetracloroetile_infl_ind", "wwt_tricloroetile_infl_ind",
         "wwt_cod_effl", "wwt_tn_effl", "wwt_tp_effl", "wwt_diclo_effl", "wwt_cadmium_effl", "wwt_hexaclorobenzene_effl", "wwt_mercury_effl", "wwt_plomo_effl", "wwt_niquel_effl", "wwt_chloro_effl", "wwt_hexaclorobutadie_effl", "wwt_nonilfenols_effl", "wwt_tetracloroetile_effl", "wwt_tricloroetile_effl",
       ],
-      pollutants_from_older_version: ["COD", "TN", "TP",  "1,2-Dichloroethane", "Cadmium", "Hexaclorobenzene", "Mercury", "Lead",
-        "Nickel", "Chloroalkanes", "Hexachlorobutadiene", "Nonylphenols", "Tetrachloroethene", "Trichloroethylene"]
+      pollutants_from_older_version: utils.pollutants_from_older_version
     }
 
   },
@@ -956,6 +955,10 @@ export default {
 
             else if (key == "pollutants_selected"){
               new_industry["pollutants_selected"] = this.pollutants_from_older_version
+            }
+
+            else if (key == "product_produced_unit"){
+              new_industry[key] = 'tonnes'
             }
 
             else {

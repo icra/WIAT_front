@@ -125,6 +125,24 @@
             mdi-pencil
           </v-icon>
         </template>
+        <template v-slot:item.warning="{ item }">
+          <v-tooltip left v-if="item.warning != ''" max-width="500">
+            <template v-slot:activator="{ on, attrs }">
+              <v-icon
+                  small
+                  class="mr-2"
+                  v-bind="attrs"
+                  v-on="on"
+                  color="#b62373"
+              >
+                {{ item.warning }}
+              </v-icon>
+
+            </template>
+            <span><b>Warning</b>: note that the EQS values are impact threshold values (universal) and not regulatory compliance values (locally defined). WBCSD recommends to not modify the EQS values, as they correspond to the stream quality needed for healthy ecosystems. These values apply to oceans or rivers (for more on EQS, refer to our Methodology document).</span>
+          </v-tooltip>
+        </template>
+
         <template v-slot:no-data>
           <br>
           <h2>Create industries first!</h2>
@@ -162,6 +180,8 @@ export default {
         { text: 'EC50 (μg/L)', value: 'tu' },
         //{ text: 'Conversion factor to gPO4eq/m3 (Eutrophication potential)', value: 'eutrophication' },
         { text: 'Edit', value: 'actions', sortable: false },
+        { text: '', value: 'warning', sortable: false },
+
       ],
       pollutants: [],
       search: '',
@@ -209,6 +229,8 @@ export default {
               eqs: conversion_factors[pollutant]['eqs'],
               tu: conversion_factors[pollutant]['tu'],
               //eutrophication: conversion_factors[pollutant]['eutrophication']
+              //Pollutant in list
+              warning: utils.pollutants_from_older_version.includes(pollutant) ? 'mdi-alert' : ''
             }
       ))
 

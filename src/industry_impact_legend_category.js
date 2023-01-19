@@ -144,8 +144,22 @@ let inputs_required = {
         return {industry, onsite_wwtp, offsite_wwtp, direct_discharge}
     },
 
-    calculate_external_sources(){
-        let industry = ['volume_external_sources']
+    calculate_external_sources_same_watershed(){
+        let industry = ['volume_external_same_watershed_sources']
+        let onsite_wwtp = []
+        let offsite_wwtp = []
+        let direct_discharge = []
+        return {industry, onsite_wwtp, offsite_wwtp, direct_discharge}
+    },
+    calculate_external_sources_different_watershed(){
+        let industry = ['volume_external_different_sources']
+        let onsite_wwtp = []
+        let offsite_wwtp = []
+        let direct_discharge = []
+        return {industry, onsite_wwtp, offsite_wwtp, direct_discharge}
+    },
+    calculate_all_external_sources(){
+        let industry = ['volume_external_same_watershed_sources', 'volume_external_different_sources']
         let onsite_wwtp = []
         let offsite_wwtp = []
         let direct_discharge = []
@@ -517,11 +531,17 @@ let industry_impact_legend_category = {
         return category_of_inputs(industry, inputs, pollutant)
     },
     dilution_factor(industry){
-        return this.net_consumptive_use(industry)
+        let water_withdrawn = inputs_required.calculate_water_withdrawn()
+        let water_discharged = inputs_required.calculate_water_discharged()
+
+        return Math.max(
+            category_of_inputs(industry, water_withdrawn),
+            category_of_inputs(industry, water_discharged),
+        )
     },
     //Consumption available ratio
     available_ratio(industry){
-        return this.net_consumptive_use(industry)
+        return this.net_consumptive_use_same_watershed(industry)
     },
     recycled_water_factor(industry){
         let water_generated_inputs = inputs_required.calculate_water_generated()
@@ -536,15 +556,33 @@ let industry_impact_legend_category = {
         let product_produced = inputs_required.calculate_product_produced()
         return Math.max(
             category_of_inputs(industry, product_produced),
-            this.net_consumptive_use(industry)
+            this.net_consumptive_use_all_watersheds(industry)
         )
     },
     // Consumptive use
-    net_consumptive_use(industry){
+    net_consumptive_use_same_watershed(industry){
         let effluent_pollutant_load = inputs_required.calculate_effluent_load()
         let water_withdrawn = inputs_required.calculate_water_withdrawn()
         let water_discharged = inputs_required.calculate_water_discharged()
-        let external_sources = inputs_required.calculate_external_sources()
+        let external_sources = inputs_required.calculate_external_sources_same_watershed()
+
+        let pollutants = industry.pollutants_selected
+
+        let level_certainty_pollutants = pollutants.map(pollutant => category_of_inputs(industry, effluent_pollutant_load, pollutant))
+
+        return Math.max(
+            ...level_certainty_pollutants,
+            category_of_inputs(industry, water_withdrawn),
+            category_of_inputs(industry, water_discharged),
+            category_of_inputs(industry, external_sources)
+        )
+    },
+
+    net_consumptive_use_all_watersheds(industry){
+        let effluent_pollutant_load = inputs_required.calculate_effluent_load()
+        let water_withdrawn = inputs_required.calculate_water_withdrawn()
+        let water_discharged = inputs_required.calculate_water_discharged()
+        let external_sources = inputs_required.calculate_all_external_sources()
 
         let pollutants = industry.pollutants_selected
 
@@ -659,8 +697,15 @@ let industry_impact_legend_category = {
         return category_of_inputs(industry, inputs)
     },
     net_consumptive_use_percentage(industry){
-        return this.net_consumptive_use(industry)
-    }
+        return this.net_consumptive_use_all_watersheds(industry)
+    },
+    external_sources_from_other_watersheds(industry){
+        let inputs = inputs_required.calculate_external_sources_different_watershed(industry)
+        return category_of_inputs(industry, inputs)
+
+    },
+
+
 
 }
 

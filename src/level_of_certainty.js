@@ -36,7 +36,7 @@ let level_of_certainty = {
             'direct_discharge', 'has_direct_discharge', 'pollutants_selected', 'level_of_certainty', 'industry_type', 'supply_chain',
             'wwt_treatment_type', 'wwt_fuel_typ', 'wwt_dige_typ', 'wwt_reus_trck_typ',
             'wwt_slu_comp_emis_treated_or_piles_covered', 'wwt_slu_inc_SNCR', 'wwt_trck_typ',
-            'discharge_same_location_as_withdrawal'
+            'discharge_same_location_as_withdrawal', 'product_produced_unit'
 
         ]),
 

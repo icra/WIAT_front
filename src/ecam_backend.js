@@ -69,7 +69,9 @@ export class Industry{
         this.has_offsite_wwtp = null
         this.volume_withdrawn = null   //Amount of superficial water withdrawn from the wb per day(m3/day)
         this.volume_withdrawn_groundwater = 0   //Amount of groundwater water withdrawn from the wb per day(m3/day)
-        this.volume_external_sources = 0   //Amount of water from external sources per day(m3/day)
+        this.volume_external_same_watershed_sources = 0   //Amount of water from external sources per day(m3/day)
+        this.volume_external_different_sources = 0   //Amount of water from external sources per day(m3/day)
+
         this.has_direct_discharge = null
         this.industry_type = null
 
@@ -87,6 +89,7 @@ export class Industry{
 
         this.pollutants_selected = ["COD", "TN", "TP"]
         this.product_produced = null
+        this.product_produced_unit = 'tonnes'
         this.supply_chain = []  //Suppliers
 
         this.level_of_certainty = level_of_certainty.set_level_of_certainty(this, 1, true)
@@ -232,7 +235,7 @@ export class Industry{
     //Adds load of pollutant from onsite WWTP (after being treated), offsite WWTP (after being treated) and directly discharged water
     //if only_same_watershed is true, only loads from the same watershed are added
     effl_pollutant_load(pollutant, only_same_watershed = false){
-        let load = 0
+        /*let load = 0
         if(this.has_onsite_wwtp == 1) {
 
             let concentration = 0
@@ -262,7 +265,50 @@ export class Industry{
             }
 
         }
+        return load*/
+        return this._effl_pollutant_load(pollutant, only_same_watershed, only_same_watershed)
+    }
+
+    //Adds load of pollutant from onsite WWTP (after being treated), offsite WWTP (after being treated) and directly discharged water
+    //Accounts only for discharges that are not in ocean
+    effl_pollutant_load_not_ocean(pollutant){
+        return this._effl_pollutant_load(pollutant, false, true)
+    }
+
+    _effl_pollutant_load(pollutant, ignore_different_watershed = false, ignore_ocean = false){
+        let load = 0
+        if(this.has_onsite_wwtp == 1) {
+
+            let concentration = 0
+            if(this.onsite_wwtp.wwt_pollutants_effl.hasOwnProperty(pollutant)){
+                concentration = this.onsite_wwtp.wwt_pollutants_effl[pollutant]
+            }
+            if ((!ignore_different_watershed || this.onsite_wwtp.discharge_same_location_as_withdrawal != 0) && (!ignore_ocean || this.onsite_wwtp.discharge_same_location_as_withdrawal != 2)){
+                load += concentration * this.onsite_wwtp.wwt_vol_disc // g/day
+            }
+        }
+        if(this.has_direct_discharge == 1) {
+            let concentration = 0
+            if(this.direct_discharge.wwt_pollutants_effl.hasOwnProperty(pollutant)){
+                concentration = this.direct_discharge.wwt_pollutants_effl[pollutant]
+            }
+            if ((!ignore_different_watershed || this.direct_discharge.discharge_same_location_as_withdrawal != 0) && (!ignore_ocean || this.direct_discharge.discharge_same_location_as_withdrawal != 2)){
+                load += concentration  *  this.direct_discharge.dd_vol_disc  // g/day
+            }
+        }
+        if(this.has_offsite_wwtp == 1){
+            let concentration = 0
+            if(this.offsite_wwtp.wwt_pollutants_effl.hasOwnProperty(pollutant)){
+                concentration = this.offsite_wwtp.wwt_pollutants_effl[pollutant]
+            }
+            if ((!ignore_different_watershed || this.offsite_wwtp.discharge_same_location_as_withdrawal != 0) && (!ignore_ocean || this.offsite_wwtp.discharge_same_location_as_withdrawal != 2)){
+                load += concentration * this.offsite_wwtp.wwt_vol_disc  // g/day
+            }
+
+        }
         return load
+
+
     }
 
     //Load of pollutant from the surface water withdrawn by the industry
@@ -280,7 +326,6 @@ export class Industry{
         if (this.ind_pollutants_infl.hasOwnProperty(pollutant)) return this.ind_pollutants_infl[pollutant]
         else return 0
     }
-
 
     //Adds load of pollutant from onsite WWTP (before being treated), offsite WWTP (before being treated) and directly discharged water
     generated_pollutant_load(pollutant){
@@ -313,7 +358,7 @@ export class Industry{
     //Water discharged by the industry
     //if only_same_watershed is true, only discharges in same watershed where water was withdrawn are added
     water_discharged(only_same_watershed = false){
-        let water_discharged = 0
+        /*let water_discharged = 0
         if(this.has_onsite_wwtp == 1) {
             if (!only_same_watershed || this.onsite_wwtp.discharge_same_location_as_withdrawal == 1){
                 water_discharged += this.onsite_wwtp.wwt_vol_disc
@@ -328,6 +373,29 @@ export class Industry{
             if (!only_same_watershed || this.offsite_wwtp.discharge_same_location_as_withdrawal == 1){
                 water_discharged += this.offsite_wwtp.wwt_vol_disc
 
+            }
+        } //m3/day*/
+        return this._water_discharged(only_same_watershed, only_same_watershed)
+    }
+
+    water_discharged_not_ocean(){
+        return this._water_discharged(false, true)
+    }
+    _water_discharged(ignore_different_watershed = false, ignore_ocean = false){
+        let water_discharged = 0
+        if(this.has_onsite_wwtp == 1) {
+            if ((!ignore_different_watershed || this.onsite_wwtp.discharge_same_location_as_withdrawal != 0) && (!ignore_ocean || this.onsite_wwtp.discharge_same_location_as_withdrawal != 2)){
+                water_discharged += this.onsite_wwtp.wwt_vol_disc
+            }
+        }  //m3/day
+        if(this.has_direct_discharge == 1) {
+            if ((!ignore_different_watershed || this.direct_discharge.discharge_same_location_as_withdrawal != 0) && (!ignore_ocean || this.direct_discharge.discharge_same_location_as_withdrawal != 2)){
+                water_discharged += this.direct_discharge.dd_vol_disc
+            }
+        } //m3/day
+        if(this.has_offsite_wwtp == 1) {
+            if ((!ignore_different_watershed || this.offsite_wwtp.discharge_same_location_as_withdrawal != 0) && (!ignore_ocean || this.offsite_wwtp.discharge_same_location_as_withdrawal != 2)){
+                water_discharged += this.offsite_wwtp.wwt_vol_disc
             }
         } //m3/day
         return water_discharged
@@ -382,8 +450,14 @@ export class Industry{
     }
 
     //external sources
-    volume_of_external_sources() {
-        return this.volume_external_sources == null ? 0 : this.volume_external_sources
+    volume_of_external_sources_same_watershed() {
+        return this.volume_external_same_watershed_sources == null ? 0 : this.volume_external_same_watershed_sources
+    }
+    volume_of_external_sources_different_watershed() {
+        return this.volume_external_different_sources == null ? 0 : this.volume_external_different_sources
+    }
+    volume_all_external_sources() {
+        return this.volume_of_external_sources_same_watershed() + this.volume_of_external_sources_different_watershed()
     }
     //Amount of water treated by onsite and external WWTP
     volume_of_water_treated(){
@@ -1164,6 +1238,12 @@ export let Tables={
     "Yes/No":[
         {text:"No", value: 0},
         {text:"Yes", value: 1},
+    ],
+
+    "Same Watershed/Different watershed/Ocean discharges": [
+        {text:"Different watershed", value: 0},
+        {text:"Same watershed", value: 1},
+        {text:"Ocean discharges", value: 2},
     ],
 
 };

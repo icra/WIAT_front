@@ -145,9 +145,8 @@
                         <v-col cols="7" >
                           <div style="width: 100%;">
                             <div style="height: 100%; width: 100%;  display: flex; justify-content: space-between; max-width: 90%">
-                            <span>
+                              <span>
                               Concentration of {{pollutant}} in the WWTP effluent
-                            </span>
                               <v-tooltip bottom v-if="user_inputs['wwt_pollutants_effl'].hasOwnProperty('description_tooltip')">
                                 <template v-slot:activator="{ on, attrs }">
                                   <v-icon
@@ -161,6 +160,9 @@
                                 </template>
                                 <span>{{ user_inputs['wwt_pollutants_effl']['description_tooltip'] }}</span>
                               </v-tooltip>
+
+
+                            </span>
 
                               <v-btn v-if="button_estimation.includes('wwt_pollutants_effl') && !isNaN(button_estimations('wwt_pollutants_effl', pollutant)) && button_estimations('wwt_pollutants_effl', pollutant) != null"
                                      tile

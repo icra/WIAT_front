@@ -236,7 +236,7 @@ export let user_inputs = {
     "wwt_vol_disc" :{question:"Volume of water discharged to water body every day", value: 0, unit: "m3/day"},
     "dd_vol_disc" :{question:"Volume of water discharged to water body every day (direct discharge of untreated water)", value: 0, unit: "m3/day"},
 
-    "wwt_pollutants_effl": {value: 0, unit: "g/m3"},
+    "wwt_pollutants_effl": {value: 0, unit: "g/m3", description_tooltip: 'Select "Estimated" level of certainty if the non-detect value is used'},
 
     //energy
     "wwt_nrg_cons": {question: "Electricity consumed from the grid for wastewater treatment per cubic meter treated", value: 0, unit: "kWh/m3"},  //kWh | energy consumed from the grid
@@ -290,41 +290,26 @@ export let user_inputs = {
     //INDUSTRY INPUTS
     "volume_withdrawn": {question: "Industry withdrawal water quantity (surface water only)", value: 0, unit: "m3/day", description_tooltip:"The quantity entered here is the quantity withdrawn from the river (raw water intake)"},
     "volume_withdrawn_groundwater": {question: "Industry withdrawal water quantity (groundwater only)", value: 0, unit: "m3/day"},
-    "volume_external_sources": {question: "All other external sources of water", value: 0, unit: "m3/day", description_tooltip: "The quantity entered here is the quantity of water withdrawn from other sources (e.g. recycled water from a third party, drinking water purchased from the municipality, etc.)"},
+    "volume_external_same_watershed_sources": {question: "All other external sources of water from the same watershed from which the water was withdrawn.", value: 0, unit: "m3/day", description_tooltip: "The quantity entered here is the quantity of water withdrawn from other sources (e.g. recycled water from a third party, drinking water purchased from the municipality, etc.) from the same watershed from which the water was withdrawn"},
+    "volume_external_different_sources": {question: "All other external sources of water from different watersheds from where the water was withdrawn", value: 0, unit: "m3/day", description_tooltip: "The quantity entered here is the quantity of water withdrawn from other sources (e.g. recycled water from a third party, drinking water purchased from the municipality, etc.) from different watersheds from where the water was withdrawn"},
 
     "has_onsite_wwtp": {question: "Has the industry an on-site wastewater pre-treatment or treatment plant?", value: false,},
     "has_direct_discharge": {question: "Does the industry directly discharge wastewater effluent (without treatment) into the water body?", value: false, description_tooltip: "Untreated water"},
     "has_offsite_wwtp": {question: "Does the industry discharge to an off-site treatment wastewater plant?", value: false,},
     "offsite_wwtp_type": {question: "Off-site treatment wastewater plant type", value: null,},
     "industry_type": {question: "Standard industrial classification", value: null,},
-    "product_produced": {question: "Amount of product produced by the industry", value: 0, unit: "tonnes/day"},
-    "ind_cod_infl": {question: "Industry withdrawal water COD concentration (surface water only)", value: 0, unit: "g/m3"},
-    "ind_tn_infl": {question: "Industry withdrawal water TN concentration (surface water only)", value: 0, unit: "g/m3"},
-    "ind_tp_infl": {question: "Industry withdrawal water TP concentration (surface water only)", value: 0, unit: "g/m3"},
+    "product_produced_unit": {question: 'Specify a unit for calculating "Specific water consumption" metric (e.g. $)', value: 0, description_tooltip: '"Specific water consumption" indicates the amount of water used per what is produced. For example, if the industry produces 1000 products per day, and the water consumption is 1000 m3/day, the specific water consumption is 1 m3/unit of product produced. The unit of product produced can be anything, e.g. $, kg, m3, etc.'},
+    "product_produced": {question: "Based on your units above, specify the amount per day", value: 0, unit: "units/day", description_tooltip: "The quantity entered here is the amount of units per day. Used on the denominator of the specific water consumption calculation"},
 
-    "ind_cod_effl": {question: "Concentration of COD in the industry effluent", value: 0, unit: "g/m3"},
-    "ind_tn_effl": {question: "Concentration of Total Nitrogen in the industry effluent", value: 0, unit: "g/m3"},
-    "ind_tp_effl": {question: "Concentration of Total Phosphorus in the industry effluent", value: 0, unit: "g/m3"},
-    "ind_diclo_effl": {question: "Concentration of 1,2-Dichloroethane in the industry effluent", value: 0, unit: "g/m3"},
-    "ind_cadmium_effl": {question: "Concentration of cadmium in the industry effluent", value: 0, unit: "g/m3"},
-    "ind_hexaclorobenzene_effl": {question: "Concentration of hexachlorobenzene in the industry effluent", value: 0, unit: "g/m3"},
-    "ind_mercury_effl": {question: "Concentration of mercury in the industry effluent", value: 0, unit: "g/m3"},
-    "ind_plomo_effl": {question: "Concentration of lead in the industry effluent", value: 0, unit: "g/m3"},
-    "ind_niquel_effl": {question: "Concentration of nickel in the industry effluent", value: 0, unit: "g/m3"},
-    "ind_chloro_effl": {question: "Concentration of chloroalkanes in the industry effluent", value: 0, unit: "g/m3"},
-    "ind_hexaclorobutadie_effl": {question: "Concentration of hexachlorobutadiene in the industry effluent", value: 0, unit: "g/m3"},
-    "ind_nonilfenols_effl": {question: "Concentration of nonylphenols in the industry effluent", value: 0, unit: "g/m3"},
-    "ind_tetracloroetile_effl": {question: "Concentration of tetrachloroethene in the industry effluent", value: 0, unit: "g/m3"},
-    "ind_tricloroetile_effl": {question: "Concentration of trichloroethylene in the industry effluent", value: 0, unit: "g/m3"},
-    "ind_pollutants_effl": {value: 0, unit: "g/m3"},
-    "ind_pollutants_infl": {value: 0, unit: "g/m3"},
+    "ind_pollutants_effl": {value: 0, unit: "g/m3", description_tooltip: 'Select "Estimated" level of certainty if the non-detect value is used'},
+    "ind_pollutants_infl": {value: 0, unit: "g/m3", description_tooltip: 'Select "Estimated" level of certainty if the non-detect value is used'},
 
 
 
 }
 
 //Inputs related to industry step
-export let industry_inputs = ["volume_withdrawn", "volume_withdrawn_groundwater", "volume_external_sources", "has_onsite_wwtp", "has_direct_discharge", "has_offsite_wwtp", "industry_type", "product_produced", "pollutants_list", "ind_pollutants_effl", "ind_pollutants_infl"]
+export let industry_inputs = ["volume_withdrawn", "volume_withdrawn_groundwater", "volume_external_same_watershed_sources", "volume_external_different_sources", "has_onsite_wwtp", "has_direct_discharge", "has_offsite_wwtp", "industry_type", "product_produced_unit", "product_produced", "pollutants_list", "ind_pollutants_effl", "ind_pollutants_infl"]
 
 //Inputs related to onsite WWTP step (without external WWTP)
 export let onsite_wwtp_no_offsite = ["wwt_treatment_type", "wwt_vol_trea", "wwt_vol_disc", "wwt_vol_reused", "discharge_same_location_as_withdrawal", "wwt_pollutants_effl", "wwt_nrg_cons", "wwt_conv_kwh", "wwt_mass_slu", "wwt_cod_slud", "wwt_ch4_efac_tre", "wwt_n2o_efac_tre", "wwt_ch4_efac_dis", "wwt_n2o_efac_dis", "wwt_fuel_typ", "wwt_vol_fuel",

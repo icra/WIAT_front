@@ -930,7 +930,7 @@ export default {
         assessment_not_selected: {v_model: false, text: "Can't create industry, please select and assessment first", },
         create_industry_not_in_map: {v_model: false, text: "Can't create industry, please return to the map tab and try again", },
         place_supply_chain: {v_model: false, text: "Please, indicate the location of the supplier on the map"},
-        new_supply_chain: {v_model: false, text: "supplier added", },
+        new_supply_chain: {v_model: false, text: "New supplier added", },
         wrong_location: {v_model: false, text: "Please select a valid location", },
         edit_sc: {v_model: false, text: "supplier edited correctly", },
 
@@ -1043,11 +1043,15 @@ export default {
 
       _this.$location_markers.push(marker)
 
+
       try {
         this.$refs.reference.close_supply_chain_mode()
         this.$refs.reference.industry_created()
 
       } catch (error) {}
+
+      this.open_edit_industry_tab(this.assessment_expansion_panel, this.selected_industry)
+
     },
 
 
@@ -1239,12 +1243,12 @@ export default {
         this.snackbars.new_industry.v_model = true
         this.$refs.reference.industry_created()
         this.secondMenu = false
-        this.open_edit_industry_tab(assessment, assessment.industries.length)
+        this.open_edit_industry_tab(this.assessment_expansion_panel, assessment.industries.length-1)
       }else {
         this.snackbars.create_industry_not_in_map.v_model = true
       }
-      this.rightMenu = false
-      this.factory_name = null
+      //this.rightMenu = false
+      //this.factory_name = null
 
     },
     open_edit_industry_tab(assessment_index, industry_index){

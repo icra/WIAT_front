@@ -18,7 +18,7 @@
                 <span>
                   {{user_inputs[industry_input].question}}
                 </span>
-                <v-tooltip bottom v-if="user_inputs[industry_input].hasOwnProperty('description_tooltip')">
+                <v-tooltip max-width="700" bottom v-if="user_inputs[industry_input].hasOwnProperty('description_tooltip')">
                   <template v-slot:activator="{ on, attrs }">
                     <v-icon
                         v-bind="attrs"
@@ -88,6 +88,19 @@
               <span v-else>
                 <!-- Text response -->
                 <v-text-field
+                    v-if="industry_input == 'product_produced_unit'"
+                    v-model="industry_model[industry_input]"
+                    :rules="required_item_text_rule(industry_input)"
+                ></v-text-field>
+                <v-text-field
+                    v-else-if="industry_input == 'product_produced'"
+                    v-model="industry_model[industry_input]"
+                    :suffix="industry_model['product_produced_unit']+'/day'"
+                    type="number"
+                    :rules="required_item_text_rule(industry_input)"
+                ></v-text-field>
+                <v-text-field
+                    v-else
                     v-model="industry_model[industry_input]"
                     :suffix=user_inputs[industry_input].unit
                     type="number"
