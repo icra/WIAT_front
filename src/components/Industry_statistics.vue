@@ -3803,19 +3803,7 @@ export default {
     },
 
     getDataTypeColor(item){
-      if(item.data == "User data") {
-        return ["#76FF03", 'All inputs have been entered with user data.']
-      }
-      else if(item.data == "Estimated") {
-        return ["#1DE9B6", 'All the inputs have been introduced, but at least one is estimated']
-      }
-      else if (item.data == "Modeled") {
-        return ["#D500F9", 'All the inputs have been introduced, but at least one is modeled']
-      }
-      else if (item.data == "Insufficient data") {
-        return ["#F50057", 'Of all the inputs, at least one is not entered']
-      }
-      return null
+      return utils.getDataTypeColor(item.data)
     },
 
     //Bold item if hovered
@@ -5280,16 +5268,7 @@ export default {
       ID = Insufficient Data = 4
      */
     get_string_impact_legend(value){
-      if (value == 1){
-        return "User data"
-      }
-      else if (value == 2){
-        return "Modeled"
-      }
-      else if (value == 3){
-        return "Estimated"
-      }
-      else return "Insufficient data"
+      return utils.get_string_impact_legend(value)
     },
 
     created_function(){

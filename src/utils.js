@@ -20,6 +20,41 @@ function sumObjectsByKey(...objs) {
  */
 let utils = {
 
+    /*Gets the string equivalent to the input
+  UD = User Data = 1
+  Mo = Modeled = 2
+  Es = Estimated = 3
+  ID = Insufficient Data = 4
+ */
+    get_string_impact_legend(value){
+        if (value == 1){
+            return "User data"
+        }
+        else if (value == 2){
+            return "Modeled"
+        }
+        else if (value == 3){
+            return "Estimated"
+        }
+        else return "Insufficient data"
+    },
+
+    getDataTypeColor(item){
+        if(item == "User data") {
+            return ["#76FF03", 'All inputs have been entered with user data.']
+        }
+        else if(item == "Estimated") {
+            return ["#1DE9B6", 'All the inputs have been introduced, but at least one is estimated']
+        }
+        else if (item == "Modeled") {
+            return ["#D500F9", 'All the inputs have been introduced, but at least one is modeled']
+        }
+        else if (item == "Insufficient data") {
+            return ["#F50057", 'Of all the inputs, at least one is not entered']
+        }
+        return null
+    },
+
     //Complete list of pollutants for which we have performed estimations
     pollutants_from_older_version: ["COD", "TN", "TP",  "1,2-Dichloroethane", "Cadmium", "Hexaclorobenzene", "Mercury", "Lead",
         "Nickel", "Chloroalkanes", "Hexachlorobutadiene", "Nonylphenols", "Tetrachloroethene", "Trichloroethylene"],

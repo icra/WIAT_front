@@ -791,6 +791,7 @@ import external_indicators from "../external_indicators"
 
 import colors from "../colors"
 import risk_thereshold from "..//risk_categories"
+import {industry_impact_legend_category} from "@/industry_impact_legend_category";
 
 export default {
   name: "Make_report",
@@ -1418,6 +1419,11 @@ export default {
       return color == null ? null : color[0]
     },
 
+
+    get_impact(color){
+      return color == null ? null : color[1]
+    },
+
     industries_deleted(){ //An industry or assessment has been deleted
 
       let _this = this
@@ -1436,10 +1442,10 @@ export default {
           _this.cdp_1_2_i = _this.generate_cdp_1_2_i_table()
           _this.cdp_1_2_j = _this.generate_cdp_1_2_j_table()
           _this.cdp_2_1_a = await _this.generate_cdp_2_1_a_table()
-          _this.gri_303_3= await _this.generate_gri_303_3_table()
-          _this.gri_clause_2_2_1= await _this.generate_gri_clause_2_2_1_table()
+          _this.gri_303_3 = await _this.generate_gri_303_3_table()
+          _this.gri_clause_2_2_1 = await _this.generate_gri_clause_2_2_1_table()
 
-          _this.gri_303_4= await _this.generate_gri_303_4_table()
+          _this.gri_303_4 = await _this.generate_gri_303_4_table()
 
           _this.selected_layers.splice(0, _this.selected_layers.length)
           _this.radio_layers = null
@@ -1978,6 +1984,117 @@ export default {
       })*/
 
     },
+
+
+    async impact_summary(dd, groupedByAssessments) {
+
+      let _this = this
+
+      dd.content.push({
+        text: "Summary\n\n",
+        style: 'indicator_title'
+      })
+
+      let industriesIndicator = {
+        table: {
+          body: [
+            [
+              {text:'Assessment', style: "bold"},
+              {text:'Industry', style: "bold"},
+              {text:'Impact',style: "bold"},
+              {text:'Statistic',style: "bold"},
+              {text:"Value",style: "bold"},
+              {text:"Units",style: "bold"},
+              {text:"Data type",style: "bold"},
+            ]
+          ]
+        }
+      }
+
+      let table_content = []
+
+      for(const [assessment_name, industries] of Object.entries(groupedByAssessments)){
+        let industries_aggregated = industries.map(industry => [industry.industry.name, [industry.industry]])
+
+        //For each industry, calculate all the statistics on each impact, and add to the table only the ones with very high or high impact
+        for (const [key, industries] of industries_aggregated) {
+          let row = [key]
+          let industry = industries[0]
+
+          row.push({text: assessment_name})
+          row.push({text: key})
+
+          //aaaaa
+          let delta_tu = await metrics.delta_tu(industries, this.global_layers, true)
+          let delta_tu_filtered = this.filter_total_and_low_impact(industry, delta_tu, 'delta_ecotoxicity', 'Delta TU', 'delta_tu', true, 'TU/day')
+
+          let delta_eqs = await metrics.delta_eqs(industries, this.global_layers, true)
+          let delta_eqs_filtered = this.filter_total_and_low_impact(industry, delta_eqs, 'delta_eqs', 'Delta EQS', 'delta_eqs', true, '%')
+
+          let eutrophication = metrics.eutrophication_potential(industries)
+          let eutrophication_filtered = this.filter_total_and_low_impact(industry, eutrophication, 'eutrophication', 'Eutrophication potencial', 'eutrophication', true, 'gPO4eq/m3')
+
+          let dilution_factor = await metrics.dilution_factor(this.global_layers, industries, true)
+          let dilution_factor_filtered = this.filter_total_and_low_impact(industry, {'Dilution factor': dilution_factor}, 'dilution_factor', 'Dilution factor', 'dilution_factor', false, '-')
+
+          let consumption_available = await metrics.available_ratio(this.global_layers, industries)
+          let consumption_available_filtered = this.filter_total_and_low_impact(industry, {'Consumption available': consumption_available}, 'water_stress_ratio', 'Consumption available', 'available_ratio', false, '%')
+
+
+          let content = [...delta_tu_filtered, ...delta_eqs_filtered, ...eutrophication_filtered, ...dilution_factor_filtered, ...consumption_available_filtered]
+
+          table_content.push(
+              ... content.map(x => {
+                let color_data_type = utils.getDataTypeColor(x.data_type)
+                return [
+                  {text: assessment_name},
+                  {text: key},
+                  {text: x.impact},
+                  {text: x.statistic},
+                  {text: x.value, fillColor: x.color},
+                  {text: x.units},
+                  {text: x.data_type, fillColor: color_data_type != null ? color_data_type[0] : null}
+                ]
+              })
+          )
+
+        }
+      }
+
+      //row.push( {text: dilution_factor_value, fillColor: _this.get_color(this.risk_categories.dilution_factor(dilution_factor_value))})
+
+
+      industriesIndicator.table.body.push(...table_content)
+      dd.content.push(industriesIndicator)
+      dd.content.push("\n")
+      this.risk_categories.legend_impact_pdf(dd)
+      dd.content.push("\n\n")
+
+
+    },
+
+    filter_total_and_low_impact(industry, impact, risk_category, title, data_type, needs_pollutant, units) {
+      let impact_filtered = Object.entries(impact).filter(([key, value]) => {
+        let impact_category = this.get_impact(this.risk_categories[risk_category](value))
+        return key.toLowerCase() != "total" && (impact_category == 'High impact' || impact_category == 'Very high impact')
+        //return key.toLowerCase() != "total"
+
+      })
+
+      let impact_filtered_completed = impact_filtered.map(([key, value]) => {
+        return {
+          impact: title,
+          statistic: key,
+          color: this.get_color(this.risk_categories[risk_category](value)),
+          value: value,
+          units: units,
+          data_type: needs_pollutant ? utils.get_string_impact_legend(industry_impact_legend_category[data_type](industry, key)) : utils.get_string_impact_legend(industry_impact_legend_category[data_type](industry))
+        }
+      })
+
+      return impact_filtered_completed
+    },
+
 
     async quality_quantity_indicators(dd, industries_aux, assessment_days) {
 
@@ -3245,6 +3362,10 @@ export default {
       });
 
 
+      await this.impact_summary(dd, groupedByAssessments)
+      dd.content.push("\n\n")
+
+
       for(const [assessment_name, industries] of Object.entries(groupedByAssessments)){
         dd.content.push({
           text: "Assessment "+assessment_name+"\n\n",
@@ -3312,10 +3433,17 @@ export default {
         dd.content.push(industriesSummary)
         dd.content.push("\n\n")
 
+
         let industries_aggregated = industries.map(industry => [industry.industry.name, [industry.industry]])
 
-        this.emissions_table_pdf(dd, industries_aggregated, assessment_days)
+
+
+        /*this.emissions_table_pdf(dd, industries_aggregated, assessment_days)
         dd.content.push("\n\n")
+
+
+
+
         await this.quality_quantity_indicators(dd, industries_aggregated, assessment_days)
         dd.content.push("\n\n")
 
@@ -3344,6 +3472,8 @@ export default {
         dd.content.push("\n\n")
 
         await this.layers_table_pdf(dd, industries_aggregated, assessment_days)
+        */
+
       }
 
 
