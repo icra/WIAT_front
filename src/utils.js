@@ -1,5 +1,6 @@
 import axios from "axios";
 import conversion_factors from "@/conversion_factors";
+import colors from "@/colors";
 let main = require("./main")
 
 //sum array of numbers
@@ -38,6 +39,19 @@ let utils = {
         }
         else return "Insufficient data"
     },
+
+    //Calculate hash code of s
+    hashCode(s) {
+        let ADLER32 = require('adler-32');
+        return ADLER32.str(s)
+    },
+
+
+    //Get color based on str
+    chooseColor(str) {
+        return Object.values(colors)[this.hashCode(str) % Object.values(colors).length]
+    },
+
 
     getDataTypeColor(item){
         if(item == "User data") {

@@ -1246,24 +1246,57 @@
                           v-if="ghg_ratio_chip === 1"
                       >
                         <template v-slot:item.name="{ item }">
-                        <span v-if="item.info">
-                        {{ item.name }}
-                        <v-btn
-                            icon
-                            @click="$data[item.info] = true"
-                            class="icon_clickable"
-                            x-small
-                        >
-                          <v-icon
-                              color='#1C195B'
-                          >
-                            mdi-information-outline
-                          </v-icon>
-                        </v-btn>
-
-                      </span>
+                          <span v-if="item.info">
+                            {{ item.name }}
+                            <v-btn
+                                icon
+                                @click="$data[item.info] = true"
+                                class="icon_clickable"
+                                x-small
+                            >
+                              <v-icon
+                                  color='#1C195B'
+                              >
+                                mdi-information-outline
+                              </v-icon>
+                            </v-btn>
+                          </span>
                           <span v-else>{{ item.name }}</span>
                         </template>
+                        <template
+                            v-slot:item.value="{ item }"
+                        >
+
+                          <template v-if="getGlobalWarming(item) != null">
+                            <v-tooltip bottom>
+                              <template v-slot:activator="{ on, attrs }">
+                                <v-chip
+                                    :color="getGlobalWarming(item)[0]"
+                                    dark
+                                    :key="industry.name"
+                                    v-bind="attrs"
+                                    v-on="on"
+                                    text-color="#1c1c1b"
+                                >
+                                  {{ item.value }}
+                                </v-chip>
+                              </template>
+                              <span>{{ getGlobalWarming(item)[1] }}</span>
+                            </v-tooltip>
+                          </template>
+                          <template v-else>
+                            <v-chip
+                                color="transparent"
+                                dark
+                                :key="industry.name"
+                                text-color="#1c1c1b"
+                                class="chip_no_hover"
+                            >
+                              {{ item.value }}
+                            </v-chip>
+                          </template>
+                        </template>
+
                         <template
                             v-slot:item.data="{ item }"
                         >
@@ -1505,57 +1538,24 @@
                           v-if="emissions_chip === 1"
                       >
                         <template v-slot:item.name="{ item }">
-                      <span v-if="item.info">
-                        {{ item.name }}
-                        <v-btn
-                            icon
-                            @click="$data[item.info] = true"
-                            class="icon_clickable"
-                            x-small
-                        >
-                          <v-icon
-                              color='#1C195B'
-                          >
-                            mdi-information-outline
-                          </v-icon>
-                        </v-btn>
-                      </span>
+                          <span v-if="item.info">
+                            {{ item.name }}
+                            <v-btn
+                                icon
+                                @click="$data[item.info] = true"
+                                class="icon_clickable"
+                                x-small
+                            >
+                              <v-icon
+                                  color='#1C195B'
+                              >
+                                mdi-information-outline
+                              </v-icon>
+                            </v-btn>
+                          </span>
                           <span v-else>{{ item.name }}</span>
                         </template>
 
-                        <template
-                            v-slot:item.value="{ item }"
-                        >
-
-                          <template v-if="getGlobalWarming(item) != null">
-                            <v-tooltip bottom>
-                              <template v-slot:activator="{ on, attrs }">
-                                <v-chip
-                                    :color="getGlobalWarming(item)[0]"
-                                    dark
-                                    :key="industry.name"
-                                    v-bind="attrs"
-                                    v-on="on"
-                                    text-color="#1c1c1b"
-                                >
-                                  {{ item.value }}
-                                </v-chip>
-                              </template>
-                              <span>{{ getGlobalWarming(item)[1] }}</span>
-                            </v-tooltip>
-                          </template>
-                          <template v-else>
-                            <v-chip
-                                color="transparent"
-                                dark
-                                :key="industry.name"
-                                text-color="#1c1c1b"
-                                class="chip_no_hover"
-                            >
-                              {{ item.value }}
-                            </v-chip>
-                          </template>
-                        </template>
                         <template
                             v-slot:item.data="{ item }"
                         >
@@ -3183,7 +3183,6 @@
 let _ = require('lodash');
 import {utils, metrics} from "../utils"
 import external_indicators from "../external_indicators"
-import colors from "../colors"
 import risk_thereshold from "..//risk_categories"
 import VueKatex from 'vue-katex';
 import 'katex/dist/katex.min.css';
@@ -3282,7 +3281,9 @@ export default {
           recycled: "Recycled water factor",
           treated: "Treated water factor",
           consumption_available: "Consumption available ratio",
-          specific_water_consumption: "Specific water consumption"
+          specific_water_consumption: "Specific water consumption",
+          consumption_available_different_watsershed: "Consumptive use from different watersheds",
+          groundwater_withdrawals_in_high_groundwater_decline: "Groundwater withdrawals (only in areas with GW decline)"
         },
         pollutants: {
           cod: "COD",
@@ -3753,6 +3754,10 @@ export default {
         return this.risk_categories["water_stress_ratio"](item.value)
       //} else if (item.value == this.table_title.availability_quantity.specific_water_consumption) {
         //return this.risk_categories["specific_water_consumption"](item[this.industry.name])
+      } else if (item.name == this.table_title.availability_quantity.consumption_available_different_watsershed){
+        return this.risk_categories["external_sources_from_other_watersheds"](item.value)
+      } else if (item.name == this.table_title.availability_quantity.groundwater_withdrawals_in_high_groundwater_decline){
+        return this.risk_categories["groundwater_withdrawals_in_high_groundwater_decline"](item.value)
       }
       return null
     },
@@ -3813,14 +3818,9 @@ export default {
 
     //Get color based on str
     chooseColor(str) {
-      return Object.values(colors)[this.hashCode(str) % Object.values(colors).length]
+      return utils.chooseColor(str)
     },
 
-    //Calculate hash code of s
-    hashCode(s) {
-      let ADLER32 = require('adler-32');
-      return ADLER32.str(s)
-    },
 
     //Carbon impact table
     generate_emissions_table() {

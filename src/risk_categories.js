@@ -166,6 +166,17 @@ let risk_category = {
         return null
     },
 
+    external_sources_from_other_watersheds: function(value){
+        if(value < 0) return null
+        else if (value == 0) return blue
+        else return red
+    },
+    groundwater_withdrawals_in_high_groundwater_decline: function(value){
+        if(value < 0) return null
+        else if (value == 0) return blue
+        else return red
+    },
+
     /**************************
     Layers from aqueduct
      **************************/
