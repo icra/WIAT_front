@@ -333,6 +333,30 @@ let risk_category = {
         })
 
     },
+    legend_impact_pdf_2: function(){
+        return {
+            style: 'legend',
+            table: {
+                widths: [10, 'auto', 10, 'auto', 10, 'auto', 10, 'auto', 10, 'auto'],
+                body: [
+                    [
+                        {text: " ", fillColor: "white", border: [true, true, true, true],},
+                        {text: "Unknown", border: [false, false, false, false]},
+                        {text: " ", fillColor: blue[0], border: [false, false, false, false]},
+                        {text: blue[1], border: [false, false, false, false]},
+                        {text: " ", fillColor: yellow[0], border: [false, false, false, false]},
+                        {text: yellow[1], border: [false, false, false, false]},
+                        {text: " ", fillColor: orange[0], border: [false, false, false, false]},
+                        {text: orange[1], border: [false, false, false, false]},
+                        {text: " ", fillColor: red[0], border: [false, false, false, false]},
+                        {text: red[1], border: [false, false, false, false]},
+                    ]
+                ]
+            }
+        }
+
+    },
+
     legend_risk_pdf: function(dd){
         dd.content.push({
             style: 'legend',

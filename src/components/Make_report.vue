@@ -793,7 +793,9 @@ import colors from "../colors"
 import risk_thereshold from "..//risk_categories"
 import {industry_impact_legend_category} from "@/industry_impact_legend_category";
 import Chart from 'chart.js/auto'
+import ChartJSPluginDatalabels from "chartjs-plugin-datalabels";
 
+Chart.register(ChartJSPluginDatalabels)
 
 export default {
   name: "Make_report",
@@ -2254,6 +2256,157 @@ export default {
 
     },
 
+    pie_chart_pdf(dd, labels, data){
+      const data_chart = {
+        labels: labels,
+        datasets: [{
+          data: data,
+          backgroundColor: labels.map(x => utils.chooseColor(x))
+        }]
+      }
+
+      const ctx = document.getElementById('chart');
+
+      if (this.chart) this.chart.destroy()
+
+      this.chart = new Chart(ctx, {
+        type: "pie",
+        data: data_chart,
+        options: {
+          animation: false,
+          plugins: {
+            legend: {
+              display: true,
+              labels: {
+                font: {
+                  size: 35
+                }
+              }
+
+            },
+            datalabels: {
+              formatter: function (value) {
+                if(value > 5) return value.toFixed(2).toString()+'%'
+                else return ''
+              },
+              color: 'white',
+              font: {
+                size: 35,
+              }
+            },
+          },
+
+        }
+      });
+
+      /*dd.content.push({
+        image: this.chart.toBase64Image(),
+        fit: [200, 200]
+      })*/
+      let image = {
+        image: this.chart.toBase64Image(),
+        fit: [200, 200]
+      }
+
+      return image
+      //dd.content.push("\n\n")
+
+    },
+
+    bar_chart_pdf(dd, labels, data){
+      const data_chart = {
+        labels: labels,
+        datasets: [{
+          data: data,
+          backgroundColor: labels.map(x => utils.chooseColor(x))
+        }]
+      };
+
+      const ctx = document.getElementById('chart');
+
+      if (this.chart) this.chart.destroy()
+
+      this.chart = new Chart(ctx, {
+        type: "bar",
+        data: data_chart,
+        options: {
+          animation: false,
+          plugins: {
+            legend: {
+              display: false,
+            },
+            datalabels: {
+              formatter: function (value, ctx) {
+                if (value > 0) return value
+                else return ''
+
+              },
+              font: {
+                size: 25,
+              }
+
+            },
+          },
+          scales: {
+            y: {
+              ticks: {
+                beginAtZero:true,
+                callback: function(value, index, values) {
+                  return value + '%';
+                },
+                font: {
+                  size: 25,
+                }
+              }
+            },
+            x: {
+              ticks: {
+                font: {
+                  size: 25,
+                }
+              }
+            },
+
+          }
+
+        }
+      });
+
+      return {
+        image: this.chart.toBase64Image(),
+        fit: [270, 300]
+      }
+
+    },
+
+    //if is_bar == true --> adds bar chart, else add pie chart
+    table_and_chart(dd, table, labels, data, is_bar, table_width, chart_width){
+      let image = is_bar ? this.bar_chart_pdf(dd, labels, data) : this.pie_chart_pdf(dd, labels, data)
+      dd.content.push(
+          {
+            alignment: 'justify',
+            columns: [
+              {
+                table: table.table,
+                width: table_width
+              },{
+                image: image.image,
+                fit: image.fit,
+                width: chart_width
+              }
+
+
+            ],
+            columnGap: 30
+
+          },
+      )
+      dd.content.push("\n")
+
+      this.risk_categories.legend_impact_pdf(dd)
+
+    },
+
     async delta_tu_pdf(dd, industry) {
 
 
@@ -2274,20 +2427,14 @@ export default {
       }
 
 
-      const data_chart = {
-        labels: [],
-        datasets: [{
-          data: [],
-          backgroundColor: []
-        }]
-      };
+      let labels = []
+      let data = []
 
       for (let [pollutant, value] of  Object.entries(delta_tu)){
 
         if (pollutant != 'total'){
-          data_chart.labels.push(pollutant)
-          data_chart.datasets[0].data.push(100 * value / delta_tu.total)
-          data_chart.datasets[0].backgroundColor.push(utils.chooseColor(pollutant))
+          labels.push(pollutant)
+          data.push(100 * value / delta_tu.total)
         }
 
         let level_of_certainty = utils.get_string_impact_legend(industry_impact_legend_category.delta_tu(industry, pollutant))
@@ -2305,66 +2452,9 @@ export default {
       }
 
 
-      const ctx = document.getElementById('chart');
+      this.table_and_chart(dd, industriesEcotoxicity, labels, data, false, 250, '*')
 
-      if (this.chart) this.chart.destroy()
-
-      this.chart = new Chart(ctx, {
-        type: "pie",
-        data: data_chart,
-        options: {
-          animation: false,
-          plugins: {
-            legend: {
-              display: true,
-              labels: {
-                // This more specific font property overrides the global property
-                font: {
-                  size: 25
-                }
-              }
-            },
-            datalabels: {
-              formatter: function (value, ctx) {
-                let datasets = ctx.chart.data.datasets;
-
-                if (datasets.length > 0) {
-                  let sum = datasets[0].data.map(x => parseFloat(x)).reduce((a, b) => a + b, 0);
-                  let percentage = ((value / sum) * 100).toFixed(2);
-                  if(percentage > 5) {
-                    return percentage + "%"
-                  }else return ''
-                }
-
-              },
-              font: {
-                size: 25
-              },
-              color: 'white'
-            },
-          },
-
-
-        }
-      });
-
-
-
-      dd.content.push(industriesEcotoxicity)
-      dd.content.push("\n")
-
-
-      dd.content.push("\n")
-      this.risk_categories.legend_impact_pdf(dd)
       dd.content.push("\n\n")
-      dd.content.push({
-        image: this.chart.toBase64Image(),
-        fit: [300, 300]
-      })
-      dd.content.push("\n")
-
-
-
 
 
     },
@@ -2388,10 +2478,16 @@ export default {
         }
       }
 
+      let labels = []
+      let data = []
+
       for (let [pollutant, value] of  Object.entries(delta_eqs)){
 
         let level_of_certainty = utils.get_string_impact_legend(industry_impact_legend_category.delta_eqs(industry, pollutant))
         let fill_color_level_of_certainty = utils.getDataTypeColor(level_of_certainty)
+
+        labels.push(pollutant)
+        data.push(value)
 
         industriesEcotoxicity.table.body.push([{
           text: pollutant,
@@ -2404,13 +2500,12 @@ export default {
         }])
       }
 
-      dd.content.push(industriesEcotoxicity)
-      dd.content.push("\n")
 
+      this.table_and_chart(dd, industriesEcotoxicity, labels, data, true, 200, '*')
 
-      dd.content.push("\n")
-      this.risk_categories.legend_impact_pdf(dd)
       dd.content.push("\n\n")
+
+
 
 
 
@@ -2427,15 +2522,8 @@ export default {
       })
 
 
-
-      const data_chart = {
-        labels: [],
-        datasets: [{
-          data: [],
-          backgroundColor: []
-        }]
-      };
-
+      let labels =  []
+      let data =  []
 
       let eutrophication = metrics.eutrophication_potential([industry])
 
@@ -2450,6 +2538,12 @@ export default {
         let level_of_certainty = utils.get_string_impact_legend(industry_impact_legend_category.eutrophication(industry, pollutant))
         let fill_color_level_of_certainty = utils.getDataTypeColor(level_of_certainty)
 
+
+        if (pollutant != 'total'){
+          labels.push(pollutant)
+          data.push(100 * value / eutrophication.total)
+        }
+
         industriesEutrophication.table.body.push([{
           text: pollutant,
           style: 'bold'
@@ -2461,45 +2555,13 @@ export default {
         }])
       }
 
-      //CHART
-      const options = {
-        animation: false,
-        legend: {
-          display: false
-        },
-        scales: {
-          yAxes: [{
-            ticks: {
-              beginAtZero: true
-            },
-            scaleLabel: {
-              display: true,
-              labelString: 'gPO4eq/m3'
-            }
-          }],
-          xAxes: [{
-            scaleLabel: {
-              display: true,
-              labelString: 'Industry'
-            }
-          }]
-        }
-      }
-      const ctx = document.getElementById('chart');
-      /*let chart = new Chart(ctx, {
-        type: "bar",
-        data: data_chart,
-        options: options
-      });*/
+      this.table_and_chart(dd, industriesEutrophication, labels, data, false, 250, '*')
 
-      dd.content.push(industriesEutrophication)
-      dd.content.push("\n")
-      _this.risk_categories.legend_impact_pdf(dd)
       dd.content.push("\n\n")
-      /*dd.content.push({
-        image: chart.toBase64Image(),
-        fit: [450, 450]
-      })*/
+
+
+
+
     },
 
     efficiency_pdf(dd, industry) {
@@ -2670,7 +2732,7 @@ export default {
 
 
       for(let pollutant of industry.pollutants_selected){
-        let level_of_certainty = utils.get_string_impact_legend(industry_impact_legend_category.pollutant_concentration(industry, pollutant))
+        let level_of_certainty = utils.get_string_impact_legend(industry_impact_legend_category.final_water_body_concentration(industry, pollutant))
         let fill_color_level_of_certainty = utils.getDataTypeColor(level_of_certainty)
         table.table.body.push([
           pollutant, concentration[pollutant], delta[pollutant], tu[pollutant] == undefined ? '' : tu[pollutant], eqs[pollutant] == undefined ? '' : eqs[pollutant],
@@ -3031,7 +3093,7 @@ export default {
       let dd = {
         pageSize: 'A4',
         //pageOrientation: 'landscape',
-        //pageMargins: [67, 60, 30, 42],
+        pageMargins: [67, 60, 30, 60],
 
         footer: function (currentPage, pageCount) {
           return {
@@ -3063,6 +3125,9 @@ export default {
           };
         },
         content: [],
+        defaultStyle: {
+          fontSize: 10,
+        },
         styles: {
           header: {
             fontSize: 18,
@@ -3098,9 +3163,7 @@ export default {
           asterisk: {
             color: "red"
           },
-          defaultStyle: {
-            fontSize: 10,
-          }
+
 
         },
 

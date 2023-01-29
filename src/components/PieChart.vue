@@ -28,6 +28,7 @@ import {
 ChartJS.register(Title, Tooltip, Legend, ArcElement, CategoryScale, ChartJSPluginDatalabels)
 
 
+
 export default {
   name: 'PieChart',
   components: {
