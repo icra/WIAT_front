@@ -374,6 +374,7 @@
                           :items="delta_ecotox_table.value"
                           :item-class="itemRowBold"
                           :hide-default-footer="true"
+                          disable-pagination
                           dense
                           v-if="delta_ecotox_chip === 1"
 
@@ -737,6 +738,96 @@
                       </div>
 
                     </div>
+                    <div v-else-if="active_indicator[0] == 6">
+
+                      <v-data-table
+                          :headers="delta_temperature_table.header"
+                          :items="delta_temperature_table.value"
+                          :item-class="itemRowBold"
+                          disable-pagination
+                          :hide-default-footer="true"
+                          dense
+                      >
+                        <template v-slot:item.name="{ item }">
+                      <span v-if="item.info">
+                        {{ item.name }}
+                        <v-btn
+                            icon
+                            class="icon_clickable"
+                            x-small
+                            @click="$data[item.info] = true"
+
+                        >
+                          <v-icon
+                              color='#1C195B'
+                          >
+                            mdi-information-outline
+                          </v-icon>
+                        </v-btn>
+
+                      </span>
+                          <span v-else>{{ item.name }}</span>
+                        </template>
+
+                        <template
+                            v-slot:item.value="{ item }"
+                        >
+
+                          <template v-if="getDeltaTemperatureColor(item) != null">
+                            <v-tooltip bottom>
+                              <template v-slot:activator="{ on, attrs }">
+                                <v-chip
+                                    :color="getDeltaTemperatureColor(item)[0]"
+                                    dark
+                                    :key=industry.name
+                                    v-bind="attrs"
+                                    v-on="on"
+                                    text-color="#1c1c1b"
+                                >
+                                  {{ item.value }}
+                                </v-chip>
+                              </template>
+                              <span>{{ getDeltaTemperatureColor(item)[1] }}</span>
+                            </v-tooltip>
+                          </template>
+                          <template v-else>
+                            <v-chip
+                                color="transparent"
+                                dark
+                                :key="industry.name"
+                                text-color="#1c1c1b"
+                                class="chip_no_hover"
+                            >
+                              {{ item.value }}
+                            </v-chip>
+                          </template>
+                        </template>
+                        <template
+                            v-slot:item.data="{ item }"
+                        >
+                          <template v-if="getDataTypeColor(item) != null">
+                            <v-tooltip bottom>
+                              <template v-slot:activator="{ on, attrs }">
+                                <v-chip
+                                    :color="getDataTypeColor(item)[0]"
+                                    dark
+                                    :key="industry.name"
+                                    text-color="#1c1c1b"
+                                    v-bind="attrs"
+                                    v-on="on"
+                                >
+                                  {{ item.data }}
+                                </v-chip>
+                              </template>
+                              <span>{{getDataTypeColor(item)[1]}}</span>
+                            </v-tooltip>
+                          </template>
+                        </template>
+
+                      </v-data-table>
+
+                    </div>
+
                     <div v-else-if="active_indicator[0] == 9">
                       <v-data-table
                           :headers="treatment_efficiency_table.header"
@@ -1497,36 +1588,6 @@
                       </v-data-table>
                     </div>
                     <div v-else-if="active_indicator[0] == 23">
-
-                      <v-chip-group
-                          mandatory
-                          v-model="emissions_chip"
-                      >
-                        <v-chip
-                            color="primary"
-                            outlined
-                            class="ma-2"
-                            pill
-                        >
-                          <v-icon left>
-                            mdi-chart-pie
-                          </v-icon>
-                          Chart
-                        </v-chip>
-
-                        <v-chip
-                            color="primary"
-                            outlined
-                            pill
-                            class="ma-2"
-                        >
-                          <v-icon left>
-                            mdi-table
-                          </v-icon>
-                          Table
-
-                        </v-chip>
-                      </v-chip-group>
                       <v-data-table
                           :headers="emissions_table.header"
                           :items="emissions_table.value"
@@ -1535,7 +1596,6 @@
                           disable-pagination
                           :hide-default-footer="true"
                           dense
-                          v-if="emissions_chip === 1"
                       >
                         <template v-slot:item.name="{ item }">
                           <span v-if="item.info">
@@ -1579,50 +1639,9 @@
                         </template>
 
                       </v-data-table>
-                      <div v-else-if="emissions_chip === 0">
-                        <PieChart
-                            style="padding-top: 10px"
-                            :chart-data="emissions_chart.chartData"
-                            :chart-options="emissions_chart.chartOptions"
-
-
-                        />
-                        <p class="instructions_2">
-                          *Only labels >5% are shown.
-                        </p>
-                      </div>
 
                     </div>
                     <div v-else-if="active_indicator[0] == 24">
-                      <v-chip-group
-                          mandatory
-                          v-model="ghg_sludge_management_chip"
-                      >
-                        <v-chip
-                            color="primary"
-                            outlined
-                            class="ma-2"
-                            pill
-                        >
-                          <v-icon left>
-                            mdi-chart-pie
-                          </v-icon>
-                          Chart
-                        </v-chip>
-
-                        <v-chip
-                            color="primary"
-                            outlined
-                            pill
-                            class="ma-2"
-                        >
-                          <v-icon left>
-                            mdi-table
-                          </v-icon>
-                          Table
-
-                        </v-chip>
-                      </v-chip-group>
                       <v-data-table
                           :headers="ghg_sludge_management_table.header"
                           :items="ghg_sludge_management_table.value"
@@ -1630,7 +1649,6 @@
                           disable-pagination
                           :hide-default-footer="true"
                           dense
-                          v-if="ghg_sludge_management_chip === 1"
                       >
                         <template v-slot:item.name="{ item }">
                         <span v-if="item.info">
@@ -1674,15 +1692,6 @@
                         </template>
 
                       </v-data-table>
-
-                      <div v-else-if="ghg_sludge_management_chip === 0">
-                        <BarChart
-                            style="padding-top: 10px"
-                            :chart-data="ghg_sludge_management_chart.chartData"
-                            :chart-options="ghg_sludge_management_chart.chartOptions"
-                        />
-                      </div>
-
                     </div>
                   </div>
                   <div v-if = "active_indicator <= 16">
@@ -2858,6 +2867,34 @@
 
         </v-dialog>
 
+        <!-- delta temperature -->
+        <v-dialog
+            v-model="info_delta_temperature"
+            width="60%"
+        >
+          <div class="dialog_detail" style="background-color: white">
+            <h3> Increase in the temperature in the receiving water body due to industry discharge </h3>
+            <br>
+            <div
+                v-katex:display="' \\frac{ \\sum_{i \\in DP} W_{effl_i} \\cdot T_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl_i}} '"></div>
+
+            <b>Where:</b>
+            <br>
+            <ul>
+              <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water</li>
+              <li><span v-katex="'T_{effl}'"></span>: Temperature of water discharged to the same water body from which it was withdrawn (°C)</li>
+              <li><span v-katex="'W_{effl}'"></span>: Amount of water discharged into the same watershed from which it was withdrawn</li>
+              <li><span v-katex="'W_{a}'"></span>: amount of water available in the river <b>(streamflow global
+                indicator)</b></li>
+              <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river</li>
+
+            </ul>
+
+          </div>
+
+        </v-dialog>
+
+
         <!-- TU -->
         <v-dialog
             v-model="info_tu"
@@ -3219,7 +3256,6 @@ export default {
       treatment_efficiency_influent_table: {header: [], value: []},
 
 
-
       delta_ecotox_table: {header: [], value: []},
       delta_ecotox_chart: {chartData: {}, chartOptions: {}},
       delta_ecotox_chip: 0,
@@ -3234,13 +3270,12 @@ export default {
       eutrophication_chart: {chartData: {}, chartOptions: {}},
       eutrophication_chip: 0,
 
+      delta_temperature_table: {header: [], value: []},
       ghg_ratio_table: {header: [], value: []},
       ghg_ratio_chart: {chartData: {}, chartOptions: {}},
       ghg_ratio_chip: 0,
 
       ghg_sludge_management_table: {header: [], value: []},
-      ghg_sludge_management_chart: {chartData: {}, chartOptions: {}},
-      ghg_sludge_management_chip: 0,
 
       concentration_table: {header: [], value: []},
       concentration_table_receiving_body: {header: [], value: []},
@@ -3248,12 +3283,9 @@ export default {
       nutrient_concentration_prior_discharge_table: {header: [], value: []},
 
       emissions_table: {header: [], value: []},
-      emissions_chart: {chartData: {}, chartOptions: {}},
-      emissions_chip: 0,
       energy_use_table: {header: [], value: []},
       biogas_valorised_table: {header: [], value: []},
 
-      simple_report_table: {header: [], value: []},
       external_indicators: external_indicators,
       main_tab: 0,
       show_context_chart: false,
@@ -3320,7 +3352,8 @@ export default {
           avg_influent_efficiency: "Percentage of treatment efficiency (compared to intake water)",
           pollution: "Pollution impact",
           energy_used_text: "Energy used",
-          ecotoxicology: "Ecotoxicology indicators"
+          ecotoxicology: "Ecotoxicology indicators",
+          delta_temperature: "Increase in temperature in the receiving water body due industry discharge",
 
         },
         data_type_table_names: {
@@ -3332,7 +3365,6 @@ export default {
       },
 
       info_energy_used: false,
-
       info_dilution_factor: false,
       info_recycled_factor: false,
       info_treated_factor: false,
@@ -3353,6 +3385,7 @@ export default {
       info_biogas_flared: false,
       info_digester_fuel: false,
       info_eutrophication: false,
+      info_delta_temperature: false,
       info_tu: false,
       info_delta_tu: false,
       info_eqs: false,
@@ -3376,6 +3409,7 @@ export default {
       selected_assessment: null,
 
       toggle: null,
+      industry_summary: null,
 
 
     }
@@ -3422,13 +3456,14 @@ export default {
       _this.freshwater_lever_for_action = await _this.generate_freshwater_lever_for_action_table()
 
       _this.eutrophication_table = _this.generate_eutrophication_table()
+      _this.delta_temperature_table = await _this.generate_delta_temperature_table()
+
       _this.treatment_efficiency_table = _this.generate_treatment_efficiency_table()
       _this.treatment_efficiency_influent_table = _this.generate_treatment_efficiency_influent_table()
 
       _this.delta_eqs_table = await _this.generate_delta_eqs_table()
       _this.delta_ecotox_table = await _this.generate_delta_ecotox_table()
 
-      _this.simple_report_table = await _this.generate_simple_report_table()
       _this.industry_table = await _this.generate_industry_table()
       _this.biogas_valorised_table = _this.generate_biogas_valorised_table()
 
@@ -3437,8 +3472,9 @@ export default {
       _this.concentration_table = await _this.generate_concentration_table()
       _this.concentration_table_receiving_body = await _this.generate_concentration_receiving_water_body_table()
 
-
       _this.nutrient_concentration_prior_discharge_table = _this.generate_nutrient_concentration_prior_discharge_table()
+
+      _this.industry_summary = await utils.summary_industry(this.industry, this.global_layers)
 
     },
 
@@ -3656,14 +3692,12 @@ export default {
     },
 
     //In impact and lever for action table, return impact (low, high, very-high, ...) associated to id
-    indicator_risk_class: function (id) {
+    indicator_risk_class(id) {
 
+      if (this.industry == null || this.industry_summary == null) return
 
-      if (this.industry == null) return
       //risks
-
-      let current_industry_name = this.industry.name
-      let industry = this.simple_report_table.value.filter(industry => industry.value == current_industry_name)[0]
+      let industry = this.industry_summary
 
       if (industry == null || industry == undefined) return
       //let ghg_impact = this.risk_categories["global_warming"](industry["carbon_impact"])
@@ -3671,9 +3705,14 @@ export default {
       let ghg_impact = this.risk_categories["global_warming"](industry["carbon_impact"])
       let freshwater_impact = this.risk_categories["pollution"](industry["freshwater_impact"])
       let pollution_impact = this.risk_categories["pollution"](industry["pollution_impact"])
+
       let eutrophication_impact = null
       if (this.eutrophication_table.value[0] != undefined){
         eutrophication_impact = this.risk_categories["eutrophication"](this.eutrophication_table.value[0].value)
+      }
+      let delta_temperature_impact = null
+      if (this.delta_temperature_table.value[0] != undefined){
+        delta_temperature_impact = this.risk_categories["delta_temperature"](this.delta_temperature_table.value[0].value)
       }
       let delta_ecotox_impact = null
       if (this.delta_ecotox_table.value[0] != undefined) {
@@ -3684,15 +3723,6 @@ export default {
         let delta_eqs_values = this.delta_eqs_table.value.map(x => x["value"])
         delta_eqs_impact = this.risk_categories["delta_eqs"](delta_eqs_values.sum() / delta_eqs_values.length)
       }
-
-      /*
-      let pollution_load_to_environment_risk = [null, null]
-      pollution_load_to_environment_risk[1] = this.return_avg_risk([eutrophication_impact, delta_eqs_impact, delta_ecotox_impact])
-      let toxicity_load_risk = [null, null]
-      toxicity_load_risk[1] = this.return_avg_risk([delta_eqs_impact, delta_ecotox_impact])
-      let effluent_toxicity_risk = [null, null]
-      effluent_toxicity_risk[1] = this.return_avg_risk([eqs_impact, ecotox_impact])*/
-
 
       let return_color_class = function (value) {
         if (value == null) return ['no-risk', "Cannot assess impact"]
@@ -3710,7 +3740,8 @@ export default {
 
       }
 
-      let id_risk = [1, 2, 3, 4, 5, 14, 15, 17, 18]
+      let id_risk = [1, 2, 3, 4, 5, 6, 14, 15, 17, 18]
+
       if (id_risk.includes(id.id)) {
         if (id.id < 3) {
           return return_color_class(pollution_impact)
@@ -3720,7 +3751,9 @@ export default {
           return return_color_class(delta_eqs_impact)
         } else if (id.id == 5) {
           return return_color_class(eutrophication_impact)
-        } else if (id.id <= 15) {
+        } else if (id.id == 6) {
+          return return_color_class(delta_temperature_impact)
+        }else if (id.id <= 15) {
           return return_color_class(freshwater_impact)
         } else {
           return return_color_class(ghg_impact)
@@ -3765,6 +3798,11 @@ export default {
     //Get impact associated to item (related to eutrophication potential)
     getEutrophicationColor(item) {
       return this.risk_categories["eutrophication"](item.value)
+    },
+
+    //Get impact associated to item (related to delta temperature)
+    getDeltaTemperatureColor(item) {
+      return this.risk_categories["delta_temperature"](item.value)
     },
 
     //Get impact associated to item (related to ecotoxicity delta)
@@ -3840,9 +3878,7 @@ export default {
         let key = this.industry.name
         let industries = [this.industry]
 
-        //emission_table.header.push({
-        //text: key, value: key,
-        //})
+
         let emissions = metrics.emissions_and_descriptions(industries, 1)
         //let DataType = industry_impact_legend_category.emissions_and_descriptions(industries[0])
 
@@ -3913,17 +3949,6 @@ export default {
 
 
 
-        /*total[key] = emissions["total"]
-        elec[key] = emissions["elec"]
-        fuel[key] = emissions["fuel"]
-        tre[key] = emissions["treatment"]
-        biog[key] = emissions["biog"]
-        dig_fuel[key] = emissions["digester_fuel"]
-        slu[key] = emissions["slu"]
-        reus[key] = emissions["reuse"]
-        disc[key] = emissions["disc"]*/
-
-
        // emission_table.header.push({text: "Unit", value: "unit", sortable: false,})
         emission_table.value.push(total)
         emission_table.value.push(elec)
@@ -3934,65 +3959,6 @@ export default {
         emission_table.value.push(slu)
         emission_table.value.push(reus)
         emission_table.value.push(disc)
-
-
-        _this.emissions_chart = {
-          chartData: {
-            labels: [
-              _this.table_title.global_warming_potential.elec,
-              _this.table_title.global_warming_potential.fuel,
-              _this.table_title.global_warming_potential.treatment,
-              _this.table_title.global_warming_potential.biogas,
-              _this.table_title.global_warming_potential.fuel_digester,
-              _this.table_title.global_warming_potential.sludge,
-              _this.table_title.global_warming_potential.reuse,
-              _this.table_title.global_warming_potential.discharged,
-
-
-            ],
-            datasets: [
-              {
-                backgroundColor: ['#1c195b', '#0095c6', '#5bc9bf', '#00b140', '#ff386b', '#f89c27', '#964fe5'],
-                data: [elec.value, fuel.value, tre.value, biog.value, dig_fuel.value, slu.value, reus.value, disc.value]
-              }
-            ]
-          },
-          chartOptions: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              tooltip: {
-                callbacks: {
-                  label: function(context) {
-                    let datasets = context.dataset;
-                    let sum = datasets.data.map(x => parseFloat(x)).reduce((a, b) => a + b, 0);
-                    let percentage = ((context.raw / sum) * 100).toFixed(2);
-
-                    return context.label + ": "+context.raw + " kgCO2eq/day" + " ("+percentage+"%)"
-                  }
-
-                }
-
-              },
-              datalabels: {
-                formatter: function (value, ctx) {
-                  let datasets = ctx.chart.data.datasets;
-                  if (datasets.length > 0) {
-                    let sum = datasets[0].data.map(x => parseFloat(x)).reduce((a, b) => a + b, 0);
-                    let percentage = ((value / sum) * 100).toFixed(2);
-                    if(percentage > 5) {
-                      return percentage + "%"
-                    }else return ''
-                  }
-
-                },
-                color: 'white'
-              },
-
-
-            },
-          }
-        }
 
         return emission_table
       }
@@ -4040,19 +4006,6 @@ export default {
           value: emissions["n2o"],
           data: this.get_string_impact_legend(industry_impact_legend_category.emissions_and_descriptions(industries[0]))
         }
-
-        //let key = this.industry.name
-
-        //emission_table.header.push({
-          //text: key, value: key,
-        //})
-
-
-        /*co2[key] = emissions["co2"]
-        ch4[key] = emissions["ch4"]
-        n2o[key] = emissions["n2o"]*/
-
-        //emission_table.header.push({text: "Unit", value: "unit", sortable: false,})
         emission_table.value.push(co2)
         emission_table.value.push(ch4)
         emission_table.value.push(n2o)
@@ -4171,7 +4124,7 @@ export default {
           name: "Sludge stockpiling",
           unit: "kgCO2eq/day",
           info: "info_sludge_management",
-          value: emissions["landfilling"],
+          value: emissions["stockpilling"],
           data: this.get_string_impact_legend(industry_impact_legend_category.sludge_stockpilling(industries[0]))
         }
         let transport = {
@@ -4181,25 +4134,14 @@ export default {
           value: emissions["sludge_transport"],
           data: this.get_string_impact_legend(industry_impact_legend_category.sludge_transport(industries[0]))
         }
+        let total = {
+          name: "Total",
+          unit: "kgCO2eq/day",
+          info: "info_sludge_management",
+          value: emissions["total"],
+        }
 
-
-        //let key = this.industry.name
-
-        //emission_table.header.push({
-          //text: key, value: key,
-        //})
-
-
-        /*storage[key] = emissions["storage"]
-        composting[key] = emissions["composting"]
-        incineration[key] = emissions["incineration"]
-        land_application[key] = emissions["land_application"]
-        landfilling[key] = emissions["landfilling"]
-        stockpilling[key] = emissions["stockpilling"]
-        transport[key] = emissions["sludge_transport"]*/
-
-
-        //emission_table.header.push({text: "Unit", value: "unit", sortable: false,})
+        emission_table.value.push(total)
         emission_table.value.push(storage)
         emission_table.value.push(composting)
         emission_table.value.push(incineration)
@@ -4208,51 +4150,6 @@ export default {
         emission_table.value.push(stockpilling)
         emission_table.value.push(transport)
 
-
-
-        _this.ghg_sludge_management_chart = {
-          chartData: {
-            labels: [
-              storage.name, composting.name, incineration.name, land_application.name, landfilling.name, stockpilling.name, transport.name
-            ],
-            datasets: [
-              {
-                backgroundColor: ['#1c195b', '#0095c6', '#5bc9bf', '#00b140', '#ff386b', '#f89c27', '#964fe5'],
-                data: [storage.value, composting.value, incineration.value, land_application.value, landfilling.value, stockpilling.value, transport.value]
-              }
-            ]
-          },
-          chartOptions: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: {
-                display: false
-              },
-              tooltip: {
-                callbacks: {
-                  label: function(context) {
-                    return context.label + ": "+context.raw + " kgCO2eq/day"
-                  }
-
-                }
-
-              },
-              datalabels: {
-                formatter: function (value, ctx) {
-                  let datasets = ctx.chart.data.datasets;
-                  if (datasets.length > 0) {
-                    return value
-                  }
-
-                },
-                color: 'white'
-              },
-
-
-            },
-          }
-        }
 
         return emission_table
       }
@@ -4427,18 +4324,6 @@ export default {
           value: emissions["valorized"],
           data: this.get_string_impact_legend(industry_impact_legend_category.biogenic_valorized(industries[0]))
         }
-        //let key = this.industry.name
-
-        //emission_table.header.push({
-          //text: key, value: key,
-        //})
-
-        /*total[key] = emissions["total"]
-        flared[key] = emissions["flared"]
-        valorized[key] = emissions["valorized"]*/
-
-
-        //emission_table.header.push({text: "Unit", value: "unit", sortable: false,})
 
         emission_table.value.push(total)
         emission_table.value.push(flared)
@@ -4541,7 +4426,7 @@ export default {
             labels: labels_dataset,
             datasets: [
               {
-                backgroundColor: ['#1c195b', '#0095c6', '#5bc9bf'],
+                backgroundColor: labels_dataset.map(pollutant => utils.chooseColor(pollutant)),
                 data: values_dataset
               }
             ]
@@ -4586,6 +4471,43 @@ export default {
       } else return {header: [], emissions: []}
 
     },
+
+    //Increase in temperature in the receiving water body due to industry discharge
+    async generate_delta_temperature_table(){
+
+      let _this = this
+
+      if (_this.industry !== null) {
+
+        let table = {
+          header: [{text: "", value: "name", sortable: false},
+            {text: this.industry.name, value: "value"},
+            {text: "Unit", value: "unit", sortable: false},
+            {text: "Data type", value: "data", sortable: false}],
+          value: []
+        }
+
+        //let key = this.industry.name
+        let industries = [this.industry]
+
+        let delta_temperature = await metrics.delta_temperature(industries, this.global_layers)
+
+        let DataType = industry_impact_legend_category.delta_temperature(industries[0])
+        let pollutant_obj = {
+          name: "Increase in temperature due to industry discharge",
+          unit: "°C",
+          info: "info_delta_temperature",
+          value: delta_temperature,
+          data: this.get_string_impact_legend(DataType)
+
+        }
+        table.value.push(pollutant_obj)
+
+        return table
+      } else return {header: [], emissions: []}
+
+    },
+
 
     //"Increase of the concentration of the pollutants in the receiving water body after discharge (with respect to EQS)" table
     async generate_delta_eqs_table() {
@@ -4765,67 +4687,6 @@ export default {
             },
           }
         }
-
-        return pollutants_table
-      } else return {header: [], emissions: []}
-
-    },
-
-    //Calculates all statistics for current industry (for calculating and evaluating industry impact for showing colors in treeview)
-    async generate_simple_report_table() {
-
-      if (this.industry !== undefined) {
-
-        let pollutants_table = {
-          header: [{text: "Name", value: "value"}, {text: "Country", value: "country"}, {
-            text: "Number of suppliers",
-            value: "supply_chain_number"
-          }, {text: "Pollution impact", value: "pollution_impact", sortable: false}, {
-            text: "Freshwater impact",
-            value: "freshwater_impact",
-            sortable: false
-          }, {text: "GHG emissions from Wastewater", value: "carbon_impact", sortable: false}],
-          value: []
-        }
-
-        let key = this.industry.name
-        let industries = [this.industry]
-
-        let industry_row = {value: key}
-
-        let dilution_factor_value = await metrics.dilution_factor(this.global_layers, industries, true)
-        let dilution_factor_risk = this.risk_categories["dilution_factor"](dilution_factor_value)
-
-        let available_factor = await metrics.available_ratio(this.global_layers, industries)
-        let available_factor_risk = this.risk_categories["water_stress_ratio"](available_factor)
-
-        industry_row["freshwater_impact"] = this.return_avg_risk([dilution_factor_risk, available_factor_risk])
-        industry_row["carbon_impact"] = metrics.emissions_and_descriptions(industries, 1).total
-
-        let eutrophication_factor = metrics.eutrophication_potential(industries).total
-        let eutrophication_risk = this.risk_categories["eutrophication"](eutrophication_factor)
-
-        let ecotox_effluent_factor = metrics.ecotoxicity_potential_tu(industries).total
-        let ecotox_effluent_risk = this.risk_categories["ecotoxicity"](ecotox_effluent_factor)
-
-        let delta_ecotox_factor = (await metrics.delta_tu(industries, this.global_layers, true)).total
-        let delta_ecotox_risk = this.risk_categories["delta_ecotoxicity"](delta_ecotox_factor)
-
-        let eqs_factor = metrics.eqs_avg(industries)
-        let eqs_risk = this.risk_categories["eqs"](eqs_factor)
-
-        let delta_eqs_factor = await metrics.delta_eqs_avg(industries, this.global_layers)
-        let delta_eqs_risk = this.risk_categories["delta_eqs"](delta_eqs_factor)
-
-        industry_row["pollution_impact"] = this.return_avg_risk([eutrophication_risk, ecotox_effluent_risk, delta_ecotox_risk, eqs_risk, delta_eqs_risk])
-
-        let industry = industries[0]
-
-        industry_row["country"] = utils.get_country_code_from_coordinates(industry.location.lat, industry.location.lng)
-        industry_row["supply_chain_number"] = industry.supply_chain.length
-
-        pollutants_table.value.push(industry_row)
-
 
         return pollutants_table
       } else return {header: [], emissions: []}
@@ -5313,6 +5174,8 @@ export default {
                 {id: 3, name: this.table_title.simple_table.delta_tu, info: "Toxic units in the receiving water body indicates if the concentration after the effluent discharge on the water body exceed the EC50, supposing the receiving water has a concentration of 0 before discharge."},
                 {id: 4, name: this.table_title.simple_table.delta_eqs, info: "Increase of the concentration of the pollutants in the receiving water body after discharge (with respect to EQS), supposing the receiving water has a concentration of 0 before discharge."},
                 {id: 5, name: this.table_title.simple_table.eutrophication, info: "Eutrophication potential (EP) is defined as the potential to cause over-fertilization of water and soil, which can result in increased growth of biomass. It will always have positive values; higher values indicate higher impact. It converts the pollutants to PO4 equivalent to calculate the total Eutrophication potential. "},
+                {id: 6, name: this.table_title.simple_table.delta_temperature, info: "Final temperature of the receiving water body after discharge, supposing the receiving water has a temperature of 0 before discharge."},
+
               ]
             },
             {

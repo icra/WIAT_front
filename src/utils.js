@@ -1,7 +1,9 @@
 import axios from "axios";
 import conversion_factors from "@/conversion_factors";
 import colors from "@/colors";
+import risk_categories from "@/risk_categories";
 let main = require("./main")
+import risk_thereshold from "@/risk_categories";
 
 //sum array of numbers
 Array.prototype.sum=function(){return this.reduce((p,c)=>(p+c),0)};
@@ -16,10 +18,87 @@ function sumObjectsByKey(...objs) {
         return a;
     }, {});
 }
+
+function return_avg_risk(factors){
+    let factors_not_null = factors.filter(factor => factor != null && factor != "-").map(factor => factor[1])
+    if(factors_not_null.length === 0) {
+        return null
+    }
+    else if(factors_not_null.includes(risk_thereshold.impact_strings.vh)) {
+        return risk_thereshold.impact_strings.vh
+    }
+    else if(factors_not_null.includes(risk_thereshold.impact_strings.h)) return risk_thereshold.impact_strings.h
+    else if(factors_not_null.includes(risk_thereshold.impact_strings.m)) return risk_thereshold.impact_strings.m
+    else if(factors_not_null.includes(risk_thereshold.impact_strings.l)) return risk_thereshold.impact_strings.l
+    return null
+}
+
 /***************
  Some basic functions used by other components
  */
 let utils = {
+
+    //Generate summary for a given industry
+    async summary_industry(industry, global_layers){
+        let key = industry.name
+        let industries = [industry]
+
+        let industry_row = {value: key}
+
+        industry_row["country"] = utils.get_country_code_from_coordinates(industry.location.lat, industry.location.lng)
+        industry_row["supply_chain_number"] = industry.supply_chain.length
+
+        //calculate  overall water index using avg between industry and its suppliers
+        let avg_owr = 0
+        const locations = [industry.location, ...industry.supply_chain.map(x => x.location)]
+        for (const location of locations){
+            let owr = await utils.overall_water_risk(location.lat, location.lng)
+            avg_owr += owr
+        }
+        avg_owr = avg_owr / locations.length
+        industry_row["owr"] = avg_owr.toFixed(3)
+
+        if(utils.is_industry_valid(industry)){
+
+            let dilution_factor_value = await metrics.dilution_factor(global_layers, industries)
+            let dilution_factor_risk = risk_categories["dilution_factor"](dilution_factor_value)
+
+            let available_factor = await metrics.available_ratio(global_layers, industries)
+            let available_factor_risk = risk_categories["water_stress_ratio"](available_factor)
+
+            let consumption_available_different_watersheds = metrics.external_sources_from_other_watersheds(industries)
+            let consumption_available_different_watersheds_risk = risk_categories['external_sources_from_other_watersheds'](consumption_available_different_watersheds)
+
+            let gw_decline = await metrics.groundwater_withdrawals_in_high_groundwater_decline(industries, global_layers)
+            let gw_decline_risk = risk_categories['groundwater_withdrawals_in_high_groundwater_decline'](gw_decline)
+
+            industry_row["freshwater_impact"] = return_avg_risk([dilution_factor_risk, available_factor_risk, consumption_available_different_watersheds_risk, gw_decline_risk])
+            industry_row["carbon_impact"] = metrics.emissions_and_descriptions(industries, 1).total
+
+            let eutrophication_factor = metrics.eutrophication_potential(industries).total
+            let eutrophication_risk = risk_categories["eutrophication"](eutrophication_factor)
+
+            let delta_temperature = await metrics.delta_temperature(industries, global_layers)
+            let delta_temperature_risk = risk_categories["delta_temperature"](delta_temperature)
+
+            let delta_ecotox_factor = (await metrics.delta_tu(industries, global_layers)).total
+            let delta_ecotox_risk = risk_categories["delta_ecotoxicity"](delta_ecotox_factor)
+
+            let delta_eqs_factor = await metrics.delta_eqs_avg(industries, global_layers)
+            let delta_eqs_risk = risk_categories["delta_eqs"](delta_eqs_factor)
+
+            industry_row["pollution_impact"] = return_avg_risk([eutrophication_risk, delta_ecotox_risk, delta_eqs_risk, delta_temperature_risk])
+
+        }else{
+            industry_row["freshwater_impact"] = "-"
+            industry_row["carbon_impact"] = "-"
+            industry_row["pollution_impact"] = "-"
+        }
+
+        return industry_row
+    },
+
+
 
     /*Gets the string equivalent to the input
   UD = User Data = 1
@@ -49,6 +128,13 @@ let utils = {
 
     //Get color based on str
     chooseColor(str) {
+        if (str == "COD") {
+            return '#1c195b'
+        }else if (str == "TN") {
+            return '#0095c6'
+        }else if (str == "TP") {
+            return '#5bc9bf'
+        }
         return Object.values(colors)[this.hashCode(str) % Object.values(colors).length]
     },
 
@@ -311,6 +397,13 @@ async function discharged_factor(industries, global_layers){
 function calculate_effluent_load(industries, pollutant_effl, only_same_watershed = false){
     let load = industries.map(industry => industry.effl_pollutant_load(pollutant_effl, only_same_watershed)).sum()
     return load
+}
+
+//Multiplies industry discharge water temperature (°C) by the weight of the discharged water (m3/day) and sums the products
+function calculate_effluent_temperature_load(industries, only_same_watershed = false){
+    let load_temperature = industries.map(industry => industry.temperature_of_discharged_water() * industry.water_discharged(only_same_watershed)).sum()
+    return load_temperature
+
 }
 
 function calculate_effluent_load_not_ocean(industries, pollutant_effl){
@@ -755,7 +848,7 @@ Impact and levers for action
 let metrics = {
 
     //Emissions separated by use
-    emissions_and_descriptions(industries, days_factor){
+    emissions_and_descriptions(industries, days_factor = 1){
 
         let industries_emissions = industries.map(industry => industry.ghg())
         let aggregated = sumObjectsByKey(...industries_emissions)
@@ -788,12 +881,15 @@ let metrics = {
 
         let streamflow_value = await streamflow(industries, global_layers) //streamflow (m3/day)
 
+        let water_withdrawn = calculate_water_withdrawn(industries, only_same_watershed) //m3/day
+
         //let dilution_factor = water_discharged/(water_discharged + flow_acc_value)
-        let dilution_factor = (water_discharged + streamflow_value)/water_discharged
+        let dilution_factor = (streamflow_value - water_withdrawn + water_discharged)/water_discharged
 
         return dilution_factor.toExponential(2)
 
     },
+
     //Consumption available ratio (%)
     async available_ratio(global_layers, industries){
 
@@ -1487,6 +1583,11 @@ let metrics = {
             if(Number.isFinite(value)) sludge[key] = value.toExponential(2)
             else sludge[key] = "-"
         })
+
+        let filtered_total = Object.values(sludge).filter(x => x != '-')
+        if(filtered_total.length == 0) sludge["total"] = '-'
+        else sludge["total"] = filtered_total.sum().toExponential(3)
+
         return sludge
     },
 
@@ -1531,7 +1632,24 @@ let metrics = {
     //external sources from other watersheds (m3/day)
     external_sources_from_other_watersheds(industries){
         return calculate_external_sources_different_watershed(industries)
+    },
+
+    //Increase in the temperature of the receiving water body due to the discharges of the industry (°C)
+    // if only_same_watershed is true, only discharges from the same watershed where water is withdrawn are considered
+    async delta_temperature(industries, global_layers){
+
+        let load_temperature = calculate_effluent_temperature_load(industries, true)
+
+        let water_discharged = calculate_water_discharged(industries, true)
+        let streamflow_value = await streamflow(industries, global_layers) //streamflow (m3/day)
+        let water_withdrawn = calculate_surface_water_withdrawn(industries)
+
+        let delta = (load_temperature) / (streamflow_value + water_discharged - water_withdrawn)
+
+        if(isNaN(delta)) return "-"
+        return delta.toExponential(3) //°C
     }
+
 
 
 }

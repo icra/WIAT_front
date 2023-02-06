@@ -26,6 +26,8 @@ Vue.prototype.$layers_description = [
       {
         name: "Population",
         locked: false,
+        belongs_to: "Population",
+
         layer: {
           info: "<b> Temporal resolution: 2000</b>",
           layers: {
@@ -42,8 +44,6 @@ Vue.prototype.$layers_description = [
           monthly: false,
           future: true,
           url: "https://sedac.ciesin.columbia.edu/data/collection/gpw-v4/documentation",
-
-
         },
       },
     ]
@@ -66,6 +66,7 @@ Vue.prototype.$layers_description = [
               {
                 name: "Seasonal variability",
                 locked: false,
+                belongs_to: "Water availability",
 
                 layer: {
                   layers: {
@@ -87,6 +88,7 @@ Vue.prototype.$layers_description = [
               {
                 name: "Interannual variability",
                 locked: false,
+                belongs_to: "Water availability",
 
                 layer: {
                   layers: {
@@ -110,6 +112,7 @@ Vue.prototype.$layers_description = [
           {
             name: "Water supply",
             locked: false,
+            belongs_to: "Water availability",
 
             layer: {
               layers: {
@@ -131,6 +134,7 @@ Vue.prototype.$layers_description = [
           {
             name: "Flow accumulation",
             locked: false,
+            belongs_to: "Water availability",
 
             layer: {
               layers: {
@@ -152,6 +156,7 @@ Vue.prototype.$layers_description = [
           {
             name: "Streamflow",
             locked: false,
+            belongs_to: "Water availability",
 
             layer: {
               layers: {
@@ -181,6 +186,7 @@ Vue.prototype.$layers_description = [
           {
             name: "Water demand",
             locked: false,
+            belongs_to: "Water availability",
 
             layer: {
               layers: {
@@ -209,6 +215,7 @@ Vue.prototype.$layers_description = [
           {
             name: "Water stress",
             locked: false,
+            belongs_to: "Water availability",
 
             layer: {
               layers: {
@@ -230,6 +237,7 @@ Vue.prototype.$layers_description = [
           {
             name: "Water depletion",
             locked: false,
+            belongs_to: "Water availability",
 
             layer: {
               layers: {
@@ -251,6 +259,7 @@ Vue.prototype.$layers_description = [
           {
             name: "Aridity index",
             locked: false,
+            belongs_to: "Water availability",
 
             layer: {
               layers: {
@@ -279,6 +288,7 @@ Vue.prototype.$layers_description = [
           {
             name: "Groundwater table decline",
             locked: false,
+            belongs_to: "Water availability",
 
             layer: {
               layers: {
@@ -308,6 +318,7 @@ Vue.prototype.$layers_description = [
           {
             name: "Riverine flood risk",
             locked: false,
+            belongs_to: "Water availability",
 
             layer: {
               layers: {
@@ -329,6 +340,7 @@ Vue.prototype.$layers_description = [
           {
             name: "Coastal flood risk",
             locked: false,
+            belongs_to: "Water availability",
 
             layer: {
               layers: {
@@ -357,6 +369,7 @@ Vue.prototype.$layers_description = [
           {
             name: "Drought risk",
             locked: false,
+            belongs_to: "Water availability",
 
             layer: {
               layers: {
@@ -392,6 +405,7 @@ Vue.prototype.$layers_description = [
             {
               name: 'Coastal Eutrophication Potential',
               locked: false,
+              belongs_to: "Water quality",
 
               layer: {
             layers: {
@@ -413,6 +427,8 @@ Vue.prototype.$layers_description = [
           {
             name: 'Surface Water Pharmaceutical Pollution',
             locked: false,
+            belongs_to: "Water quality",
+
 
             layer: {
               layers: {
@@ -434,6 +450,8 @@ Vue.prototype.$layers_description = [
           {
             name: 'Coastal Pharmaceutical Pollution',
             locked: false,
+            belongs_to: "Water quality",
+
 
             layer: {
               layers: {
@@ -455,6 +473,8 @@ Vue.prototype.$layers_description = [
           {
             name: 'Unimproved/No Drinking Water',
             locked: false,
+            belongs_to: "Water quality",
+
 
             layer: {
               layers: {
@@ -476,6 +496,8 @@ Vue.prototype.$layers_description = [
           {
             name: 'Unimproved/No Sanitation',
             locked: false,
+            belongs_to: "Water quality",
+
 
             layer: {
               layers: {
@@ -497,6 +519,8 @@ Vue.prototype.$layers_description = [
           {
             name: 'BOD',
             locked: false,
+            belongs_to: "Water quality",
+
 
             layer: {
               layers: {
@@ -518,7 +542,7 @@ Vue.prototype.$layers_description = [
           {
             name: 'Nitrates',
             locked: false,
-
+            belongs_to: "Water quality",
             layer: {
               layers: {
                 baseline: {

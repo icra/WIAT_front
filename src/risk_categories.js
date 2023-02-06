@@ -103,6 +103,15 @@ let risk_category = {
         else if (value >= 2) return red
         return null
     },
+    //delta temperature
+    delta_temperature: function(value){
+        if(value < 0) return null
+        else if (value < 0.5) return blue
+        else if (value < 1) return yellow
+        else if (value < 2) return orange
+        else if (value >= 2) return red
+        return null
+    },
 
     //toxic units
     ecotoxicity: function(){
@@ -166,11 +175,13 @@ let risk_category = {
         return null
     },
 
+    //Consumptive use from different watersheds
     external_sources_from_other_watersheds: function(value){
         if(value < 0) return null
         else if (value == 0) return blue
         else return red
     },
+    //Groundwater withdrawals (only in areas with GW decline)
     groundwater_withdrawals_in_high_groundwater_decline: function(value){
         if(value < 0) return null
         else if (value == 0) return blue
@@ -333,17 +344,13 @@ let risk_category = {
         })
 
     },
-    legend_impact_pdf_2: function(){
-        return {
+    legend_high_impact_pdf: function(dd){
+        dd.content.push({
             style: 'legend',
             table: {
-                widths: [10, 'auto', 10, 'auto', 10, 'auto', 10, 'auto', 10, 'auto'],
+                widths: [10, 'auto', 10, 'auto', 10, 'auto'],
                 body: [
                     [
-                        {text: " ", fillColor: "white", border: [true, true, true, true],},
-                        {text: "Unknown", border: [false, false, false, false]},
-                        {text: " ", fillColor: blue[0], border: [false, false, false, false]},
-                        {text: blue[1], border: [false, false, false, false]},
                         {text: " ", fillColor: yellow[0], border: [false, false, false, false]},
                         {text: yellow[1], border: [false, false, false, false]},
                         {text: " ", fillColor: orange[0], border: [false, false, false, false]},
@@ -353,7 +360,7 @@ let risk_category = {
                     ]
                 ]
             }
-        }
+        })
 
     },
 

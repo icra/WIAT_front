@@ -71,7 +71,6 @@ export class Industry{
         this.volume_withdrawn_groundwater = 0   //Amount of groundwater water withdrawn from the wb per day(m3/day)
         this.volume_external_same_watershed_sources = 0   //Amount of water from external sources per day(m3/day)
         this.volume_external_different_sources = 0   //Amount of water from external sources per day(m3/day)
-
         this.has_direct_discharge = null
         this.industry_type = null
 
@@ -486,6 +485,33 @@ export class Industry{
         return volume
     }
 
+    //temperature of the discharged water
+    temperature_of_discharged_water(){
+
+        let onsite_vol = 0
+        let external_vol = 0
+        let direct_discharge_vol = 0
+        let onsite_temp = 0
+        let external_temp = 0
+        let direct_discharge_temp = 0
+
+        if (this.has_onsite_wwtp == 1) {
+            onsite_vol = this.onsite_wwtp.discharges_same_location_than_withdrawals()
+            onsite_temp = this.onsite_wwtp.wwt_temperature_discharge
+        }
+        if (this.has_offsite_wwtp == 1) {
+            external_vol = this.offsite_wwtp.discharges_same_location_than_withdrawals()
+            external_temp = this.offsite_wwtp.wwt_temperature_discharge
+        }
+        if (this.has_direct_discharge == 1) {
+            direct_discharge_vol = this.direct_discharge.discharges_same_location_than_withdrawals()
+            direct_discharge_temp = this.direct_discharge.wwt_temperature_discharge
+        }
+
+
+        return (onsite_vol*onsite_temp + external_vol*external_temp + direct_discharge_vol*direct_discharge_temp) / (onsite_vol + external_vol + direct_discharge_vol)
+    }
+
 };
 
 export class Direct_discharge{
@@ -503,12 +529,18 @@ export class Direct_discharge{
         this.dd_vol_disc = null
         this.wwt_ch4_efac_dis = 0
         this.wwt_n2o_efac_dis = 0
+        this.wwt_temperature_discharge = 0
+
 
         if (set_level_of_certainty) this.level_of_certainty = level_of_certainty.set_level_of_certainty(industry, 3, true)
         else this.level_of_certainty = {}
 
     }
 
+
+    discharges_same_location_than_withdrawals(){
+        return this.discharge_same_location_as_withdrawal == 1 ? this.dd_vol_disc : 0
+    }
     /*
       GHG emissions (kgCO2eq)
     */
@@ -585,6 +617,9 @@ export class WWTP{
             TN: 0,
             TP: 0,
         }
+
+        this.wwt_temperature_discharge = 0
+
 
         //energy
         this.wwt_nrg_cons = 0
@@ -674,6 +709,11 @@ export class WWTP{
 
 
     }
+
+    discharges_same_location_than_withdrawals(){
+        return this.discharge_same_location_as_withdrawal == 1 ? this.wwt_vol_disc : 0
+    }
+
     /*
     GHG emissions (kgCO2eq)
     */

@@ -122,6 +122,13 @@ function category_of_inputs(industry, inputs, pollutant = null, print = false){
 }
 
 let inputs_required = {
+    delta_temperature(){
+        let industry = []
+        let onsite_wwtp = ['ind_temperature_discharge']
+        let offsite_wwtp = ['ind_temperature_discharge']
+        let direct_discharge = ['ind_temperature_discharge']
+        return {industry, onsite_wwtp, offsite_wwtp, direct_discharge}
+    },
     calculate_effluent_load(){
         let industry = []
         let onsite_wwtp = ['wwt_pollutants_effl', 'wwt_vol_disc']
@@ -480,6 +487,11 @@ let inputs_required = {
 
 
 let industry_impact_legend_category = {
+
+    delta_temperature(industry) {
+        let inputs = inputs_required.delta_temperature()
+        return category_of_inputs(industry, inputs)
+    },
 
     delta_tu(industry, pollutant) {
         let inputs = inputs_required.effl_delta()
