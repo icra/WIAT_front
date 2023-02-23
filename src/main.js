@@ -616,6 +616,11 @@ Vue.prototype.$layers_description = [
   },*/
 ]
 Vue.prototype.$created_pollutants = new Set() //Created pollutants among all assessments and industries
+
+//WIAT loads some necessary elements when the main page (map component) is loaded, so if the map component has not
+//been accessed yet, we should redirect to the map component
+Vue.prototype.$first_page_loaded = false
+
 new Vue({
   router,
   vuetify,

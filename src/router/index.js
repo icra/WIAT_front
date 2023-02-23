@@ -53,7 +53,6 @@ const routes = [
     component: General_config
   },
 
-
 ]
 
 const router = new VueRouter({

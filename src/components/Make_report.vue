@@ -915,10 +915,6 @@ export default {
   },
   watch: {
 
-    selected_layers_pdf: function(value){
-      console.log(this.layers[1])
-    },
-
     radio_layers: function(value){
       let _this = this
       if(value == 2){
@@ -2067,6 +2063,7 @@ export default {
               labels: {
                 font: {
                   size: 35
+                  //size: 60
                 }
               }
 
@@ -2079,6 +2076,7 @@ export default {
               color: 'white',
               font: {
                 size: 35,
+                //size: 60
               }
             },
           },
@@ -2129,7 +2127,8 @@ export default {
 
               },
               font: {
-                size: 25,
+                size: 30,
+                //size: 60
               }
 
             },
@@ -2143,6 +2142,7 @@ export default {
                 },
                 font: {
                   size: 25,
+                  //size: 60
                 }
               }
             },
@@ -2150,6 +2150,7 @@ export default {
               ticks: {
                 font: {
                   size: 25,
+                  //size: 60
                 }
               }
             },
@@ -3329,6 +3330,7 @@ export default {
   },
 
   created(){
+
     let _this = this
     this.assessments_with_industries.forEach(assessment => {
       if(!assessment.disabled) _this.selected_assessments.push(assessment.assessment)

@@ -99,12 +99,10 @@
               :industry_model = industry_model
               :required_item_select_rule = required_item_select_rule
               :items_selected_pollutants = items_selected_pollutants
-              :search_pollutant = search_pollutant
               :onChangeCombobox = onChangeCombobox
               :model_selected_pollutants = model_selected_pollutants
               :button_estimation = button_estimation
               :array_difference = array_difference
-              :remove_chip = remove_chip
               :stepper_model = 1
               ref="industry_questionnaire"
 
@@ -461,9 +459,9 @@ export default {
         "discharge_same_location_as_withdrawal": {items: Tables["Same Watershed/Different watershed/Ocean discharges"]},
       },
       button_estimation: ["ind_pollutants_infl", "ind_pollutants_effl", "wwt_vol_disc", "wwt_vol_treated_external", "wwt_vol_reused", "wwt_pollutants_effl", "wwt_conv_kwh",
-        "wwt_biog_pro", "wwt_biog_fla", "wwt_biog_val", "wwt_biog_lkd", "wwt_biog_sold", "wwt_ch4_biog", "wwt_slu_comp_low_CN_EF", "wwt_slu_comp_seqst_rate", "wwt_slu_comp_uncovered_pile_EF", "wwt_temp_inc", "wwt_slu_lf_uncertainty", "wwt_slu_lf_CH4_in_gas", "wwt_slu_lf_DOCf", "wwt_slu_lf_decomp_3yr", "wwt_slu_lf_low_CN_EF" ],
+        "wwt_biog_pro", "wwt_biog_fla", "wwt_biog_val", "wwt_biog_lkd", "wwt_biog_sold", "wwt_ch4_biog", "wwt_slu_comp_low_CN_EF", "wwt_slu_comp_seqst_rate", "wwt_slu_comp_uncovered_pile_EF", "wwt_temp_inc", "wwt_slu_lf_uncertainty", "wwt_slu_lf_CH4_in_gas", "wwt_slu_lf_DOCf", "wwt_slu_lf_decomp_3yr", "wwt_slu_lf_low_CN_EF", "wwt_slu_sto_EF", "wwt_temperature_discharge"],
       select_estimation: ["wwt_cod_slud", "wwt_ch4_efac_dis", "wwt_ch4_efac_tre", "wwt_n2o_efac_tre", "wwt_n2o_efac_dis", "wwt_slu_sto_TVS", "wwt_slu_sto_f_CH4", "wwt_slu_sto_f_CH4", "wwt_slu_comp_N_cont", "wwt_slu_comp_TVS", "wwt_slu_inc_N_cont", "wwt_slu_la_TVS", "wwt_slu_la_N_cont", "wwt_slu_la_EF", "wwt_slu_lf_TVS", "wwt_slu_lf_MCF", "wwt_slu_lf_N_cont"],
-      basic_inputs: ["volume_external_same_watershed_sources", "volume_external_different_sources", "discharge_same_location_as_withdrawal", "pollutants_list", "ind_pollutants_effl", "wwt_treatment_type", "wwt_vol_trea", "wwt_vol_disc", "dd_vol_disc", "wwt_vol_reused", "wwt_vol_treated_external", "wwt_ch4_efac_tre", "wwt_n2o_efac_tre", "wwt_ch4_efac_dis", "wwt_n2o_efac_dis", "volume_withdrawn", "volume_withdrawn_groundwater", "has_onsite_wwtp", "has_direct_discharge", "has_offsite_wwtp", "industry_type", "product_produced_unit", "product_produced", "ind_cod_effl", "ind_tn_effl", "ind_tp_effl", "wwt_nrg_cons", "wwt_conv_kwh", "wwt_mass_slu", "wwt_cod_slud", "wwt_temperature_discharge"],
+      basic_inputs: ["volume_external_same_watershed_sources", "volume_external_different_sources", "discharge_same_location_as_withdrawal", "pollutants_list", "ind_pollutants_effl", "wwt_treatment_type", "wwt_vol_trea", "wwt_vol_disc", "dd_vol_disc", "wwt_vol_reused", "wwt_vol_treated_external", "wwt_ch4_efac_tre", "wwt_n2o_efac_tre", "wwt_ch4_efac_dis", "wwt_n2o_efac_dis", "volume_withdrawn", "volume_withdrawn_groundwater", "has_onsite_wwtp", "has_direct_discharge", "has_offsite_wwtp", "industry_type", "product_produced_unit", "product_produced", "ind_cod_effl", "ind_tn_effl", "ind_tp_effl", "wwt_nrg_cons", "wwt_conv_kwh", "wwt_mass_slu", "wwt_cod_slud", "wwt_temperature_discharge", "ind_temperature_withdrawn"],
       advanced_pollution_effluent: ["wwt_diclo_effl", "wwt_cadmium_effl", "wwt_hexaclorobenzene_effl", "wwt_mercury_effl", "wwt_plomo_effl", "wwt_niquel_effl", "wwt_chloro_effl", "wwt_hexaclorobutadie_effl", "wwt_nonilfenols_effl", "wwt_tetracloroetile_effl", "wwt_tricloroetile_effl"],
       advanced_fuel_engines: ["wwt_fuel_typ", "wwt_vol_fuel"],
       advanced_biogas_from_anaerobic: ["wwt_biog_pro", "wwt_biog_fla", "wwt_biog_val", "wwt_biog_lkd", "wwt_biog_sold", "wwt_ch4_biog", "wwt_dige_typ", "wwt_fuel_dig"],
@@ -487,7 +485,6 @@ export default {
 
       model_selected_pollutants: defaultIndustry.pollutants_selected,
       items_selected_pollutants: ["COD", "TN", "TP", '1,2-Dichloroethane', 'Cadmium', 'Hexaclorobenzene', 'Mercury', 'Lead', 'Nickel', 'Chloroalkanes', 'Hexachlorobutadiene', 'Nonylphenols', 'Tetrachloroethene', 'Trichloroethylene'],
-      search_pollutant: null,
 
 
     }
@@ -562,8 +559,6 @@ export default {
 
       this.model_selected_pollutants.splice(0, this.model_selected_pollutants.length, ...this.industry.pollutants_selected)
 
-      console.log(this.model_selected_pollutants)
-
       this.industry_to_model()
       this.direct_discharge_to_model()
       this.offsite_wwtp_to_model()
@@ -621,22 +616,22 @@ export default {
 
     //Change in pollutant select
     onChangeCombobox(items){
-
       //Prevent users deleting COD, TN or TP
       if(!items.includes("COD")){
-        this.model_selected_pollutants.splice(0, 0, "COD");
+        items.splice(0, 0, "COD");
         return
       }
       if(!items.includes("TN")){
-        this.model_selected_pollutants.splice(1, 0, "TN");
+        items.splice(1, 0, "TN");
         return
       }
       if(!items.includes("TP")){
-        this.model_selected_pollutants.splice(2, 0, "TP");
+        items.splice(2, 0, "TP");
         return
       }
+      console.log('aa')
 
-
+      //Update ind_pollutants_effl, ind_pollutants_effl and level_of_certainty
       for (let item of items){
         if (!Object.keys(this.industry_model["ind_pollutants_effl"]).includes(item) ){
           this.$set(this.industry_model["ind_pollutants_effl"], item, 0)
@@ -644,21 +639,18 @@ export default {
         if (!Object.keys(this.industry_model["ind_pollutants_infl"]).includes(item)){
           this.$set(this.industry_model["ind_pollutants_infl"], item, 0)
         }
-      }
-    },
-    remove_chip (itemText) {
+        let level_of_certainty = this.industry_model.level_of_certainty
+        if (!Object.keys(level_of_certainty["ind_pollutants_infl"]).includes(item)){
+          this.$set(level_of_certainty["ind_pollutants_infl"], item, 'no_data')
+        }
+        if (!Object.keys(level_of_certainty["ind_pollutants_effl"]).includes(item)){
+          this.$set(level_of_certainty["ind_pollutants_effl"], item, 'no_data')
+        }
 
-      if (itemText === 'COD') {
-        return;
-      } else {
-        this.model_selected_pollutants.forEach(obj => {
-          if (obj === itemText) {
-            this.model_selected_pollutants.splice(this.model_selected_pollutants.indexOf(obj), 1)
-          }
-        })
-        this.model_selected_pollutants = [...this.model_selected_pollutants]
       }
+
     },
+
     scrollToTop() {
       location.href = "#";
       location.href = "#top";
@@ -771,7 +763,8 @@ export default {
       this.scrollToTop()
 
 
-      let selected_pollutants = JSON.parse(JSON.stringify(this.$refs.industry_questionnaire.model_selected_pollutants_data))
+      let selected_pollutants = JSON.parse(JSON.stringify(this.$refs.industry_questionnaire.model_selected_pollutants_))
+      this.model_selected_pollutants = selected_pollutants
 
       //Industry inputs
       for(let input of ['level_of_certainty', ...this.industry_inputs]){
@@ -800,15 +793,7 @@ export default {
 
       this.industry['pollutants_selected'] = selected_pollutants
 
-      for (let pollutant of selected_pollutants){
-        if (!conversion_factors.hasOwnProperty(pollutant)){
-          if (pollutant == "COD" || pollutant == "TN" || pollutant == "TP") {
-            conversion_factors[pollutant] = {eutrophication: null, tu: '-', eqs: '-'}
-          }else{
-            conversion_factors[pollutant] = {eutrophication: '-', tu: null, eqs: null}
-          }
-        }
-      }
+      utils.add_pollutants_to_conversion_factors(selected_pollutants)
 
       //Local wwtp
       if(this.industry.has_onsite_wwtp == 1){
@@ -833,9 +818,6 @@ export default {
         this.industry.reset_offsite_wwtp()
         this.offsite_wwtp_to_model()
       }
-
-      let global_pollutants_created = this.$created_pollutants
-      this.model_selected_pollutants.forEach(item => global_pollutants_created.add(item)) //Update all pollutants created set
 
 
       if(this.industry.has_onsite_wwtp != 1){
@@ -868,28 +850,28 @@ export default {
       let industry = this.industry_model
 
 
-      let disabled = industry.volume_withdrawn != null && industry.volume_withdrawn !== "" &&
-          industry.product_produced != null && industry.product_produced !== "" &&
-          industry.has_onsite_wwtp != null && industry.has_direct_discharge != null && industry.has_offsite_wwtp != null && industry.industry_type != null
+      let disabled = industry.volume_withdrawn !== null && industry.volume_withdrawn !== "" &&
+          industry.product_produced !== null && industry.product_produced !== "" && industry.product_produced !== 0 &&
+          industry.has_onsite_wwtp !== null && industry.has_direct_discharge !== null && industry.has_offsite_wwtp !== null && industry.industry_type !== null
 
       return !disabled
     },
 
     tab_2_disabled(){
       let wwtp = this.onsite_wwtp_model
-      let disabled = wwtp.wwt_vol_trea != null && wwtp.wwt_vol_trea != "" && wwtp.wwt_vol_disc != null && wwtp.wwt_vol_disc != ""
+      let disabled = wwtp.wwt_vol_trea !== 0 && wwtp.wwt_vol_trea !== null && wwtp.wwt_vol_trea !== "" && wwtp.wwt_vol_disc !== null && wwtp.wwt_vol_disc !== ""
       return !disabled
     },
 
     tab_3_disabled(){
       let dd = this.direct_discharge_model
-      let disabled = dd.dd_vol_disc != null && dd.dd_vol_disc != ""
+      let disabled = dd.dd_vol_disc !== null && dd.dd_vol_disc !== "" && dd.dd_vol_disc !== 0
       return !disabled
     },
 
     tab_4_disabled(){
       let wwtp = this.offsite_wwtp_model
-      let disabled = wwtp.wwt_vol_trea != null && wwtp.wwt_vol_trea != ""
+      let disabled = wwtp.wwt_vol_trea !== 0 && wwtp.wwt_vol_trea !== null && wwtp.wwt_vol_trea !== "" && wwtp.wwt_vol_disc !== null && wwtp.wwt_vol_disc !== ""
       return !disabled
     },
   }

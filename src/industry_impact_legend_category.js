@@ -123,10 +123,10 @@ function category_of_inputs(industry, inputs, pollutant = null, print = false){
 
 let inputs_required = {
     delta_temperature(){
-        let industry = []
-        let onsite_wwtp = ['ind_temperature_discharge']
-        let offsite_wwtp = ['ind_temperature_discharge']
-        let direct_discharge = ['ind_temperature_discharge']
+        let industry = ['ind_temperature_withdrawn', 'volume_withdrawn']
+        let onsite_wwtp = ['wwt_temperature_discharge', 'wwt_vol_disc']
+        let offsite_wwtp = ['wwt_temperature_discharge', 'wwt_vol_disc']
+        let direct_discharge = ['wwt_temperature_discharge', 'dd_vol_disc']
         return {industry, onsite_wwtp, offsite_wwtp, direct_discharge}
     },
     calculate_effluent_load(){
@@ -371,9 +371,9 @@ let inputs_required = {
     //Only for COD and TN
     wwt_KPI_GHG_disc(){
         let industry = []
-        let onsite_wwtp = ['wwt_pollutants_effl', 'wwt_vol_disc', 'wwt_ch4_efac_dis']
+        let onsite_wwtp = ['wwt_pollutants_effl', 'wwt_vol_disc', 'wwt_ch4_efac_dis', 'wwt_n2o_efac_dis']
         let offsite_wwtp = onsite_wwtp
-        let direct_discharge = ['wwt_pollutants_effl', 'wwt_ch4_efac_dis', 'wwt_n2o_efac_dis']
+        let direct_discharge = ['wwt_pollutants_effl', 'dd_vol_disc', 'wwt_ch4_efac_dis', 'wwt_n2o_efac_dis']
         return {industry, onsite_wwtp, offsite_wwtp, direct_discharge}
     },
 
@@ -645,8 +645,8 @@ let industry_impact_legend_category = {
         let inputs = inputs_required.wwt_KPI_GHG_tre();
 
         return Math.max(
-            category_of_inputs(industry, inputs, "COD", true),
-            category_of_inputs(industry, inputs, "TN", true)
+            category_of_inputs(industry, inputs, "COD"),
+            category_of_inputs(industry, inputs, "TN")
         )
     },
     emissions_biog(industry) {

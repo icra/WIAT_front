@@ -85,7 +85,7 @@ export let user_inputs = {
     "wwt_mass_slu_comp": {
         question: "Sludge composted (dry weight)",
         value: 0,
-        unit: "kg/L",
+        unit: "kg",
         description_tooltip: "Amount of sludge that is sent to composting (dry weight)"
     }, //kg of sludge composted
     "wwt_slu_comp_emis_treated_or_piles_covered": {
@@ -149,7 +149,7 @@ export let user_inputs = {
         unit: "%"
     }, //%
     "wwt_slu_la_TVS": {
-        question: "Total Volatile Solids (TVS) content of sludge sent to land application)",
+        question: "Total Volatile Solids (TVS) content of sludge sent to land application",
         value: 0,
         unit: "%",
     }, //%
@@ -161,8 +161,8 @@ export let user_inputs = {
     "wwt_slu_la_EF": {
         question: "Amount of Nitrogen converted to N2O",
         value: 0,
-        unit: "kgN2O-N/gN",
-    }, //kgN2O-N/gN
+        unit: "kgN2O-N/kgN",
+    }, //kgN2O-N/kgN
 
     //sludge LF
     "wwt_mass_slu_land": {question: "Sludge sent to landfilling (dry weight)", value: 0, unit: "kg/day"}, //kg of sludge sent to LF
@@ -288,12 +288,12 @@ export let user_inputs = {
     "wwt_vol_treated_external": {question: "Volume of water from the WWTP also treated in an off-site WWTP every day", value: 0, unit: "m3/day"},
 
     "wwt_temperature_discharge": {question: "Temperature of the discharged water", value: 0, unit: "°C"},
-
+    "ind_temperature_withdrawn": {question: "Temperature of water withdrawn from the receiving water body", value: 0, unit: "°C"},
 
     //INDUSTRY INPUTS
     "volume_withdrawn": {question: "Industry withdrawal water quantity (surface water only)", value: 0, unit: "m3/day", description_tooltip:"The quantity entered here is the quantity withdrawn from the river (raw water intake)"},
     "volume_withdrawn_groundwater": {question: "Industry withdrawal water quantity (groundwater only)", value: 0, unit: "m3/day"},
-    "volume_external_same_watershed_sources": {question: "All other external sources of water from the same watershed from which the water was withdrawn.", value: 0, unit: "m3/day", description_tooltip: "The quantity entered here is the quantity of water withdrawn from other sources (e.g. recycled water from a third party, drinking water purchased from the municipality, etc.) from the same watershed from which the water was withdrawn"},
+    "volume_external_same_watershed_sources": {question: "All other external sources of water from the same watershed from which the water was withdrawn", value: 0, unit: "m3/day", description_tooltip: "The quantity entered here is the quantity of water withdrawn from other sources (e.g. recycled water from a third party, drinking water purchased from the municipality, etc.) from the same watershed from which the water was withdrawn"},
     "volume_external_different_sources": {question: "All other external sources of water from different watersheds from where the water was withdrawn", value: 0, unit: "m3/day", description_tooltip: "The quantity entered here is the quantity of water withdrawn from other sources (e.g. recycled water from a third party, drinking water purchased from the municipality, etc.) from different watersheds from where the water was withdrawn"},
 
     "has_onsite_wwtp": {question: "Has the industry an on-site wastewater pre-treatment or treatment plant?", value: false,},
@@ -306,13 +306,10 @@ export let user_inputs = {
 
     "ind_pollutants_effl": {value: 0, unit: "g/m3", description_tooltip: 'Select "Estimated" level of certainty if the non-detect value is used'},
     "ind_pollutants_infl": {value: 0, unit: "g/m3", description_tooltip: 'Select "Estimated" level of certainty if the non-detect value is used'},
-
-
-
 }
 
 //Inputs related to industry step
-export let industry_inputs = ["volume_withdrawn", "volume_withdrawn_groundwater", "volume_external_same_watershed_sources", "volume_external_different_sources", "has_onsite_wwtp", "has_direct_discharge", "has_offsite_wwtp", "industry_type", "product_produced_unit", "product_produced", "pollutants_list", "ind_pollutants_effl", "ind_pollutants_infl"]
+export let industry_inputs = ["volume_withdrawn", "volume_withdrawn_groundwater", "volume_external_same_watershed_sources", "volume_external_different_sources", "has_onsite_wwtp", "has_direct_discharge", "has_offsite_wwtp", "industry_type", "product_produced_unit", "product_produced", "pollutants_list", "ind_pollutants_effl", "ind_temperature_withdrawn", "ind_pollutants_infl"]
 
 //Inputs related to onsite WWTP step (without external WWTP)
 export let onsite_wwtp_no_offsite = ["wwt_treatment_type", "wwt_vol_trea", "wwt_vol_disc", "wwt_vol_reused", "discharge_same_location_as_withdrawal", "wwt_temperature_discharge", "wwt_pollutants_effl", "wwt_nrg_cons", "wwt_conv_kwh", "wwt_mass_slu", "wwt_cod_slud", "wwt_ch4_efac_tre", "wwt_n2o_efac_tre", "wwt_ch4_efac_dis", "wwt_n2o_efac_dis", "wwt_fuel_typ", "wwt_vol_fuel",

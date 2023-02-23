@@ -4,6 +4,7 @@ import colors from "@/colors";
 import risk_categories from "@/risk_categories";
 let main = require("./main")
 import risk_thereshold from "@/risk_categories";
+import Vue from "vue";
 
 //sum array of numbers
 Array.prototype.sum=function(){return this.reduce((p,c)=>(p+c),0)};
@@ -37,6 +38,22 @@ function return_avg_risk(factors){
  Some basic functions used by other components
  */
 let utils = {
+
+    add_pollutants_to_conversion_factors: function (pollutants) {
+        for (let pollutant of pollutants){
+            if (!conversion_factors.hasOwnProperty(pollutant)){
+                if (pollutant == "COD" || pollutant == "TN" || pollutant == "TP") {
+                    conversion_factors[pollutant] = {eutrophication: null, tu: '-', eqs: '-'}
+                }else{
+                    conversion_factors[pollutant] = {eutrophication: '-', tu: null, eqs: null}
+                }
+            }
+        }
+
+        let global_pollutants_created = Vue.prototype.$created_pollutants
+        pollutants.forEach(item => global_pollutants_created.add(item)) //Update all pollutants created set
+
+    },
 
     //Generate summary for a given industry
     async summary_industry(industry, global_layers){
@@ -399,11 +416,23 @@ function calculate_effluent_load(industries, pollutant_effl, only_same_watershed
     return load
 }
 
-//Multiplies industry discharge water temperature (°C) by the weight of the discharged water (m3/day) and sums the products
-function calculate_effluent_temperature_load(industries, only_same_watershed = false){
-    let load_temperature = industries.map(industry => industry.temperature_of_discharged_water() * industry.water_discharged(only_same_watershed)).sum()
-    return load_temperature
+//avg of increment of temperature of water body due to discharge of effluent (°C)
+async function calculate_delta_temperature(industries, global_layers, only_same_watershed = false){
 
+    let temperatures = []
+    for (let industry of industries){
+        let streamflow_value = await streamflow([industry], global_layers) //streamflow (m3/day)
+        let water_withdrawn = calculate_surface_water_withdrawn([industry]) //m3/day
+        let temperature_water_body = industry.temperature_of_water_withdrawn()
+        let mass_temperature_product = industry.mass_temperature_product()
+        let water_discharged = industry.water_discharged(only_same_watershed)
+
+        let final_temperature = (((streamflow_value-water_withdrawn)*temperature_water_body) + mass_temperature_product) / (streamflow_value-water_withdrawn+water_discharged)
+
+        temperatures.push(final_temperature - temperature_water_body)
+    }
+
+    return temperatures.sum() / temperatures.length
 }
 
 function calculate_effluent_load_not_ocean(industries, pollutant_effl){
@@ -863,6 +892,7 @@ let metrics = {
     emissions_deglossed(industries){
 
         let industries_emissions = industries.map(industry => industry.ghg_deglossed())
+
         let aggregated = sumObjectsByKey(...industries_emissions)
         Object.keys(aggregated).forEach(key => {
             let value = aggregated[key]
@@ -881,7 +911,7 @@ let metrics = {
 
         let streamflow_value = await streamflow(industries, global_layers) //streamflow (m3/day)
 
-        let water_withdrawn = calculate_water_withdrawn(industries, only_same_watershed) //m3/day
+        let water_withdrawn = calculate_surface_water_withdrawn(industries, only_same_watershed) //m3/day
 
         //let dilution_factor = water_discharged/(water_discharged + flow_acc_value)
         let dilution_factor = (streamflow_value - water_withdrawn + water_discharged)/water_discharged
@@ -1437,12 +1467,14 @@ let metrics = {
             let tu_factor = conversion_factors[pollutant]['tu']
             let pollutant_delta = await effl_delta(industries, pollutant, global_layers, only_same_watershed)
             let delta_tu = 1000*pollutant_delta/tu_factor
-            if(Number.isFinite(delta_tu)) toxic_units[pollutant] = delta_tu.toExponential(2)
+
+            if(pollutant_delta == 0) toxic_units[pollutant] = (0).toFixed(3)
+            else if(Number.isFinite(delta_tu)) toxic_units[pollutant] = delta_tu.toExponential(2)
             else toxic_units[pollutant] = "-"
 
         }
-
-        if (Object.values(toxic_units).filter(x => x != "-").length == 0) toxic_units["total"] = '-'
+        if (utils.get_pollutants(industries).length == 0) toxic_units = {}
+        else if (Object.values(toxic_units).filter(x => x != "-").length == 0) toxic_units["total"] = '-'
         else toxic_units["total"] = Object.values(toxic_units).sum().toExponential(2)
 
         return toxic_units
@@ -1472,6 +1504,7 @@ let metrics = {
             let eqs_factor = conversion_factors[pollutant]['eqs']
             let pollutant_delta = await effl_delta(industries, pollutant, global_layers, same_watershed)
             let delta_eqs = 100*pollutant_delta/eqs_factor
+
 
             if(pollutant_delta == 0) toxic_units[pollutant] = (0).toFixed(3)
             else if(Number.isFinite(delta_eqs)) toxic_units[pollutant] = delta_eqs.toFixed(3)
@@ -1636,18 +1669,10 @@ let metrics = {
 
     //Increase in the temperature of the receiving water body due to the discharges of the industry (°C)
     // if only_same_watershed is true, only discharges from the same watershed where water is withdrawn are considered
-    async delta_temperature(industries, global_layers){
-
-        let load_temperature = calculate_effluent_temperature_load(industries, true)
-
-        let water_discharged = calculate_water_discharged(industries, true)
-        let streamflow_value = await streamflow(industries, global_layers) //streamflow (m3/day)
-        let water_withdrawn = calculate_surface_water_withdrawn(industries)
-
-        let delta = (load_temperature) / (streamflow_value + water_discharged - water_withdrawn)
-
-        if(isNaN(delta)) return "-"
-        return delta.toExponential(3) //°C
+    async delta_temperature(industries, global_layers) {
+        let delta_temp = await calculate_delta_temperature(industries, global_layers, true)
+        if (isNaN(delta_temp)) return "-"
+        return delta_temp.toFixed(2)
     }
 
 

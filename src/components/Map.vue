@@ -2216,6 +2216,9 @@ export default {
     },
   },
 
+  created() {
+    Vue.prototype.$first_page_loaded = true
+  },
   mounted() {
     this.setupLeafletMap();
     this.place_markers(this.$location_markers)

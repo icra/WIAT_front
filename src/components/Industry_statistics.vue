@@ -381,8 +381,8 @@
                       >
                         <template v-slot:item.name="{ item }">
                         <span v-if="item.info">
-                        {{ item.name }}
-                        <v-btn
+                          {{ item.name }}
+                          <v-btn
                             icon
 
                             @click="selected_pollutant = item.name; $data[item.info] = true"
@@ -395,9 +395,7 @@
                             mdi-information-outline
                           </v-icon>
                         </v-btn>
-
-
-                      </span>
+                        </span>
                           <span v-else>{{ item.name }}</span>
                         </template>
 
@@ -429,7 +427,7 @@
                                 text-color="#1c1c1b"
                                 class="chip_no_hover"
                             >
-                              {{ item.data }}
+                              {{ item.value }}
                             </v-chip>
                           </template>
 
@@ -529,30 +527,26 @@
                       >
 
                         <template v-slot:item.name="{ item }">
-                      <span v-if="item.info">
-                        {{ item.name }}
-                        <v-btn
-                            icon
-                            @click="selected_pollutant = item.name; $data[item.info] = true"
-                            class="icon_clickable"
-                            x-small
-                        >
-                          <v-icon
-                              color='#1C195B'
-                          >
-                            mdi-information-outline
-                          </v-icon>
-                        </v-btn>
-
-
-                      </span>
+                          <span v-if="item.info">
+                            {{ item.name }}
+                            <v-btn
+                                icon
+                                @click="selected_pollutant = item.name; $data[item.info] = true"
+                                class="icon_clickable"
+                                x-small
+                            >
+                              <v-icon
+                                  color='#1C195B'
+                              >
+                                mdi-information-outline
+                              </v-icon>
+                            </v-btn>
+                          </span>
                           <span v-else>{{ item.name }}</span>
                         </template>
-
                         <template
                             v-slot:item.value="{ item }"
                         >
-
                           <template v-if="getDeltaEQSColor(item) != null">
                             <v-tooltip bottom>
                               <template v-slot:activator="{ on, attrs }">
@@ -578,7 +572,7 @@
                                 text-color="#1c1c1b"
                                 class="chip_no_hover"
                             >
-                              {{ item.data }}
+                              {{ item.value }}
                             </v-chip>
                           </template>
                         </template>
@@ -603,7 +597,6 @@
                             </v-tooltip>
                           </template>
                         </template>
-
 
                       </v-data-table>
 
@@ -838,23 +831,21 @@
                       >
 
                         <template v-slot:item.name="{ item }">
-                      <span v-if="item.info">
-                        {{ item.name }}
-                        <v-btn
-                            icon
-                            @click="selected_pollutant = item.name; $data[item.info] = true"
-                            class="icon_clickable"
-                            x-small
-                        >
-                          <v-icon
-                              color='#1C195B'
-                          >
-                            mdi-information-outline
-                          </v-icon>
-                        </v-btn>
-
-
-                      </span>
+                          <span v-if="item.info">
+                            {{ item.name }}
+                            <v-btn
+                                icon
+                                @click="selected_pollutant = item.name; $data[item.info] = true"
+                                class="icon_clickable"
+                                x-small
+                            >
+                              <v-icon
+                                  color='#1C195B'
+                              >
+                                mdi-information-outline
+                              </v-icon>
+                            </v-btn>
+                          </span>
                           <span v-else>{{ item.name }}</span>
                         </template>
                         <template
@@ -1015,9 +1006,9 @@
                       >
 
                         <template v-slot:item.name="{ item }">
-                      <span v-if="item.info">
-                        {{ item.name }}
-                        <v-btn
+                          <span v-if="item.info">
+                            {{ item.name }}
+                            <v-btn
                             icon
                             @click="$data[item.info] = true"
                             class="icon_clickable"
@@ -1029,7 +1020,7 @@
                             mdi-information-outline
                           </v-icon>
                         </v-btn>
-                      </span>
+                          </span>
                           <span v-else>{{ item.name }}</span>
                         </template>
                         <template
@@ -1435,23 +1426,22 @@
                           dense
                       >
                         <template v-slot:item.name="{ item }">
-                      <span v-if="item.info">
-                        {{ item.name }}
-                        <v-btn
-                            icon
-                            @click="$data[item.info] = true"
-                            class="icon_clickable"
-                            x-small
-                        >
-                          <v-icon
-                              color='#1C195B'
-                          >
-                            mdi-information-outline
-                          </v-icon>
-                        </v-btn>
+                          <span v-if="item.info">
+                            {{ item.name }}
+                            <v-btn
+                                icon
+                                @click="$data[item.info] = true"
+                                class="icon_clickable"
+                                x-small
+                            >
+                              <v-icon
+                                  color='#1C195B'
+                              >
+                                mdi-information-outline
+                              </v-icon>
+                            </v-btn>
 
-
-                      </span>
+                          </span>
                           <span v-else>{{ item.value }}</span>
                         </template>
                         <template
@@ -2873,20 +2863,25 @@
             width="60%"
         >
           <div class="dialog_detail" style="background-color: white">
-            <h3> Increase in the temperature in the receiving water body due to industry discharge </h3>
+            <h3> Increase in the temperature in the receiving water body due to industry discharge</h3>
             <br>
             <div
-                v-katex:display="' \\frac{ \\sum_{i \\in DP} W_{effl_i} \\cdot T_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl_i}} '"></div>
+                v-katex:display="' \\Delta T = \\frac{ (W_a - W_w)\\cdot T_{WB} + \\sum_{i \\in DP} W_{effl_i} \\cdot T_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl_i}} - T_{WB} '"></div>
 
             <b>Where:</b>
             <br>
             <ul>
+              <li><span v-katex="'\\Delta T'"></span>: Increase in the temperature in the receiving water body due to industry discharge</li>
+
               <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water</li>
               <li><span v-katex="'T_{effl}'"></span>: Temperature of water discharged to the same water body from which it was withdrawn (°C)</li>
               <li><span v-katex="'W_{effl}'"></span>: Amount of water discharged into the same watershed from which it was withdrawn</li>
               <li><span v-katex="'W_{a}'"></span>: amount of water available in the river <b>(streamflow global
                 indicator)</b></li>
               <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river</li>
+              <li><span v-katex="'T_{WB}'"></span>: Temperature in water body before discharge</li>
+
+
 
             </ul>
 
@@ -3115,7 +3110,7 @@
             <ul>
               <li><span v-katex="'C'"></span>: Concentration of pollutants in the water after treatment in the WWTP (g/m3)</li>
               <li><span v-katex="'TU'"></span>: Toxic Units in the industry effluent aims to calculate how toxic is industry effluent for ecosystem</li>
-              <li><span v-katex="'EQS'"></span>: Enviromental Quality Standards are the limits approved by the EU's Water Framework Directive</li>
+              <li><span v-katex="'EQS'"></span>: Concentration with respect to EQS</li>
 
               <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water</li>
               <li><span v-katex="this.selected_pollutant+'_{effl}'"></span>: load of pollutant in the industry effluent</li>
@@ -3153,7 +3148,7 @@
               <li><span v-katex="'C_{effl}'"></span>: Concentration of {{ this.selected_pollutant }} in the industry effluent after treatment in the WWTP (only the part that is being discharged in the same water body where water was withdrawn) (g/m3)</li>
               <li><span v-katex="'\\Delta'"></span>: Increase of the concentration in the water body where water was withdrawn after industry discharge (g/m3)</li>
               <li><span v-katex="'TU'"></span>: Toxic Units in the industry effluent aims to calculate how toxic is industry effluent for ecosystem </li>
-              <li><span v-katex="'EQS'"></span>: Enviromental Quality Standards are the limits approved by the EU's Water Framework Directive</li>
+              <li><span v-katex="'EQS'"></span>: Concentration with respect to EQS</li>
 
               <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water</li>
               <li><span v-katex="this.selected_pollutant+'_{effl}'"></span>: load of pollutant in the effluent</li>
@@ -3760,20 +3755,6 @@ export default {
         }
       }
     },
-
-    //Return very high impact if there is a very high impact in factors, high impact if there is a high impact in factors, ..., until low impact level is reached
-    return_avg_risk(factors) {
-      let factors_not_null = factors.filter(factor => factor != null && factor != "-").map(factor => factor[1])
-      if (factors_not_null.length === 0) {
-        return null
-      } else if (factors_not_null.includes(risk_thereshold.impact_strings.vh)) {  //Very high
-        return risk_thereshold.impact_strings.vh
-      } else if (factors_not_null.includes(risk_thereshold.impact_strings.h)) return risk_thereshold.impact_strings.h  //High
-      else if (factors_not_null.includes(risk_thereshold.impact_strings.m)) return risk_thereshold.impact_strings.m  //Medium
-      else if (factors_not_null.includes(risk_thereshold.impact_strings.l)) return risk_thereshold.impact_strings.l  //Low
-      return null
-    },
-
 
     //Get impact associated to item (related to freshwater)
     getAvailabilityColor(item) {
@@ -4618,28 +4599,33 @@ export default {
         }
 
         let tu = await metrics.delta_tu(industries, _this.global_layers, true)
-        let total = {name: _this.table_title.pollutants.total, unit: "TU/day", value: tu.total}
-        pollutants_table.value.push(total)
 
         let labels_dataset = []
         let values_dataset = []
 
+        if (utils.remove_nutrients(this.industry.pollutants_selected).length > 0){
+          let total = {name: _this.table_title.pollutants.total, unit: "TU/day", value: tu.total}
+          pollutants_table.value.push(total)
 
-        for(let pollutant of utils.remove_nutrients(this.industry.pollutants_selected)){
-          let DataType = industry_impact_legend_category.delta_tu(industries[0], pollutant)
-          let pollutant_obj = {
-            name: pollutant,
-            unit: "TU/day",
-            info: "info_delta_tu",
-            value: tu[pollutant],
-            data: this.get_string_impact_legend(DataType)
+          for(let pollutant of utils.remove_nutrients(this.industry.pollutants_selected)){
+            let DataType = industry_impact_legend_category.delta_tu(industries[0], pollutant)
+            let pollutant_obj = {
+              name: pollutant,
+              unit: "TU/day",
+              info: "info_delta_tu",
+              value: tu[pollutant],
+              data: this.get_string_impact_legend(DataType)
 
+            }
+            pollutants_table.value.push(pollutant_obj)
+
+            labels_dataset.push(pollutant)
+            values_dataset.push(tu[pollutant])
           }
-          pollutants_table.value.push(pollutant_obj)
-
-          labels_dataset.push(pollutant)
-          values_dataset.push(tu[pollutant])
         }
+
+
+
 
         //let dichloroethane = {value: _this.table_title.pollutants.diclo, unit: "TU/day", info: "info_delta_tu_diclo"}
 
@@ -5174,7 +5160,7 @@ export default {
                 {id: 3, name: this.table_title.simple_table.delta_tu, info: "Toxic units in the receiving water body indicates if the concentration after the effluent discharge on the water body exceed the EC50, supposing the receiving water has a concentration of 0 before discharge."},
                 {id: 4, name: this.table_title.simple_table.delta_eqs, info: "Increase of the concentration of the pollutants in the receiving water body after discharge (with respect to EQS), supposing the receiving water has a concentration of 0 before discharge."},
                 {id: 5, name: this.table_title.simple_table.eutrophication, info: "Eutrophication potential (EP) is defined as the potential to cause over-fertilization of water and soil, which can result in increased growth of biomass. It will always have positive values; higher values indicate higher impact. It converts the pollutants to PO4 equivalent to calculate the total Eutrophication potential. "},
-                {id: 6, name: this.table_title.simple_table.delta_temperature, info: "Final temperature of the receiving water body after discharge, supposing the receiving water has a temperature of 0 before discharge."},
+                {id: 6, name: this.table_title.simple_table.delta_temperature, info: "Increase in the temperature in the receiving water body after discharging water."},
 
               ]
             },
@@ -5211,7 +5197,7 @@ export default {
               children: [
                 {id: 20, name: "Energy use", info: "Energy used by the industry to treat a m3 of water"},
                 {id: 21, name: "Effluent concentration prior to discharge", info: "TN and COD concentration of the effluent, which are triggering N2O and methane emissions"},
-                {id: 22, name: "Biogenic emissions", info: "Biogenic emissions sources are emissions that come from natural sources"},
+                {id: 22, name: "Potential to capture CO2", info: "When burning the biogas in a flare or through an energy valorisation system such as a CHP engine or a heater, the CO2 emissions in the exhaust can be captured to be valorised or stored."},
                 {id: 23, name: "GHG emissions by source", info: "Amount of CO2eq by source emitted to the atmosphere during wastewater treatment process"},
                 {id: 24, name: "Sludge management", info: "GHG emissions from sludge management operations (storing, composting, incineration, land application, landfilling, stockpiling and truck transport)"},
               ]

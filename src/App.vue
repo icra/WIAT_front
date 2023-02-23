@@ -893,6 +893,7 @@
 
 <script>
 import {Assessment, Industry } from "./ecam_backend";
+import Vue from "vue";
 export default {
   data () {
     return {
@@ -960,6 +961,13 @@ export default {
       dialog_legal: false
     }
   },
+
+  beforeCreate() {
+    if(!Vue.prototype.$first_page_loaded) {
+      this.$router.push({name: 'map'})
+    }
+  },
+
   created() {
     document.title = "WIAT";
     window.addEventListener('beforeunload', e => this.beforeunloadFn(e))

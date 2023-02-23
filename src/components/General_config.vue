@@ -5,6 +5,7 @@
 
     <div>
       For some factors WIAT has a default value assigned based on the literature (for example, for converting a pollutant to Toxic Units), but if you add more contaminants to work with in WIAT, you will have to add these values yourself.  For some factors WIAT has a default value assigned based on the literature (for example, for converting a pollutant to Toxic Units), but if you add more contaminants to work with in WIAT, you will have to add these values yourself.
+      <b>If a value is not set it will be considered as 0.</b>
     </div>
 
     <v-card style="margin: 30px">
@@ -145,7 +146,7 @@
 
         <template v-slot:no-data>
           <br>
-          <h2>Create industries first!</h2>
+          <h2>Create industries first or add pollutants first!</h2>
         </template>
       </v-data-table>
     </v-card>
@@ -222,7 +223,6 @@ export default {
   methods: {
     initialize () {
       let created_pollutants_set = this.$created_pollutants
-
       this.pollutants = utils.remove_nutrients([...created_pollutants_set]).map(pollutant => (
             {
               name: pollutant,
@@ -233,10 +233,6 @@ export default {
               warning: utils.pollutants_from_older_version.includes(pollutant) ? 'mdi-alert' : ''
             }
       ))
-
-
-
-
     },
 
     editItem (item) {

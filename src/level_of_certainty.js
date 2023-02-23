@@ -62,12 +62,15 @@ let level_of_certainty = {
 
         try{
             Object.keys(stage).forEach(input => {
+
+
                 if (!this.keys_without_level_of_certainty.has(input)){
                     if(!this.keys_with_pollutant.has(input)){
                         if (set_no_data){
                             level_of_certainty[input] = 'no_data'
                         }else{
                             let estimation = industry_estimations.get_estimation(input, industry, industry, stepper_model, wwtp, wwtp, null, true)
+
                             if(stage[input] == 0 || stage[input] == null || stage[input] == '' ){
                                 level_of_certainty[input] = 'no_data'
                             }else if (stage[input] == estimation){

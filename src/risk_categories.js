@@ -104,6 +104,7 @@ let risk_category = {
         return null
     },
     //delta temperature
+    // https://www.knowyourh2o.com/outdoor-3/water-quality-index-calculator-for-surface-water
     delta_temperature: function(value){
         if(value < 0) return null
         else if (value < 0.5) return blue
@@ -129,21 +130,21 @@ let risk_category = {
 
     //Increase of the concentration of the pollutants in the receiving water body after discharge (with respect to EQS)
     delta_eqs: function(value){
-        if(value < 0) return null
+        if(value < 0 || value === '-') return null
         else if (value < 2) return blue
         else if (value < 100) return yellow
         else if (value < 200) return orange
-        else if (value === '-' || value >= 200) return red
+        else if (value >= 200) return red
         return null
     },
 
     //Increase in toxic units in the receiving water body after discharge
     delta_ecotoxicity: function(value){
-        if(value < 0) return null
+        if(value < 0 || value === '-') return null
         else if (value < 0.2) return blue
         else if (value < 1) return yellow
         else if (value < 2) return orange
-        else if (value === '-' || value >= 2) return red
+        else if (value >= 2) return red
         return null
     },
 

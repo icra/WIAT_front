@@ -114,7 +114,7 @@
         <v-col cols="2">
           <v-select
               label="Level of certainty"
-              :items = level_of_certainty
+              :items = level_of_certainty_text
               v-model="industry_model.level_of_certainty[industry_input]"
               item-text="text"
               item-value="key"
@@ -129,7 +129,7 @@
       >
         <v-col cols="12">
           <v-combobox
-              v-model="model_selected_pollutants_data"
+              v-model="model_selected_pollutants_"
               :items="items_selected_pollutants"
               :search-input.sync="search_pollutant"
               hide-selected
@@ -147,6 +147,7 @@
                       v-bind="attrs"
                       v-on="on"
                       class="link_to_report"
+                      style="color: #b62373;"
                   >Parameter configuration window</span>
                 </template>
                 <span>Accessible from your permanent side menu</span>
@@ -180,7 +181,7 @@
       <!-- ind_pollutants_effl -->
       <v-row v-else-if = "industry_input == 'ind_pollutants_effl'"
              align="center"
-             v-for = "pollutant in model_selected_pollutants"
+             v-for = "pollutant in model_selected_pollutants_"
              :key="pollutant"
       >
         <v-col cols="7" >
@@ -232,7 +233,7 @@
         <v-col cols="2">
           <v-select
               label="Level of certainty"
-              :items = level_of_certainty
+              :items = level_of_certainty_text
               v-model="industry_model.level_of_certainty[industry_input][pollutant]"
               item-text="text"
               item-value="key"
@@ -262,7 +263,7 @@
             >
               <v-row
                   align="center"
-                  v-for = "pollutant in model_selected_pollutants"
+                  v-for = "pollutant in model_selected_pollutants_"
                   :key="pollutant"
               >
                 <!-- Input description -->
@@ -325,7 +326,7 @@
                 <v-col cols="2">
                   <v-select
                       label="Level of certainty"
-                      :items = level_of_certainty
+                      :items = level_of_certainty_text
                       v-model="industry_model.level_of_certainty[industry_input][pollutant]"
                       item-text="text"
                       item-value="key"
@@ -354,21 +355,22 @@ export default {
   name: "industry_questionnaire",
   props: [ 'array_intersection', 'industry_inputs', 'basic_inputs', 'user_inputs', 'required',
     'button_estimations', 'select_estimation', 'type_option', 'industry_model', 'required_item_select_rule',
-  'items_selected_pollutants', 'search_pollutant', 'onChangeCombobox', 'model_selected_pollutants', 'button_estimation', 'array_difference',
-    'remove_chip', 'required_item_text_rule', 'stepper_model'],
+  'items_selected_pollutants', 'onChangeCombobox', 'model_selected_pollutants', 'button_estimation', 'array_difference',
+    'required_item_text_rule', 'stepper_model'],
   data(){
     let _this = this
     return {
-      level_of_certainty: [
+      level_of_certainty_text: [
         { text: 'User data', key: 'user_data' },
         { text: 'Estimated', key: 'estimated' },
         { text: 'Modeled', key: 'modeled' },
         { text: 'No data', key: 'no_data' },
       ],
       keys_without_level_of_certainty: level_of_certainty.keys_without_level_of_certainty,
-      model_selected_pollutants_data: _this.model_selected_pollutants,
       cod_influent_quality: null,
       tn_influent_quality: null,
+      search_pollutant: null,
+      model_selected_pollutants_: _this.model_selected_pollutants
 
     }
   },
@@ -398,6 +400,13 @@ export default {
   },
 
   methods: {
+    remove_chip (itemText) {
+      let index = this.model_selected_pollutants_.indexOf(itemText)
+      if (index > -1) {
+        this.model_selected_pollutants_.splice(index, 1);
+      }
+      this.onChangeCombobox(this.model_selected_pollutants_)
+    },
     infl_estimation_cod(){
       let _this = this
       this.button_estimations('ind_pollutants_infl', 'COD').then((res) => {

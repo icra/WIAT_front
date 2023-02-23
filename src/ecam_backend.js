@@ -1,9 +1,4 @@
 
-/*
-  UTILS
-*/
-import {utils} from "./utils"
-import Countries from "./countries"
 import {level_of_certainty} from "@/level_of_certainty";
 
 //sum array of numbers
@@ -90,6 +85,7 @@ export class Industry{
         this.product_produced = null
         this.product_produced_unit = 'tonnes'
         this.supply_chain = []  //Suppliers
+        this.ind_temperature_withdrawn = 0   //Temperature of the water withdrawn from the water body (°C)
 
         this.level_of_certainty = level_of_certainty.set_level_of_certainty(this, 1, true)
         //this.level_of_certainty = {}
@@ -485,8 +481,13 @@ export class Industry{
         return volume
     }
 
-    //temperature of the discharged water
-    temperature_of_discharged_water(){
+    //temperature of the water withdrawn
+    temperature_of_water_withdrawn(){
+        return this.ind_temperature_withdrawn == null ? 0 : this.ind_temperature_withdrawn
+    }
+
+    //from discharges to same watershed than withdrawals, returns the temperature of the water discharged multiplied by the volume of water discharged
+    mass_temperature_product(){
 
         let onsite_vol = 0
         let external_vol = 0
@@ -494,6 +495,7 @@ export class Industry{
         let onsite_temp = 0
         let external_temp = 0
         let direct_discharge_temp = 0
+
 
         if (this.has_onsite_wwtp == 1) {
             onsite_vol = this.onsite_wwtp.discharges_same_location_than_withdrawals()
@@ -509,7 +511,7 @@ export class Industry{
         }
 
 
-        return (onsite_vol*onsite_temp + external_vol*external_temp + direct_discharge_vol*direct_discharge_temp) / (onsite_vol + external_vol + direct_discharge_vol)
+        return onsite_vol*onsite_temp + external_vol*external_temp + direct_discharge_vol*direct_discharge_temp
     }
 
 };
@@ -574,8 +576,8 @@ export class Direct_discharge{
     wwt_KPI_GHG_disc(){
         let co2   = 0;
 
-        let cod = this.wwt_pollutants_effl["COD"]
-        let tn = this.wwt_pollutants_effl["TN"]
+        let cod = this.wwt_pollutants_effl["COD"] * this.dd_vol_disc / 1000  //kg
+        let tn = this.wwt_pollutants_effl["TN"] * this.dd_vol_disc/ 1000  //kg
 
         let ch4   = cod*this.wwt_ch4_efac_dis*Cts.ct_ch4_eq.value;    //Equation 6.2 IPCC
         let n2o   = tn*this.wwt_n2o_efac_dis*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;    //Equation 6.12 IPCC
@@ -591,7 +593,7 @@ export class WWTP{
 
         this.location = null
         if (industry != null) this.location = industry.location
-        this.discharge_same_location_as_withdrawal = 1  //yes/no
+        this.discharge_same_location_as_withdrawal = 1  //different watershed/same watershed/ocean discharge
 
         this.wwt_treatment_type = 0
         this.wwt_vol_trea = null            //Amount of water treated by WWTP
@@ -748,6 +750,7 @@ export class WWTP{
         let disc = this.wwt_KPI_GHG_disc()
 
         let arr = [elec, fuel, treatment, biog, digester_fuel, slu, reuse, disc]
+
         let co2 = arr.map(x => x.co2).sum()
         let n2o = arr.map(x => x.n2o).sum()
         let ch4 = arr.map(x => x.ch4).sum()
@@ -760,11 +763,12 @@ export class WWTP{
     wwt_KPI_GHG_disc(){
         let co2   = 0;
 
-        let cod = this.wwt_pollutants_effl["COD"]
-        let tn = this.wwt_pollutants_effl["TN"]
+        let cod = this.wwt_pollutants_effl["COD"] * this.wwt_vol_disc / 1000  //kg
+        let tn = this.wwt_pollutants_effl["TN"] * this.wwt_vol_disc/ 1000  //kg
 
-        let ch4   = cod*this.wwt_vol_disc*this.wwt_ch4_efac_dis*Cts.ct_ch4_eq.value;    //Equation 6.2
-        let n2o   = tn *this.wwt_vol_disc*this.wwt_n2o_efac_dis*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;    //Equation 6.12
+        let ch4   = cod * this.wwt_ch4_efac_dis * Cts.ct_ch4_eq.value;    //Equation 6.2
+        let n2o   = tn * this.wwt_n2o_efac_dis * Cts.ct_N_to_N2O_44_28.value * Cts.ct_n2o_eq.value;    //Equation 6.12
+
         let total = co2+ch4+n2o;
         return {total,co2,ch4,n2o};
     }
@@ -777,12 +781,13 @@ export class WWTP{
         let cod_infl_wwtp = this.wwt_pollutants_infl_wwtp["COD"]
         let tn_infl_wwtp = this.wwt_pollutants_infl_wwtp["TN"]
 
-        let cod_load = cod_infl_ind*this.wwt_vol_trea + this.wwt_vol_from_external*cod_infl_wwtp
-        let tn_load = tn_infl_ind*this.wwt_vol_trea + this.wwt_vol_from_external*tn_infl_wwtp
+        let cod_load = (cod_infl_ind*this.wwt_vol_trea + this.wwt_vol_from_external*cod_infl_wwtp) / 1000 //kg
+        let tn_load = (tn_infl_ind*this.wwt_vol_trea + this.wwt_vol_from_external*tn_infl_wwtp) / 1000 //kg
 
         let co2   = 0;
         let ch4   = (cod_load-this.wwt_cod_slud)*this.wwt_ch4_efac_tre*Cts.ct_ch4_eq.value;    //Eq. 6.4
         let n2o   = tn_load*this.wwt_n2o_efac_tre*Cts.ct_N_to_N2O_44_28.value*Cts.ct_n2o_eq.value;  //Eq. 6.11
+
         let total = co2+ch4+n2o;
         return {total,co2,ch4,n2o};
     }
@@ -798,7 +803,7 @@ export class WWTP{
 
     //emissions from fuel engines
     wwt_KPI_GHG_fuel(){
-        let vol   = this.wwt_vol_fuel;
+        let vol   = this.wwt_vol_fuel / 1000; //L to m3
         let fuel  = Tables.get_row('Fuel type',this.wwt_fuel_typ); //object
         let co2   = vol*fuel.FD*fuel.NCV/1000*fuel.EFCO2;
         let ch4   = vol*fuel.FD*fuel.NCV/1000*fuel.EFCH4.engines*Cts.ct_ch4_eq.value;
@@ -809,7 +814,7 @@ export class WWTP{
 
     //emissions from biogas (fuel used in digester)
     wwt_KPI_GHG_dig_fuel(){
-        let vol   = this.wwt_fuel_dig;
+        let vol   = this.wwt_fuel_dig / 1000    //L to m3
         let fuel  = Tables.get_row('Fuel type',this.wwt_dige_typ);
         let co2   = vol*fuel.FD*fuel.NCV/1000*fuel.EFCO2
         let ch4   = vol*fuel.FD*fuel.NCV/1000*fuel.EFCH4.engines*Cts.ct_ch4_eq.value;
@@ -918,11 +923,13 @@ export class WWTP{
         //emission factor
         let CH4_EF = this.wwt_slu_sto_EF/100; //gCH4 released / gCH4 potential
 
+
         //gases
         let co2   = 0;
         let n2o   = 0;
         let ch4   = ch4_potential*CH4_EF*Cts.ct_ch4_eq.value;
         let total = co2+ch4+n2o;
+
         return {total,co2,ch4,n2o};
     }
 
@@ -941,7 +948,7 @@ export class WWTP{
         //gases
         let co2 = 0;
         let ch4 = (function(){
-            if(emissions_are_treated_or_piles_are_covered){return 0}
+            if(emissions_are_treated_or_piles_are_covered == 1){return 0}
             if(solids_content_of_compost>55){return 0}
 
             let OC_to_CH4 = Cts.ct_C_to_CH4_16_12.value; //1.33 gCH4/gOC
@@ -1084,7 +1091,7 @@ export class WWTP{
         emissions.n2o[0] = sludge_mass*rates.n2o[0];
         emissions.co2[0] = sludge_mass*rates.co2[0];
 
-        //year 1 to 3eel
+        //year 1 to 3
         for(let i=1;i<3;i++){
             emissions.ch4[i] = sludge_mass*rates.ch4[1];
             emissions.n2o[i] = sludge_mass*rates.n2o[1];
@@ -1116,12 +1123,20 @@ export class WWTP{
         co2 += sp_lifespan_dec*(emissions.co2[sp_lifespan_int]||0);
 
         let total = co2+ch4+n2o;
+
+        if(sp_lifespan > 0){
+            total = total/sp_lifespan/365;
+            co2 = co2/sp_lifespan/365;
+            ch4 = ch4/sp_lifespan/365;
+            n2o = n2o/sp_lifespan/365;
+        }
+
         return {total,co2,ch4,n2o};
     }
 
     //emissions from sludge transport
     wwt_KPI_GHG_sludge_transport(){
-        let vol   = this.wwt_vol_tslu;
+        let vol   = this.wwt_vol_tslu / 1000;  //L to m3
         let fuel  = Tables.get_row('Fuel type',this.wwt_trck_typ);
         let co2   = vol*fuel.FD*fuel.NCV/1000*fuel.EFCO2;
         let n2o   = vol*fuel.FD*fuel.NCV/1000*fuel.EFN2O.vehicles*Cts.ct_n2o_eq.value;
@@ -1132,7 +1147,7 @@ export class WWTP{
 
     //emissions from water reuse transport
     wwt_KPI_GHG_reus_trck(){
-        let vol   = this.wwt_reus_vol_trck;
+        let vol   = this.wwt_reus_vol_trck / 1000;  //L to m3
         let fuel  = Tables.get_row('Fuel type', this.wwt_reus_trck_typ);
         let co2   = vol*fuel.FD*fuel.NCV/1000*fuel.EFCO2;
         let ch4   = vol*fuel.FD*fuel.NCV/1000*fuel.EFCH4.vehicles*Cts.ct_ch4_eq.value;

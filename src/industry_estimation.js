@@ -921,6 +921,17 @@ export let industry_estimations = {
             wwt_slu_lf_N_cont: function(){
                 return all_toggle_estimations_or_current("Type of sludge disposed", "name", "N_cont")
             },
+            wwt_slu_sto_EF: function(){
+                let storage_time = wwtp_model.wwt_time_slu_sto
+                if(storage_time < 5) return 0
+                else if(storage_time < 20) return 3
+                else return 5
+            },
+            wwt_temperature_discharge: function(){
+                return industry.ind_temperature_withdrawn
+            }
+
+
 
         }
 
