@@ -81,9 +81,9 @@ function analyse_stage(inputs, level_of_certainty_obj, pollutant=null, print=fal
 
 /*
 Returns 1 if all the values has been entered by the user
-Returns 2 if all values are set, but at least one is modeled
-Returns 3 if all values are set, but at least one is modeled
-Returns 4 if at least any value is not set (insufficient data)
+Returns 2 if all values are set, and all of them are modeled or entered by the user
+Returns 3 if all values are set, and all or them are entered by user, estimated or modeled
+Returns 4 if at least one value is not set (insufficient data)
  */
 function category_of_inputs(industry, inputs, pollutant = null, print = false){
 

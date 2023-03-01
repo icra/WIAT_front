@@ -247,8 +247,8 @@ function parse_level_of_certainty(industry, stage, stepper_model, key, level_of_
 let _parse_level_of_certainty = function(sheet, i, level_of_certainty){
     if (level_of_certainty == null) return null
     else if(level_of_certainty === 0) return "no_data"
-    else if(level_of_certainty === 1) return "modeled"
-    else if(level_of_certainty === 2) return "estimated"
+    else if(level_of_certainty === 1) return "estimated"
+    else if(level_of_certainty === 2) return "modeled"
     else if(level_of_certainty === 3) return "user_data"
     throw "INVALID LEVEL OF CERTAINTY IN SHEET "+sheet.name+" ROW "+i
 }

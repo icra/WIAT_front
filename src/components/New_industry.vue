@@ -352,6 +352,23 @@
 
           Finally, the <b>fourth screen</b> contains inputs related to the external treatment plant (and the water sent from the on-site treatment plant, if any).
 
+          <br><br>
+
+          To be more precise with the impact of the industries' actions, we take into account the <b>level of certainty</b> of the data entered. Therefore, for most of the variables, you can select:
+          <ul>
+            <li>
+              <b>User data:</b> tha data has been measured
+              <b>Modeled data data:</b> tha data has been measured
+              <b>Estimated data:</b> data that you have extracted from a scientific model. It would typically be more accurate than estimated data, and less accurate than measured data
+              <b>No data:</b> Insufficient information
+            </li>
+          </ul>
+
+          By default, the level of certainty is set to "No data", but you can change it if you wish.
+
+
+
+
           <v-row style="padding: 0px 0px 0px 0px">
             <v-col>
               <v-img
