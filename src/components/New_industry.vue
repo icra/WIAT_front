@@ -629,7 +629,6 @@ export default {
         items.splice(2, 0, "TP");
         return
       }
-      console.log('aa')
 
       //Update ind_pollutants_effl, ind_pollutants_effl and level_of_certainty
       for (let item of items){

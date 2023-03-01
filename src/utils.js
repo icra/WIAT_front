@@ -158,16 +158,16 @@ let utils = {
 
     getDataTypeColor(item){
         if(item == "User data") {
-            return ["#76FF03", 'All inputs have been entered with user data.']
+            return ["#76FF03", 'The impact results shown can be considered accurate in this case, but will depend on the quality of the input data (i.e.: monitoring frequency and techniques).']
         }
         else if(item == "Estimated") {
-            return ["#1DE9B6", 'All the inputs have been introduced, but at least one is estimated']
+            return ["#1DE9B6", 'Explore which data is estimated and evaluate the quality of the estimation to potentially decide to start measuring the estimated parameter. The impact results shown cannot be considered fully accurate in this case, but they provide a good indication of the trend (high-medium-low). When impact is medium or high, it is recommended to start measuring relevant parameters as a first step of the impact reduction strategy']
         }
         else if (item == "Modeled") {
             return ["#D500F9", 'All the inputs have been introduced, but at least one is modeled']
         }
         else if (item == "Insufficient data") {
-            return ["#F50057", 'Of all the inputs, at least one is not entered']
+            return ["#F50057", 'Explore which data is missing and take action to estimate or start measuring the missing data. The impact results shown cannot be considered accurate in this case']
         }
         return null
     },

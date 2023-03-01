@@ -436,7 +436,7 @@
                             v-slot:item.data="{ item }"
                         >
                           <template v-if="getDataTypeColor(item) != null">
-                            <v-tooltip bottom>
+                            <v-tooltip bottom max-width="300px">
                               <template v-slot:activator="{ on, attrs }">
                                 <v-chip
                                     :color="getDataTypeColor(item)[0]"
@@ -580,7 +580,7 @@
                             v-slot:item.data="{ item }"
                         >
                           <template v-if="getDataTypeColor(item) != null">
-                            <v-tooltip bottom>
+                            <v-tooltip bottom max-width="300px">
                               <template v-slot:activator="{ on, attrs }">
                                 <v-chip
                                     :color="getDataTypeColor(item)[0]"
@@ -698,7 +698,7 @@
                             v-slot:item.data="{ item }"
                         >
                           <template v-if="getDataTypeColor(item) != null">
-                            <v-tooltip bottom>
+                            <v-tooltip bottom max-width="300px">
                               <template v-slot:activator="{ on, attrs }">
                                 <v-chip
                                     :color="getDataTypeColor(item)[0]"
@@ -799,7 +799,7 @@
                             v-slot:item.data="{ item }"
                         >
                           <template v-if="getDataTypeColor(item) != null">
-                            <v-tooltip bottom>
+                            <v-tooltip bottom max-width="300px">
                               <template v-slot:activator="{ on, attrs }">
                                 <v-chip
                                     :color="getDataTypeColor(item)[0]"
@@ -885,7 +885,7 @@
                             v-slot:item.data="{ item }"
                         >
                           <template v-if="getDataTypeColor(item) != null">
-                            <v-tooltip bottom>
+                            <v-tooltip bottom max-width="300px">
                               <template v-slot:activator="{ on, attrs }">
                                 <v-chip
                                     :color="getDataTypeColor(item)[0]"
@@ -974,7 +974,7 @@
                             v-slot:item.data="{ item }"
                         >
                           <template v-if="getDataTypeColor(item) != null">
-                            <v-tooltip bottom>
+                            <v-tooltip bottom max-width="300px">
                               <template v-slot:activator="{ on, attrs }">
                                 <v-chip
                                     :color="getDataTypeColor(item)[0]"
@@ -1027,7 +1027,7 @@
                             v-slot:item.data="{ item }"
                         >
                           <template v-if="getDataTypeColor(item) != null">
-                            <v-tooltip bottom>
+                            <v-tooltip bottom max-width="300px">
                               <template v-slot:activator="{ on, attrs }">
                                 <v-chip
                                     :color="getDataTypeColor(item)[0]"
@@ -1078,7 +1078,7 @@
                             v-slot:item.data="{ item }"
                         >
                           <template v-if="getDataTypeColor(item) != null">
-                            <v-tooltip bottom>
+                            <v-tooltip bottom max-width="300px">
                               <template v-slot:activator="{ on, attrs }">
                                 <v-chip
                                     :color="getDataTypeColor(item)[0]"
@@ -1094,6 +1094,55 @@
                               <span>{{getDataTypeColor(item)[1]}}</span>
                             </v-tooltip>
                           </template>
+                        </template>
+                        <template v-slot:header.concentration="{ header }">
+                          {{ header.text }}
+
+                          <v-tooltip bottom max-width="700px">
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-icon
+                                  small
+                                  v-bind="attrs"
+                                  v-on="on"
+                              >mdi-information-outline</v-icon>
+                            </template>
+                            <span>
+                              Concentration of pollutants after treatment in the WWTP.
+                            </span>
+                          </v-tooltip>
+                        </template>
+
+                        <template v-slot:header.tu="{ header }">
+                          {{ header.text }}
+
+                          <v-tooltip bottom max-width="700px">
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-icon
+                                  small
+                                  v-bind="attrs"
+                                  v-on="on"
+                              >mdi-information-outline</v-icon>
+                            </template>
+                            <span>
+                              Toxic units in the industry effluent
+                            </span>
+                          </v-tooltip>
+                        </template>
+                        <template v-slot:header.eqs="{ header }">
+                          {{ header.text }}
+
+                          <v-tooltip bottom max-width="700px">
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-icon
+                                  small
+                                  v-bind="attrs"
+                                  v-on="on"
+                              >mdi-information-outline</v-icon>
+                            </template>
+                            <span>
+                              Concentration in the industry effluent, compared to the EQS (limits approved by the EU’s Water Framework Directive).
+                            </span>
+                          </v-tooltip>
                         </template>
                       </v-data-table>
                     </div>
@@ -1124,11 +1173,83 @@
                           </span>
                           <span v-else>{{ item.name }}</span>
                         </template>
+                        <template v-slot:header.concentration="{ header }">
+                          {{ header.text }}
+
+                          <v-tooltip bottom max-width="700px">
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-icon
+                                  small
+                                  v-bind="attrs"
+                                  v-on="on"
+                              >mdi-information-outline</v-icon>
+                            </template>
+                            <span>
+                              Concentration of pollutants in the water body after discharge of the effluent.
+                              It accounts for the river body concentration prior to discharge if river quality
+                              data prior to discharge was entered by the user. If the river concentration prior
+                              to discharge is not documented by the user, the tool assumes a concentration of Zero.
+                            </span>
+                          </v-tooltip>
+                        </template>
+
+                        <template v-slot:header.delta="{ header }">
+                          {{ header.text }}
+
+                          <v-tooltip bottom max-width="700px">
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-icon
+                                  small
+                                  v-bind="attrs"
+                                  v-on="on"
+                              >mdi-information-outline</v-icon>
+                            </template>
+                            <span>
+                              Calculates the increment of the industry pollutants on the receiving water,
+                              or the final concentration in the river supposing the receiving water has a concentration of 0.
+                            </span>
+                          </v-tooltip>
+                        </template>
+
+                        <template v-slot:header.tu="{ header }">
+                          {{ header.text }}
+
+                          <v-tooltip bottom max-width="700px">
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-icon
+                                  small
+                                  v-bind="attrs"
+                                  v-on="on"
+                              >mdi-information-outline</v-icon>
+                            </template>
+                            <span>
+                              Toxic units in the receiving water body after dilution of the industry discharge into the water body.
+                            </span>
+                          </v-tooltip>
+                        </template>
+                        <template v-slot:header.eqs="{ header }">
+                          {{ header.text }}
+
+                          <v-tooltip bottom max-width="700px">
+                            <template v-slot:activator="{ on, attrs }">
+                              <v-icon
+                                  small
+                                  v-bind="attrs"
+                                  v-on="on"
+                              >mdi-information-outline</v-icon>
+                            </template>
+                            <span>
+                              Concentration in the receiving water body after dilution of the industry
+                              discharge into the water body, compared to the EQS (limits approved by the EU’s Water Framework Directive).
+                            </span>
+                          </v-tooltip>
+                        </template>
+
                         <template
                             v-slot:item.data="{ item }"
                         >
                           <template v-if="getDataTypeColor(item) != null">
-                            <v-tooltip bottom>
+                            <v-tooltip bottom max-width="300px">
                               <template v-slot:activator="{ on, attrs }">
                                 <v-chip
                                     :color="getDataTypeColor(item)[0]"
@@ -1214,7 +1335,7 @@
                             v-slot:item.data="{ item }"
                         >
                           <template v-if="getDataTypeColor(item) != null">
-                            <v-tooltip bottom>
+                            <v-tooltip bottom max-width="300px">
                               <template v-slot:activator="{ on, attrs }">
                                 <v-chip
                                     :color="getDataTypeColor(item)[0]"
@@ -1266,7 +1387,7 @@
                             v-slot:item.data="{ item }"
                         >
                           <template v-if="getDataTypeColor(item) != null">
-                            <v-tooltip bottom>
+                            <v-tooltip bottom max-width="300px">
                               <template v-slot:activator="{ on, attrs }">
                                 <v-chip
                                     :color="getDataTypeColor(item)[0]"
@@ -1383,7 +1504,7 @@
                             v-slot:item.data="{ item }"
                         >
                           <template v-if="getDataTypeColor(item) != null">
-                            <v-tooltip bottom>
+                            <v-tooltip bottom max-width="300px">
                               <template v-slot:activator="{ on, attrs }">
                                 <v-chip
                                     :color="getDataTypeColor(item)[0]"
@@ -1448,7 +1569,7 @@
                             v-slot:item.data="{ item }"
                         >
                           <template v-if="getDataTypeColor(item) != null">
-                            <v-tooltip bottom>
+                            <v-tooltip bottom max-width="300px">
                               <template v-slot:activator="{ on, attrs }">
                                 <v-chip
                                     :color="getDataTypeColor(item)[0]"
@@ -1501,7 +1622,7 @@
                                 v-slot:item.data="{ item }"
                             >
                               <template v-if="getDataTypeColor(item) != null">
-                                <v-tooltip bottom>
+                                <v-tooltip bottom max-width="300px">
                                   <template v-slot:activator="{ on, attrs }">
                                     <v-chip
                                         :color="getDataTypeColor(item)[0]"
@@ -1556,7 +1677,7 @@
                             v-slot:item.data="{ item }"
                         >
                           <template v-if="getDataTypeColor(item) != null">
-                            <v-tooltip bottom>
+                            <v-tooltip bottom max-width="300px">
                               <template v-slot:activator="{ on, attrs }">
                                 <v-chip
                                     :color="getDataTypeColor(item)[0]"
@@ -1610,7 +1731,7 @@
                             v-slot:item.data="{ item }"
                         >
                           <template v-if="getDataTypeColor(item) != null">
-                            <v-tooltip bottom>
+                            <v-tooltip bottom max-width="300px">
                               <template v-slot:activator="{ on, attrs }">
                                 <v-chip
                                     :color="getDataTypeColor(item)[0]"
@@ -1663,7 +1784,7 @@
                             v-slot:item.data="{ item }"
                         >
                           <template v-if="getDataTypeColor(item) != null">
-                            <v-tooltip bottom>
+                            <v-tooltip bottom max-width="300px">
                               <template v-slot:activator="{ on, attrs }">
                                 <v-chip
                                     :color="getDataTypeColor(item)[0]"
@@ -1783,9 +1904,7 @@
           <div class="dialog_detail" style="background-color: white">
             <h3>Dilution factor</h3>
             <br>
-            Ratio of concentration in the effluent to concentration in the receiving water after mixing in the receiving
-            water. Bigger values indicate less impact of the effluent concentration to the river.
-            <div v-katex:display="'\\frac{W_a + W_{effl} - W_w}{W_{effl}}'"></div>
+            The dilution factor (DF) can be defined as the ratio between receiving water body flow and the total industrial wastewater effluent generated within a catchment. Higher values indicate less impact on the river.             <div v-katex:display="'\\frac{W_a + W_{effl} - W_w}{W_{effl}}'"></div>
             <b>Where:</b>
             <br>
             <ul>
@@ -1805,11 +1924,7 @@
           <div class="dialog_detail" style="background-color: white">
             <h3>Recycled water factor</h3>
             <br>
-            This metric indicates the percentage of the reused water used by the industry
-            respect the water that leaves the industry (to direct discharge, onsite industry
-            WWTP effluent and to external WWTP effluent). Values that may have this
-            metric range from 0 to 100, the larger its value the more efficient the water
-            recycled is.
+            This metric indicates the percentage of reused water used by the industry respect the water discharged by industry (to direct discharge, onsite industry WWTP effluent and to external WWTP effluent).  Values that may have this metric range from 0 to 100, the larger its value the more efficient the water recycled is.
             <div v-katex:display="'\\frac{W_r}{OWWTP_{infl} + EWWTP_{infl} + DD}'"></div>
             <b>Where:</b>
             <br>
@@ -1856,6 +1971,18 @@
             amount of water available and multiplied by 100. It indicates the percentage of the available water withdrawn
             by the industry’s consumption. This metric may have values ranging from 0, to a value greater than 100,
             indicating that the demand for water is higher than the available.
+
+            Note that water is considered consumed if:
+
+            <br>
+            <ul>
+              <li>
+                It is not returned to the river it was taken from
+              </li>
+              <li>
+                It not returned to the river with a sufficient quality, as this water will therefore not properly support downstream ecosystems and usages. </li>
+            </ul>
+            <br>
             <div v-katex:display="'W_s = 100 \\cdot \\frac{W_c}{W_a}'"></div>
 
 
@@ -1913,8 +2040,18 @@
           <div class="dialog_detail" style="background-color: white">
             <h3>Specific water consumption </h3>
             <br>
-            Specific water consumption is a metric that indicates what is the amount of water consumed needed
-            to produce one unit of the user's specified product (by default, tonnes). Higher values indicate higher water demand.
+            Specific water consumption is a metric that indicates the amount of water consumed to produce one unit of the user's specified product (by default, tonnes). Note that water is considered consumed if:
+
+            <br>
+            <ul>
+              <li>
+                It is not returned to the river it was taken from
+              </li>
+              <li>
+                It not returned to the river with a sufficient quality, as this water will therefore not properly support downstream ecosystems and usages. </li>
+            </ul>
+            Higher values indicate higher water demand.
+            <br><br>
             <div v-katex:display="'SWC = \\frac{W_c}{A}'"></div>
 
 
@@ -1947,7 +2084,18 @@
           <div class="dialog_detail" style="background-color: white">
             <h3>Net consumptive use </h3>
             <br>
-            Amount of water withdrawn by the industry minus the amount of water discharged into the same watershed that meets the EQS
+            Amount of water withdrawn by the industry minus the amount of water discharged into the same watershed that meets the EQS.
+            Note that water is considered consumed if:
+
+            <br>
+            <ul>
+              <li>
+                It is not returned to the river it was taken from
+              </li>
+              <li>
+                It not returned to the river with a sufficient quality, as this water will therefore not properly support downstream ecosystems and usages. </li>
+            </ul>
+
             <span v-katex:display="'\\begin{cases}\n'+
                 'W_c=W_w + W_e - W_d &\\text{if discharged water has concentrations below the EQS}\\\\\n'+
                 'W_c= W_w + W_e &\\text{otherwise}\\\\\n'+
@@ -1973,6 +2121,19 @@
         >
           <div class="dialog_detail" style="background-color: white">
             <h3>Percentage of consumptive use over water withdrawn </h3>
+            <br>
+            Water consumptive use divided by water withdrawn.
+            Note that water is considered consumed if:
+
+            <br>
+            <ul>
+              <li>
+                It is not returned to the river it was taken from
+              </li>
+              <li>
+                It not returned to the river with a sufficient quality, as this water will therefore not properly support downstream ecosystems and usages. </li>
+            </ul>
+            <br><br>
             <div v-katex:display="'W_{frac} = \\frac{W_c}{W_w} \\cdot 100'"></div>
             <span v-katex:display="'\\begin{cases}\n'+
                 'W_c=W_w + W_e - W_d &\\text{if discharged water has concentrations below the EQS}\\\\\n'+
@@ -2039,7 +2200,7 @@
             <br>
             <ul>
               <li><span v-katex="'WWTPS'"></span>: onsite and external WWTP's where industry treats water</li>
-              <li><span v-katex="'V'"></span>: volume of fuel consumed</li>
+              <li><span v-katex="'V'"></span>: volume of fuel consumed in m3</li>
               <li><span v-katex="'EQ_{N_2O}'"></span>: conversion of N2O emissions to CO2 equivalent emissions (<b>298
                 kgCO2eq/kgN2O</b>)
               </li>
@@ -2149,7 +2310,7 @@
             <ul>
               <li><span v-katex="'WWTPS'"></span>: onsite and external WWTP's where industry treats water</li>
 
-              <li><span v-katex="'V'"></span>: volume of fuel consumed</li>
+              <li><span v-katex="'V'"></span>: volume of fuel consumed in m3</li>
 
               <li><span v-katex="'EQ_{N_2O}'"></span>: conversion of N2O emissions to CO2 equivalent emissions (<b>298
                 kgCO2eq/kgN2O</b>)
@@ -2208,6 +2369,10 @@
           <div class="dialog_detail" style="background-color: white">
             <h3>Emissions from water treatment </h3>
             <br>
+            Emissions from treatment are related to the production of Nitrous oxide (N2O) and methane (CH4) converted into equivalent CO2.<br>
+            The IPCC methodology assumes that organic carbon present in wastewater derives from modern (biogenic) organic matter; consequently, CO2 emissions from wastewater treatment are considered wholly biogenic and are discounted from the inventories as they do not represent a transfer of carbon from the lithosphere to the atmosphere. The presence of fossil organic carbon in sewage implies the emission of additional fossil CO2 from wastewater treatment facilities, sludge management, and environmental recipients of treated or untreated wastewater. As stated in the appendix 6 Ap.1 from IPCC chapter 6 on wastewater treatment and discharge presents a discussion of non-biogenic (fossil) CO2 emissions there is no yet agreement on this issue. We are aware of the fact that some industries produce mostly non-biogenic organic matter and hence WIAT might be underestimating the CO2 emissions. In a future version of the tool this aspect will be addressed with care, in line with the IPCC new developments.
+
+            <br>
             <div
                 v-katex:display="'CH_4 = \\sum_{i \\in WWTPS} (COD_{infl_i} - COD_{slu_i}) \\cdot EF_{CH4_i} \\cdot EQ_{CH_4}'"></div>
             <div
@@ -2218,8 +2383,8 @@
             <br>
             <ul>
               <li><span v-katex="'WWTPS'"></span>: onsite and external wastewater treatment plants</li>
-              <li><span v-katex="'COD_{infl}'"></span>: COD load in WWTP influent</li>
-              <li><span v-katex="'COD_{slu}'"></span>: COD removed as sludge</li>
+              <li><span v-katex="'COD_{infl}'"></span>: COD load (kg) in WWTP influent</li>
+              <li><span v-katex="'COD_{slu}'"></span>: kg of COD removed as sludge</li>
               <li><span v-katex="'EF_{CH_4}'"></span>: CH4 emission factor</li>
               <li><span v-katex="'EQ_{CH_4}'"></span>: conversion of CH4 emissions to CO2 equivalent emissions (<b>34
                 kgCO2eq/kgCH4</b>)
@@ -2613,7 +2778,7 @@
                 <b>Where:</b>
                 <br>
                 <ul>
-                  <li><span v-katex="'V'"></span>: Volume of fuel consumed</li>
+                  <li><span v-katex="'V'"></span>: Volume of fuel consumed in m3</li>
                   <li><span v-katex="'EQ_{N2O}'"></span>: Conversion of N2O emissions to CO2 equivalent emissions</li>
                   <li><span v-katex="'EQ_{CH_4}'"></span>: Conversion of CH4 emissions to CO2 equivalent emissions</li>
                   <li><span v-katex="'EQ_{CH_4}'"></span>: Conversion of CH4 emissions to CO2 equivalent emissions</li>
@@ -2774,7 +2939,7 @@
             <ul>
               <li><span v-katex="'WWTPS'"></span>: onsite and external WWTP's where industry treats water</li>
 
-              <li><span v-katex="'V'"></span>: volume of fuel consumed</li>
+              <li><span v-katex="'V'"></span>: volume of fuel consumed in m3</li>
 
               <li><span v-katex="'EQ_{N_2O}'"></span>: conversion of N2O emissions to CO2 equivalent emissions (<b>298
                 kgCO2eq/kgN2O</b>)
@@ -2833,7 +2998,9 @@
             width="60%"
         >
           <div class="dialog_detail" style="background-color: white">
-            <h3>Eutrophication potential ({{ this.selected_pollutant }}) </h3>
+            <h3>Eutrophication potential from {{ this.selected_pollutant }} </h3>
+            <br>
+            The eutrophication potential is proportional to the concentration of the discharge and does not account for Streamflow or the quality of the river prior to discharge. The user should review the Context table : If the Coastal Eutrophication Potential, BOD or Nitrates are high, it increases the risk to actually have eutrophication occur. If Streamflow is high, it reduces the risk to have eutrophication occur.
             <br>
             <div
                 v-katex:display="'\\frac{\\sum_{i \\in DP} '+this.selected_pollutant+'_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot EQ_{'+this.selected_pollutant+'} '"></div>
@@ -2890,31 +3057,6 @@
         </v-dialog>
 
 
-        <!-- TU -->
-        <v-dialog
-            v-model="info_tu"
-            width="60%"
-        >
-          <div class="dialog_detail" style="background-color: white">
-            <h3> Ecotoxicity profile for {{ this.selected_pollutant }} </h3>
-            <br>
-            <div
-                v-katex:display="'\\frac{\\sum_{i \\in DP} '+this.selected_pollutant+'_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EC50_{'+this.selected_pollutant+'} \\cdot 10^{-3}}'"></div>
-
-            <b>Where:</b>
-            <br>
-            <ul>
-              <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water</li>
-              <li><span v-katex="this.selected_pollutant+'_{effl}'"></span>: load of {{ selected_pollutant }} in the effluent</li>
-              <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body</li>
-              <li><span v-katex="'EC50_{'+this.selected_pollutant+'}: '+this.conversion_factors[this.selected_pollutant]['eqs']+' \\mu g/L'"></span></li>
-            </ul>
-            <br>
-
-
-          </div>
-
-        </v-dialog>
 
 
         <!-- Delta TU -->
@@ -2926,7 +3068,7 @@
             <h3> Ecotoxicity profile for {{selected_pollutant}} </h3>
             <br>
             <div
-                v-katex:display="' \\frac{ \\sum_{i \\in DP} '+this.selected_pollutant+'_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EC50_{'+this.selected_pollutant+'}\\cdot 10^{-3}} '"></div>
+                v-katex:display="' \\frac{ \\sum_{i \\in DP} '+this.selected_pollutant+'_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EC50_{'+this.selected_pollutant+'}} \\cdot 1000 '"></div>
 
             <b>Where:</b>
             <br>
@@ -2946,33 +3088,6 @@
           </div>
 
         </v-dialog>
-
-
-        <!-- EQS -->
-        <v-dialog
-            v-model="info_eqs"
-            width="60%"
-        >
-          <div class="dialog_detail" style="background-color: white">
-            <h3> Ecotoxicity profile for {{selected_pollutant}} </h3>
-            <br>
-            <div
-                v-katex:display="'\\frac{\\sum_{i \\in DP} '+this.selected_pollutant+'_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EQS_{'+this.selected_pollutant+'}} \\cdot 100'"></div>
-
-            <b>Where:</b>
-            <br>
-            <ul>
-              <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water</li>
-              <li><span v-katex="this.selected_pollutant+'_{effl}'"></span>: load of {{ this.selected_pollutant }} in the effluent</li>
-              <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body</li>
-              <li><span v-katex="'EQS_{'+this.selected_pollutant+'}: '+this.conversion_factors[this.selected_pollutant]['eqs']+' mg/L'"></span></li>
-            </ul>
-            <br>
-
-          </div>
-
-        </v-dialog>
-
 
         <!-- Delta EQS -->
         <v-dialog
@@ -3101,16 +3216,16 @@
             <br>
 
             <div v-katex:display="'C = \\frac{\\sum_{i \\in DP} '+this.selected_pollutant+'_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} '"></div>
-            <div v-katex:display="'TU = \\frac{\\sum_{i \\in DP} '+this.selected_pollutant+'_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EC50_{'+this.selected_pollutant+'} \\cdot 10^{-3}}'"></div>
-            <div v-katex:display="'EQS = \\frac{\\sum_{i \\in DP} '+this.selected_pollutant+'_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} \\cdot \\frac{1}{EQS_{'+this.selected_pollutant+'}} \\cdot 100'"></div>
+            <div v-katex:display="'TU = \\frac{C}{EC50_{'+this.selected_pollutant+'}} \\cdot 1000'"></div>
+            <div v-katex:display="'EQS = \\frac{C}{EQS_{'+this.selected_pollutant+'}} \\cdot 100'"></div>
 
 
             <b>Where:</b>
             <br>
             <ul>
-              <li><span v-katex="'C'"></span>: Concentration of pollutants in the water after treatment in the WWTP (g/m3)</li>
-              <li><span v-katex="'TU'"></span>: Toxic Units in the industry effluent aims to calculate how toxic is industry effluent for ecosystem</li>
-              <li><span v-katex="'EQS'"></span>: Concentration with respect to EQS</li>
+              <li><span v-katex="'C'"></span>: Concentration of pollutants in the industry effluent (g/m3)</li>
+              <li><span v-katex="'TU'"></span>: Toxic Units in the industry effluent</li>
+              <li><span v-katex="'EQS'"></span>: Concentration in the industry effluent with respect to EQS</li>
 
               <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water</li>
               <li><span v-katex="this.selected_pollutant+'_{effl}'"></span>: load of pollutant in the industry effluent</li>
@@ -3133,31 +3248,45 @@
             <h3> Pollutant concentration </h3>
             <br>
 
-            <div v-katex:display="'C_{effl} = \\frac{\\sum_{i \\in DP} '+this.selected_pollutant+'_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} '"></div>
-            <div v-katex:display="'C = \\frac{C_{WB} \\cdot W_a - C_{WB} \\cdot W_w + C_{effl} \\cdot W_{effl}}{W_a - W_w + W_{effl}} '"></div>
-
-            <div v-katex:display="' \\Delta = \\frac{C_{effl}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}}'"></div>
-            <div v-katex:display="'TU = \\frac{C}{EC50_{'+this.selected_pollutant+'} \\cdot 10^{-3}}'"></div>
+            <div v-katex:display="'C = \\frac{C_{WB} \\cdot W_a - C_{WB} \\cdot W_w + '+this.selected_pollutant+'_{effl}}{W_a - W_w + \\sum_{i \\in DP} W_{effl}} '"></div>
+            <div v-katex:display="' \\Delta = \\frac{'+this.selected_pollutant+'_{effl}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl}}'"></div>
+            <div v-katex:display="'TU = \\frac{C}{EC50_{'+this.selected_pollutant+'}} \\cdot 1000'"></div>
             <div v-katex:display="'EQS = \\frac{C}{EQS_{'+this.selected_pollutant+'}} \\cdot 100'"></div>
+
+
+
 
 
             <b>Where:</b>
             <br>
             <ul>
-              <li><span v-katex="'C'"></span>: Concentration of {{ this.selected_pollutant }} in the same water body where water was withdrawn after discharging water (g/m3)</li>
-              <li><span v-katex="'C_{effl}'"></span>: Concentration of {{ this.selected_pollutant }} in the industry effluent after treatment in the WWTP (only the part that is being discharged in the same water body where water was withdrawn) (g/m3)</li>
-              <li><span v-katex="'\\Delta'"></span>: Increase of the concentration in the water body where water was withdrawn after industry discharge (g/m3)</li>
-              <li><span v-katex="'TU'"></span>: Toxic Units in the industry effluent aims to calculate how toxic is industry effluent for ecosystem </li>
-              <li><span v-katex="'EQS'"></span>: Concentration with respect to EQS</li>
-
-              <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water</li>
-              <li><span v-katex="this.selected_pollutant+'_{effl}'"></span>: load of pollutant in the effluent</li>
-              <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the same water body where water was withdrawn</li>
+              <li><span v-katex="'C'"></span>: Concentration of {{ this.selected_pollutant }} in the water body after discharge of the effluent.</li>
+              <li><span v-katex="'C_{WB}'"></span>: river concentration prior to discharge (g/m3)</li>
               <li><span v-katex="'W_{a}'"></span>: amount of water available in the river <b>(streamflow global
                 indicator)</b></li>
               <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river</li>
+              <li><span v-katex="this.selected_pollutant+'_{effl}'"></span>: Load of pollutant in the industry effluent discharged to receiving water body</li>
+              <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the same water body where water was withdrawn</li>
+
+
+
+              <li><span v-katex="'\\Delta'"></span>: Increase of the concentration in the water body where water was withdrawn after industry discharge (g/m3)</li>
+              <li><span v-katex="'TU'"></span>: Toxic units in the receiving water body after dilution of the industry discharge into the water body. </li>
+              <li><span v-katex="'EQS'"></span>: Concentration in the receiving water body after discharge with respect to EQS</li>
+
+
+              <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water</li>
               <li><span v-katex="'EC50_{'+this.selected_pollutant+'}: '+this.conversion_factors[this.selected_pollutant]['eqs']+' \\mu g/L'"></span></li>
               <li><span v-katex="'EQS_{'+this.selected_pollutant+'}: '+this.conversion_factors[this.selected_pollutant]['eqs']+' mg/L'"></span></li>
+
+
+
+
+
+
+
+
+
 
             </ul>
             <br>
@@ -3381,9 +3510,7 @@ export default {
       info_digester_fuel: false,
       info_eutrophication: false,
       info_delta_temperature: false,
-      info_tu: false,
       info_delta_tu: false,
-      info_eqs: false,
       info_delta_eqs: false,
       info_efficiency: false,
       info_efficiency_influent: false,
@@ -4192,7 +4319,7 @@ export default {
 
         let pollutants_table = {
           header: [{text: "", value: "name", sortable: false},
-            {text: "Concentration(g/m3)", value: 'concentration'},
+            {text: "Concentration in the river after discharge (g/m3)", value: 'concentration'},
             {text: "Increase of the concentration (g/m3)", value: 'delta'},
             {text: "Toxic units (TU/Day)", value: 'tu'},
             {text: "Concentration of the pollutants with respect to EQS (%)", value: 'eqs'},
@@ -5079,11 +5206,16 @@ export default {
         }
 
         let indicators = []
+
+        //indicators for water quality
         if (_this.active_indicator >= 1 && _this.active_indicator <= 13) {
-          indicators = ["Coastal Eutrophication Potential", "Surface Water Pharmaceutical Pollution", "Coastal Pharmaceutical Pollution", "Unimproved/No Drinking Water", "Unimproved/No Sanitation", "BOD", "Nitrates", "Streamflow"]
-        } else if (_this.active_indicator >= 14 && _this.active_indicator <= 16) {
+          indicators = ["Coastal Eutrophication Potential", "Unimproved/No Drinking Water", "Unimproved/No Sanitation", "BOD", "Nitrates", "Streamflow"]
+        }
+        //indicators for water availability
+        else if (_this.active_indicator >= 14 && _this.active_indicator <= 16) {
           indicators = ["Seasonal variability", "Interannual variability", "Water stress", "Water depletion", "Aridity index", "Groundwater table decline", "Drought risk", "Streamflow"]
         }
+        //ghg emissions does not have context indicators related
 
         for (let indicator of indicators) {
           let location = _this.industry.location
@@ -5157,9 +5289,9 @@ export default {
               id: 2,
               name: 'Change in the state of Nature',
               children: [
-                {id: 3, name: this.table_title.simple_table.delta_tu, info: "Toxic units in the receiving water body indicates if the concentration after the effluent discharge on the water body exceed the EC50, supposing the receiving water has a concentration of 0 before discharge."},
-                {id: 4, name: this.table_title.simple_table.delta_eqs, info: "Increase of the concentration of the pollutants in the receiving water body after discharge (with respect to EQS), supposing the receiving water has a concentration of 0 before discharge."},
-                {id: 5, name: this.table_title.simple_table.eutrophication, info: "Eutrophication potential (EP) is defined as the potential to cause over-fertilization of water and soil, which can result in increased growth of biomass. It will always have positive values; higher values indicate higher impact. It converts the pollutants to PO4 equivalent to calculate the total Eutrophication potential. "},
+                {id: 3, name: this.table_title.simple_table.delta_tu, info: "Toxic units in the receiving water body indicates if the concentration after the effluent discharge on the water body exceed the EC50, supposing the receiving water has a concentration of 0. This metric does not calculate values for COD, TN, TP, just for PP. "},
+                {id: 4, name: this.table_title.simple_table.delta_eqs, info: "Increase of the concentration of the pollutants after dilution in the receiving water body after discharge (with respect to EQS). Indicates if the increase in concentration caused by the effluent discharge on the water body exceeds the Environmental Quality Standards (> 100%). This metric does not calculate values for COD, TN, TP, just for PP."},
+                {id: 5, name: this.table_title.simple_table.eutrophication, info: "Eutrophication potential (EP) is defined as the potential to cause over-fertilization of water and soil, which can result in increased growth of biomass. It will always have positive values; higher values indicate higher potential impact. It converts the pollutants to PO4 equivalent to calculate the total Eutrophication potential. It needs to cross-checked with the context indicators Coastal Eutrophication Potential BOD, Nitrates, and Streamflow. If the Coastal Eutrophication Potential, BOD or Nitrates are high, it increases the risk to actually have eutrophication occur. If Streamflow is high, it reduces the risk to have eutrophication occur."},
                 {id: 6, name: this.table_title.simple_table.delta_temperature, info: "Increase in the temperature in the receiving water body after discharging water."},
 
               ]
@@ -5168,11 +5300,11 @@ export default {
               id: 8,
               name: 'Levers for action',
               children: [
-                {id: 9, name: this.table_title.simple_table.avg_treatment_efficiency, info: "This metric indicates what is the percentage of pollutant load that the WWTP eliminates from the industry water."},
-                {id: 10, name: this.table_title.simple_table.avg_influent_efficiency, info: "This metric indicates whether there is an improvement in water quality due to its use by the industry. If the quality of the water after treatment is better than the industry withdrawal water quality (surface water only), then the value of this metric is greater than 100. This is only calculated for COD, TN and TP when the “advanced inputs” provide a value under “Industry withdrawal water quality (surface water only)”"},
+                {id: 9, name: this.table_title.simple_table.avg_treatment_efficiency, info: "This metric indicates which is the percentage of pollutant load that the WWTP eliminates from the industry water."},
+                {id: 10, name: this.table_title.simple_table.avg_influent_efficiency, info: "This metric indicates whether there is an improvement in water quality due to its use by the industry. If the quality of the water after treatment is better than the industry withdrawal water quality (surface water only), then the value of this metric is greater than 100. This is only calculated when the “advanced inputs” provide a value under “Industry withdrawal water quality (surface water only)”"},
                 {id: 11, name: this.table_title.simple_table.treated, info: "This metric indicates the ratio between the water remaining after the industry consumption and the water that is treated in the WWTP"},
                 {id: 12, name: 'Concentration of pollutants in the industry effluent', info: "Statistics related to the concentration of pollutants in the water after treatment in the WWTP"},
-                {id: 13, name: 'Concentration of pollutants in the receiving water body', info: "Statistics related to the concentration of the receiving water body after industry discharge"},
+                {id: 13, name: 'Concentration of pollutants in the receiving water body', info: "These indicators support understanding the dilution of the discharge and the relative weight of the discharge compared to the river flows and concentrations. The lever for action is actually reducing the volume and/or concentrations of the effluent discharged, as this will reduce the concentration of pollutants in the receiving water body."},
 
               ]
             },
@@ -5190,14 +5322,16 @@ export default {
           id: 17,
           name: "GHG emissions from wastewater treatment",
           children: [
-            {id: 18, name: "Change in the state of Nature",},
+            {id: 18, name: "Change in the state of Nature", info: "This metric indicates the GHG emissions from the industry. It counts the amount of CO2 equivalent that is produced during the water treatment, water discharge, the emissions from sludge management and the emissions from biogas. It will always have positive values; higher values indicate higher impact. The methodology to calculate the global warming potential is from the Energy Performance and Carbon Emissions Assessment and Monitoring Tool (ECAM).  (Sanitation Treatment, n.d.)"},
             {
               id: 19,
               name: "Levers for action",
               children: [
                 {id: 20, name: "Energy use", info: "Energy used by the industry to treat a m3 of water"},
                 {id: 21, name: "Effluent concentration prior to discharge", info: "TN and COD concentration of the effluent, which are triggering N2O and methane emissions"},
-                {id: 22, name: "Potential to capture CO2", info: "When burning the biogas in a flare or through an energy valorisation system such as a CHP engine or a heater, the CO2 emissions in the exhaust can be captured to be valorised or stored."},
+                {id: 22, name: "Potential to capture CO2", info: "When burning the biogas in a flare or through an energy valorisation system such as a CHP engine or a heater, the CO2 emissions in the exhaust can be captured to be valorised or stored." +
+                      "Assessing  these emissions allows to evaluate whether source is large enough to consider investing in capturing this CO2. \n" +
+                      "The CO2 from the exhaust can be considered biogenic only if the organic matter processed by the industry is non-fossil based. If the organic matter is fossil based, it allows the displacement of emissions from the equivalent product that would otherwise have been produced with other carbon-energy sources."},
                 {id: 23, name: "GHG emissions by source", info: "Amount of CO2eq by source emitted to the atmosphere during wastewater treatment process"},
                 {id: 24, name: "Sludge management", info: "GHG emissions from sludge management operations (storing, composting, incineration, land application, landfilling, stockpiling and truck transport)"},
               ]

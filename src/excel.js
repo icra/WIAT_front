@@ -203,8 +203,8 @@ function parse_value(i, sheet, industry, stage, key, stepper_model, is_string = 
 
     if (raw == null){
         if (mandatory) throw "MISSING VALUE IN SHEET "+sheet_name+" ROW "+i
-        else if (is_string) value = "tonnes"
-        else value = 0
+        else if (is_string) raw = "tonnes"
+        else raw = 0
     }
     if (isNaN(raw) && is_string) value = raw
     else if (isNaN(raw) && !is_string) throw "INVALID VALUE IN SHEET "+sheet_name+" ROW "+i
@@ -218,6 +218,8 @@ function parse_value(i, sheet, industry, stage, key, stepper_model, is_string = 
             else throw "INVALID VALUE IN SHEET "+sheet_name+" ROW "+i
         }
         value = parsed
+
+        if (value < 0) throw "NEGATIVE VALUE IN SHEET "+sheet_name+" ROW "+i
     }
     stage[key] = value
 
@@ -242,7 +244,7 @@ function parse_level_of_certainty(industry, stage, stepper_model, key, level_of_
     }
 }
 
-let _parse_level_of_certainty = function(sheet, level_of_certainty){
+let _parse_level_of_certainty = function(sheet, i, level_of_certainty){
     if (level_of_certainty == null) return null
     else if(level_of_certainty === 0) return "no_data"
     else if(level_of_certainty === 1) return "modeled"
@@ -256,7 +258,7 @@ function parse_level_of_certainty_row(i, sheet, industry, stage, stepper_model, 
 
     if (pollutant == null){
         let level_of_certainty = sheet.getRow(i).getCell(6).value
-        parse_level_of_certainty(industry, stage, stepper_model, key, _parse_level_of_certainty(sheet, level_of_certainty), pollutant)
+        parse_level_of_certainty(industry, stage, stepper_model, key, _parse_level_of_certainty(sheet, i, level_of_certainty), pollutant)
     }
 
 }
@@ -351,7 +353,6 @@ function parse_selected_pollutants(i, sheet, add_mandatory_pollutants=true){
 
 function parse_pollutants(i, sheet, industry, stage, key, stepper_model){
 
-
     let all_pollutants = industry.pollutants_selected
 
     let row = sheet.getRow(i).values
@@ -373,12 +374,13 @@ function parse_pollutants(i, sheet, industry, stage, key, stepper_model){
         if (pollutants_added_by_user.includes(pollutant)){
             //if pollutant is in the range of the array
             if (2*j < raw.length) value = raw[2*j]
+            if(value < 0) throw new Error("Invalid value in row  "+i+"of sheet "+sheet.name)
 
             //if level of certainty is in the range of the array
             if (2*j+1 < raw.length) level_of_certainty_value = raw[2*j+1]
         }
 
-        parse_level_of_certainty(industry, stage, stepper_model, key, _parse_level_of_certainty(sheet, level_of_certainty_value), pollutant)
+        parse_level_of_certainty(industry, stage, stepper_model, key, _parse_level_of_certainty(sheet, i, level_of_certainty_value), pollutant)
         obj[pollutant] = value
     }
     stage[key] = obj
@@ -388,9 +390,9 @@ function parse_industry(industry, sheet){
     try {
 
         parse_value(5, sheet, industry, industry, 'volume_withdrawn', 1, false, true)
-        parse_value(6, sheet, industry, industry, 'volume_withdrawn_groundwater', 1, false, true)
-        parse_value(7, sheet, industry, industry, 'volume_external_same_watershed_sources', 1, false, true)
-        parse_value(8, sheet, industry, industry, 'volume_external_different_sources', 1, false, true)
+        parse_value(6, sheet, industry, industry, 'volume_withdrawn_groundwater', 1, false, false)
+        parse_value(7, sheet, industry, industry, 'volume_external_same_watershed_sources', 1, false, false)
+        parse_value(8, sheet, industry, industry, 'volume_external_different_sources', 1, false, false)
         industry.has_onsite_wwtp = parse_yes_no(9, sheet, true)
         industry.has_direct_discharge = parse_yes_no(10, sheet, true)
         industry.has_offsite_wwtp = parse_yes_no(11, sheet, true)
@@ -402,6 +404,7 @@ function parse_industry(industry, sheet){
         pollutants_added_by_user = parse_selected_pollutants(15, sheet, false)
 
         parse_pollutants(16, sheet, industry, industry, 'ind_pollutants_effl', 1)
+
         parse_value(17, sheet, industry, industry, 'ind_temperature_withdrawn', 1, false, false)
         parse_pollutants(18, sheet, industry, industry, 'ind_pollutants_infl', 1)
 
@@ -634,11 +637,11 @@ let utils_excel = {
     async read_industres_location(file){
         let [assessments, industries] = await parse_excel(file)
 
-        if (assessments.length === 0 || industries.length === 0) return "ERROR IMPORTING FILE"
+        if (assessments.length === 0 && industries.length === 0) return "ERROR IMPORTING FILE"
 
         try {
-            parse_assessments(assessments)
-            parse_industry_locations(industries)
+            if(assessments.length > 0) parse_assessments(assessments)
+            if(industries.length > 0) parse_industry_locations(industries)
             return "FILE IMPORTED CORRECTLY"
         }catch (e) {
             return e
@@ -647,6 +650,7 @@ let utils_excel = {
     },
     async read_new_industry(file){
         try {
+
             let new_industry = await parse_excel_new_industry(file)
             return "FILE IMPORTED CORRECTLY"
 
