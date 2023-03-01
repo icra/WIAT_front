@@ -358,8 +358,14 @@
           <ul>
             <li>
               <b>User data:</b> tha data has been measured
+            </li>
+            <li>
               <b>Modeled data data:</b> tha data has been measured
+            </li>
+            <li>
               <b>Estimated data:</b> data that you have extracted from a scientific model. It would typically be more accurate than estimated data, and less accurate than measured data
+            </li>
+            <li>
               <b>No data:</b> Insufficient information
             </li>
           </ul>
