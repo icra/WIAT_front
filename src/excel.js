@@ -626,6 +626,7 @@ function parse_excel_new_industry(file){
             reader.readAsArrayBuffer(file)
 
         }).catch(e => {
+            console.log('aaaaa')
             throw e
         })
 
@@ -635,6 +636,7 @@ function parse_excel_new_industry(file){
 let utils_excel = {
 
     async read_industres_location(file){
+
         let [assessments, industries] = await parse_excel(file)
 
         if (assessments.length === 0 && industries.length === 0) return "ERROR IMPORTING FILE"

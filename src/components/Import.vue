@@ -341,7 +341,7 @@ export default {
       ],
       pollutants_from_older_version: utils.pollutants_from_older_version,
       items_excel_type: [{value:'Industry locations', key: 'industry_locations'}, {value: 'Advanced inputs', key: "industry_questionnaire"}],
-      excel_type : {value:'Industry locations', key: 'industry_locations'}
+      excel_type : 'industry_locations'
     }
 
   },
@@ -488,6 +488,7 @@ export default {
 
     //Uploaded excel session
     async onUploadExcel(){
+
       if (this.excel_type === "industry_locations") {
         utils_excel.read_industres_location(this.imported_file_excel).then((text) => {
           this.snackbar_text = text
