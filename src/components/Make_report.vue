@@ -3389,14 +3389,17 @@ export default {
 
     is_there_any_industry_created: function () {
 
-      let _this = this
       let industries = []
       this.assessments_and_industries_tree.forEach(assessment => {
         industries.push(...assessment.children)
       })
+
+      return industries.length > 0
+
+      /*
       return industries.filter(industry => {
         return utils.is_industry_valid(industry.industry)
-      }).length > 0
+      }).length > 0*/
 
 
     },

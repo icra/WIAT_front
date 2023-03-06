@@ -210,6 +210,9 @@ let utils = {
     //Says if industry has the required inputs for being correct
     is_industry_valid(industry){
         if(industry == null || industry == undefined) return false
+
+        //Uncomment section if the industries shown in the report have to have all the inputs
+        /*
         if(industry.volume_withdrawn!=null && industry.product_produced!=null && industry.has_onsite_wwtp!=null && industry.has_offsite_wwtp!=null && industry.has_direct_discharge!=null && industry.industry_type!=null){
             let arr = [true]
             if(industry.has_onsite_wwtp == 1) {
@@ -226,7 +229,8 @@ let utils = {
             }
             return !arr.includes(false)
         }
-        return false
+        return false*/
+        return true
 
     },
 
