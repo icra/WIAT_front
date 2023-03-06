@@ -104,7 +104,6 @@ let risk_category = {
         return null
     },
     //delta temperature
-    // https://www.knowyourh2o.com/outdoor-3/water-quality-index-calculator-for-surface-water
     delta_temperature: function(value){
         if(value < 0) return null
         else if (value < 0.5) return blue

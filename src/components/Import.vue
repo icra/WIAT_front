@@ -331,7 +331,7 @@ export default {
       imported_file_excel: null,
       imported_file_excel_risk: null,
       risk_categories: risk_thereshold,
-      current_thresholds: [[], [0.2, 1, 2], [20, 100, 200], [0.5, 1, 2], [], [], [2, 10, 100], [2, 5, 50]],
+      //current_thresholds: [[], [0.2, 1, 2], [20, 100, 200], [0.5, 1, 2], [], [], [2, 10, 100], [2, 5, 50]],
       keys_from_older_versions: [
           "ind_cod_infl", "ind_tn_infl", "ind_tp_infl",
         "ind_cod_effl", "ind_tn_effl", "ind_tp_effl", "ind_diclo_effl", "ind_cadmium_effl", "ind_hexaclorobenzene_effl", "ind_mercury_effl", "ind_plomo_effl", "ind_niquel_effl", "ind_chloro_effl", "ind_hexaclorobutadie_effl", "ind_nonilfenols_effl", "ind_tetracloroetile_effl", "ind_tricloroetile_effl",
@@ -396,10 +396,10 @@ export default {
         }
         return function(value){
           if(value < 0) return null
-          else if (value < low) return red
-          else if (value < medium) return orange
-          else if (value < high) return yellow
-          else if (value >= high) return blue
+          else if (value <= low) return red
+          else if (value <= medium) return orange
+          else if (value <= high) return yellow
+          else if (value > high) return blue
           return null
         }
       }
@@ -411,10 +411,10 @@ export default {
         }
         return function(value){   //the higher the value, the higher the impact
           if(value < 0 ) return  null
-          else if (value < low) return blue
-          else if (value < medium) return yellow
-          else if (value < high) return orange
-          else if (value >= high) return red
+          else if (value <= low) return blue
+          else if (value <= medium) return yellow
+          else if (value <= high) return orange
+          else if (value > high) return red
           return null
         }
       }
@@ -422,30 +422,31 @@ export default {
       try{
         risk = risk.richText[0].text
 
-        if(risk === "GHG emissions from Wastewater"){
+        if(risk === "GHG emissions from wastewater treatment"){
           this.risk_categories["global_warming"] = increasing_worse()
-          this.current_thresholds[0] = [low, medium, high]
+          //this.current_thresholds[0] = [low, medium, high]
         }else if(risk === "Increase in toxic units in the receiving water body after discharge"){
           this.risk_categories["delta_ecotoxicity"] = increasing_worse()
-          this.current_thresholds[1] = [low, medium, high]
+          //this.current_thresholds[1] = [low, medium, high]
         }else if(risk === "Increase of the concentration of the pollutants in the receiving water body after discharge (with respect to EQS)"){
           this.risk_categories["delta_eqs"] = increasing_worse()
-          this.current_thresholds[2] = [low, medium, high]
+          //this.current_thresholds[2] = [low, medium, high]
         }else if(risk === "Eutrophication potential"){
           this.risk_categories["eutrophication"] = increasing_worse()
-          this.current_thresholds[3] = [low, medium, high]
-        }else if(risk === "Toxic units in the effluent"){
-          this.risk_categories["ecotoxicity"] = increasing_worse()
-          this.current_thresholds[4] = [low, medium, high]
-        }else if(risk === "Concentration of the pollutants in the effluent (with respect to EQS)"){
-          this.risk_categories["eqs"] = increasing_worse()
-          this.current_thresholds[5] = [low, medium, high]
-        }else if(risk === "Dilution factor"){
+          //this.current_thresholds[3] = [low, medium, high]
+        }else if(risk === "Increase in temperature in the receiving water body due to industry discharge"){
+          console.log('aaa')
+          this.risk_categories["delta_temperature"] = increasing_worse()
+          //this.current_thresholds[3] = [low, medium, high]
+        }
+
+
+        else if(risk === "Dilution factor"){
           this.risk_categories["dilution_factor"] = increasing_better()
-          this.current_thresholds[6] = [low, medium, high]
+          //this.current_thresholds[6] = [low, medium, high]
         }else if(risk === "Consumption available ratio"){
           this.risk_categories["water_stress_ratio"] = increasing_worse()
-          this.current_thresholds[7] = [low, medium, high]
+          //this.current_thresholds[7] = [low, medium, high]
 
         }
 

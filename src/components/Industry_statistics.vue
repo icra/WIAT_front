@@ -3930,7 +3930,8 @@ export default {
 
     //Get impact associated to item (related to carbon impact)
     getGlobalWarming(item) {
-      return this.risk_categories["global_warming"](item[this.industry.name])
+
+      return this.risk_categories["global_warming"](item.value)
     },
 
     //Get impact associated to item (related to toxic units)
