@@ -12,6 +12,25 @@ let created_assessments = Vue.prototype.$assessments
 let assessment_active = Vue.prototype.$assessment_active
 let pollutants_added_by_user = null
 
+
+function parse_suppliers(sheet, rowNumber, columnNumber){
+
+    let suppliers = []
+    let row = sheet.getRow(rowNumber)
+
+    if (row.values.length >= columnNumber){
+        //array elements in chunks of 3 (get name, lat and long of supplier
+        for (let i = columnNumber; i < row.values.length; i+=3){
+            suppliers.push({
+                name: row.getCell(i).value,
+                latitude: row.getCell(i+1).value,
+                longitude: row.getCell(i+2).value
+            })
+        }
+    }
+    return suppliers
+}
+
 function parse_excel(file){
     if(file != null){
         const wb = new Excel.Workbook();
@@ -51,27 +70,14 @@ function parse_excel(file){
                                         let industry_latitude = row.getCell(3).value
                                         let industry_longitude = row.getCell(4).value
 
-                                        let suppliers = []
-
-                                        if (row.values.length > 4){
-                                            //array elements in chunks of 3 (get name, lat and long of supplier
-                                            for (let i = 5; i < row.values.length; i+=3){
-                                                suppliers.push({
-                                                    name: row.getCell(i).value,
-                                                    latitude: row.getCell(i+1).value,
-                                                    longitude: row.getCell(i+2).value
-                                                })
-                                            }
-                                        }
-
-                                        industries.push({
+                                         industries.push({
                                             assessment: assessment_industry,
                                             name: industry_name,
                                             location: {
                                                 latitude: industry_latitude,
                                                 longitude: industry_longitude
                                             },
-                                            suppliers: suppliers
+                                            suppliers: parse_suppliers(sheet, rowIndex, 5)
                                         })
                                     }
 
@@ -136,64 +142,81 @@ function parse_assessments(assessments){
 function parse_industry_locations(industries){
     for (let industry of industries){
         let industry_name = industry.name
-        let industry_latitude = industry.location.latitude
-        let industry_longitude = industry.location.longitude
         let industry_assessment = industry.assessment
-        let suppliers = industry.suppliers
 
         let assessment = created_assessments.find(a => a.name === industry_assessment)
         if (assessment == null){
             throw "INDUSTRY "+industry_name+" PLACED IN NON EXISTING ASSESSMENT"
         }
-        if(industry_latitude == null || industry_longitude == null){
-            throw "INDUSTRY "+industry_name+" HAS NO LOCATION"
-        }
 
-        //check if location is valid
-        if(utils.get_country_code_from_coordinates(industry_latitude, industry_longitude) == null) throw new Error('COORDINATES OF INDUSTRY '+industry_name+' NOT VALID')
+        let new_industry = _parse_industry_location(industry)
 
         let industry_to_delete = assessment.industries.findIndex(i => i.name === industry_name)
         if (industry_to_delete > -1) {
             assessment.industries.splice(industry_to_delete,1);
         }
-        let new_industry = new Industry()
-        new_industry.name = industry_name
-        new_industry.location = {
-            lat: industry_latitude,
-            lng: industry_longitude
-        }
-
-        for (let supplier of suppliers){
-            let supplier_name = supplier.name
-            let supplier_latitude = supplier.latitude
-            let supplier_longitude = supplier.longitude
-
-            if(supplier_name == null || supplier_latitude == null || supplier_longitude == null){
-                throw supplier_name+" MISSING FIELDS"
-            }
-            //check if location is valid
-            if(utils.get_country_code_from_coordinates(supplier_latitude, supplier_longitude) == null) throw new Error('COORDINATES OF SUPPLIER '+supplier_name+' NOT VALID')
-
-            let new_supplier = {
-                name: supplier_name,
-                location: {
-                    lat: supplier_latitude,
-                    lng: supplier_longitude
-                }
-            }
-
-            //Delete supplier if it already exists
-            let supplier_to_delete = new_industry.supply_chain.findIndex(s => s.name === supplier_name)
-            if (supplier_to_delete > -1) {
-                new_industry.supply_chain.splice(supplier_to_delete,1);
-            }
-
-            new_industry.supply_chain.push(new_supplier)
-        }
-
 
         assessment.industries.push(new_industry)
     }
+}
+
+function _parse_industry_location(industry){
+    let industry_name = industry.name
+    let industry_latitude = industry.location.latitude
+    let industry_longitude = industry.location.longitude
+    let industry_assessment = industry.assessment
+    let suppliers = industry.suppliers
+
+    let assessment = created_assessments.find(a => a.name === industry_assessment)
+    if (assessment == null){
+        throw "INDUSTRY "+industry_name+" PLACED IN NON EXISTING ASSESSMENT"
+    }
+    if(industry_latitude == null || industry_longitude == null){
+        throw "INDUSTRY "+industry_name+" HAS NO LOCATION"
+    }
+
+    //check if location is valid
+    if(utils.get_country_code_from_coordinates(industry_latitude, industry_longitude) == null) throw new Error('COORDINATES OF INDUSTRY '+industry_name+' NOT VALID')
+
+    let new_industry = new Industry()
+    new_industry.name = industry_name
+    new_industry.location = {
+        lat: industry_latitude,
+        lng: industry_longitude
+    }
+
+    for (let supplier of suppliers){
+        let supplier_name = supplier.name
+        let supplier_latitude = supplier.latitude
+        let supplier_longitude = supplier.longitude
+
+        if(supplier_name == null) throw "SUPPLIER HAS NO NAME"
+
+        if(supplier_latitude == null || supplier_longitude == null){
+            throw supplier_name+" MISSING COORDINATES"
+        }
+        //check if location is valid
+        if(utils.get_country_code_from_coordinates(supplier_latitude, supplier_longitude) == null) throw new Error('COORDINATES OF SUPPLIER '+supplier_name+' NOT VALID')
+
+        let new_supplier = {
+            name: supplier_name,
+            location: {
+                lat: supplier_latitude,
+                lng: supplier_longitude
+            }
+        }
+
+        //Delete supplier if it already exists
+        let supplier_to_delete = new_industry.supply_chain.findIndex(s => s.name === supplier_name)
+        if (supplier_to_delete > -1) {
+            new_industry.supply_chain.splice(supplier_to_delete,1);
+        }
+
+        new_industry.supply_chain.push(new_supplier)
+    }
+
+
+    return new_industry
 }
 
 function parse_value(i, sheet, industry, stage, key, stepper_model, is_string = false, mandatory = false){
@@ -389,24 +412,24 @@ function parse_pollutants(i, sheet, industry, stage, key, stepper_model){
 function parse_industry(industry, sheet){
     try {
 
-        parse_value(5, sheet, industry, industry, 'volume_withdrawn', 1, false, true)
-        parse_value(6, sheet, industry, industry, 'volume_withdrawn_groundwater', 1, false, false)
-        parse_value(7, sheet, industry, industry, 'volume_external_same_watershed_sources', 1, false, false)
-        parse_value(8, sheet, industry, industry, 'volume_external_different_sources', 1, false, false)
-        industry.has_onsite_wwtp = parse_yes_no(9, sheet, true)
-        industry.has_direct_discharge = parse_yes_no(10, sheet, true)
-        industry.has_offsite_wwtp = parse_yes_no(11, sheet, true)
-        industry.industry_type = parse_industry_type(12, sheet, true)
-        parse_value(13, sheet, industry, industry, 'product_produced_unit', 1, true, false)
-        parse_value(14, sheet, industry, industry, 'product_produced', 1, false, true)
+        parse_value(8, sheet, industry, industry, 'volume_withdrawn', 1, false, true)
+        parse_value(9, sheet, industry, industry, 'volume_withdrawn_groundwater', 1, false, false)
+        parse_value(10, sheet, industry, industry, 'volume_external_same_watershed_sources', 1, false, false)
+        parse_value(11, sheet, industry, industry, 'volume_external_different_sources', 1, false, false)
+        industry.has_onsite_wwtp = parse_yes_no(12, sheet, true)
+        industry.has_direct_discharge = parse_yes_no(13, sheet, true)
+        industry.has_offsite_wwtp = parse_yes_no(14, sheet, true)
+        industry.industry_type = parse_industry_type(15, sheet, true)
+        parse_value(16, sheet, industry, industry, 'product_produced_unit', 1, true, false)
+        parse_value(17, sheet, industry, industry, 'product_produced', 1, false, true)
 
-        industry.pollutants_selected = parse_selected_pollutants(15, sheet)
-        pollutants_added_by_user = parse_selected_pollutants(15, sheet, false)
+        industry.pollutants_selected = parse_selected_pollutants(18, sheet) //includes COD TN TP
+        pollutants_added_by_user = parse_selected_pollutants(18, sheet, false)  //does not include COD TN TP
 
-        parse_pollutants(16, sheet, industry, industry, 'ind_pollutants_effl', 1)
+        parse_pollutants(19, sheet, industry, industry, 'ind_pollutants_effl', 1)
 
-        parse_value(17, sheet, industry, industry, 'ind_temperature_withdrawn', 1, false, false)
-        parse_pollutants(18, sheet, industry, industry, 'ind_pollutants_infl', 1)
+        parse_value(20, sheet, industry, industry, 'ind_temperature_withdrawn', 1, false, false)
+        parse_pollutants(21, sheet, industry, industry, 'ind_pollutants_infl', 1)
 
 
     } catch (e) {
@@ -576,28 +599,61 @@ function parse_excel_new_industry(file){
     if(file != null){
         const wb = new Excel.Workbook();
         const reader = new FileReader()
+        let _this = this
 
         return new Promise((resolve, reject) => {
             reader.onload = () => {
                 const buffer = reader.result;
                 wb.xlsx.load(buffer).then(workbook => {
-
-                    //Check if industry is already created
-                    let sheet = workbook.getWorksheet(1)
-                    let assessment_name = sheet.getRow(3).getCell(5).value
-                    let industry_name = sheet.getRow(4).getCell(5).value
-
-                    //check if assessment and industry exist
-                    let assessment = created_assessments.find(a => a.name === assessment_name)
-                    if (assessment == null){
-                        reject("ASSESSMENT "+assessment_name+" DOES NOT EXIST. CREATE IT FIRST")
-                    }
-                    let industry = assessment.industries.find(i => i.name === industry_name)
-                    if (industry == null){
-                        reject("INDUSTRY "+industry_name+" DOES NOT EXIST IN ASSESSMENT "+assessment_name+". CREATE IT FIRST")
-                    }
                     try {
+                        let sheet = workbook.getWorksheet(1)
+                        let assessment_name = sheet.getRow(3).getCell(5).value
+
+                        if (assessment_name == null) throw("ASSESSMENT NAME IS MISSING")
+
+                        let industry_name = sheet.getRow(4).getCell(5).value
+
+                        if (industry_name == null) throw("INDUSTRY NAME IS MISSING")
+
+                        let latitude = sheet.getRow(5).getCell(5).value
+
+                        if (latitude == null) throw("INDUSTRY LATITUDE IS MISSING")
+
+                        let longitude = sheet.getRow(6).getCell(5).value
+
+                        if (longitude == null) throw("INDUSTRY LONGITUDE IS MISSING")
+
+
+                        //check if assessment exists
+                        let assessment = created_assessments.find(a => a.name === assessment_name)
+
+
+                        if ((assessment == null || assessment == undefined) && assessment_name != null){
+
+                            //Create assessment
+                            let new_assessment = new Assessment()
+                            new_assessment.name = assessment_name
+                            created_assessments.push(new_assessment)
+                            assessment_active.push(true)
+                            assessment = new_assessment
+
+                            //reject("ASSESSMENT "+assessment_name+" DOES NOT EXIST. CREATE IT FIRST")
+                        }
+
+                        let industry = {
+                            assessment: assessment_name,
+                            name: industry_name,
+                            location: {
+                                latitude: latitude,
+                                longitude: longitude
+                            },
+                            suppliers: parse_suppliers(sheet, 7, 5)
+                        }
+
+                        industry = _parse_industry_location(industry)
+
                         parse_industry(industry, workbook.getWorksheet(1))
+
                         if(industry.has_onsite_wwtp == 1) {
                             industry.update_onsite_wwtp()
                             let wwtp = industry.onsite_wwtp
@@ -616,17 +672,28 @@ function parse_excel_new_industry(file){
                             wwtp.location = industry.location
                             parse_external_wwtp(wwtp, industry, 4, workbook.getWorksheet(4))
                         }
+
+                        //once its created correctly, delete the older one if exists
+                        let industry_to_delete = assessment.industries.findIndex(i => i.name === industry_name)
+                        if (industry_to_delete > -1) {
+                            assessment.industries.splice(industry_to_delete,1);
+                        }
+
+                        //Add the new industry
+                        assessment.industries.push(industry)
+
+                        resolve([industry])
+
                     }
                     catch (e) {
                         reject(e)
                     }
-                    resolve([industry])
+
                 })
             }
             reader.readAsArrayBuffer(file)
 
         }).catch(e => {
-            console.log('aaaaa')
             throw e
         })
 
@@ -653,7 +720,7 @@ let utils_excel = {
     async read_new_industry(file){
         try {
 
-            let new_industry = await parse_excel_new_industry(file)
+            let a = await parse_excel_new_industry(file)
             return "FILE IMPORTED CORRECTLY"
 
         }catch (e) {

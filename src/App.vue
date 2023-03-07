@@ -1326,9 +1326,10 @@ export default {
       else return 'An industry with same name already exists. '
     },
     new_supply_chain_rules_name(value){
+
       if (this.created_assessments[this.assessment_expansion_panel].industries[this.selected_industry].supply_chain.filter(industry => {
         return industry.name == value
-      }).length == 0 && this.created_assessments[this.assessment_expansion_panel].industries[this.selected_industry].name != value) return true
+      }).length === 0) return true
       else return "Supplier with same name already exists"
     },
     rules_required(value) {

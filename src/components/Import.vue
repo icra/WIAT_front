@@ -128,8 +128,7 @@
             </v-icon>
           </template>
           <span>In step 1, select "Industry Locations" to create new assessments and upload the locations of the new industries, with their suppliers. Note that if the industry you are adding already exists, the old one will be overwritten.
-            On the other hand, if you want to add information (advanced entries) to an already created industry, select "Advanced entries" (in this case, the already existing industry will be overwritten).
-
+            On the other hand, select "Advanced entries" if you want to create an industry with advanced inputs entered (again, if the created industry is already in the tool, it will be overwritten).
           </span>
         </v-tooltip>
 
@@ -435,7 +434,6 @@ export default {
           this.risk_categories["eutrophication"] = increasing_worse()
           //this.current_thresholds[3] = [low, medium, high]
         }else if(risk === "Increase in temperature in the receiving water body due to industry discharge"){
-          console.log('aaa')
           this.risk_categories["delta_temperature"] = increasing_worse()
           //this.current_thresholds[3] = [low, medium, high]
         }

@@ -758,7 +758,10 @@
         <div>
 
           <!--<PDFJSViewer class="center" v-show="selected_industries.length>0 && !generating_pdf" ref="make_pdf"/> -->
-          <div style="visibility: hidden">
+          <!--
+          CHARTS ARE RENDERED HERE FOR PDF GENERATION, BUT HIDEN FROM THE USER
+          -->
+          <div style="position: absolute; left: -999em">
             <canvas id="chart"></canvas>
           </div>
 
@@ -1766,6 +1769,7 @@ export default {
 
             let layers_description = {
               table: {
+                headerRows: 1,
                 body: [
                   [
                     {text:'Industry', style: "bold"},
@@ -1843,6 +1847,7 @@ export default {
       let industriesSummary = {
         style: 'tableExample',
         table: {
+          headerRows: 1,
           body: [
             [
               {text:'Name', style: "bold"},
@@ -1901,6 +1906,7 @@ export default {
 
       let industriesIndicator = {
         table: {
+          headerRows: 1,
           body: [
             [
               {text:'Assessment', style: "bold"},
@@ -2210,6 +2216,7 @@ export default {
 
       let industriesEcotoxicity = {
         table: {
+          headerRows: 1,
           body: [[{text: "Pollutant", style: 'bold'}, {text: "Value (TU/day)", style: 'bold'}, {text: "Level of certainty", style: 'bold'}]]
         }
       }
@@ -2267,6 +2274,7 @@ export default {
 
       let industriesEcotoxicity = {
         table: {
+          headerRows: 1,
           body: [[{text: "Pollutant", style: 'bold'}, {text: "Value (%)", style: 'bold'}, {text: "Level of certainty", style: 'bold'}]]
         }
       }
@@ -2321,6 +2329,7 @@ export default {
 
       let industriesEutrophication = {
         table: {
+          headerRows: 1,
           body: [[{text: "Pollutant", style: 'bold'}, {text: "Value (gPO4eq/day)", style: 'bold'}, {text: "Level of certainty", style: 'bold'}]]
         }
       }
@@ -2378,6 +2387,7 @@ export default {
       //fillColor: utils.get_string_impact_legend(industry_impact_legend_category.delta_temperature(industry))
       let table = {
         table: {
+          headerRows: 1,
           body: [
               [{text: "Increase in temperature (°C)", style: 'bold'}, {text: "Level of certainty", style: 'bold'}],
                   [{text: delta_temperature, fillColor: _this.get_color(this.risk_categories["delta_temperature"](delta_temperature))},
@@ -2404,6 +2414,7 @@ export default {
 
       let industriesInfluentEfficiency = {
         table: {
+          headerRows: 1,
           body: [[{text: "Pollutant", style: 'bold'}, {text: "Value (%)", style: 'bold'}, {text: "Level of certainty", style: 'bold'}]]
         }
       }
@@ -2443,6 +2454,7 @@ export default {
 
       let industriesEfficiency = {
         table: {
+          headerRows: 1,
           body: [[{text: "Pollutant", style: 'bold'}, {text: "Value (%)", style: 'bold'}, {text: "Level of certainty", style: 'bold'}]]
         }
       }
@@ -2490,6 +2502,7 @@ export default {
 
       let industriesTreatedFactor = {
         table: {
+          headerRows: 1,
           body: [
               [{text: "Treated water factor (%)", style: 'bold'}, {text: "Level of certainty", style: 'bold'}],
             [{text: treated}, {text: level_of_certainty, fillColor: fill_color_level_of_certainty != null ? fill_color_level_of_certainty[0] : null}],
@@ -2515,6 +2528,7 @@ export default {
 
       let table = {
         table: {
+          headerRows: 1,
           body: [[{text: "Pollutant", style: 'bold'}, {text: "Concentration (g/m3)", style: 'bold'}, {text: "Toxic units (TU)", style: 'bold'}, {text: "Concentration with respect to EQS (%) ", style: 'bold'}, {text: "Level of certainty ", style: 'bold'}]]
         }
       }
@@ -2552,6 +2566,7 @@ export default {
 
       let table = {
         table: {
+          headerRows: 1,
           body: [[{text: "Pollutant", style: 'bold'}, {text: "Increase of concentration (g/m3)", style: 'bold'}, {text: "Concentration (g/m3)", style: 'bold'}, {text: "Toxic units (TU)", style: 'bold'}, {text: "Concentration with respect to EQS (%) ", style: 'bold'}, {text: "Level of certainty ", style: 'bold'}]]
         }
       }
@@ -2587,6 +2602,7 @@ export default {
 
       let table = {
         table: {
+          headerRows: 1,
           body: []
         }
       }
@@ -2698,6 +2714,7 @@ export default {
 
       let table = {
         table: {
+          headerRows: 1,
           body: []
         }
       }
@@ -2756,6 +2773,7 @@ export default {
 
       let table = {
         table: {
+          headerRows: 1,
           body: [[{text: "GHG gas", style: 'bold'}, {text: "Value (kgCO2eq/day)", style: 'bold'}, {text: "Level of certainty", style: 'bold'}]]
         }
       }
@@ -2807,6 +2825,7 @@ export default {
 
       let table = {
         table: {
+          headerRows: 1,
           body: [
             [{text: "Energy used per day (kWh/m3)", style: 'bold'}, {text: "Level of certainty", style: 'bold'}],
             [{text: energy_used}, {text: level_of_certainty, fillColor: fill_color_level_of_certainty != null ? fill_color_level_of_certainty[0] : null}],
@@ -2827,6 +2846,7 @@ export default {
 
       let table = {
         table: {
+          headerRows: 1,
           body: [[{text: "Pollutant", style: 'bold'}, {text: "Concentration (g/m3)", style: 'bold'}, {text: "Level of certainty ", style: 'bold'}]]
         }
       }
@@ -2861,6 +2881,7 @@ export default {
 
       let table = {
         table: {
+          headerRows: 1,
           body: [[{text: "Biogenic source", style: 'bold'}, {text: "Value (kgCO2eq/day)", style: 'bold'}, {text: "Level of certainty ", style: 'bold'}]]
         }
       }
@@ -2904,6 +2925,7 @@ export default {
 
       let table = {
         table: {
+          headerRows: 1,
           body: [[{text: "Biogenic source", style: 'bold'}, {text: "Value (kgCO2eq/day)", style: 'bold'}, {text: "Level of certainty ", style: 'bold'}]]
         }
       }
@@ -2953,6 +2975,7 @@ export default {
 
       let table = {
         table: {
+          headerRows: 1,
           body: [[{text: "Emissions", style: 'bold'}, {text: "Value (kgCO2eq/day)", style: 'bold'}, {text: "Level of certainty ", style: 'bold'}]]
         }
       }
@@ -3007,6 +3030,7 @@ export default {
 
       let industriesIndicator = {
         table: {
+          headerRows: 1,
           body: [
             [
               {text:'Industry', style: "bold"},
@@ -3081,6 +3105,7 @@ export default {
           return {
             margin: [0, 20, 0, 30],
             table: {
+              headerRows: 1,
               widths: [150, '*', 100],
               body: [
                 [
@@ -3098,6 +3123,7 @@ export default {
             margin: [20, 20],
             layout: 'noBorders',
             table: {
+              headerRows: 1,
               widths: ['*',200],
               body: [
                 ['', {image: img, fit:[50,50], alignment: 'right'}],
