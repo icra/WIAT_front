@@ -110,7 +110,7 @@
                 <v-card flat  style="padding: 40px">
 
                   <div style="padding: 0px 50px 0px 50px">
-                    <a class="button-link" href="/WIAT science and methods.pdf" download >
+                    <a class="button-link" href="/WIAT V1 Science and methods.pdf" download >
                       <v-btn small tile block color="#b62373">
                         Download methodology
                         <v-icon right>
