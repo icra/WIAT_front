@@ -1,6 +1,6 @@
 
 import {level_of_certainty} from "@/level_of_certainty";
-
+import {utils} from "@/utils";
 //sum array of numbers
 Array.prototype.sum=function(){return this.reduce((p,c)=>(parseFloat(p)+parseFloat(c)),0)};
 
@@ -261,6 +261,7 @@ export class Industry{
 
         }
         return load*/
+
         return this._effl_pollutant_load(pollutant, only_same_watershed, only_same_watershed)
     }
 

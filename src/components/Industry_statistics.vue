@@ -157,6 +157,19 @@
                 </v-alert>
               </v-hover>
 
+              <v-hover v-slot="{ hover }">
+                <v-alert
+                    shaped
+                    type="warning"
+                    prominent
+                    border="left"
+                    :outlined = "!hover"
+                    @click="edit_industry"
+                    v-if="!utils.industry_has_all_inputs(industry)"
+                >
+                  The industry has some mandatory entries that are not configured, and the information shown here may not be completely accurate. Click here to edit the industry.                </v-alert>
+              </v-hover>
+
               <div v-if="toggle == 1">
                 <h3>
                   <span style="color: #b62373;">{{industry.name}}</span>: Context layers
@@ -3603,6 +3616,10 @@ export default {
     set_pollutants_factors(){
       this.$router.push({name: 'general_configuration'})
     },
+    edit_industry() {
+      this.$router.push({name: 'edit_industry', params: {assessment_id: this.assessment_id, industry_id: this.industry_id}})
+    },
+
     //Sort strings numerically
     customSort(items, index, isDescending) {
       items.sort((a, b) => {

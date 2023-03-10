@@ -105,6 +105,7 @@ let utils = {
             let delta_eqs_risk = risk_categories["delta_eqs"](delta_eqs_factor)
 
             industry_row["pollution_impact"] = return_avg_risk([eutrophication_risk, delta_ecotox_risk, delta_eqs_risk, delta_temperature_risk])
+            if(industry_row["pollution_impact"] === null) industry_row["pollution_impact"] = "No data/No impact"
 
         }else{
             industry_row["freshwater_impact"] = "-"
@@ -207,7 +208,7 @@ let utils = {
         return filtered.sum() / filtered.length
     },
 
-    //Says if industry has the required inputs for being correct
+    //says if industry is neither null nor undefined
     is_industry_valid(industry){
         if(industry == null || industry == undefined) return false
 
@@ -233,6 +234,30 @@ let utils = {
         return true
 
     },
+
+    //says if industry has all mandatory inputs setted
+    industry_has_all_inputs(industry){
+        if(industry == null || industry == undefined) return false
+
+        if(industry.volume_withdrawn!=null && industry.product_produced!=null && industry.has_onsite_wwtp!=null && industry.has_offsite_wwtp!=null && industry.has_direct_discharge!=null && industry.industry_type!=null){
+            let arr = [true]
+            if(industry.has_onsite_wwtp == 1) {
+                let wwtp = industry.onsite_wwtp
+                arr.push(wwtp.wwt_vol_trea!=null && wwtp.wwt_vol_disc!=null)
+            }
+            if(industry.has_direct_discharge == 1) {
+                let dd = industry.direct_discharge
+                arr.push(dd.dd_vol_disc!=null)
+            }
+            if(industry.has_offsite_wwtp == 1) {
+                let wwtp = industry.offsite_wwtp
+                arr.push(wwtp.wwt_vol_trea!=null)
+            }
+            return !arr.includes(false)
+        }
+        return false
+    },
+
 
     equals(a, b){
         return JSON.stringify(a) === JSON.stringify(b);
@@ -919,7 +944,7 @@ let metrics = {
 
         //let dilution_factor = water_discharged/(water_discharged + flow_acc_value)
         let dilution_factor = (streamflow_value - water_withdrawn + water_discharged)/water_discharged
-
+        if (isNaN(dilution_factor)) return "-"
         return dilution_factor.toExponential(2)
 
     },
@@ -1470,15 +1495,15 @@ let metrics = {
         for(let pollutant of utils.get_pollutants(industries)){
             let tu_factor = conversion_factors[pollutant]['tu']
             let pollutant_delta = await effl_delta(industries, pollutant, global_layers, only_same_watershed)
+
             let delta_tu = 1000*pollutant_delta/tu_factor
 
-            if(pollutant_delta == 0) toxic_units[pollutant] = (0).toFixed(3)
-            else if(Number.isFinite(delta_tu)) toxic_units[pollutant] = delta_tu.toExponential(2)
+            if(Number.isFinite(delta_tu)) toxic_units[pollutant] = delta_tu.toExponential(2)
             else toxic_units[pollutant] = "-"
 
         }
         if (utils.get_pollutants(industries).length == 0) toxic_units = {}
-        else if (Object.values(toxic_units).filter(x => x != "-").length == 0) toxic_units["total"] = '-'
+        else if (Object.values(toxic_units).filter(x => !isNaN(x)).length == 0) toxic_units["total"] = '-'
         else toxic_units["total"] = Object.values(toxic_units).sum().toExponential(2)
 
         return toxic_units
@@ -1597,10 +1622,10 @@ let metrics = {
 
             let eutrophication_value = eutrophication_factor*effluent_concentration
             if(Number.isFinite(eutrophication_value)) eutrophication[pollutant] = eutrophication_value.toExponential(3)
-            else eutrophication[pollutant] = "NA"
+            else eutrophication[pollutant] = "-"
         }
-        let filtered_total = Object.values(eutrophication).filter(x => x != 'NA')
-        if(filtered_total.length == 0) eutrophication["total"] = 'NA'
+        let filtered_total = Object.values(eutrophication).filter(x => x != '-')
+        if(filtered_total.length == 0) eutrophication["total"] = '-'
         else eutrophication["total"] = filtered_total.sum().toExponential(3)
 
         return eutrophication

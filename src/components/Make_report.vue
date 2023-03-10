@@ -118,6 +118,26 @@
                                   </span>
                             </template>
 
+                            <template v-slot:item.warning="{ item }">
+                              <v-tooltip left v-if="item.warning != ''" max-width="500">
+                                <template v-slot:activator="{ on, attrs }">
+                                  <v-icon
+                                      small
+                                      class="mr-2"
+                                      v-bind="attrs"
+                                      v-on="on"
+                                      color="#b62373"
+                                  >
+                                    {{ item.warning }}
+                                  </v-icon>
+
+                                </template>
+                                <span><b>Warning</b>: The industry has some mandatory entries that are not configured, and the impact estimation may not be completely accurate. </span>
+
+                              </v-tooltip>
+                            </template>
+
+
                             <template
                                 v-for="value in ['pollution_impact', 'freshwater_impact', 'carbon_impact', 'owr']"
                                 v-slot:[`item.${value}`]="{ item }"
@@ -1598,13 +1618,14 @@ export default {
       if(_this.tab !== undefined){
 
         let pollutants_table = {
-          header: [{text: "Name", value: "value", sortable: false}, {text: "Country", value: "country", sortable: false}, {text: "Number of suppliers", value: "supply_chain_number", sortable: true}, {text: "Impact of industrial wastewater on water quality", value: "pollution_impact", sortable: false}, {text: "Impact of industrial wastewater on water availability", value: "freshwater_impact", sortable: false}, {text: "GHG emissions from wastewater treatment", value: "carbon_impact", sortable: true}, {text: "Overall water risk", value: "owr", sortable: true}],
+          header: [{text: "Name", value: "value", sortable: false}, {text: "Country", value: "country", sortable: false}, {text: "Number of suppliers", value: "supply_chain_number", sortable: true}, {text: "Impact of industrial wastewater on water quality", value: "pollution_impact", sortable: false}, {text: "Impact of industrial wastewater on water availability", value: "freshwater_impact", sortable: false}, {text: "GHG emissions from wastewater treatment", value: "carbon_impact", sortable: true}, {text: "Overall water risk", value: "owr", sortable: true}, {text: "", value: "warning", sortable: false}],
           value: []
         }
 
         for (let industry of this.created_assessments[this.tab].industries) {
 
           let industry_row = await utils.summary_industry(industry, this.global_layers)
+          industry_row["warning"] = utils.industry_has_all_inputs(industry) ? '' : 'mdi-alert'
           pollutants_table.value.push(industry_row)
 
         }
@@ -1871,7 +1892,6 @@ export default {
         let carbon_impact = _this.getSimpleReportColor(industry, "carbon_impact")
         let owr_impact = _this.getSimpleReportColor(industry, "owr")
 
-
         let arr = [
           industry.value,
           industry.country,
@@ -1888,10 +1908,29 @@ export default {
       dd.content.push(industriesSummary)
       dd.content.push("\n")
       this.risk_categories.legend_impact_pdf(dd)
+
+      //say which of the industries has not all the data setted (if any)
+
+      let industries_completed_bool = assessment.industries.map(industry => utils.industry_has_all_inputs(industry))
+
+
+      //zip with original array and filter out the ones that are completed
+      let industries_not_completed = assessment.industries.map((industry, index) => [industry, industries_completed_bool[index]]).filter(industry => !industry[1])
+      let industries_not_completed_name = industries_not_completed.map(industry => industry[0].name)
+      if (industries_not_completed.length > 0){
+        dd.content.push("\n\n")
+        dd.content.push({
+          text: "The following industries have not all the mandatory data settled, and they results may not be accurate:\n\n",
+          color: '#b62373',
+          bold: true
+        })
+        dd.content.push({
+          ul: industries_not_completed_name
+        })
+      }
+
+
       dd.content.push("\n\n")
-
-
-
 
     },
 
@@ -2068,7 +2107,7 @@ export default {
               display: true,
               labels: {
                 font: {
-                  size: 35
+                  size: 12,
                   //size: 60
                 }
               }
@@ -2081,7 +2120,7 @@ export default {
               },
               color: 'white',
               font: {
-                size: 35,
+                size: 12,
                 //size: 60
               }
             },
@@ -2133,7 +2172,7 @@ export default {
 
               },
               font: {
-                size: 30,
+                size: 12,
                 //size: 60
               }
 
@@ -2147,7 +2186,7 @@ export default {
                   return value + '%';
                 },
                 font: {
-                  size: 25,
+                  size: 12,
                   //size: 60
                 }
               }
@@ -2155,7 +2194,7 @@ export default {
             x: {
               ticks: {
                 font: {
-                  size: 25,
+                  size: 12,
                   //size: 60
                 }
               }
