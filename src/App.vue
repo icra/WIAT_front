@@ -38,6 +38,15 @@
                     <source src="demo.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"' />
                   </video>
 
+                  <br><br>
+                  <b>Download the files used on the video and import them on the web:</b>
+                  <ul>
+                    <li><a href="dummy_files/dummy session.json" download>Exported session</a></li>
+                    <li><a href="dummy_files/wiat_locations.xlsx" download>Industry locations</a></li>
+                    <li><a href="dummy_files/wiat_industries.xlsx" download>Industry advanced inputs</a></li>
+
+                  </ul>
+
                 </v-card>
 
               </div>

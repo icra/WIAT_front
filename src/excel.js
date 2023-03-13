@@ -232,11 +232,10 @@ function parse_value(i, sheet, industry, stage, key, stepper_model, is_string = 
     if (isNaN(raw) && is_string) value = raw
     else if (isNaN(raw) && !is_string) throw "INVALID VALUE IN SHEET "+sheet_name+" ROW "+i
     else{
-        let parsed = parseInt(raw)
+        let parsed = parseFloat(raw)
 
         //check if is int or float
         if(isNaN(parsed)){
-            parsed = parseFloat(raw)
             if (isNaN(parsed) && is_string) value = raw
             else throw "INVALID VALUE IN SHEET "+sheet_name+" ROW "+i
         }
@@ -244,6 +243,7 @@ function parse_value(i, sheet, industry, stage, key, stepper_model, is_string = 
 
         if (value < 0) throw "NEGATIVE VALUE IN SHEET "+sheet_name+" ROW "+i
     }
+
     stage[key] = value
 
     parse_level_of_certainty_row(i, sheet, industry, stage, stepper_model, key, null)

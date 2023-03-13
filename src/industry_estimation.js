@@ -42,6 +42,8 @@ export let industry_estimations = {
 
         }
 
+        if(stepper_model == 1) industry = industry_model
+
         let industry_estimations = {
 
             wwt_vol_disc: function(){
@@ -78,6 +80,7 @@ export let industry_estimations = {
             },
 
             ind_pollutants_effl: function(){
+
                 if (pollutant == "COD"){
                     if(industry.industry_type === 1){
                         return 336.2591324200910/2.4
