@@ -1,6 +1,5 @@
 <template>
 
-  <!-- Disable cache so that the user can always see the latest version of the app -->
 
 
   <v-app class="app">
@@ -984,6 +983,17 @@ export default {
   created() {
     document.title = "WIAT";
     window.addEventListener('beforeunload', e => this.beforeunloadFn(e))
+
+    // if new content is available, reload the page
+    if (process.env.NODE_ENV === 'production') {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function (registrations) {
+          for (let registration of registrations) {
+            registration.update()
+          }
+        })
+      }
+    }
   },
 
   watch: {
