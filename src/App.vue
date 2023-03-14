@@ -1,4 +1,11 @@
 <template>
+
+  <!-- Disable cache so that the user can always see the latest version of the app -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+
+
   <v-app class="app">
 
     <!-- Header -->
@@ -69,7 +76,7 @@
               <div style="background-color: white; overflow: hidden">
 
                 <v-card flat style="padding: 40px">
-                  WIAT (Wastewater Impact Assessment Tool) v1.0  is a tool that allows users to understand which aspects of wastewater treatment and industry management cause major impacts related to climate, biodiversity and water security, as well as to help identify water risks and prioritize their water management interventions.
+                  WIAT (Wastewater Impact Assessment Tool) v1 is a tool that allows users to understand which aspects of wastewater treatment and industry management cause major changes in the state of nature related to climate, biodiversity and water security, as well as to help identify water risks and prioritize their water management interventions.
                   <br>
 
                   This project is part of the <a href="https://wbcsdpublications.org/wastewater-zero/" target="_blank" rel="noopener noreferrer">Wastewater Zero Commitment</a> initiative developed by the WBCSD.
