@@ -37,7 +37,7 @@
               <div style="background-color: white; height: 100%; width: 100%">
 
                 <v-card flat style="padding: 40px; height: 100%;">
-                  <br><br>
+                  <br>
                   <video controls id="video" style="padding: 40px; width: 70%">
                     <source src="demo.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"' />
                   </video>
