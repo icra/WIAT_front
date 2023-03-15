@@ -46,7 +46,7 @@
                   <ul>
                     <li><a href="dummy_files/dummy session.json" download>Exported session</a></li>
                     <li><a href="dummy_files/wiat_locations.xlsx" download>Industry locations</a></li>
-                    <li><a href="dummy_files/wiat_industries.xlsx" download>Industry advanced inputs</a></li>
+                    <li><a href="dummy_files/wiat_template.xlsx" download>Industry advanced inputs</a></li>
 
                   </ul>
 
