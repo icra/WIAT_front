@@ -29,15 +29,17 @@
             </v-hover>
             <v-dialog
                 v-model="dialog_tour"
-                width="1100"
+                width="80%"
+                height="80%"
                 scrollable
+                style="background-color: white"
             >
-              <div style="background-color: white; overflow: hidden">
+              <div style="background-color: white; height: 100%; width: 100%">
 
-                <v-card flat style="padding: 40px; height: 100%">
+                <v-card flat style="padding: 40px; height: 100%;">
                   <b>This video is from the older version of the WIAT tool. Some things has changed in this version, but the way assessments and industries are added is the same.</b>
                   <br><br>
-                  <video controls id="video">
+                  <video controls id="video" style="padding: 40px; width: 70%">
                     <source src="demo.mp4" type='video/mp4; codecs="avc1.42E01E, mp4a.40.2"' />
                   </video>
 
