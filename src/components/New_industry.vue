@@ -290,7 +290,7 @@
             <br>
             <br>
 
-            <router-link :to="{name: 'report'}" style="text-decoration: none">
+            <router-link :to="{name: 'report_prop', params: {assessment_id: assessment_id}}" style="text-decoration: none">
               <v-hover
                   v-slot="{ hover }"
               >
@@ -822,8 +822,8 @@ export default {
         this.industry.update_onsite_wwtp()
       }else{
         this.industry.reset_onsite_wwtp()
-        this.onsite_wwtp_to_model()
       }
+      this.onsite_wwtp_to_model()
 
       //Direct discharge
       if(this.industry.has_direct_discharge == 1){
@@ -873,7 +873,7 @@ export default {
 
 
       let disabled = industry.volume_withdrawn !== null && industry.volume_withdrawn !== "" &&
-          industry.product_produced !== null && industry.product_produced !== "" && industry.product_produced !== 0 &&
+          industry.product_produced !== null && industry.product_produced !== "" &&
           industry.has_onsite_wwtp !== null && industry.has_direct_discharge !== null && industry.has_offsite_wwtp !== null && industry.industry_type !== null
 
       return !disabled
@@ -881,7 +881,7 @@ export default {
 
     tab_2_disabled(){
       let wwtp = this.onsite_wwtp_model
-      let disabled = wwtp.wwt_vol_trea !== 0 && wwtp.wwt_vol_trea !== null && wwtp.wwt_vol_trea !== "" && wwtp.wwt_vol_disc !== null && wwtp.wwt_vol_disc !== ""
+      let disabled = wwtp.wwt_vol_trea !== null && wwtp.wwt_vol_trea !== "" && wwtp.wwt_vol_disc !== null && wwtp.wwt_vol_disc !== ""
       return !disabled
     },
 
@@ -893,7 +893,7 @@ export default {
 
     tab_4_disabled(){
       let wwtp = this.offsite_wwtp_model
-      let disabled = wwtp.wwt_vol_trea !== 0 && wwtp.wwt_vol_trea !== null && wwtp.wwt_vol_trea !== "" && wwtp.wwt_vol_disc !== null && wwtp.wwt_vol_disc !== ""
+      let disabled = wwtp.wwt_vol_trea !== null && wwtp.wwt_vol_trea !== "" && wwtp.wwt_vol_disc !== null && wwtp.wwt_vol_disc !== ""
       return !disabled
     },
   }

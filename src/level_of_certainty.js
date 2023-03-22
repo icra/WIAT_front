@@ -71,7 +71,7 @@ let level_of_certainty = {
                         }else{
                             let estimation = industry_estimations.get_estimation(input, industry, industry, stepper_model, wwtp, wwtp, null, true)
 
-                            if(stage[input] == 0 || stage[input] == null || stage[input] == '' ){
+                            if(stage[input] == 0 || stage[input] == null || stage[input] == '' ||isNaN(stage[input])){
                                 level_of_certainty[input] = 'no_data'
                             }else if (stage[input] == estimation){
                                 level_of_certainty[input] = 'estimated'
@@ -86,7 +86,7 @@ let level_of_certainty = {
                                 level_of_certainty[input][pollutant] = 'no_data'
                             }else{
                                 let estimation = industry_estimations.get_estimation(input, industry, industry, stepper_model, wwtp, wwtp, pollutant, true)
-                                if(stage[input][pollutant] == 0 || stage[input][pollutant] == null || stage[input][pollutant] == ''){
+                                if(stage[input][pollutant] == 0 || stage[input][pollutant] == null || stage[input][pollutant] == '' || isNaN(stage[input][pollutant])){
                                     level_of_certainty[input][pollutant] = 'no_data'
                                 }else if (stage[input][pollutant] == estimation){
                                     level_of_certainty[input][pollutant] = 'estimated'

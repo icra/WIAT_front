@@ -168,6 +168,7 @@ export class Industry{
         //wwtp.level_of_certainty['wwt_pollutants_infl_ind'] = JSON.parse(JSON.stringify(this.level_of_certainty["ind_pollutants_effl"]))
 
         if(this.has_offsite_wwtp != 1)  wwtp.wwt_vol_treated_external = 0
+
         wwtp["level_of_certainty"] = level_of_certainty.set_level_of_certainty(this, 2)
 
 
