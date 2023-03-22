@@ -1,7 +1,13 @@
 # wiat_front
 
+## Versions
+```
+Node 16.8.1 or less
+```
+
 ## Project setup
 ```
+npm install -g carto
 npm install
 ```
 
