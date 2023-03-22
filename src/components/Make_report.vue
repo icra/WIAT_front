@@ -1601,15 +1601,6 @@ export default {
       return R;
     },
 
-    chooseColor(str){
-      return Object.values(colors)[this.hashCode(str) % Object.values(colors).length]
-    },
-
-    hashCode(s) {
-      let ADLER32 = require('adler-32');
-      return ADLER32.str(s)
-    },
-
 
     async generate_simple_report_table() {
 
@@ -2101,13 +2092,14 @@ export default {
         type: "pie",
         data: data_chart,
         options: {
+          devicePixelRatio: 1.5,
           animation: false,
           plugins: {
             legend: {
               display: true,
               labels: {
                 font: {
-                  size: 12,
+                  size: 10,
                   //size: 60
                 }
               }
@@ -2120,7 +2112,7 @@ export default {
               },
               color: 'white',
               font: {
-                size: 12,
+                size: 10,
                 //size: 60
               }
             },
@@ -2160,6 +2152,8 @@ export default {
         type: "bar",
         data: data_chart,
         options: {
+          devicePixelRatio: 1.5,
+
           animation: false,
           plugins: {
             legend: {
@@ -2172,7 +2166,7 @@ export default {
 
               },
               font: {
-                size: 12,
+                size: 7,
                 //size: 60
               }
 
@@ -2186,7 +2180,7 @@ export default {
                   return value + '%';
                 },
                 font: {
-                  size: 12,
+                  size: 7,
                   //size: 60
                 }
               }
@@ -2194,7 +2188,7 @@ export default {
             x: {
               ticks: {
                 font: {
-                  size: 12,
+                  size: 7,
                   //size: 60
                 }
               }

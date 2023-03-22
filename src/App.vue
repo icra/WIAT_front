@@ -45,9 +45,9 @@
                   <br><br>
                   <b>Download the files used on the video and import them on the web:</b>
                   <ul>
-                    <li><a href="dummy_files/dummy session.json" download>Exported session</a></li>
-                    <li><a href="dummy_files/wiat_locations.xlsx" download>Industry locations</a></li>
-                    <li><a href="dummy_files/wiat_template.xlsx" download>Industry advanced inputs</a></li>
+                    <li><a href="dummy_files/dummy session.json" download>Import a previously exported session</a></li>
+                    <li><a href="dummy_files/wiat_locations.xlsx" download>Upload industry locations excel</a></li>
+                    <li><a href="dummy_files/wiat_template.xlsx" download>Upload industry advanced inputs excel</a></li>
 
                   </ul>
 

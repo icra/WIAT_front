@@ -51,7 +51,7 @@
                    color="#b62373"
                    @click="industry_model[industry_input] = button_estimations(industry_input)"
             >
-              Estimation:  {{button_estimations(industry_input)}}
+              Estimation:  {{button_estimations(industry_input).toExponential(3)}}
             </v-btn>
 
             <!--Toggle menu with estimation-->
@@ -212,7 +212,7 @@
                      color="#b62373"
                      @click="industry_model['ind_pollutants_effl'][pollutant] = button_estimations(industry_input, pollutant)"
               >
-                Estimation:  {{button_estimations(industry_input, pollutant)}}
+                Estimation:  {{button_estimations(industry_input, pollutant).toExponential(3)}}
               </v-btn>
             </div>
           </div>
@@ -294,7 +294,7 @@
                                color="#b62373"
                                @click="industry_model['ind_pollutants_infl'][pollutant] = cod_influent_quality"
                         >
-                          Estimation:  {{cod_influent_quality}}<!-- Button estimation -->
+                          Estimation:  {{cod_influent_quality.toExponential(3)}}<!-- Button estimation -->
                         </v-btn>
                         <v-btn v-else-if="button_estimation.includes('ind_pollutants_infl') && pollutant == 'TN' && tn_influent_quality != null"
                                tile
@@ -302,7 +302,7 @@
                                color="#b62373"
                                @click="industry_model['ind_pollutants_infl'][pollutant] = tn_influent_quality"
                         >
-                          Estimation:  {{tn_influent_quality}}<!-- Button estimation -->
+                          Estimation:  {{tn_influent_quality.toExponential(3)}}<!-- Button estimation -->
                         </v-btn>
 
                       </div>

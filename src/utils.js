@@ -139,8 +139,19 @@ let utils = {
 
     //Calculate hash code of s
     hashCode(s) {
-        let ADLER32 = require('adler-32');
-        return ADLER32.str(s)
+        //let ADLER32 = require('adler-32');
+        //return ADLER32.str(s)
+
+        //hashcode from string
+        let hash = 0, i, chr;
+        if (s.length === 0) return hash;
+        for (i = 0; i < s.length; i++) {
+            chr   = s.charCodeAt(i);
+            hash  = ((hash << 5) - hash) + chr;
+            hash |= 0; // Convert to 32bit integer
+        }
+        if (hash < 0) hash = hash * -1
+        return hash;
     },
 
 
@@ -153,6 +164,7 @@ let utils = {
         }else if (str == "TP") {
             return '#5bc9bf'
         }
+
         return Object.values(colors)[this.hashCode(str) % Object.values(colors).length]
     },
 

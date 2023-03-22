@@ -170,7 +170,7 @@
                                      color="#b62373"
                                      @click="wwtp_model['wwt_pollutants_effl'][pollutant] = button_estimations('wwt_pollutants_effl', pollutant)"
                               >
-                                Estimation:  {{button_estimations('wwt_pollutants_effl', pollutant)}}<!-- Estimation button -->
+                                Estimation:  {{button_estimations('wwt_pollutants_effl', pollutant).toExponential(3)}}<!-- Estimation button -->
                               </v-btn>
                             </div>
                           </div>
