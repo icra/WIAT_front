@@ -37,7 +37,7 @@
               editable
           >
 
-          <span>Water withdrawal and industry</span>
+          <span>Water withdrawal and site</span>
 
         </v-stepper-step>
 
@@ -318,11 +318,11 @@
       <div style="background-color: white; ">
 
         <v-card flat style="padding: 40px">
-          In order to calculate some statistics, we need to know some inputs from the industry.
+          In order to calculate some statistics, we need to know some data from the site.
           We have divided them into different screens, depending on whether they relate to one part of the water treatment cycle or another.
 
           <br><br>
-          In the <b>first step</b>, we ask inputs related to the industry in general. Depending on the answers here, the questions in the other screens will vary slightly.
+          In the <b>first step</b>, we ask inputs related to the site in general. Depending on the answers here, the questions in the other screens will vary slightly.
           <br>
           <v-row style="padding: 10px 0px 10px 0px">
             <v-img
@@ -354,7 +354,7 @@
 
           <br><br>
 
-          To be more precise with the impact of the industries' actions, we take into account the <b>level of certainty</b> of the data entered. Therefore, for most of the variables, you can select:
+          To be more precise with the impact of the sites' actions, we take into account the <b>level of certainty</b> of the data entered. Therefore, for most of the variables, you can select:
           <ul>
             <li>
               <b>User data:</b> tha data has been measured
@@ -363,7 +363,7 @@
               <b>Modeled data:</b> data that you have extracted from a scientific model. It would typically be more accurate than estimated data, and less accurate than measured data
             </li>
             <li>
-              <b>Estimated data:</b> data estimated based on similar industries and/or professional experience
+              <b>Estimated data:</b> data estimated based on similar sites and/or professional experience
             </li>
             <li>
               <b>No data:</b> Insufficient information

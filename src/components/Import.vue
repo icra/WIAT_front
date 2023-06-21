@@ -52,7 +52,7 @@
                           mdi-information-outline
                         </v-icon>
                       </template>
-                      <span>Add new industries and assessments to the current assessments</span>
+                      <span>Add new sites and assessments to the current assessments</span>
                     </v-tooltip>
                   </template>
 
@@ -127,8 +127,8 @@
               mdi-information-outline
             </v-icon>
           </template>
-          <span>In step 1, select "Industry Locations" to create new assessments and upload the locations of the new industries, with their suppliers. Note that if the industry you are adding already exists, the old one will be overwritten.
-            On the other hand, select "Advanced entries" if you want to create an industry with advanced inputs entered (again, if the created industry is already in the tool, it will be overwritten).
+          <span>In step 1, select "Site Locations" to create new assessments and upload the locations of the new sites, with their sub-suppliers. Note that if the site you are adding already exists, the old one will be overwritten.
+            On the other hand, select "Advanced entries" if you want to create a site with site data inputs entered (again, if the created site is already in the tool, it will be overwritten).
           </span>
         </v-tooltip>
 
@@ -339,7 +339,7 @@ export default {
         "wwt_cod_effl", "wwt_tn_effl", "wwt_tp_effl", "wwt_diclo_effl", "wwt_cadmium_effl", "wwt_hexaclorobenzene_effl", "wwt_mercury_effl", "wwt_plomo_effl", "wwt_niquel_effl", "wwt_chloro_effl", "wwt_hexaclorobutadie_effl", "wwt_nonilfenols_effl", "wwt_tetracloroetile_effl", "wwt_tricloroetile_effl",
       ],
       pollutants_from_older_version: utils.pollutants_from_older_version,
-      items_excel_type: [{value:'Industry locations', key: 'industry_locations'}, {value: 'Advanced inputs', key: "industry_questionnaire"}],
+      items_excel_type: [{value:'Site locations', key: 'industry_locations'}, {value: 'Site data inputs', key: "industry_questionnaire"}],
       excel_type : 'industry_locations'
     }
 
@@ -433,7 +433,7 @@ export default {
         }else if(risk === "Eutrophication potential"){
           this.risk_categories["eutrophication"] = increasing_worse()
           //this.current_thresholds[3] = [low, medium, high]
-        }else if(risk === "Increase in temperature in the receiving water body due to industry discharge"){
+        }else if(risk === "Increase in temperature in the receiving water body due to site discharge"){
           this.risk_categories["delta_temperature"] = increasing_worse()
           //this.current_thresholds[3] = [low, medium, high]
         }

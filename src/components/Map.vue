@@ -796,8 +796,8 @@ export default {
         this.popup_info=this.clicked_marker.bindPopup()
       }
 
-      if(this.adding_supply_chain) text += ('<br><br><button class="trigger">ADD SUPPLY CHAIN INDUSTRY</button>')
-      else if(add_industry === true) text += ('<br><br><button class="trigger">ADD INDUSTRY</button>')
+      if(this.adding_supply_chain) text += ('<br><br><button class="trigger">ADD SUB-SUPPLIER</button>')
+      else if(add_industry === true) text += ('<br><br><button class="trigger">ADD SITE</button>')
       //else if(add_industry === "supply_chain") text += ('<br><br>'+this.supply_chain_name)
 
 

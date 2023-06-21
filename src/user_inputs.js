@@ -291,17 +291,17 @@ export let user_inputs = {
     "ind_temperature_withdrawn": {question: "Temperature of water withdrawn from the receiving water body", value: 0, unit: "°C"},
 
     //INDUSTRY INPUTS
-    "volume_withdrawn": {question: "Industry withdrawal water quantity (surface water only)", value: 0, unit: "m3/day", description_tooltip:"The quantity entered here is the quantity withdrawn from the river (raw water intake)"},
-    "volume_withdrawn_groundwater": {question: "Industry withdrawal water quantity (groundwater only)", value: 0, unit: "m3/day"},
+    "volume_withdrawn": {question: "Site withdrawal water quantity (surface water only)", value: 0, unit: "m3/day", description_tooltip:"The quantity entered here is the quantity withdrawn from the river (raw water intake)"},
+    "volume_withdrawn_groundwater": {question: "Site withdrawal water quantity (groundwater only)", value: 0, unit: "m3/day"},
     "volume_external_same_watershed_sources": {question: "All other external sources of water from the same watershed from which the water was withdrawn", value: 0, unit: "m3/day", description_tooltip: "The quantity entered here is the quantity of water withdrawn from other sources (e.g. recycled water from a third party, drinking water purchased from the municipality, etc.) from the same watershed from which the water was withdrawn"},
     "volume_external_different_sources": {question: "All other external sources of water from different watersheds from where the water was withdrawn", value: 0, unit: "m3/day", description_tooltip: "The quantity entered here is the quantity of water withdrawn from other sources (e.g. recycled water from a third party, drinking water purchased from the municipality, etc.) from different watersheds from where the water was withdrawn"},
 
-    "has_onsite_wwtp": {question: "Has the industry an on-site wastewater pre-treatment or treatment plant?", value: false,},
-    "has_direct_discharge": {question: "Does the industry directly discharge wastewater effluent (without treatment) into the water body?", value: false, description_tooltip: "Untreated water"},
-    "has_offsite_wwtp": {question: "Does the industry discharge to an off-site treatment wastewater plant?", value: false,},
+    "has_onsite_wwtp": {question: "Has the site an on-site wastewater pre-treatment or treatment plant?", value: false,},
+    "has_direct_discharge": {question: "Does the site directly discharge wastewater effluent (without treatment) into the water body?", value: false, description_tooltip: "Untreated water"},
+    "has_offsite_wwtp": {question: "Does the site discharge to an off-site treatment wastewater plant?", value: false,},
     "offsite_wwtp_type": {question: "Off-site treatment wastewater plant type", value: null,},
     "industry_type": {question: "Standard industrial classification", value: null,},
-    "product_produced_unit": {question: 'Specify a unit for calculating "Specific water consumption" metric (e.g. $)', value: 0, description_tooltip: '"Specific water consumption" indicates the amount of water used per what is produced. For example, if the industry produces 1000 products per day, and the water consumption is 1000 m3/day, the specific water consumption is 1 m3/unit of product produced. The unit of product produced can be anything, e.g. $, kg, m3, etc.'},
+    "product_produced_unit": {question: 'Specify a unit for calculating "Specific water consumption" metric (e.g. $)', value: 0, description_tooltip: '"Specific water consumption" indicates the amount of water used per what is produced. For example, if the site produces 1000 products per day, and the water consumption is 1000 m3/day, the specific water consumption is 1 m3/unit of product produced. The unit of product produced can be anything, e.g. $, kg, m3, etc.'},
     "product_produced": {question: "Based on your units above, specify the amount per day", value: 0, unit: "units/day", description_tooltip: "The quantity entered here is the amount of units per day. Used on the denominator of the specific water consumption calculation"},
 
     "ind_pollutants_effl": {value: 0, unit: "g/m3", description_tooltip: 'Select "Estimated" level of certainty if the non-detect value is used'},

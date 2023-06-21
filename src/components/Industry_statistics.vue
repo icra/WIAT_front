@@ -167,7 +167,7 @@
                     @click="edit_industry"
                     v-if="!utils.industry_has_all_inputs(industry)"
                 >
-                  The industry has some mandatory entries that are not configured, and the information shown here may not be completely accurate. Click here to edit the industry.                </v-alert>
+                  The site has some mandatory entries that are not configured, and the information shown here may not be completely accurate. Click here to edit the site.                </v-alert>
               </v-hover>
 
               <div v-if="toggle == 1">
@@ -193,7 +193,7 @@
                           mdi-factory
                         </v-icon>
                       </template>
-                      <span>Main industry</span>
+                      <span>Main site</span>
                     </v-tooltip>
                     <v-tooltip left v-else>
                       <template v-slot:activator="{ on, attrs }">
@@ -204,7 +204,7 @@
                           mdi-truck
                         </v-icon>
                       </template>
-                      <span>Supplier</span>
+                      <span>Sub-supplier</span>
                     </v-tooltip>
                   </template>
 
@@ -220,7 +220,7 @@
                         >mdi-information-outline</v-icon>
                       </template>
                       <span>
-                      Overall water risk measures all water-related risks of an industry, by aggregating all indicators from the Physical Quantity, Quality and Regulatory & Reputational Risk categories. Higher values indicate higher water risk.
+                      Overall water risk measures all water-related risks of a site, by aggregating all indicators from the Physical Quantity, Quality and Regulatory & Reputational Risk categories. Higher values indicate higher water risk.
                       <br>
                       <b>Source: Aqueduct</b>
 
@@ -471,7 +471,7 @@
 
                       <div v-else-if="delta_ecotox_chip === 0">
                         <p class="chart_no_data" v-if="utils.get_pollutants([this.industry]).length == 0">
-                          Current industry doesn't have pollutants selected
+                          Current site doesn't have pollutants selected
                         </p>
                         <div v-else>
                           <PieChart
@@ -518,7 +518,7 @@
                       </v-chip-group>
                       <div v-if="delta_eqs_chip == 0">
                         <p class="chart_no_data" v-if="utils.get_pollutants([this.industry]).length == 0">
-                          Current industry doesn't have pollutants selected
+                          Current site doesn't have pollutants selected
                         </p>
                         <BarChart
                             style="padding-top: 40px;"
@@ -1137,7 +1137,7 @@
                               >mdi-information-outline</v-icon>
                             </template>
                             <span>
-                              Toxic units in the industry effluent
+                              Toxic units in the site effluent
                             </span>
                           </v-tooltip>
                         </template>
@@ -1153,7 +1153,7 @@
                               >mdi-information-outline</v-icon>
                             </template>
                             <span>
-                              Concentration in the industry effluent, compared to the EQS (limits approved by the EU’s Water Framework Directive).
+                              Concentration in the site effluent, compared to the EQS (limits approved by the EU’s Water Framework Directive).
                             </span>
                           </v-tooltip>
                         </template>
@@ -1218,7 +1218,7 @@
                               >mdi-information-outline</v-icon>
                             </template>
                             <span>
-                              Calculates the increment of the industry pollutants on the receiving water,
+                              Calculates the increment of the site pollutants on the receiving water,
                               or the final concentration in the river supposing the receiving water has a concentration of 0.
                             </span>
                           </v-tooltip>
@@ -1236,7 +1236,7 @@
                               >mdi-information-outline</v-icon>
                             </template>
                             <span>
-                              Toxic units in the receiving water body after dilution of the industry discharge into the water body.
+                              Toxic units in the receiving water body after dilution of the site discharge into the water body.
                             </span>
                           </v-tooltip>
                         </template>
@@ -1252,7 +1252,7 @@
                               >mdi-information-outline</v-icon>
                             </template>
                             <span>
-                              Concentration in the receiving water body after dilution of the industry
+                              Concentration in the receiving water body after dilution of the site
                               discharge into the water body, compared to the EQS (limits approved by the EU’s Water Framework Directive).
                             </span>
                           </v-tooltip>
@@ -1899,7 +1899,7 @@
             <b>Where:</b>
             <br>
             <ul>
-              <li><span v-katex="'WWTPS'"></span>: Onsite and external WWTP's where industry treats water</li>
+              <li><span v-katex="'WWTPS'"></span>: Onsite and external WWTP's where site treats water</li>
               <li><span v-katex="'W_t'"></span>: Volume of water treated in the WWTP</li>
               <li><span v-katex="'energy_{consumed}'"></span>: Electricity consumed from the grid for wastewater treatment
                 per cubic meter treated
@@ -1937,16 +1937,16 @@
           <div class="dialog_detail" style="background-color: white">
             <h3>Recycled water factor</h3>
             <br>
-            This metric indicates the percentage of reused water used by the industry respect the water discharged by industry (to direct discharge, onsite industry WWTP effluent and to external WWTP effluent).  Values that may have this metric range from 0 to 100, the larger its value the more efficient the water recycled is.
+            This metric indicates the percentage of reused water used by the site respect the water discharged by site (to direct discharge, onsite site WWTP effluent and to external WWTP effluent).  Values that may have this metric range from 0 to 100, the larger its value the more efficient the water recycled is.
             <div v-katex:display="'\\frac{W_r}{OWWTP_{infl} + EWWTP_{infl} + DD}'"></div>
             <b>Where:</b>
             <br>
             <ul>
-              <li><span v-katex="'W_r'"></span>: Amount of water that the industry reuses/recycles from the WWTP.</li>
+              <li><span v-katex="'W_r'"></span>: Amount of water that the site reuses/recycles from the WWTP.</li>
 
               <li><span v-katex="'OWWTP_{infl}'"></span>: On-site industrial WWTP influent</li>
               <li><span v-katex="'EWWTP_{infl}'"></span>: External WWTP influent</li>
-              <li><span v-katex="'DD'"></span>: Amount of water discharged into the river by industry</li>
+              <li><span v-katex="'DD'"></span>: Amount of water discharged into the river by site</li>
             </ul>
           </div>
 
@@ -1958,17 +1958,17 @@
           <div class="dialog_detail" style="background-color: white">
             <h3>Treated water factor</h3>
             <br>
-            This metric indicates the ratio between the water remaining after the industry consumption and the water that
+            This metric indicates the ratio between the water remaining after the site consumption and the water that
             is treated in the WWTP.
             <div v-katex:display="'\\frac{W_t}{OWWTP_{infl} + EWWTP_{infl} + DD}'"></div>
 
             <b>Where:</b>
             <br>
             <ul>
-              <li><span v-katex="'W_t'"></span>: Amount of water used by the industry that is treated in a WWTP</li>
+              <li><span v-katex="'W_t'"></span>: Amount of water used by the site that is treated in a WWTP</li>
               <li><span v-katex="'OWWTP_{infl}'"></span>: On-site industrial WWTP influent</li>
               <li><span v-katex="'EWWTP_{infl}'"></span>: External WWTP influent</li>
-              <li><span v-katex="'DD'"></span>: Amount of water discharged into the river by industry</li>
+              <li><span v-katex="'DD'"></span>: Amount of water discharged into the river by site</li>
             </ul>
           </div>
 
@@ -1982,7 +1982,7 @@
             <br>
             This metric is calculated from the relationship between the volume of consumptive use in the same watershed and the
             amount of water available and multiplied by 100. It indicates the percentage of the available water withdrawn
-            by the industry’s consumption. This metric may have values ranging from 0, to a value greater than 100,
+            by the site’s consumption. This metric may have values ranging from 0, to a value greater than 100,
             indicating that the demand for water is higher than the available.
 
             Note that water is considered consumed if:
@@ -2097,7 +2097,7 @@
           <div class="dialog_detail" style="background-color: white">
             <h3>Net consumptive use </h3>
             <br>
-            Amount of water withdrawn by the industry minus the amount of water discharged into the same watershed that meets the EQS.
+            Amount of water withdrawn by the site minus the amount of water discharged into the same watershed that meets the EQS.
             Note that water is considered consumed if:
 
             <br>
@@ -2181,7 +2181,7 @@
             <b>Where:</b>
             <br>
             <ul>
-              <li><span v-katex="'WWTPS'"></span>: onsite and external WWTP's where industry treats water</li>
+              <li><span v-katex="'WWTPS'"></span>: onsite and external WWTP's where site treats water</li>
               <li><span v-katex="'EF'"></span>: emission factor for grid electricity</li>
               <li><span v-katex="'EC'"></span>: energy consumed from the grid for wastewater treatment per cubic meter
                 treated
@@ -2212,7 +2212,7 @@
             <b>Where:</b>
             <br>
             <ul>
-              <li><span v-katex="'WWTPS'"></span>: onsite and external WWTP's where industry treats water</li>
+              <li><span v-katex="'WWTPS'"></span>: onsite and external WWTP's where site treats water</li>
               <li><span v-katex="'V'"></span>: volume of fuel consumed in m3</li>
               <li><span v-katex="'EQ_{N_2O}'"></span>: conversion of N2O emissions to CO2 equivalent emissions (<b>298
                 kgCO2eq/kgN2O</b>)
@@ -2321,7 +2321,7 @@
             <b>Where:</b>
             <br>
             <ul>
-              <li><span v-katex="'WWTPS'"></span>: onsite and external WWTP's where industry treats water</li>
+              <li><span v-katex="'WWTPS'"></span>: onsite and external WWTP's where site treats water</li>
 
               <li><span v-katex="'V'"></span>: volume of fuel consumed in m3</li>
 
@@ -2383,7 +2383,7 @@
             <h3>Emissions from water treatment </h3>
             <br>
             Emissions from treatment are related to the production of Nitrous oxide (N2O) and methane (CH4) converted into equivalent CO2.<br>
-            The IPCC methodology assumes that organic carbon present in wastewater derives from modern (biogenic) organic matter; consequently, CO2 emissions from wastewater treatment are considered wholly biogenic and are discounted from the inventories as they do not represent a transfer of carbon from the lithosphere to the atmosphere. The presence of fossil organic carbon in sewage implies the emission of additional fossil CO2 from wastewater treatment facilities, sludge management, and environmental recipients of treated or untreated wastewater. As stated in the appendix 6 Ap.1 from IPCC chapter 6 on wastewater treatment and discharge presents a discussion of non-biogenic (fossil) CO2 emissions there is no yet agreement on this issue. We are aware of the fact that some industries produce mostly non-biogenic organic matter and hence WIAT might be underestimating the CO2 emissions. In a future version of the tool this aspect will be addressed with care, in line with the IPCC new developments.
+            The IPCC methodology assumes that organic carbon present in wastewater derives from modern (biogenic) organic matter; consequently, CO2 emissions from wastewater treatment are considered wholly biogenic and are discounted from the inventories as they do not represent a transfer of carbon from the lithosphere to the atmosphere. The presence of fossil organic carbon in sewage implies the emission of additional fossil CO2 from wastewater treatment facilities, sludge management, and environmental recipients of treated or untreated wastewater. As stated in the appendix 6 Ap.1 from IPCC chapter 6 on wastewater treatment and discharge presents a discussion of non-biogenic (fossil) CO2 emissions there is no yet agreement on this issue. We are aware of the fact that some sites produce mostly non-biogenic organic matter and hence WIAT might be underestimating the CO2 emissions. In a future version of the tool this aspect will be addressed with care, in line with the IPCC new developments.
 
             <br>
             <div
@@ -2434,7 +2434,7 @@
               <b>Where:</b>
               <br>
               <ul>
-                <li><span v-katex="'WWTPS'"></span>: onsite and external WWTP's where industry treats water</li>
+                <li><span v-katex="'WWTPS'"></span>: onsite and external WWTP's where site treats water</li>
                 <li><span class="hover" @click="dialog_biogas_stage = 1">storage</span>: Amount of CO2eq emissions related
                   to sludge storage
                 </li>
@@ -2860,7 +2860,7 @@
             <b>Where:</b>
             <br>
             <ul>
-              <li><span v-katex="'WWTPS'"></span>: onsite and external WWTP's where industry treats water</li>
+              <li><span v-katex="'WWTPS'"></span>: onsite and external WWTP's where site treats water</li>
               <li><span v-katex="'P : 1.013 \\cdot 10^{5}'"></span> Pa</li>
               <li><span v-katex="'V'"></span>: Volume of biogas produced in the WWTP</li>
               <li><span v-katex="'R'"></span>: 8.31446261815324 J/K·mol</li>
@@ -2887,7 +2887,7 @@
             <b>Where:</b>
             <br>
             <ul>
-              <li><span v-katex="'WWTPS'"></span>: onsite and external WWTP's where industry treats water</li>
+              <li><span v-katex="'WWTPS'"></span>: onsite and external WWTP's where site treats water</li>
               <li><span v-katex="'P : 1.013 \\cdot 10^{5}'"></span> Pa</li>
               <li><span v-katex="'V'"></span>: Volume of biogas produced in the WWTP</li>
               <li><span v-katex="'R'"></span>: 8.31446261815324 J/K·mol</li>
@@ -2915,7 +2915,7 @@
             <b>Where:</b>
             <br>
             <ul>
-              <li><span v-katex="'WWTPS'"></span>: onsite and external WWTP's where industry treats water</li>
+              <li><span v-katex="'WWTPS'"></span>: onsite and external WWTP's where site treats water</li>
               <li><span v-katex="'P : 1.013 \\cdot 10^{5}'"></span> Pa</li>
               <li><span v-katex="'V'"></span>: Volume of biogas produced in the WWTP</li>
               <li><span v-katex="'R'"></span>: 8.31446261815324 J/K·mol</li>
@@ -2950,7 +2950,7 @@
             <b>Where:</b>
             <br>
             <ul>
-              <li><span v-katex="'WWTPS'"></span>: onsite and external WWTP's where industry treats water</li>
+              <li><span v-katex="'WWTPS'"></span>: onsite and external WWTP's where site treats water</li>
 
               <li><span v-katex="'V'"></span>: volume of fuel consumed in m3</li>
 
@@ -3022,7 +3022,7 @@
             <br>
             <ul>
               <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water</li>
-              <li><span v-katex="this.selected_pollutant+'_{effl}'"></span>: load of {{ selected_pollutant }} in the industry effluent (except ocean discharges)</li>
+              <li><span v-katex="this.selected_pollutant+'_{effl}'"></span>: load of {{ selected_pollutant }} in the site effluent (except ocean discharges)</li>
               <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body (except ocean discharges)</li>
               <li><span v-katex="'EQ_{'+this.selected_pollutant+'}'"></span>: conversion of {{ selected_pollutant }} to PO4 equivalent (<b> {{this.conversion_factors[this.selected_pollutant]['eutrophication']}}gPO4eq/g{{selected_pollutant}} </b>)</li>
 
@@ -3043,7 +3043,7 @@
             width="60%"
         >
           <div class="dialog_detail" style="background-color: white">
-            <h3> Increase in the temperature in the receiving water body due to industry discharge</h3>
+            <h3> Increase in the temperature in the receiving water body due to site discharge</h3>
             <br>
             <div
                 v-katex:display="' \\Delta T = \\frac{ (W_a - W_w)\\cdot T_{WB} + \\sum_{i \\in DP} W_{effl_i} \\cdot T_{effl_i}}{W_{a} - W_{w} + \\sum_{i \\in DP} W_{effl_i}} - T_{WB} '"></div>
@@ -3051,7 +3051,7 @@
             <b>Where:</b>
             <br>
             <ul>
-              <li><span v-katex="'\\Delta T'"></span>: Increase in the temperature in the receiving water body due to industry discharge</li>
+              <li><span v-katex="'\\Delta T'"></span>: Increase in the temperature in the receiving water body due to site discharge</li>
 
               <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water</li>
               <li><span v-katex="'T_{effl}'"></span>: Temperature of water discharged to the same water body from which it was withdrawn (°C)</li>
@@ -3173,7 +3173,7 @@
             <ul>
               <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water</li>
               <li><span v-katex="this.selected_pollutant+'_{effl}'"></span>: load of {{ selected_pollutant }} in the effluent</li>
-              <li><span v-katex="this.selected_pollutant+'_{infl}'"></span>:  Industry withdrawal water {{ selected_pollutant }} load (surface water only) </li>
+              <li><span v-katex="this.selected_pollutant+'_{infl}'"></span>:  Site withdrawal water {{ selected_pollutant }} load (surface water only) </li>
 
             </ul>
             <br>
@@ -3225,7 +3225,7 @@
             width="60%"
         >
           <div class="dialog_detail" style="background-color: white">
-            <h3> Pollutant concentration in the industry effluent</h3>
+            <h3> Pollutant concentration in the site effluent</h3>
             <br>
 
             <div v-katex:display="'C = \\frac{\\sum_{i \\in DP} '+this.selected_pollutant+'_{effl_i}}{\\sum_{i \\in DP} W_{effl_i}} '"></div>
@@ -3236,12 +3236,12 @@
             <b>Where:</b>
             <br>
             <ul>
-              <li><span v-katex="'C'"></span>: Concentration of pollutants in the industry effluent (g/m3)</li>
-              <li><span v-katex="'TU'"></span>: Toxic Units in the industry effluent</li>
-              <li><span v-katex="'EQS'"></span>: Concentration in the industry effluent with respect to EQS</li>
+              <li><span v-katex="'C'"></span>: Concentration of pollutants in the site effluent (g/m3)</li>
+              <li><span v-katex="'TU'"></span>: Toxic Units in the site effluent</li>
+              <li><span v-katex="'EQS'"></span>: Concentration in the site effluent with respect to EQS</li>
 
               <li><span v-katex="'DP'"></span>: onsite and external WWTP's, and directly discharged water</li>
-              <li><span v-katex="this.selected_pollutant+'_{effl}'"></span>: load of pollutant in the industry effluent</li>
+              <li><span v-katex="this.selected_pollutant+'_{effl}'"></span>: load of pollutant in the site effluent</li>
               <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the water body</li>
 
               <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river</li>
@@ -3278,13 +3278,13 @@
               <li><span v-katex="'W_{a}'"></span>: amount of water available in the river <b>(streamflow global
                 indicator)</b></li>
               <li><span v-katex="'W_{w}'"></span>: amount of water withdrawn from the river</li>
-              <li><span v-katex="this.selected_pollutant+'_{effl}'"></span>: Load of pollutant in the industry effluent discharged to receiving water body</li>
+              <li><span v-katex="this.selected_pollutant+'_{effl}'"></span>: Load of pollutant in the site effluent discharged to receiving water body</li>
               <li><span v-katex="'W_{effl}'"></span>: amount of water discharged to the same water body where water was withdrawn</li>
 
 
 
-              <li><span v-katex="'\\Delta'"></span>: Increase of the concentration in the water body where water was withdrawn after industry discharge (g/m3)</li>
-              <li><span v-katex="'TU'"></span>: Toxic units in the receiving water body after dilution of the industry discharge into the water body. </li>
+              <li><span v-katex="'\\Delta'"></span>: Increase of the concentration in the water body where water was withdrawn after site discharge (g/m3)</li>
+              <li><span v-katex="'TU'"></span>: Toxic units in the receiving water body after dilution of the site discharge into the water body. </li>
               <li><span v-katex="'EQS'"></span>: Concentration in the receiving water body after discharge with respect to EQS</li>
 
 
@@ -3314,7 +3314,7 @@
           <div class="dialog_detail" style="background-color: white">
             <h3> {{ selected_pollutant }} effluent load </h3>
             <br>
-            Concentration of {{ selected_pollutant }} discharged by the industry.
+            Concentration of {{ selected_pollutant }} discharged by the site.
             <br>
             Reducing {{ selected_pollutant }} will contribute to reducing your GHG emissions associated to "water discharged"
           </div>
@@ -3329,7 +3329,7 @@
     </div>
 
     <div v-else style="padding-left: 3vw; padding-top: 3vh">
-      <h3>Please complete the required industry inputs so you can see the results.</h3>
+      <h3>Please complete the required site inputs so you can see the results.</h3>
       <br>
       <br>
 
@@ -3338,7 +3338,7 @@
             v-slot="{ hover }"
         >
           <h3 :class="`${hover? 'link_to_edit_hovered': 'link_to_edit'}`">
-            Click here to edit the industry
+            Click here to edit the site
           </h3>
 
         </v-hover>
@@ -3490,7 +3490,7 @@ export default {
           pollution: "Pollution impact",
           energy_used_text: "Energy used",
           ecotoxicology: "Ecotoxicology indicators",
-          delta_temperature: "Increase in temperature in the receiving water body due industry discharge",
+          delta_temperature: "Increase in temperature in the receiving water body due site discharge",
 
         },
         data_type_table_names: {
@@ -4293,8 +4293,8 @@ export default {
         let pollutants_table = {
           header: [{text: "", value: "name", sortable: false},
             {text: "Concentration of the water discharged (g/m3)", value: 'concentration'},
-            {text: "Toxic units in the industry effluent (TU/Day)", value: 'tu'},
-            {text: "Concentration of the pollutants in the industry effluent (with respect to EQS) (%)", value: 'eqs'},
+            {text: "Toxic units in the site effluent (TU/Day)", value: 'tu'},
+            {text: "Concentration of the pollutants in the site effluent (with respect to EQS) (%)", value: 'eqs'},
             {text: "Data Type", value: "data", sortable: false}],
           value: []
         }
@@ -4620,7 +4620,7 @@ export default {
 
         let DataType = industry_impact_legend_category.delta_temperature(industries[0])
         let pollutant_obj = {
-          name: "Increase in temperature due to industry discharge",
+          name: "Increase in temperature due to site discharge",
           unit: "°C",
           info: "info_delta_temperature",
           value: delta_temperature,
@@ -5318,10 +5318,10 @@ export default {
               id: 8,
               name: 'Levers for action',
               children: [
-                {id: 9, name: this.table_title.simple_table.avg_treatment_efficiency, info: "This metric indicates which is the percentage of pollutant load that the WWTP eliminates from the industry water."},
-                {id: 10, name: this.table_title.simple_table.avg_influent_efficiency, info: "This metric indicates whether there is an improvement in water quality due to its use by the industry. If the quality of the water after treatment is better than the industry withdrawal water quality (surface water only), then the value of this metric is greater than 100. This is only calculated when the “advanced inputs” provide a value under “Industry withdrawal water quality (surface water only)”"},
-                {id: 11, name: this.table_title.simple_table.treated, info: "This metric indicates the ratio between the water remaining after the industry consumption and the water that is treated in the WWTP"},
-                {id: 12, name: 'Concentration of pollutants in the industry effluent', info: "Statistics related to the concentration of pollutants in the water after treatment in the WWTP"},
+                {id: 9, name: this.table_title.simple_table.avg_treatment_efficiency, info: "This metric indicates which is the percentage of pollutant load that the WWTP eliminates from the site water."},
+                {id: 10, name: this.table_title.simple_table.avg_influent_efficiency, info: "This metric indicates whether there is an improvement in water quality due to its use by the site. If the quality of the water after treatment is better than the industry withdrawal water quality (surface water only), then the value of this metric is greater than 100. This is only calculated when the “site data inputs” provide a value under “Industry withdrawal water quality (surface water only)”"},
+                {id: 11, name: this.table_title.simple_table.treated, info: "This metric indicates the ratio between the water remaining after the site consumption and the water that is treated in the WWTP"},
+                {id: 12, name: 'Concentration of pollutants in the site effluent', info: "Statistics related to the concentration of pollutants in the water after treatment in the WWTP"},
                 {id: 13, name: 'Concentration of pollutants in the receiving water body', info: "These indicators support understanding the dilution of the discharge and the relative weight of the discharge compared to the river flows and concentrations. The lever for action is actually reducing the volume and/or concentrations of the effluent discharged, as this will reduce the concentration of pollutants in the receiving water body."},
 
               ]
@@ -5340,16 +5340,16 @@ export default {
           id: 17,
           name: "GHG emissions from wastewater treatment",
           children: [
-            {id: 18, name: "Change in the state of Nature", info: "This metric indicates the GHG emissions from the industry. It counts the amount of CO2 equivalent that is produced during the water treatment, water discharge, the emissions from sludge management and the emissions from biogas. It will always have positive values; higher values indicate higher impact. The methodology to calculate the global warming potential is from the Energy Performance and Carbon Emissions Assessment and Monitoring Tool (ECAM).  (Sanitation Treatment, n.d.)"},
+            {id: 18, name: "Change in the state of Nature", info: "This metric indicates the GHG emissions from the site. It counts the amount of CO2 equivalent that is produced during the water treatment, water discharge, the emissions from sludge management and the emissions from biogas. It will always have positive values; higher values indicate higher impact. The methodology to calculate the global warming potential is from the Energy Performance and Carbon Emissions Assessment and Monitoring Tool (ECAM).  (Sanitation Treatment, n.d.)"},
             {
               id: 19,
               name: "Levers for action",
               children: [
-                {id: 20, name: "Energy use", info: "Energy used by the industry to treat a m3 of water"},
+                {id: 20, name: "Energy use", info: "Energy used by the site to treat a m3 of water"},
                 {id: 21, name: "Effluent concentration prior to discharge", info: "TN and COD concentration of the effluent, which are triggering N2O and methane emissions"},
                 {id: 22, name: "Potential to capture CO2", info: "When burning the biogas in a flare or through an energy valorisation system such as a CHP engine or a heater, the CO2 emissions in the exhaust can be captured to be valorised or stored." +
                       "Assessing  these emissions allows to evaluate whether source is large enough to consider investing in capturing this CO2. \n" +
-                      "The CO2 from the exhaust can be considered biogenic only if the organic matter processed by the industry is non-fossil based. If the organic matter is fossil based, it allows the displacement of emissions from the equivalent product that would otherwise have been produced with other carbon-energy sources."},
+                      "The CO2 from the exhaust can be considered biogenic only if the organic matter processed by the site is non-fossil based. If the organic matter is fossil based, it allows the displacement of emissions from the equivalent product that would otherwise have been produced with other carbon-energy sources."},
                 {id: 23, name: "GHG emissions by source", info: "Amount of CO2eq by source emitted to the atmosphere during wastewater treatment process"},
                 {id: 24, name: "Sludge management", info: "GHG emissions from sludge management operations (storing, composting, incineration, land application, landfilling, stockpiling and truck transport)"},
               ]

@@ -46,8 +46,8 @@
                   <b>Download the files used on the video and import them on the web:</b>
                   <ul>
                     <li><a href="dummy_files/dummy session.json" download>Import a previously exported session</a></li>
-                    <li><a href="dummy_files/wiat_locations.xlsx" download>Upload industry locations excel</a></li>
-                    <li><a href="dummy_files/wiat_template.xlsx" download>Upload industry advanced inputs excel</a></li>
+                    <li><a href="dummy_files/wiat_locations.xlsx" download>Upload site locations excel</a></li>
+                    <li><a href="dummy_files/wiat_template.xlsx" download>Upload site data inputs excel</a></li>
 
                   </ul>
 
@@ -73,7 +73,7 @@
               <div style="background-color: white; overflow: hidden">
 
                 <v-card flat style="padding: 40px">
-                  WIAT (Wastewater Impact Assessment Tool) v1 is a tool that allows users to understand which aspects of wastewater treatment and industry management cause major changes in the state of nature related to climate, biodiversity and water security, as well as to help identify water risks and prioritize their water management interventions.
+                  WIAT (Wastewater Impact Assessment Tool) v1 is a tool that allows users to understand which aspects of wastewater treatment and site management cause major changes in the state of nature related to climate, biodiversity and water security, as well as to help identify water risks and prioritize their water management interventions.
                   <br>
 
                   This project is part of the <a href="https://wbcsdpublications.org/wastewater-zero/" target="_blank" rel="noopener noreferrer">Wastewater Zero Commitment</a> initiative developed by the WBCSD.
@@ -123,7 +123,7 @@
                 <v-card flat  style="padding: 40px">
 
                   <div style="padding: 0px 50px 0px 50px">
-                    <a class="button-link" href="/WIAT V1 Science and methods.pdf" download >
+                    <a class="button-link" href="/WIAT Science and methods.pdf" download >
                       <v-btn small tile block color="#b62373">
                         Download methodology
                         <v-icon right>
@@ -134,7 +134,7 @@
 
                     <br>
 
-                    <a class="button-link" href="/user_guide.pdf" download >
+                    <a class="button-link" href="/WIAT_UserGuide.pdf" download >
                       <v-btn small tile block color="#b62373">
                         DOWNLOAD USER MANUAL
                         <v-icon right>
@@ -454,7 +454,7 @@
           <div style="padding-bottom: 20px; min-width: 100px; margin-top: 10px">
             <div v-if="show_tip" style="margin-bottom: 20px; padding: 20px; border-color: #1C195B; border-size: 4px; border-style: solid; font-size: 13px">
               <div>
-                Click the button below to start a new assessment. Once created, select it from the list above, and click on the map to create an industry. With the industry created, you can start adding advanced inputs and view statistics. To see a more detailed manual, click on the "DOCUMENTS" tab (at the top of the page).
+                Click the button below to start a new assessment. Once created, select it from the list above, and click on the map to create a site. With the site created, you can start adding site data inputs and view statistics. To see a more detailed manual, click on the "DOCUMENTS" tab (at the top of the page).
               </div>
               <v-btn
                   x-small
@@ -661,7 +661,7 @@
           <!-- edit industry -->
           <div v-else-if="right_sidebar_content === 3">
             <div style="margin: 7px; padding: 7px; background-color: white">
-              <h3 style="color: #b62373">Edit industry</h3>
+              <h3 style="color: #b62373">Edit site</h3>
               <v-form
                   v-model="new_factory_valid"
               >
@@ -683,7 +683,7 @@
                 <br>
               </v-form>
               <v-btn :to="{ name: 'edit_industry', params: {assessment_id: selected_assessment, industry_id: selected_industry}}" small tile block @click="selected_layer=null; secondMenu=false; rightMenu=false;" color="#b62373">
-                Advanced INPUTS
+                ADD SITE DATA INPUTS
               </v-btn>
               <v-btn :to="{ name: 'statistics', params: {assessment_id: selected_assessment, industry_id: selected_industry}}" small tile block @click="selected_layer=null; secondMenu=false; rightMenu=false;" color="#b62373">
                 Statistics
@@ -700,7 +700,7 @@
                   color="#b62373"
 
               >
-                PLACE supplier ON THE MAP
+                PLACE SUB-SUPPLIER ON THE MAP
               </v-btn>
             </div>
             <div style="margin: 7px; padding: 7px;">
@@ -715,13 +715,13 @@
           <!-- Create industry -->
           <div v-else-if="right_sidebar_content === 5">
             <div style="margin: 7px; padding: 7px; background-color: white">
-              <h1>New industry</h1>
+              <h1>New site</h1>
               <v-form
                   v-model="new_factory_valid"
               >
                 <v-text-field
                     v-model="factory_name"
-                    label="Industry name"
+                    label="Site name"
                     :rules="[new_factory_rules_name, rules_required]"
 
                 ></v-text-field>
@@ -733,7 +733,7 @@
                     block
                     color="#b62373"
                 >
-                  Add industry
+                  Add site
                 </v-btn>
               </v-form>
 
@@ -819,13 +819,13 @@
           <!-- Create supply chain industry -->
           <div v-else-if="right_sidebar_content === 7">
             <div style="margin: 7px; padding: 7px; background-color: white">
-              <h3 style="color: #b62373">Supplier</h3>
+              <h3 style="color: #b62373">Sub-supplier</h3>
               <v-form
                   v-model="new_supply_chain_valid"
               >
                 <v-text-field
                     v-model="supply_chain_name"
-                    label="Supplier name"
+                    label="Sub-supplier name"
                     :rules="[new_supply_chain_rules_name, rules_required]"
 
                 ></v-text-field>
@@ -837,7 +837,7 @@
                     block
                     color="#b62373"
                 >
-                  Add supplier
+                  Add sub-supplier
                 </v-btn>
               </v-form>
 
@@ -847,7 +847,7 @@
           <!-- Edit supply chain industry -->
           <div v-else-if="right_sidebar_content === 8">
             <div style="margin: 7px; padding: 7px; background-color: white">
-              <h3 style="color: #b62373">Edit supplier (from industry {{ factory_name }})</h3>
+              <h3 style="color: #b62373">Edit sub-supplier (from site {{ factory_name }})</h3>
               <v-form
                   v-model="new_supply_chain_valid"
               >
@@ -937,16 +937,16 @@ export default {
         new_assessment: {v_model: false, text: "New assessment created correctly", },
         edit_assessment: {v_model: false, text: "Assessment edited correctly", },
         delete_assessment: {v_model: false, text: "Assessment deleted correctly", },
-        new_industry: {v_model: false, text: "New industry added correctly", },
-        edit_industry: {v_model: false, text: "Industry edited correctly", },
-        delete_industry: {v_model: false, text: "Industry deleted correctly", },
-        delete_sc: {v_model: false, text: "Supplier deleted correctly", },
-        assessment_not_selected: {v_model: false, text: "Can't create industry, please select and assessment first", },
-        create_industry_not_in_map: {v_model: false, text: "Can't create industry, please return to the map tab and try again", },
-        place_supply_chain: {v_model: false, text: "Please, indicate the location of the supplier on the map"},
-        new_supply_chain: {v_model: false, text: "New supplier added", },
+        new_industry: {v_model: false, text: "New site added correctly", },
+        edit_industry: {v_model: false, text: "Site edited correctly", },
+        delete_industry: {v_model: false, text: "Site deleted correctly", },
+        delete_sc: {v_model: false, text: "Sub-supplier deleted correctly", },
+        assessment_not_selected: {v_model: false, text: "Can't create site, please select and assessment first", },
+        create_industry_not_in_map: {v_model: false, text: "Can't create site, please return to the map tab and try again", },
+        place_supply_chain: {v_model: false, text: "Please, indicate the location of the Sub-supplier on the map"},
+        new_supply_chain: {v_model: false, text: "New sub-supplier added", },
         wrong_location: {v_model: false, text: "Please select a valid location", },
-        edit_sc: {v_model: false, text: "supplier edited correctly", },
+        edit_sc: {v_model: false, text: "sub-supplier edited correctly", },
 
 
       },
@@ -1347,14 +1347,14 @@ export default {
         return company.name === value
       })
       if (factories_with_same_name.length === 0) return true
-      else return 'An industry with same name already exists. '
+      else return 'A site with same name already exists. '
     },
     new_supply_chain_rules_name(value){
 
       if (this.created_assessments[this.assessment_expansion_panel].industries[this.selected_industry].supply_chain.filter(industry => {
         return industry.name == value
       }).length === 0) return true
-      else return "Supplier with same name already exists"
+      else return "Sub-supplier with same name already exists"
     },
     rules_required(value) {
       if(!!value) return true

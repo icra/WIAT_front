@@ -118,7 +118,7 @@
           <v-expansion-panel>
 
             <v-expansion-panel-header color="#1c195b" >
-              <h3 style="color: white">SHOW ADVANCED INPUTS</h3>
+              <h3 style="color: white">SHOW ADVANCED DATA INPUTS</h3>
               <template v-slot:actions>
                 <v-icon color="white">
                   $expand

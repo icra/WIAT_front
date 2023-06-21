@@ -139,7 +139,7 @@
               @change="onChangeCombobox"
           >
             <template v-slot:label>
-              To add contaminants in this industry, first select them from this menu. If the one you want to add is not there, add it yourself and then add the parameters in the
+              To add pollutants in this site, first select them from this menu. If the one you want to add is not there, add it yourself and then add the parameters in the
 
               <v-tooltip top>
                 <template v-slot:activator="{ on, attrs }">
@@ -189,7 +189,7 @@
             <div style="height: 100%; display: flex; justify-content: space-between; width: 90%">
               <div>
                 <span>
-                  Concentration of {{pollutant}} in the water used by the industry (and before being treated in a WWTP)
+                  Concentration of {{pollutant}} in the water used by the site (and before being treated in a WWTP)
                 </span>
                 <v-tooltip bottom v-if="user_inputs[industry_input].hasOwnProperty('description_tooltip')">
                   <template v-slot:activator="{ on, attrs }">
@@ -249,7 +249,7 @@
       <v-expansion-panels style="padding-top: 20px">
         <v-expansion-panel>
           <v-expansion-panel-header color="#1c195b">
-            <h3 style="color: white">SHOW ADVANCED INPUTS</h3>
+            <h3 style="color: white">SHOW ADVANCED DATA INPUTS</h3>
             <template v-slot:actions>
               <v-icon color="white">
                 $expand
@@ -272,7 +272,7 @@
                     <div style="height: 100%; display: flex; justify-content: space-between; width: 90%">
                       <div>
                       <span>
-                        Industry withdrawal water {{pollutant}} concentration (surface water only)
+                        Site withdrawal water {{pollutant}} concentration (surface water only)
                       </span>
                         <v-tooltip bottom v-if="user_inputs[industry_input].hasOwnProperty('description_tooltip')">
                           <template v-slot:activator="{ on, attrs }">

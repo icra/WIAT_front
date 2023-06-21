@@ -111,7 +111,7 @@ let external_indicators = {
                 header: {
                     "withdrawals": 'Surface and groundwater withdrawals',
                     "consumption": 'Water withdrawals minus total discharges',
-                    "water_stress": 'Says if industry location has a Baseline water stress equal to/greater than 40% (WRI Aqueduct).'
+                    "water_stress": 'Says if site location has a Baseline water stress equal to/greater than 40% (WRI Aqueduct).'
                 }
             }
 

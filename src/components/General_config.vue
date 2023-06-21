@@ -146,7 +146,7 @@
 
         <template v-slot:no-data>
           <br>
-          <h2>Create industries or add pollutants first!</h2>
+          <h2>Create sites or add pollutants first!</h2>
         </template>
       </v-data-table>
     </v-card>

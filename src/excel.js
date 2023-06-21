@@ -146,7 +146,7 @@ function parse_industry_locations(industries){
 
         let assessment = created_assessments.find(a => a.name === industry_assessment)
         if (assessment == null){
-            throw "INDUSTRY "+industry_name+" PLACED IN NON EXISTING ASSESSMENT"
+            throw "SITE "+industry_name+" PLACED IN NON EXISTING ASSESSMENT"
         }
 
         let new_industry = _parse_industry_location(industry)
@@ -169,14 +169,14 @@ function _parse_industry_location(industry){
 
     let assessment = created_assessments.find(a => a.name === industry_assessment)
     if (assessment == null){
-        throw "INDUSTRY "+industry_name+" PLACED IN NON EXISTING ASSESSMENT"
+        throw "SITE "+industry_name+" PLACED IN NON EXISTING ASSESSMENT"
     }
     if(industry_latitude == null || industry_longitude == null){
-        throw "INDUSTRY "+industry_name+" HAS NO LOCATION"
+        throw "SITE "+industry_name+" HAS NO LOCATION"
     }
 
     //check if location is valid
-    if(utils.get_country_code_from_coordinates(industry_latitude, industry_longitude) == null) throw new Error('COORDINATES OF INDUSTRY '+industry_name+' NOT VALID')
+    if(utils.get_country_code_from_coordinates(industry_latitude, industry_longitude) == null) throw new Error('COORDINATES OF SITE '+industry_name+' NOT VALID')
 
     let new_industry = new Industry()
     new_industry.name = industry_name
@@ -190,7 +190,7 @@ function _parse_industry_location(industry){
         let supplier_latitude = supplier.latitude
         let supplier_longitude = supplier.longitude
 
-        if(supplier_name == null) throw "SUPPLIER HAS NO NAME"
+        if(supplier_name == null) throw "SUB-SUPPLIER HAS NO NAME"
 
         if(supplier_latitude == null || supplier_longitude == null){
             throw supplier_name+" MISSING COORDINATES"
@@ -613,15 +613,15 @@ function parse_excel_new_industry(file){
 
                         let industry_name = sheet.getRow(4).getCell(5).value
 
-                        if (industry_name == null) throw("INDUSTRY NAME IS MISSING")
+                        if (industry_name == null) throw("SITE NAME IS MISSING")
 
                         let latitude = sheet.getRow(5).getCell(5).value
 
-                        if (latitude == null) throw("INDUSTRY LATITUDE IS MISSING")
+                        if (latitude == null) throw("SITE LATITUDE IS MISSING")
 
                         let longitude = sheet.getRow(6).getCell(5).value
 
-                        if (longitude == null) throw("INDUSTRY LONGITUDE IS MISSING")
+                        if (longitude == null) throw("SITE LONGITUDE IS MISSING")
 
 
                         //check if assessment exists

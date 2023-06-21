@@ -2,7 +2,7 @@
 
 ## Versions
 ```
-Node 16.8.1 or less
+Node 16.18.1 or less
 ```
 
 ## Project setup

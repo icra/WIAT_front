@@ -4,7 +4,7 @@
     <div v-if="is_there_any_industry_created" style="height: 100%;">
 
       <div v-if="assessment_id != null && (this.assessments_with_industries[this.assessment_id] == undefined || this.assessments_with_industries[this.assessment_id].disabled)" style="height: 100%;">
-        <p class="side_menu_title">Please create an industry first and fill in the required data to see statistics of the current assessment.</p>
+        <p class="side_menu_title">Please create a site first and fill in the required data to see statistics of the current assessment.</p>
       </div>
 
       <div v-else>
@@ -16,9 +16,9 @@
                   v-model="main_tab"
               >
                 <v-tabs-slider color="#b62373"></v-tabs-slider>
-                <v-tab style="border-color: #b62373">INDUSTRIES</v-tab>
+                <v-tab style="border-color: #b62373">SITES</v-tab>
                 <v-tab style="border-color: #b62373">EXTERNAL REPORTING</v-tab>
-                <v-tab style="border-color: #b62373">EDIT INDUSTRY</v-tab>
+                <v-tab style="border-color: #b62373">EDIT SITE</v-tab>
                 <v-tab style="border-color: #b62373">GLOBAL INDICATORS</v-tab>
                 <v-tab style="border-color: #b62373">EXPORT</v-tab>
               </v-tabs>
@@ -79,7 +79,7 @@
                                   >mdi-information-outline</v-icon>
                                 </template>
                                 <span>
-                                Overall water risk measures all water-related risks of an industry and all its suppliers, by aggregating all indicators from the Physical Quantity, Quality and Regulatory & Reputational Risk categories. Higher values indicate higher water risk.
+                                Overall water risk measures all water-related risks of a site and all its sub-suppliers, by aggregating all indicators from the Physical Quantity, Quality and Regulatory & Reputational Risk categories. Higher values indicate higher water risk.
 
                                 <br>
                                 <b>Source: Aqueduct</b>
@@ -132,7 +132,7 @@
                                   </v-icon>
 
                                 </template>
-                                <span><b>Warning</b>: The industry has some mandatory entries that are not configured, and the impact estimation may not be completely accurate. </span>
+                                <span><b>Warning</b>: The site has some mandatory entries that are not configured, and the impact estimation may not be completely accurate. </span>
 
                               </v-tooltip>
                             </template>
@@ -484,7 +484,7 @@
                       <v-card flat style="margin-left: 10px;">
 
                         <div>
-                          <p class="side_menu_title">Select industry to edit</p>
+                          <p class="side_menu_title">Select site to edit</p>
 
 
                           <v-list dense>
@@ -514,7 +514,7 @@
                             </v-list-item-group>
                           </v-list>
                           <v-btn  :to="{ name: 'edit_industry', params: {assessment_id: assessment_idx, industry_id: radio_industry_edit}}" tile color="#b62373" :disabled="radio_industry_edit == null">
-                            EDIT INDUSTRY
+                            EDIT SITE
                           </v-btn>
 
                         </div>
@@ -538,9 +538,9 @@
 
                         <div>
 
-                          <p class="side_menu_title">Global indicators on industries and suppliers</p>
+                          <p class="side_menu_title">Global indicators on sites and sub-suppliers</p>
                           <div class="instructions_2">
-                            *This step may require a some time, depending on the selected layers and the industries created
+                            *This step may require a some time, depending on the selected layers and the sites created
                           </div>
                           <v-row
                               class="pa-4"
@@ -793,7 +793,7 @@
     </div>
 
     <div v-else>
-      <p class="side_menu_title">Please create an industry first and fill in the required data to generate a report.</p>
+      <p class="side_menu_title">Please create a site first and fill in the required data to generate a report.</p>
     </div>
 
   </div>
@@ -919,7 +919,7 @@ export default {
           avg_treatment_efficiency: "Percentage of treatment efficiency (compared to WWTP influent)",
           impact_biodiversity: "Impact on biodiversity and ecosystems",
           eqs: "Concentration of the pollutants in the effluent (with respect to EQS)",
-          avg_influent_efficiency: "Percentage of treatment efficiency (compared to industry influent)",
+          avg_influent_efficiency: "Percentage of treatment efficiency (compared to site influent)",
           pollution: "Pollution impact",
           energy_used_text: "Energy used",
           ecotoxicology: "Ecotoxicology indicators"
@@ -1374,7 +1374,7 @@ export default {
       let industries = this.created_assessments[this.tab].industries.map(x => x.name)
       let sc = this.created_assessments[this.tab].industries.map(industry => {
         return industry.supply_chain.map(sc => {
-          return sc.name+" (Supply chain of "+industry.name+")"
+          return sc.name+" (Sub-supplier of "+industry.name+")"
         })
       }).flat(2)
       return [...industries, ...sc]
@@ -1386,7 +1386,7 @@ export default {
 
     get_supply_chain(industry){
       let header = [
-        {text: "Supply chain", value: "name"},
+        {text: "Sub-supplier", value: "name"},
         {text: "Latitude", value: "lat"},
         {text: "Longitude", value: "lng"}
       ]
@@ -1609,7 +1609,7 @@ export default {
       if(_this.tab !== undefined){
 
         let pollutants_table = {
-          header: [{text: "Name", value: "value", sortable: false}, {text: "Country", value: "country", sortable: false}, {text: "Number of suppliers", value: "supply_chain_number", sortable: true}, {text: "Impact of industrial wastewater on water quality", value: "pollution_impact", sortable: false}, {text: "Impact of industrial wastewater on water availability", value: "freshwater_impact", sortable: false}, {text: "GHG emissions from wastewater treatment", value: "carbon_impact", sortable: true}, {text: "Overall water risk", value: "owr", sortable: true}, {text: "", value: "warning", sortable: false}],
+          header: [{text: "Name", value: "value", sortable: false}, {text: "Country", value: "country", sortable: false}, {text: "Number of sub-suppliers", value: "supply_chain_number", sortable: true}, {text: "Impact of industrial wastewater on water quality", value: "pollution_impact", sortable: false}, {text: "Impact of industrial wastewater on water availability", value: "freshwater_impact", sortable: false}, {text: "GHG emissions from wastewater treatment", value: "carbon_impact", sortable: true}, {text: "Overall water risk", value: "owr", sortable: true}, {text: "", value: "warning", sortable: false}],
           value: []
         }
 
@@ -1664,7 +1664,7 @@ export default {
             })
             industry.supply_chain.forEach(sc => {
               industries_and_supply_chain.push({
-                name: sc.name + " (Supply chain of "+industry.name+")",
+                name: sc.name + " (Sub-supplier of "+industry.name+")",
                 location: sc.location
               })
             })
@@ -1784,7 +1784,7 @@ export default {
                 headerRows: 1,
                 body: [
                   [
-                    {text:'Industry', style: "bold"},
+                    {text:'Site', style: "bold"},
                   ]
                 ]
               }
@@ -1815,7 +1815,7 @@ export default {
               let lat = supply_chain.location.lat
               let lng = supply_chain.location.lng
 
-              let row = [supply_chain.name + " (Supplier)"]
+              let row = [supply_chain.name + " (Sub-supplier)"]
               for (let [layer_name, layer] of chunk) {
                 let baseline_data = await layer["data_for_report"](lat, lng)
                 row.push({text: baseline_data, fillColor: this.getGISLayerColorPDF(layer_name, baseline_data)})
@@ -1864,7 +1864,7 @@ export default {
             [
               {text:'Name', style: "bold"},
               {text:'Country', style: "bold"},
-              {text:'Number of suppliers', style: "bold"},
+              {text:'Number of sub-suppliers', style: "bold"},
               {text:"Impact of industrial wastewater on water quality", style: "bold"},
               {text:"Impact of industrial wastewater on water availability", style: "bold"},
               {text:"GHG emissions from wastewater treatment", style: "bold"},
@@ -1911,7 +1911,7 @@ export default {
       if (industries_not_completed.length > 0){
         dd.content.push("\n\n")
         dd.content.push({
-          text: "The following industries have not all the mandatory data settled, and they results may not be accurate:\n\n",
+          text: "The following sites have not all the mandatory data settled, and they results may not be accurate:\n\n",
           color: '#b62373',
           bold: true
         })
@@ -1931,7 +1931,11 @@ export default {
         text: "Summary\n\n",
         style: 'header',
         color: '#b62373'
+      })
 
+      dd.content.push({
+        text: 'We only present indicators related to \'change in the state of nature\' with \'medium\' or higher impact. ',
+        style: 'bold',
       })
 
       let industriesIndicator = {
@@ -1940,7 +1944,7 @@ export default {
           body: [
             [
               {text:'Assessment', style: "bold"},
-              {text:'Industry', style: "bold"},
+              {text:'Site', style: "bold"},
               {text:'Impact',style: "bold"},
               {text:'Statistic',style: "bold"},
               {text:"Value",style: "bold"},
@@ -2407,7 +2411,7 @@ export default {
       let _this = this
 
       dd.content.push({
-        text: "Increase in temperature in the receiving water body due to industry discharge\n\n",
+        text: "Increase in temperature in the receiving water body due to site discharge\n\n",
         style: 'subsubheader'
       })
 
@@ -2555,7 +2559,7 @@ export default {
     concentration_pollutants_effluent_pdf(dd, industry) {
 
       dd.content.push({
-        text: "Pollutants in the industry effluent\n\n",
+        text: "Pollutants in the site effluent\n\n",
         style: 'subsubheader'
       })
 
@@ -3066,7 +3070,7 @@ export default {
           headerRows: 1,
           body: [
             [
-              {text:'Industry', style: "bold"},
+              {text:'Site', style: "bold"},
               {text:[{text: 'Water withdrawal (', style: "bold",}, {text: 'GRI 303-1', style: "bold", color: "blue", link: "https://www.globalreporting.org/standards/media/1909/gri-303-water-and-effluents-2018.pdf"}, {text: ') (m3/year)', style: "bold",}], },
               {text:[{text: 'Effect of water withdrawal on the water body (', style: "bold",}, {text: 'GRI 303-2', style: "bold", color: "blue", link: "https://www.globalreporting.org/standards/media/1909/gri-303-water-and-effluents-2018.pdf"}, {text: ') (%)', style: "bold",}], },
               {text:[{text: 'Water recycled and reused (', style: "bold",}, {text: 'GRI 303-3', style: "bold", color: "blue", link: "https://www.globalreporting.org/standards/media/1909/gri-303-water-and-effluents-2018.pdf"}, {text: ') (%)', style: "bold",}], },
@@ -3240,7 +3244,7 @@ export default {
 
           dd.content.push({
             text: [{
-              text: "Industry: ",
+              text: "Site: ",
               style: 'industry_title',
               color: "#b62373"
             },
