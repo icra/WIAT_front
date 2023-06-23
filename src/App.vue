@@ -43,11 +43,11 @@
                   </video>
 
                   <br><br>
-                  <b>Download the files used on the video and import them on the web:</b>
+                  <b>Download the files used on the video and test them on the web!</b>
                   <ul>
-                    <li><a href="dummy_files/dummy session.json" download>Import a previously exported session</a></li>
-                    <li><a href="dummy_files/wiat_locations.xlsx" download>Upload site locations excel</a></li>
-                    <li><a href="dummy_files/wiat_template.xlsx" download>Upload site data inputs excel</a></li>
+                    <li><a href="dummy_files/dummy session.json" download>Exported session in JSON</a></li>
+                    <li><a href="dummy_files/wiat_locations.xlsx" download>Site locations in excel</a></li>
+                    <li><a href="dummy_files/wiat_template.xlsx" download>Site data inputs in excel</a></li>
 
                   </ul>
 
@@ -901,6 +901,34 @@
       </template>
     </v-snackbar>
 
+    <!-- main pop up-->
+    <v-dialog
+        v-model="dialog_tutorial_popup"
+        width="700"
+        scrollable
+    >
+      <div style="background-color: white; overflow: hidden">
+
+        <v-card flat  style="padding: 40px">
+
+          <div style="padding: 0px 50px 0px 50px">
+            <p><b style = "color: #b62373">Wastewater Impact Assessment Tool (WIAT)</b> aims to provide a site-level assessment of the pressures resulting from the industrial activities, also called change in the State of Nature under the SBTN methodology. These changes lead to impacts on climate, biodiversity, and water security.</p>
+            <p>The current tool allows users to visualize the impacts of wastewater per site through key indicators:</p>
+            <ul>
+              <li>Water quality</li>
+              <li>Water availability</li>
+              <li>GHG emissions from wastewater treatment</li>
+            </ul>
+            <p style="padding-top: 20px">These indicators are evaluated within the local watershed context documented by global datasets. The tool enables the prioritization of sites within the company, highlighting the impact level and pointing to where action is most needed.</p>
+            <p>To begin with, select the <b style = "color: #b62373">Documents</b> in the menu bar to view the user guide, and the science and methods that support the calculations and tool. You can also watch a video tutorial on how to use the tool selecting <b style = "color: #b62373">How to use</b>. </p>
+          </div>
+
+        </v-card>
+
+      </div>
+    </v-dialog>
+
+
   </v-app>
 </template>
 
@@ -971,7 +999,8 @@ export default {
       dialog_about: false,
       dialog_documents: false,
       dialog_contact: false,
-      dialog_legal: false
+      dialog_legal: false,
+      dialog_tutorial_popup: true
     }
   },
 

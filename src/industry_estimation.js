@@ -819,6 +819,11 @@ export let industry_estimations = {
                 let lng = location.lng
                 let code = utils.get_country_code_from_coordinates(lat, lng)
                 if(code == null) return null
+
+                //check if undefined
+                if (Countries[code] === undefined) return null
+                if (Countries[code].conv_kwh_co2 === undefined) return null
+
                 return Countries[code].conv_kwh_co2
             },
             wwt_biog_pro: function(){
