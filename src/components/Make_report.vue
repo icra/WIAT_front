@@ -3400,8 +3400,6 @@ export default {
     })
     let indexFirstValid = this.assessments_with_industries.findIndex(assessment => assessment.disabled == false)
 
-
-    console.log(this.assessment_id)
     if(indexFirstValid >= 0 && this.assessment_id == null) {
       this.selected_assessment = this.assessments_with_industries[indexFirstValid].assessment.name
     }else if(indexFirstValid >= 0) {

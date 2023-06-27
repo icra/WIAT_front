@@ -3,7 +3,6 @@ import App from './App.vue'
 import router from './router'
 import vuetify from './plugins/vuetify'
 
-
 Vue.config.productionTip = false
 
 import "@/assets/global.css"
@@ -620,6 +619,8 @@ Vue.prototype.$created_pollutants = new Set() //Created pollutants among all ass
 //WIAT loads some necessary elements when the main page (map component) is loaded, so if the map component has not
 //been accessed yet, we should redirect to the map component
 Vue.prototype.$first_page_loaded = false
+
+
 
 new Vue({
   router,

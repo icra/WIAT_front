@@ -928,6 +928,65 @@
       </div>
     </v-dialog>
 
+    <v-dialog
+        v-model="dialog_tutorial_popup"
+        width="700"
+        scrollable
+    >
+      <div style="background-color: white; overflow: hidden">
+
+        <v-card flat  style="padding: 40px">
+
+          <div style="padding: 0px 50px 0px 50px">
+            <p><b style = "color: #b62373">Wastewater Impact Assessment Tool (WIAT)</b> aims to provide a site-level assessment of the pressures resulting from the industrial activities, also called change in the State of Nature under the SBTN methodology. These changes lead to impacts on climate, biodiversity, and water security.</p>
+            <p>The current tool allows users to visualize the impacts of wastewater per site through key indicators:</p>
+            <ul>
+              <li>Water quality</li>
+              <li>Water availability</li>
+              <li>GHG emissions from wastewater treatment</li>
+            </ul>
+            <p style="padding-top: 20px">These indicators are evaluated within the local watershed context documented by global datasets. The tool enables the prioritization of sites within the company, highlighting the impact level and pointing to where action is most needed.</p>
+            <p>To begin with, select the <b style = "color: #b62373">Documents</b> in the menu bar to view the user guide, and the science and methods that support the calculations and tool. You can also watch a video tutorial on how to use the tool selecting <b style = "color: #b62373">How to use</b>. </p>
+          </div>
+
+        </v-card>
+
+      </div>
+    </v-dialog>
+
+    <v-dialog
+        v-model="cookies_modal"
+        width="70%"
+        scrollable
+    >
+      <div style="background-color: white">
+
+        <v-card flat  style="padding: 40px">
+
+          <div style="padding: 0px 50px 0px 50px">
+            <cookie_policy></cookie_policy>
+          </div>
+
+        </v-card>
+
+      </div>
+    </v-dialog>
+
+
+    <footer v-show="cookies_footer && !dialog_tutorial_popup">
+      <cookie-law
+          theme="dark-lime"
+          :buttonDecline = "true"
+          v-on:accept="accept_cookies()"
+          v-on:decline="decline_cookies()"
+          buttonText="Accept">
+        <div slot="message">
+          This site uses cookies to offer you a better browsing experience. Find out more on how we use them and how you can change your settings <a class="moreInfo" @click="openCookiesModal()"><b style="color: #b62373">HERE</b></a>.
+        </div>
+      </cookie-law>
+
+    </footer>
+
 
   </v-app>
 </template>
@@ -935,7 +994,14 @@
 <script>
 import {Assessment, Industry } from "./ecam_backend";
 import Vue from "vue";
+import CookieLaw from 'vue-cookie-law'
+import Cookie_policy from "@/components/cookie_policy.vue";
+import {bootstrap} from "vue-gtag";
+
+
 export default {
+  components: {Cookie_policy, CookieLaw },
+
   data () {
     return {
       show_tip: true,
@@ -1000,7 +1066,9 @@ export default {
       dialog_documents: false,
       dialog_contact: false,
       dialog_legal: false,
-      dialog_tutorial_popup: true
+      dialog_tutorial_popup: true,
+      cookies_footer: true,
+      cookies_modal: false,
     }
   },
 
@@ -1024,9 +1092,20 @@ export default {
         })
       }
     }
+
+    console.log(this.getCookies())
+    if(!this.getCookies() === true) this.cookies_footer = true;
   },
 
   watch: {
+
+    //when closing cookies modal, open cooking footer again to accept or decline
+    cookies_modal: function(newVal){
+      if(!newVal) {
+        this.cookies_footer = true
+      }
+    },
+
     //If opened, sets video tutorial under "how to use" to the beginning
     dialog_tour: function(opened){
       if(!opened){
@@ -1065,6 +1144,31 @@ export default {
   },
 
   methods: {
+    accept_cookies(){
+      // eslint-disable-next-line
+      bootstrap().then(gtag =>{
+        this.cookies_footer = false;
+        //location.reload();
+      });
+      console.log("Accepted COOKIES")
+    },
+    decline_cookies(){
+      this.cookies_footer = false;
+      //localStorage.setItem('GDPR:accepted', 'false');
+      console.log("Declined COOKIES")
+    },
+    getCookies(){
+
+      console.log(localStorage.getItem('cookie:accepted'))
+
+      return localStorage.getItem('cookie:accepted');
+    },
+
+    openCookiesModal(){
+      this.cookies_footer= false
+      this.cookies_modal = true
+    },
+
     //Call function from map component
     add_supply_chain_industry(){
       try {
@@ -1635,6 +1739,8 @@ v-btn--disabled{
 
 
 
+
+
 .v-picker--date .v-btn__content {
   color: #646464 !important ;
 }
@@ -1643,6 +1749,30 @@ v-btn--disabled{
   color: white !important ;
 }
 
+
+.Cookie--dark-lime {
+  background-color: #262626;
+}
+
+
+.Cookie--dark-lime .Cookie__button {
+  background-color: #b62373;
+}
+
+.Cookie--dark-lime .Cookie__button:hover {
+  background-color: #b62373;
+}
+
+.Cookie--dark-lime .Cookie__button--decline {
+  background-color: #b62373;
+  color: #FFFFFF;
+}
+
+.Cookie--dark-lime .Cookie__button--decline:hover {
+  background-color: #b62373;
+  color: #FFFFFF;
+
+}
 
 
 

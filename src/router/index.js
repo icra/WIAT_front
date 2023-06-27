@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
+import VueGtag from 'vue-gtag'
 
 
 const Map = () => import('../components/Map')
@@ -59,5 +60,16 @@ const router = new VueRouter({
   mode: "hash",
   routes
 })
+
+const getCookies = localStorage.getItem('cookie:accepted');
+//const getCookies = localStorage.getItem('GA:accepted');
+
+Vue.use(VueGtag, {
+  config: {
+    id: 'G-VFVWVGECE2'
+  },
+  bootstrap: getCookies === 'true',
+  enabled: getCookies === 'true',
+}, router);
 
 export default router
